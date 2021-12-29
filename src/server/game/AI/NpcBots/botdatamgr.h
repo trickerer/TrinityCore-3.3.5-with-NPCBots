@@ -4,6 +4,7 @@
 #include "botcommon.h"
 
 #include <set>
+#include <shared_mutex>
 
 class Creature;
 
@@ -101,6 +102,8 @@ public:
     float armorPenPct;
 };
 
+typedef std::set<Creature const*> NpcBotRegistry;
+
 class BotDataMgr
 {
     public:
@@ -120,9 +123,11 @@ class BotDataMgr
         static void RegisterBot(Creature const* bot);
         static void UnregisterBot(Creature const* bot);
         static Creature const* FindBot(uint32 entry);
+        static NpcBotRegistry const& GetExistingNPCBots();
+
+        static std::shared_mutex* GetLock();
 
     private:
-
         BotDataMgr() {}
         BotDataMgr(BotDataMgr const&);
 };

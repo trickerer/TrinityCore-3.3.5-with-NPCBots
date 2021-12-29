@@ -8,8 +8,6 @@
 #include "ObjectMgr.h"
 #include "StringConvert.h"
 #include "WorldDatabase.h"
-
-#include <shared_mutex>
 /*
 Npc Bot Data Manager by Trickerer (onlysuffering@gmail.com)
 NpcBots DB Data management
@@ -19,15 +17,18 @@ NpcBots DB Data management
 typedef std::unordered_map<uint32 /*entry*/, NpcBotData*> NpcBotDataMap;
 typedef std::unordered_map<uint32 /*entry*/, NpcBotAppearanceData*> NpcBotAppearanceDataMap;
 typedef std::unordered_map<uint32 /*entry*/, NpcBotExtras*> NpcBotExtrasMap;
-typedef std::set<Creature const*> NpcBotRegistry;
 NpcBotDataMap _botsData;
 NpcBotAppearanceDataMap _botsAppearanceData;
 NpcBotExtrasMap _botsExtras;
 NpcBotRegistry _existingBots;
 
-static std::shared_mutex _lock;
-
 bool allBotsLoaded = false;
+
+std::shared_mutex* BotDataMgr::GetLock()
+{
+    static std::shared_mutex _lock;
+    return &_lock;
+}
 
 bool BotDataMgr::AllBotsLoaded()
 {
@@ -484,7 +485,7 @@ void BotDataMgr::RegisterBot(Creature const* bot)
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(_lock);
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
 
     _existingBots.insert(bot);
     //TC_LOG_ERROR("entities.unit", "BotDataMgr::RegisterBot: registered bot %u (%s)", bot->GetEntry(), bot->GetName().c_str());
@@ -498,14 +499,14 @@ void BotDataMgr::UnregisterBot(Creature const* bot)
         return;
     }
 
-    std::unique_lock<std::shared_mutex> lock(_lock);
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
 
     _existingBots.erase(bot);
     //TC_LOG_ERROR("entities.unit", "BotDataMgr::UnregisterBot: unregistered bot %u (%s)", bot->GetEntry(), bot->GetName().c_str());
 }
 Creature const* BotDataMgr::FindBot(uint32 entry)
 {
-    std::shared_lock<std::shared_mutex> lock(_lock);
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
 
     for (NpcBotRegistry::const_iterator ci = _existingBots.begin(); ci != _existingBots.end(); ++ci)
     {
@@ -513,4 +514,9 @@ Creature const* BotDataMgr::FindBot(uint32 entry)
             return *ci;
     }
     return nullptr;
+}
+
+NpcBotRegistry const& BotDataMgr::GetExistingNPCBots()
+{
+    return _existingBots;
 }

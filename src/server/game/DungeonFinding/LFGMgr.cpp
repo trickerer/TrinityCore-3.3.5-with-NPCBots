@@ -813,6 +813,9 @@ void LFGMgr::UpdateRoleCheck(ObjectGuid gguid, ObjectGuid guid /* = ObjectGuid::
         if (Player* player = ObjectAccessor::FindPlayer(guid))
             roles = FilterClassRoles(player, roles);
         else
+        //npcbot: allow bots to pass through, bot roles are checked elsewhere
+        if (guid.IsPlayer())
+        //end npcbot
             return;
     }
 

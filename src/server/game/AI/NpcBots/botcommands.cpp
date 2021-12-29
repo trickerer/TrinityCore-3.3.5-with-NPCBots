@@ -130,6 +130,7 @@ public:
             { "revive",     HandleNpcBotReviveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_REVIVE,             Console::No  },
             { "reloadconfig",HandleNpcBotReloadConfigCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_RELOADCONFIG,       Console::Yes },
             { "command",    npcbotCommandCommandTable                                                                               },
+            { "spawned",    HandleNpcBotSpawnedCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
             { "info",       HandleNpcBotInfoCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_INFO,               Console::No  },
             { "hide",       HandleNpcBotHideCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_HIDE,               Console::No  },
             { "unhide",     HandleNpcBotUnhideCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_UNHIDE,             Console::No  },
@@ -1263,6 +1264,57 @@ public:
         sObjectMgr->AddCreatureToGrid(db_guid, sObjectMgr->GetCreatureData(db_guid));
 
         handler->SendSysMessage("NpcBot successfully spawned");
+        return true;
+    }
+
+    static bool HandleNpcBotSpawnedCommand(ChatHandler* handler)
+    {
+        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
+        std::stringstream ss;
+        if (all_bots.empty())
+            ss << "No spawned bots found!";
+        else
+        {
+            ss << "Found " << uint32(all_bots.size()) << " bots:";
+            uint32 counter = 0;
+            for (Creature const* bot : all_bots)
+            {
+                ++counter;
+
+                std::string bot_color_str;
+                std::string bot_class_str;
+                switch (bot->GetBotClass())
+                {
+                    case BOT_CLASS_WARRIOR:     bot_color_str = "ffc79c6e"; bot_class_str = "Warrior";            break;
+                    case BOT_CLASS_PALADIN:     bot_color_str = "fff58cba"; bot_class_str = "Paladin";            break;
+                    case BOT_CLASS_HUNTER:      bot_color_str = "ffabd473"; bot_class_str = "Hunter";             break;
+                    case BOT_CLASS_ROGUE:       bot_color_str = "fffff569"; bot_class_str = "Rogue";              break;
+                    case BOT_CLASS_PRIEST:      bot_color_str = "ffffffff"; bot_class_str = "Priest";             break;
+                    case BOT_CLASS_DEATH_KNIGHT:bot_color_str = "ffc41f3b"; bot_class_str = "Death Knight";       break;
+                    case BOT_CLASS_SHAMAN:      bot_color_str = "ff0070de"; bot_class_str = "Shaman";             break;
+                    case BOT_CLASS_MAGE:        bot_color_str = "ff69ccf0"; bot_class_str = "Mage";               break;
+                    case BOT_CLASS_WARLOCK:     bot_color_str = "ff9482c9"; bot_class_str = "Warlock";            break;
+                    case BOT_CLASS_DRUID:       bot_color_str = "ffff7d0a"; bot_class_str = "Druid";              break;
+                    case BOT_CLASS_BM:          bot_color_str = "ffa10015"; bot_class_str = "Blademaster";        break;
+                    case BOT_CLASS_SPHYNX:      bot_color_str = "ff29004a"; bot_class_str = "Obsidian Destroyer"; break;
+                    case BOT_CLASS_ARCHMAGE:    bot_color_str = "ff028a99"; bot_class_str = "Archmage";           break;
+                    case BOT_CLASS_DREADLORD:   bot_color_str = "ff534161"; bot_class_str = "Dreadlord";          break;
+                    case BOT_CLASS_SPELLBREAKER:bot_color_str = "ffcf3c1f"; bot_class_str = "Spellbreaker";       break;
+                    case BOT_CLASS_DARK_RANGER: bot_color_str = "ff3e255e"; bot_class_str = "Dark Ranger";        break;
+                    default:                    bot_color_str = "ffffffff"; bot_class_str = "Unknown";            break;
+                }
+
+                AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
+                std::string zone_name = zone ? zone->AreaName[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
+
+                ss << "\n" << counter << ") " << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
+                    << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << "\" - "
+                    << (bot->IsFreeBot() ? (bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : "free") : "active");
+            }
+        }
+
+        handler->SendSysMessage(ss.str().c_str());
         return true;
     }
 
