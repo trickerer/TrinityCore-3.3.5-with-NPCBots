@@ -4396,3 +4396,62 @@ NpcBot.OwnershipExpireTime = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+#Skip Death Knight Starting Area#
+#################################
+#
+#    Skip Death Knight Starting Area
+#        Enable this if you want to skip the Deathknight starting area
+#        Start with level 58 DK with Runeforging.
+#
+#    Skip.Deathknight.Starter.Announce.enable
+#         Description: Announces Module when player logs in.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+Skip.Deathknight.Starter.Announce.enable = 1
+
+#    Skip.DeathKnight.Starter.Enable
+#         Active Module for all new accounts regardless of account level.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+Skip.Deathknight.Starter.Enable = 1
+
+#    GM.Skip.Deathknight.Starter.Enable
+#         Active Module for all new accounts of a GM account level ONLY.
+#         Ensure you have Skip.Deathknight.Starter.Enable set to 0 if using this conf.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+
+GM.Skip.Deathknight.Starter.Enable = 0
+
+#    Skip.Deathknight.Start.Level
+#         Adjusted Death Knight Start Level if module is used.
+#         Default:    58 - (Default)
+#
+
+Skip.Deathknight.Start.Level = 70
+
+#	Skip.DeathKnight.EndLocation.Override.Enable = 0	
+#	Skip.DeathKnight.EndLocation.Override.MapID = 1
+#	Skip.DeathKnight.EndLocation.Override.X = 16226.2
+#	Skip.DeathKnight.EndLocation.Override.Y = 16257	
+#	Skip.DeathKnight.EndLocation.Override.Z = 13.2	
+#	Skip.DeathKnight.EndLocation.Override.O = 1.65	
+#		Note: The location in the example above is GM Island		
+#		If Enabled and Values populated it overrides where the DKs start (instead of stormwind/org)
+#		Default: 0 - (Disabled)
+#				 1 - (Enabled)
+#
+
+Skip.DeathKnight.EndLocation.Override.Enable = 1
+Skip.DeathKnight.EndLocation.Override.MapID = 1
+Skip.DeathKnight.EndLocation.Override.X = 16226.2
+Skip.DeathKnight.EndLocation.Override.Y = 16257
+Skip.DeathKnight.EndLocation.Override.Z = 13.2
+Skip.DeathKnight.EndLocation.Override.O = 1.65
+
+#
+###################################################################################################
