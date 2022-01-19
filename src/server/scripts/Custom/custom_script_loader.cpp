@@ -23,6 +23,6 @@ void AddSC_skip_StarterArea();
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
 {
-    AddSC_LearnSpellsOnLevelUp();
+	AddSC_LearnSpellsOnLevelUp();
 	AddSC_skip_StarterArea();
 }

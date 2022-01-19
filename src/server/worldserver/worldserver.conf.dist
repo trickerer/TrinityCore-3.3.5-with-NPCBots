@@ -38,6 +38,8 @@
 #    PACKET SPOOF PROTECTION SETTINGS
 #    MISC ANTI-CHEAT SETTINGS
 #    METRIC SETTINGS
+#    Skip Death Knight Starting Area
+#	 ELUNA SETTINGS
 #
 ###################################################################################################
 
@@ -4481,6 +4483,33 @@ Skip.DeathKnight.EndLocation.Override.X = 16226.2
 Skip.DeathKnight.EndLocation.Override.Y = 16257
 Skip.DeathKnight.EndLocation.Override.Z = 13.2
 Skip.DeathKnight.EndLocation.Override.O = 1.65
+
+#
+###################################################################################################
+
+###################################################################################################
+#  ELUNA SETTINGS
+#
+#   Eluna.Enabled
+#       Description: Enable or disable Eluna LuaEngine
+#       Default:    true  - (enabled)
+#                   false - (disabled)
+#
+#   Eluna.TraceBack
+#       Description: Sets whether to use debug.traceback function on a lua error or not.
+#                    Notice that you can redefine the function.
+#       Default:    false - (use default error output)
+#                   true  - (use debug.traceback function)
+#
+#   Eluna.ScriptPath
+#       Description: Sets the location of the script folder to load scripts from
+#                    The path can be relative or absolute.
+#       Default:    "lua_scripts"
+#
+
+Eluna.Enabled = true
+Eluna.TraceBack = false
+Eluna.ScriptPath = "lua_scripts"
 
 #
 ###################################################################################################
