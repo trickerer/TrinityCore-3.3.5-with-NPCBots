@@ -164,6 +164,7 @@ class HostileDispelTargetCheck
                 u->IsWithinDistInMap(me, m_range) &&
                 u->isTargetableForAttack() &&
                 //!ai->InDuel(u) &&
+                (!ai->IsInBotParty(u) || ai->IsInHeroicOrRaid()) &&
                 (ai->IsInBotParty(u->GetVictim()) || me->GetVictim() == u))
             {
                 if (!checksteal && u->GetEntry() == 25744 && !u->GetOwnedAuras().empty()) // Sunwell - Dark Fiend
@@ -983,10 +984,12 @@ class FarTauntUnitCheck
 class ManaDrainUnitCheck
 {
     public:
-        explicit ManaDrainUnitCheck(Unit const* unit, float maxdist) : me(unit), max_range(maxdist)
+        explicit ManaDrainUnitCheck(Unit const* unit, float maxdist, bot_ai const* ai) : me(unit), max_range(maxdist), ai(ai)
         { maxPool = me->GetMaxPower(POWER_MANA) * 3 / 2; }
         bool operator()(Unit const* u)
         {
+            if (!_botPvP && !ai->IAmFree() && u->IsControlledByPlayer())
+                return false;
             if (u == me)
                 return false;
             if (!u->IsAlive())
@@ -999,6 +1002,13 @@ class ManaDrainUnitCheck
                 return false;
             //if (u->IsControlledByPlayer())
             //    return false;
+            if (ai->IAmFree())
+            {
+                if (!me->IsValidAttackTarget(u) || !u->isTargetableForAttack())
+                    return false;
+                if (ai->IsInBotParty(u))
+                    return false;
+            }
             //if (ai->InDuel(u))
             //    return false;
             if (u->GetPowerType() != POWER_MANA)
@@ -1018,6 +1028,7 @@ class ManaDrainUnitCheck
     private:
         Unit const* me;
         float max_range;
+        bot_ai const* ai;
         uint32 maxPool;
         ManaDrainUnitCheck(ManaDrainUnitCheck const&);
 };

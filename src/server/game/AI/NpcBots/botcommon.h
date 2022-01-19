@@ -95,7 +95,8 @@ enum BotCommonValues
     GOSSIP_CLASSDESC_DREADLORD          = 70104,
     GOSSIP_CLASSDESC_SPELLBREAKER       = 70105,
     GOSSIP_CLASSDESC_DARKRANGER         = 70106,
-    //70107-70200 reserved for bot class descriptions gossip texts (not selectable)
+    GOSSIP_CLASSDESC_NECROMANCER        = 70107,
+    //70108-70200 reserved for bot class descriptions gossip texts (not selectable)
     GOSSIP_BOTGIVER_GREET               = 70201,
     GOSSIP_BOTGIVER_HIRE                = 70202,
     GOSSIP_BOTGIVER_HIRE_CLASS          = 70203,
@@ -550,7 +551,9 @@ enum BotCommonValues
     BOT_TEXT_DELAY_HEALING_BY           = 70643, //"Delay healing by"
     BOT_TEXT_SECOND_SHORT               = 70644, //"s"
     BOT_TEXT_TANK_OFF                   = 70645, //"Off-Tank"
-    //70646-70799 reserved for custom localization strings
+    BOT_TEXT_CLASS_NECROMANCER_PLU      = 70646, //"Necromancers"
+    BOT_TEXT_CLASS_NECROMANCER          = 70647, //"Necromancer"
+    //70648-70799 reserved for custom localization strings
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity
@@ -591,6 +594,8 @@ enum BotCommonValues
     LEGS_HALISCAN                       = 50567, //Haliscan Pants
 //COMMON GAMEEVENTS
     GAME_EVENT_WINTER_VEIL              = 2,
+//COMMON FACTIONS
+    FACTION_TEMPLATE_HATES_EVERYTHING_1 = 2150, //faction 966 - Monster spar buddy
 //COMMON MOUNTS SPELLS
     REINDEER                            = 25859,
     REINDEER_FLY                        = 44827,
@@ -654,7 +659,7 @@ enum BotCommonValues
     SPELL_COMBAT_SPECIAL_2H_ATTACK      = 44079,//animation only
 //SPHYNX
   //modify
-    SPELL_SHADOW_BOLT                   = 16408,
+    SPELL_SHADOW_BOLT1                  = 16408,
     SPELL_SHADOW_BLAST                  = 38085,
     //SPELL_SHADOW_BLAST_SPLASH           = 38205,
     SPELL_ATTACK_MELEE_RANDOM           = 42902,
@@ -696,6 +701,18 @@ enum BotCommonValues
     SPELL_SILENCE                       = 29943,
     //SPELL_CHARM                         = 11111, //
   //unmodify
+//NECROMANCER
+  //modify
+    SPELL_SHADOW_BOLT2                  = 17509,
+    SPELL_RAISE_DEAD                    = 34011,
+    SPELL_UNHOLY_FRENZY                 = 52499,
+    SPELL_CRIPPLE                       = 50379,
+    SPELL_CORPSE_EXPLOSION              = 61614,
+    //SPELL_BONE_SHIELD                   = 0,//27688, //NIY //NO VIABLE SPELLS
+    //for Attract faction reaction must be adjusted at Object.cpp::GetFactionReactionTo(L2831)
+    //SPELL_BLOOD_CURSE                   = 29933, //NIY for Attract //NO VIABLE SPELLS
+  //unmodify
+    CORPSE_EXPLOSION_VISUAL             = 60081, //explosion
 
   //SOUNDS
     SOUND_FREEZE_IMPACT_WINDWALK        = 29,
@@ -709,6 +726,7 @@ enum BotCommonValues
 //OTHER
     BASE_MANA_SPHYNX                    = 400 * 5,
     BASE_MANA_SPELLBREAKER              = 250 * 5,
+    BASE_MANA_NECROMANCER               = 400 * 5,
     //base mana at 10
     BASE_MANA_10_BM                     = 540 * 5,
     BASE_MANA_10_ARCHMAGE               = 705 * 5,
@@ -742,6 +760,7 @@ enum BotClasses : uint8
     BOT_CLASS_DREADLORD,
     BOT_CLASS_SPELLBREAKER,
     BOT_CLASS_DARK_RANGER,
+    BOT_CLASS_NECROMANCER,
     BOT_CLASS_END
 };
 
@@ -933,6 +952,9 @@ enum BotPetTypes
     //Dark Ranger
     BOT_PET_DARK_MINION                 = 70573,
     BOT_PET_DARK_MINION_ELITE           = 70574,
+
+    //Necromancer
+    BOT_PET_NECROSKELETON               = 70580,
 
     BOT_PET_INVALID                     = 99999
 };

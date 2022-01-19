@@ -290,7 +290,7 @@ void bot_ai::BotSay(const std::string &text, Player const* target) const
     if (!target)
         return;
 
-    me->Say(text.c_str(), LANG_UNIVERSAL, target);
+    me->Say(text, LANG_UNIVERSAL, target);
 }
 void bot_ai::BotWhisper(const std::string &text, Player const* target) const
 {
@@ -301,7 +301,7 @@ void bot_ai::BotWhisper(const std::string &text, Player const* target) const
 
     Player* playerTarget = const_cast<Player*>(target);
 
-    me->Whisper(text.c_str(), LANG_UNIVERSAL, playerTarget);
+    me->Whisper(text, LANG_UNIVERSAL, playerTarget);
 }
 void bot_ai::BotYell(const std::string &text, Player const* /*target*/) const
 {
@@ -310,7 +310,31 @@ void bot_ai::BotYell(const std::string &text, Player const* /*target*/) const
     //if (!target)
     //    return;
 
-    me->Yell(text.c_str(), LANG_UNIVERSAL);
+    me->Yell(text, LANG_UNIVERSAL);
+}
+void bot_ai::BotSay(std::string&& text, Player const* target) const
+{
+    if (!target && master->GetTypeId() == TYPEID_PLAYER)
+        target = master;
+    if (!target)
+        return;
+
+    me->Say(text, LANG_UNIVERSAL, target);
+}
+void bot_ai::BotWhisper(std::string&& text, Player const* target) const
+{
+    if (!target && master->GetTypeId() == TYPEID_PLAYER)
+        target = master;
+    if (!target)
+        return;
+
+    Player* playerTarget = const_cast<Player*>(target);
+
+    me->Whisper(text, LANG_UNIVERSAL, playerTarget);
+}
+void bot_ai::BotYell(std::string&& text, Player const* /*target*/) const
+{
+    me->Yell(text, LANG_UNIVERSAL);
 }
 
 void bot_ai::ReportSpellCast(uint32 spellId, const std::string& followedByString, Player const* target) const
@@ -654,6 +678,7 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
         case BOT_CLASS_DREADLORD:
         case BOT_CLASS_SPELLBREAKER:
         case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
             break;
         default:
             TC_LOG_ERROR("entities.player", "CheckBotCast(): Unknown bot class %u", _botclass);
@@ -1665,6 +1690,7 @@ bool bot_ai::_canCureTarget(Unit const* target, uint32 cureSpell) const
     if (me->GetLevel() < 10 || target->GetLevel() < 10) return false;
     if (target->HasUnitState(UNIT_STATE_ISOLATED)) return false;
     if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsTempBot()) return false;
+    if (target->HasAuraType(SPELL_AURA_MOD_POSSESS) && !IsInBotParty(target)) return false;
 
     SpellInfo const* info = sSpellMgr->GetSpellInfo(cureSpell);
     if (!info)
@@ -2097,6 +2123,8 @@ void bot_ai::SetStats(bool force)
         mylevel = std::max<uint8>(mylevel, 20);
     else if (_botclass == BOT_CLASS_DARK_RANGER)
         mylevel = std::max<uint8>(mylevel, 40);
+    else if (_botclass == BOT_CLASS_NECROMANCER)
+        mylevel = std::max<uint8>(mylevel, 20);
 
     //LEVEL
     if (me->GetLevel() != mylevel)
@@ -2143,6 +2171,7 @@ void bot_ai::SetStats(bool force)
         case BOT_CLASS_DREADLORD:
         case BOT_CLASS_SPELLBREAKER:
         case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
             break;
 
         default:
@@ -2218,6 +2247,8 @@ void bot_ai::SetStats(bool force)
             strmult = 5.f; agimult = 0.f; break;
         case BOT_CLASS_DARK_RANGER:
             strmult = 0.f; agimult = 5.f; break;
+        case BOT_CLASS_NECROMANCER:
+            strmult = 0.f; agimult = 0.f; break;
         default:
             TC_LOG_ERROR("entities.player", "_MeleeDamageUpdate(): NIY myclass %u!", uint32(myclass));
             strmult = 0.f; agimult = 0.f; break;
@@ -2367,6 +2398,10 @@ void bot_ai::SetStats(bool force)
         {
             armor_mod += -0.3f; // reduce armor so cannot really tank
         }
+        if (_botclass == BOT_CLASS_NECROMANCER)
+        {
+            value += 5.f * _getTotalBotStat(BOT_STAT_MOD_INTELLECT);
+        }
     }
 
     value *= armor_mod;
@@ -2487,6 +2522,10 @@ void bot_ai::SetStats(bool force)
     if (_botclass == BOT_CLASS_DARK_RANGER)
     {
         tempval -= 0.35f;
+    }
+    if (_botclass == BOT_CLASS_NECROMANCER)
+    {
+        tempval -= 0.2f;
     }
 
     dmg_taken_phy = value;
@@ -3069,6 +3108,11 @@ void bot_ai::SetStats(bool force)
             //bonus from intellect
             value += 0.5f * _getTotalBotStat(BOT_STAT_MOD_INTELLECT);
         }
+        if (_botclass == BOT_CLASS_NECROMANCER)
+        {
+            //bonus from intellect
+            value += _getTotalBotStat(BOT_STAT_MOD_INTELLECT);
+        }
 
         spellpower = uint32(value);
     }
@@ -3359,6 +3403,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell) const
             case BOT_CLASS_DREADLORD:   mainMask = SPELL_SCHOOL_MASK_NONE;                                                                  break;
             case BOT_CLASS_SPELLBREAKER:mainMask = SPELL_SCHOOL_MASK_NONE;                                                                  break;
             case BOT_CLASS_DARK_RANGER: mainMask = SPELL_SCHOOL_MASK_NONE;                                                                  break;
+            case BOT_CLASS_NECROMANCER: mainMask = SPELL_SCHOOL_MASK_NONE;                                                                  break;
             default:                    mainMask = SPELL_SCHOOL_MASK_NORMAL;                                                                break;
         }
     }
@@ -3888,6 +3933,7 @@ bool bot_ai::CheckAttackTarget()
             break;
         case BOT_CLASS_SPHYNX:
         case BOT_CLASS_ARCHMAGE:
+        case BOT_CLASS_NECROMANCER:
             byspell = HasRole(BOT_ROLE_DPS);
             break;
         case BOT_CLASS_HUNTER:
@@ -3989,26 +4035,76 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
     }
     if (me->GetMapId() == 564 && isInWMOArea(WMOAreaGroupNajentus) && Rand() < 10) // Black Temple - High Warlord Naj'entus
     {
-        if (Group* const gr = master->GetGroup())
+        if (Group const* gr = master->GetGroup())
         {
-            std::vector<Player*> spines;
+            if (Rand() < 4)
+            {
+                InstanceScript* iscript = me->GetMap()->ToInstanceMap()->GetInstanceScript();
+                Unit* najentus = iscript ? iscript->GetCreature(0) : nullptr; // boss_warlord_najentus.cpp::DATA_HIGH_WARLORD_NAJENTUS
+
+                if (najentus && najentus->HasAuraTypeWithMiscvalue(SPELL_AURA_SCHOOL_IMMUNITY, 127)) // Tidal Shield
+                {
+                    //Try to grab spines from corpses of dead players
+                    std::vector<Player*> spiners;
+                    for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    {
+                        Player* pl = itr->GetSource();
+                        if (pl && pl->IsInWorld() && me->GetMap() == pl->FindMap() && !pl->IsAlive() &&
+                            me->GetDistance(pl) < 25.f && pl->HasItemCount(32408)) // Naj'entus Spine
+                            spiners.push_back(pl);
+                    }
+
+                    if (Player* pl = spiners.empty() ? nullptr : spiners.size() == 1u ? spiners.front() :
+                        Trinity::Containers::SelectRandomContainerElement(spiners))
+                    {
+                        BotWhisper("Taking 1 Naj'entus Spine from you");
+                        me->CastSpell(najentus, 39948, true); // Hurl Spine
+                        pl->DestroyItemCount(32408, 1, true); // Naj'entus Spine
+                    }
+                }
+            }
+
+            std::vector<Unit*> spines;
             //Find and free impaled player (player gets the spine)
             for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* pl = itr->GetSource();
                 //We don't make bots run to player to "click" the spine, so range is rather big
-                if (pl && pl->IsInWorld() && pl->IsAlive() && me->GetMap() == pl->FindMap() && pl->HasUnitState(UNIT_STATE_STUNNED) &&
-                    me->GetDistance(pl) < 25.f && pl->HasAura(39837)) // "Impaling Spine"
-                    spines.push_back(pl);
+                if (pl && pl->IsInWorld() && me->GetMap() == pl->FindMap())
+                {
+                    auto is_impaled = [=](Unit const* unit) -> bool {
+                        return unit->IsAlive() && unit->HasUnitState(UNIT_STATE_STUNNED) &&
+                            me->GetDistance(unit) < 25.f && unit->HasAura(39837); // "Impaling Spine"
+                    };
+
+                    if (is_impaled(pl))
+                        spines.push_back(pl->ToUnit());
+                    if (pl->HaveBot())
+                    {
+                        BotMap const* bmap = pl->GetBotMgr()->GetBotMap();
+                        for (BotMap::const_iterator ci = bmap->begin(); ci != bmap->end(); ++ci)
+                        {
+                            Creature* bot = ci->second;
+                            if (bot && is_impaled(bot))
+                                spines.push_back(bot->ToUnit());
+                        }
+                    }
+                }
             }
 
-            if (Player* pl = spines.empty() ? nullptr : spines.size() == 1u ? spines.front() :
+            if (Unit* u = spines.empty() ? nullptr : spines.size() == 1u ? spines.front() :
                 Trinity::Containers::SelectRandomContainerElement(spines))
             {
-                if (GameObject const* spine = pl->GetFirstGameObjectById(185584)) // Naj'entus Spine
+                if (GameObject const* spine = u->GetFirstGameObjectById(185584)) // Naj'entus Spine
                 {
-                    if (spine->AI() && spine->AI()->OnGossipHello(pl))
+                    Player* receiver = u->GetTypeId() == TYPEID_PLAYER ? u->ToPlayer() : master;
+                    if (spine->AI() && spine->AI()->OnGossipHello(receiver))
+                    {
+                        // Item is created by spell 39956 Create Naj'entus Spine - cannot target dead, force add item
+                        if (!receiver->IsAlive())
+                            receiver->AddItem(32408, 1); // Naj'entus Spine
                         return true;
+                    }
                 }
             }
         }
@@ -5203,7 +5299,7 @@ Unit* bot_ai::FindDrainTarget(float maxdist) const
 {
     Unit* unit = nullptr;
 
-    ManaDrainUnitCheck check(me, maxdist);
+    ManaDrainUnitCheck check(me, maxdist, this);
     Trinity::UnitLastSearcher <ManaDrainUnitCheck> searcher(me, unit, check);
     Cell::VisitAllObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
@@ -5607,6 +5703,8 @@ void bot_ai::_OnManaUpdate() const
         m_basemana = BASE_MANA_SPELLBREAKER;
     if (_botclass == BOT_CLASS_DARK_RANGER)
         m_basemana = BASE_MANA_1_DARK_RANGER + (BASE_MANA_10_DARK_RANGER - BASE_MANA_1_DARK_RANGER) * ((mylevel - 40)/82.f);
+    if (_botclass == BOT_CLASS_NECROMANCER)
+        m_basemana = BASE_MANA_NECROMANCER;
     //TC_LOG_ERROR("entities.player", "classinfo base mana = %f", m_basemana);
 
     me->SetCreateMana(uint32(_classinfo->basemana));
@@ -5704,6 +5802,12 @@ void bot_ai::_OnManaRegenUpdate() const
             value += 0.2f * (me->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) + _getTotalBotStat(BOT_STAT_MOD_MANA_REGENERATION));
             value *= me->GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
         }
+        else if (_botclass == BOT_CLASS_NECROMANCER)
+        {
+            value = 7.5f; //base 1.5/sec
+            value += 0.2f * (me->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) + _getTotalBotStat(BOT_STAT_MOD_MANA_REGENERATION));
+            value *= me->GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
+        }
         else
             value = 0;
 
@@ -5795,6 +5899,11 @@ void bot_ai::_OnAreaUpdate(uint32 areaId)
                 botPet->CastSpell(botPet, itr->second->spellId, true);
         }
     }
+}
+
+bool bot_ai::IsInHeroicOrRaid() const
+{
+    return me->FindMap() && (me->GetMap()->IsHeroic() || me->GetMap()->IsRaid());
 }
 
 //SpellHit()... OnSpellHit()
@@ -6091,15 +6200,15 @@ void bot_ai::ApplyBotSpellChanceOfSuccessMods(SpellInfo const* spellInfo, float&
     //ALL CLASS PROC_TRIGGER_SPELL SPELLS chance of success bonus
     ApplyClassSpellChanceOfSuccessMods(spellInfo, chance);
 }
-void bot_ai::ApplyBotEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const
+void bot_ai::ApplyBotEffectMods(WorldObject const* wtarget, SpellInfo const* spellInfo, uint8 effIndex, float& value) const
 {
     //ALL SPELLS SPELLMOD_EFFECT_X bonus
-    ApplyClassEffectMods(spellInfo, effIndex, value);
+    ApplyClassEffectMods(wtarget, spellInfo, effIndex, value);
 }
-void bot_ai::ApplyBotEffectMods(Unit const* target, SpellInfo const* spellInfo, uint8 effIndex, float& value) const
+void bot_ai::ApplyBotThreatMods(SpellInfo const* spellInfo, float& threat) const
 {
-    //ALL SPELLS SPELLMOD_EFFECT_X bonus (target-specific)
-    ApplyClassEffectModsTarget(target, spellInfo, effIndex, value);
+    //ALL threat mods
+    ApplyClassThreatMods(spellInfo, threat);
 }
 //Spell Mod Utilities
 float bot_ai::CalcSpellMaxRange(uint32 spellId, bool enemy) const
@@ -8182,6 +8291,13 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_LVL40).c_str(), me->GetName().c_str());
                     break;
                 }
+                if (_botclass == BOT_CLASS_NECROMANCER && player->GetLevel() < 20)
+                {
+                    //BotWhisper("placeholder", player);
+                    ChatHandler ch(player->GetSession());
+                    ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_LVL20).c_str(), me->GetName().c_str());
+                    break;
+                }
 
                 if (SetBotOwner(player))
                 {
@@ -8714,6 +8830,9 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     break;
                 case BOT_CLASS_DARK_RANGER:
                     gossipTextId = GOSSIP_CLASSDESC_DARKRANGER;
+                    break;
+                case BOT_CLASS_NECROMANCER:
+                    gossipTextId = GOSSIP_CLASSDESC_NECROMANCER;
                     break;
                 default:
                     break;
@@ -9591,6 +9710,7 @@ bool bot_ai::_canEquip(Item const* newItem, uint8 slot, bool ignoreItemLevel) co
                             return false;
                         break;
                     case BOT_CLASS_ARCHMAGE:
+                    case BOT_CLASS_NECROMANCER:
                         if (newProto->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
                             return false;
                         break;
@@ -9851,6 +9971,7 @@ bool bot_ai::_canEquip(Item const* newItem, uint8 slot, bool ignoreItemLevel) co
                 }
                 break;
             case BOT_CLASS_ARCHMAGE:
+            case BOT_CLASS_NECROMANCER:
                 switch (newProto->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_STAFF:
@@ -12300,6 +12421,7 @@ bool bot_ai::IsValidSpecForClass(uint8 m_class, uint8 spec)
         case BOT_CLASS_DREADLORD:
         case BOT_CLASS_SPELLBREAKER:
         case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
             return spec == BOT_SPEC_DEFAULT;
         default:
             break;
@@ -14415,7 +14537,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             }
             if (!interrupt && !info->IsPositive())
             {
-                if (!target->IsAlive())
+                if (!target->IsAlive() && info->Id != SPELL_CORPSE_EXPLOSION && info->Id != SPELL_RAISE_DEAD)
                     interrupt = true;
                 else if ((info->Mechanic == MECHANIC_POLYMORPH || info->Mechanic == MECHANIC_SHACKLE ||
                     info->Mechanic == MECHANIC_DISORIENTED || info->Mechanic == MECHANIC_SLEEP ||
@@ -15650,6 +15772,8 @@ uint8 bot_ai::GetPlayerClass() const
                 return BOT_CLASS_PALADIN;
             case BOT_CLASS_DARK_RANGER:
                 return BOT_CLASS_HUNTER;
+            case BOT_CLASS_NECROMANCER:
+                return BOT_CLASS_WARLOCK;
             default:
                 TC_LOG_ERROR("entities.unit", "GetPlayerClass: %s has unknown Ex bot class %u!", me->GetName().c_str(), _botclass);
                 return BOT_CLASS_PALADIN;
@@ -15676,6 +15800,8 @@ uint8 bot_ai::GetPlayerRace() const
                 return RACE_BLOODELF;
             case BOT_CLASS_DARK_RANGER:
                 return RACE_BLOODELF;
+            case BOT_CLASS_NECROMANCER:
+                return RACE_HUMAN;
             default:
                 TC_LOG_ERROR("entities.unit", "GetPlayerRace: %s has unknown Ex bot class %u!", me->GetName().c_str(), _botclass);
                 return RACE_HUMAN;
@@ -15770,7 +15896,7 @@ bool bot_ai::IsCastingClass(uint8 m_class)
     return (m_class == CLASS_PALADIN || m_class == CLASS_PRIEST || m_class == CLASS_SHAMAN ||
         m_class == CLASS_MAGE || m_class == CLASS_WARLOCK || m_class == CLASS_DRUID ||
         m_class == BOT_CLASS_SPHYNX || m_class == BOT_CLASS_ARCHMAGE || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_DARK_RANGER);
+        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_DARK_RANGER || m_class == BOT_CLASS_NECROMANCER);
 }
 bool bot_ai::IsHealingClass(uint8 m_class)
 {
@@ -15874,6 +16000,7 @@ bool bot_ai::CanMount() const
         case BOT_CLASS_BM:
         case BOT_CLASS_SPELLBREAKER:
         case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
             return true;
         default:
             return _botclass < BOT_CLASS_EX_START;
@@ -15976,7 +16103,7 @@ void bot_ai::InitBotCustomSpells()
     BotCustomSpells.insert(SPELL_NETHERWALK);//3
     BotCustomSpells.insert(SPELL_MIRROR_IMAGE_BM);//4
     BotCustomSpells.insert(SPELL_SHADOW_BLAST);//5
-    BotCustomSpells.insert(SPELL_SHADOW_BOLT);//6
+    BotCustomSpells.insert(SPELL_SHADOW_BOLT1);//6
     //BotCustomSpells.insert(SPELL_ATTACK_MELEE_RANDOM);//7 //exclusive
     //BotCustomSpells.insert(SHADOWFURY_VISUAL);//8 //exclusive
     BotCustomSpells.insert(SPELL_DEVOUR_MAGIC);//9
@@ -15999,6 +16126,12 @@ void bot_ai::InitBotCustomSpells()
     //BotCustomSpells.insert(SPELL_BLACK_ARROW);//26 //exclusive
     //BotCustomSpells.insert(SPELL_DRAIN_LIFE);//27 //exclusive
     //BotCustomSpells.insert(SPELL_SILENCE);//28 //exclusive
+    BotCustomSpells.insert(SPELL_SHADOW_BOLT2);//29
+    BotCustomSpells.insert(SPELL_RAISE_DEAD);//30
+    BotCustomSpells.insert(SPELL_UNHOLY_FRENZY);//31
+    BotCustomSpells.insert(SPELL_CRIPPLE);//32
+    BotCustomSpells.insert(SPELL_CORPSE_EXPLOSION);//33
+    //BotCustomSpells.insert(SPELL_BLOOD_CURSE);//34 //NIY
 
     uint32 trig;
     SpellInfo* trigInfo;
@@ -16143,7 +16276,7 @@ void bot_ai::InitBotCustomSpells()
     //5) END SHADOW BLAST (SPLASH ATTACK)
 
     //6) SHADOW BOLT (BASE ATTACK)
-    spellId = SPELL_SHADOW_BOLT; //16408
+    spellId = SPELL_SHADOW_BOLT1; //16408
     sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
 
     sinfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
@@ -16211,7 +16344,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->InterruptFlags = 0xF;
     sinfo->SpellLevel = 0;
     sinfo->MaxLevel = 0;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->RecoveryTime = 7000;
     sinfo->PowerType = POWER_MANA;
     sinfo->ManaCost = 0;
@@ -16253,7 +16386,7 @@ void bot_ai::InitBotCustomSpells()
 
     sinfo->SpellLevel = 0;
     sinfo->MaxLevel = 0;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->RecoveryTime = 0;//60000;
     //sinfo->PowerType = POWER_MANA;
     //sinfo->ManaCost = 0;
@@ -16477,7 +16610,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->SpellFamilyName = SPELLFAMILY_GENERIC;
     sinfo->SpellLevel = 20;
     sinfo->BaseLevel = 20;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->ManaCost = 0;
     sinfo->ManaCostPercentage = 0;
     sinfo->ManaCostPerlevel = 0;
@@ -16564,7 +16697,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->InterruptFlags = 0xF;
     sinfo->SpellLevel = 0;
     sinfo->BaseLevel = 0;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->Dispel = DISPEL_MAGIC;
     sinfo->Mechanic = MECHANIC_SLEEP;
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
@@ -16605,7 +16738,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
     sinfo->SpellLevel = 40;
     sinfo->BaseLevel = 40;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
     sinfo->RecoveryTime = 10000;
     sinfo->StartRecoveryCategory = 133;
@@ -16727,7 +16860,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->Mechanic = MECHANIC_NONE;
     sinfo->SpellLevel = 40;
     sinfo->BaseLevel = 40;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3); //500ms
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //5-30 yds
     sinfo->DurationEntry = sSpellDurationStore.LookupEntry(85); //18 sec
@@ -16779,7 +16912,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->Mechanic = MECHANIC_NONE;
     sinfo->SpellLevel = 40;
     sinfo->BaseLevel = 40;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->CastTimeEntry = nullptr;
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
     //sinfo->DurationEntry = sSpellDurationStore.LookupEntry(85); //18 sec
@@ -16822,7 +16955,7 @@ void bot_ai::InitBotCustomSpells()
     sinfo->Mechanic = MECHANIC_SILENCE;
     sinfo->SpellLevel = 60;
     sinfo->BaseLevel = 60;
-    sinfo->MaxTargetLevel = 83;
+    sinfo->MaxTargetLevel = 0;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(2); //250ms
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
     //sinfo->DurationEntry = sSpellDurationStore.LookupEntry(85); //18 sec
@@ -16842,6 +16975,149 @@ void bot_ai::InitBotCustomSpells()
     sinfo->_effects[0].BasePoints = 1;
     sinfo->_effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_15_YARDS);
     //28) END SILENCE
+
+    // NECROMANCER
+
+    //29) SHADOW BOLT (MAIN_ATTACK)
+    //TODO: balance
+    spellId = SPELL_SHADOW_BOLT2; //17509
+    sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
+
+    sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+    sinfo->SpellLevel = 20;
+    sinfo->BaseLevel = 20;
+    sinfo->MaxLevel = 82;
+    sinfo->ManaCost = 0;
+    sinfo->ManaCostPercentage = 0;
+    sinfo->ManaCostPerlevel = 0;
+    sinfo->CastTimeEntry = nullptr;
+    sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
+    sinfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW | SPELL_SCHOOL_MASK_ARCANE;
+    sinfo->Attributes |= SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE;
+
+    sinfo->_effects[0].BasePoints = 15;
+    sinfo->_effects[0].DieSides = 9;
+    sinfo->_effects[0].BonusMultiplier = 0.5f;
+    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].RealPointsPerLevel = 12.f;
+    sinfo->_effects[0].ValueMultiplier = 1.f;
+    //29) END SHADOW BOLT (MAIN_ATTACK)
+
+    //30) RAISE DEAD
+    spellId = SPELL_RAISE_DEAD; //34011
+    sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
+
+    sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+    sinfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    sinfo->InterruptFlags = 0xF;
+    sinfo->SpellLevel = 20;
+    sinfo->BaseLevel = 20;
+    sinfo->MaxTargetLevel = 0;
+    sinfo->RangeEntry = sSpellRangeStore.LookupEntry(34); //25 yds
+    sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3); //500ms
+    sinfo->RecoveryTime = 8000;
+    sinfo->StartRecoveryCategory = 133;
+    sinfo->StartRecoveryTime = 1500;
+    sinfo->ManaCost = 50 * 5;
+    sinfo->ManaCostPercentage = 0;
+    sinfo->ManaCostPerlevel = 0;
+    sinfo->ExplicitTargetMask = TARGET_FLAG_CORPSE_ENEMY;
+    sinfo->Attributes |= SPELL_ATTR0_ABILITY | SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE;
+    sinfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+
+    sinfo->_effects[0].Effect = SPELL_EFFECT_DUMMY;
+    sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    sinfo->_effects[1].Effect = SPELL_EFFECT_NONE;
+    sinfo->_effects[2].Effect = SPELL_EFFECT_NONE;
+    //30) END RAISE DEAD
+
+    //31) UNHOLY FRENZY
+    spellId = SPELL_UNHOLY_FRENZY; //52499
+    sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
+
+    sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+    sinfo->DmgClass = SPELL_DAMAGE_CLASS_NONE;
+    sinfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    sinfo->SpellLevel = 30;
+    sinfo->BaseLevel = 30;
+    sinfo->MaxTargetLevel = 0;
+    sinfo->DurationEntry = sSpellDurationStore.LookupEntry(22); //566 - 0 sec //3 - 60 sec //1 - 10 sec //32 - 6 sec //22 - 45 sec
+    sinfo->RecoveryTime = 2000; //original 1000
+    sinfo->CategoryEntry = nullptr;
+    sinfo->StartRecoveryCategory = 133;
+    sinfo->StartRecoveryTime = 1500;
+    sinfo->ManaCost = 50 * 5;
+    sinfo->ManaCostPercentage = 0;
+    sinfo->ManaCostPerlevel = 0;
+    sinfo->ExplicitTargetMask = TARGET_FLAG_UNIT;
+    sinfo->Attributes |= SPELL_ATTR0_ABILITY | SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE;
+    sinfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED | SPELL_ATTR1_CANT_BE_REDIRECTED;
+    sinfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
+    sinfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_NO_DONE_BONUS;
+    sinfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
+
+    sinfo->_effects[0].ApplyAuraName = SPELL_AURA_MOD_ATTACKSPEED;
+    sinfo->_effects[0].BasePoints = 75;
+    sinfo->_effects[1].Amplitude = 1000;
+    sinfo->_effects[1].BasePoints = 1;
+    //31) END UNHOLY FRENZY
+
+    //32) CRIPPLE
+    spellId = SPELL_CRIPPLE; //50379
+    sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
+
+    sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+    sinfo->DmgClass = SPELL_DAMAGE_CLASS_NONE;
+    sinfo->Dispel = DISPEL_CURSE; //TODO: check if works
+    sinfo->SpellLevel = 50;
+    sinfo->BaseLevel = 50;
+    sinfo->MaxLevel = 0;
+    sinfo->MaxTargetLevel = 0;
+    sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(0); //0ms
+    sinfo->DurationEntry = sSpellDurationStore.LookupEntry(3); //60 sec
+    sinfo->RecoveryTime = 10000;
+    sinfo->CategoryEntry = nullptr;
+    sinfo->StartRecoveryCategory = 133;
+    sinfo->StartRecoveryTime = 1500;
+    sinfo->ManaCost = 175 * 5;
+    sinfo->ExplicitTargetMask = TARGET_FLAG_UNIT;
+    sinfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED | SPELL_ATTR1_CANT_BE_REDIRECTED;
+    sinfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+    //32) END CRIPPLE
+
+    //33) CORPSE EXPLOSION
+    spellId = SPELL_CORPSE_EXPLOSION; //61614
+    sinfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(spellId));
+
+    sinfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+    sinfo->DmgClass = SPELL_DAMAGE_CLASS_NONE;
+    sinfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+    sinfo->TargetCreatureType = 0x0000037F;
+    sinfo->InterruptFlags = 0xF;
+    sinfo->SpellLevel = 40;
+    sinfo->BaseLevel = 40;
+    sinfo->MaxTargetLevel = 0;
+    sinfo->DurationEntry = sSpellDurationStore.LookupEntry(21); //-1
+    sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(110); //750ms
+    sinfo->RangeEntry = sSpellRangeStore.LookupEntry(3); //20 yds
+    sinfo->RecoveryTime = 1500;
+    sinfo->StartRecoveryCategory = 133;
+    sinfo->StartRecoveryTime = 1500;
+    sinfo->ManaCost = 100 * 5;
+    sinfo->ExplicitTargetMask = TARGET_FLAG_CORPSE_ENEMY;
+    sinfo->Attributes |= SPELL_ATTR0_ABILITY | SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE;
+    sinfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
+    sinfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_NO_DONE_BONUS;
+
+    sinfo->_effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+    sinfo->_effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+    sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    sinfo->_effects[0].TargetB = SpellImplicitTargetInfo(0);
+    sinfo->_effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
+    sinfo->_effects[0].SpellClassMask[0] = 0;
+    sinfo->_effects[0].BasePoints = 1;
+    sinfo->_effects[1].Effect = SPELL_EFFECT_NONE;
+    //33) END CORPSE EXPLOSION
 
     TC_LOG_INFO("server.loading", "Re-Loading Spell Proc conditions...");
     sSpellMgr->LoadSpellProcs();

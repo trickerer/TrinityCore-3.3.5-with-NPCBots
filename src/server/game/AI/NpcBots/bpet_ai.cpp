@@ -15,6 +15,7 @@ NpcBot Pet System by Trickerer (https://github.com/trickerer/Trinity-Bots; onlys
 #define DRUID_MAX_PET_POSITIONS 3
 #define DK_MAX_PET_POSITIONS 10
 #define DARK_RANGER_MAX_PET_POSITIONS 5
+#define NECROMANCER_MAX_PET_POSITIONS 6
 float const ShamanPetPositionAnglesByPosNumber[SHAMAN_MAX_PET_POSITIONS] =
 {
     0.f,//left
@@ -46,6 +47,15 @@ float const DarkRangerPetPositionAnglesByPosNumber[DARK_RANGER_MAX_PET_POSITIONS
     0.7853981f,//1*M_PI/4
     1.5707963f,//2*M_PI/4
     2.3561944f //3*M_PI/4
+};
+float const NecromancerPetPositionAnglesByPosNumber[NECROMANCER_MAX_PET_POSITIONS] =
+{
+    0.f,
+    float(M_PI),
+    float(M_PI) / 5.f * 1.f,
+    float(M_PI) / 5.f * 4.f,
+    float(M_PI) / 5.f * 2.f,
+    float(M_PI) / 5.f * 3.f
 };
 
 extern uint8 GroupIconsFlags[TARGETICONCOUNT];
@@ -113,6 +123,8 @@ void bot_pet_ai::_calculatePos(Position& pos) const
         o += ShamanPetPositionAnglesByPosNumber[posNum];
     else if (petOwner->GetBotClass() == BOT_CLASS_DARK_RANGER)
         o += DarkRangerPetPositionAnglesByPosNumber[posNum];
+    else if (petOwner->GetBotClass() == BOT_CLASS_NECROMANCER)
+        o += NecromancerPetPositionAnglesByPosNumber[posNum];
 
     o = Position::NormalizeOrientation(o);
     //distance
@@ -437,6 +449,8 @@ void bot_pet_ai::SetPetStats(bool force)
         //dark ranger
         case BOT_PET_DARK_MINION:
         case BOT_PET_DARK_MINION_ELITE:
+        //necromancer
+        case BOT_PET_NECROSKELETON:
             break;
         default:
             TC_LOG_ERROR("entities.player", "bot_pet_ai::SetPetStats(): unk pet type %u, aborting", myType);
@@ -452,6 +466,7 @@ void bot_pet_ai::SetPetStats(bool force)
         case BOT_PET_FORCE_OF_NATURE:
         case BOT_PET_DARK_MINION:
         case BOT_PET_DARK_MINION_ELITE:
+        case BOT_PET_NECROSKELETON:
             if (force == false)
                 return;
             break;
@@ -559,6 +574,11 @@ void bot_pet_ai::SetPetStats(bool force)
                 me->SetCreateHealth(pInfo->health / 2);
                 me->SetByteValue(UNIT_FIELD_BYTES_0, 3, MAX_POWERS);
             }
+            else if (myType == BOT_PET_NECROSKELETON)
+            {
+                me->SetCreateHealth(pInfo->health / 5);
+                me->SetByteValue(UNIT_FIELD_BYTES_0, 3, MAX_POWERS);
+            }
             else if (myType == BOT_PET_AWATER_ELEMENTAL || myType == BOT_PET_INFERNAL)
             {
                 //custom pets / not using mana
@@ -638,6 +658,11 @@ void bot_pet_ai::SetPetStats(bool force)
     //Resist  x0.3  -- resistances
     //Stamina x0.8  -- stamina
     //rest is same as warlock
+    // NECROMANCER
+    //AP      x0.40 -- attack power
+    //Resist  x0.25 -- resistances
+    //Stamina x0.8  -- stamina
+    //rest is same as warlock
 
     //attack power
     if (force)
@@ -667,6 +692,11 @@ void bot_pet_ai::SetPetStats(bool force)
             me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level * 3));
             me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level * 4));
         }
+        else if (myType == BOT_PET_NECROSKELETON)
+        {
+            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level));
+            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + level / 3));
+        }
         else
         {
             me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level - (level / 4)));
@@ -692,6 +722,9 @@ void bot_pet_ai::SetPetStats(bool force)
         case BOT_PET_DARK_MINION_ELITE:
             atpower += 2 * me->GetTotalStatValue(STAT_STRENGTH) - 20.0f;
             atpower += 0.4f * petOwner->GetTotalAttackPowerValue(RANGED_ATTACK);
+            break;
+        case BOT_PET_NECROSKELETON:
+            atpower += 2 * me->GetTotalStatValue(STAT_STRENGTH) - 20.0f;
             break;
         default:
             //atpower += 2 * me->GetTotalStatValue(STAT_STRENGTH) - 20.0f;
@@ -721,7 +754,9 @@ void bot_pet_ai::SetPetStats(bool force)
             break;
         case BOT_CLASS_DREADLORD:
             atpower += spdtotal * 6;
-            //TC_LOG_ERROR("entities.player", "SetPetStat(): atpower += 0.57 of %i = %.2f", spdtotal, atpower);
+            break;
+        case BOT_CLASS_NECROMANCER:
+            atpower += 0.75f * spdtotal;
             break;
         default:
             break;
@@ -746,7 +781,7 @@ void bot_pet_ai::SetPetStats(bool force)
         if (level >= 32)
             myarmor += myarmor / 10;
     }
-    if (petOwner->GetBotClass() == BOT_CLASS_DARK_RANGER)
+    if (petOwner->GetBotClass() == BOT_CLASS_DARK_RANGER || petOwner->GetBotClass() == BOT_CLASS_NECROMANCER)
     {
         //even though skeletons have shields their armor needs to be very low
         myarmor = myarmor / 4;
@@ -763,6 +798,7 @@ void bot_pet_ai::SetPetStats(bool force)
                 petResist = (petOwner->GetBotAI()->GetBotResistanceBonus(SpellSchools(i)) + petOwner->GetResistance(SpellSchools(i)))*2.0f;
                 break;
             case BOT_CLASS_DARK_RANGER:
+            case BOT_CLASS_NECROMANCER:
                 petResist = (petOwner->GetBotAI()->GetBotResistanceBonus(SpellSchools(i)) + petOwner->GetResistance(SpellSchools(i)))*0.3f;
                 break;
             default:
@@ -796,6 +832,7 @@ void bot_pet_ai::SetPetStats(bool force)
                 amount += petOwner->GetCreatureCritChance() * 0.5f;
                 break;
             case BOT_CLASS_DARK_RANGER:
+            case BOT_CLASS_NECROMANCER:
                 amount += petOwner->GetCreatureCritChance() * 0.35f;
                 break;
             default:
@@ -1061,6 +1098,9 @@ void bot_pet_ai::SetPetStats(bool force)
                     stamValue += 0.8f * petOwner->GetBotAI()->GetTotalBotStat(BOT_STAT_MOD_STAMINA);
                     break;
             }
+            break;
+        case BOT_CLASS_NECROMANCER:
+            stamValue += 0.75f * petOwner->GetBotAI()->GetTotalBotStat(BOT_STAT_MOD_STAMINA);
             break;
         default:
             break;
@@ -1498,6 +1538,7 @@ bool bot_pet_ai::_canRegenerate() const
     {
         case BOT_PET_DARK_MINION:
         case BOT_PET_DARK_MINION_ELITE:
+        case BOT_PET_NECROSKELETON:
             return false;
         default:
             return true;

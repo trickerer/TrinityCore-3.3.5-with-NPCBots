@@ -1281,6 +1281,7 @@ public:
                 case BOT_CLASS_DREADLORD:
                 case BOT_CLASS_SPELLBREAKER:
                 case BOT_CLASS_DARK_RANGER:
+                case BOT_CLASS_NECROMANCER:
                     if (BLESSING_OF_KINGS && !kings && doCast(target, BLESSING_OF_KINGS))
                         return true;
                     else if (BLESSING_OF_MIGHT && !might && doCast(target, BLESSING_OF_MIGHT))
@@ -2045,7 +2046,7 @@ public:
             targets = targets + bonusTargets;
         }
 
-        void ApplyClassEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
             uint8 lvl = me->GetLevel();

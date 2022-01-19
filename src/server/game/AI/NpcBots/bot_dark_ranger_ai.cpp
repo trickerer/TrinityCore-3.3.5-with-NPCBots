@@ -307,7 +307,7 @@ public:
             damage = int32(fdamage * pctbonus + flat_mod);
         }
 
-        void ApplyClassEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
             //uint8 lvl = me->GetLevel();
@@ -450,7 +450,7 @@ public:
                 //    TC_LOG_ERROR("entities.player", "bot_dranger_ai::SummonBotPet(): found minion to erase(1)");
                 //try 3: last resort
                 if (!u)
-                u = *(_minions.begin());
+                    u = *(_minions.begin());
                 //if (u)
                 //    TC_LOG_ERROR("entities.player", "bot_dranger_ai::SummonBotPet(): found minion to erase(2)");
 
@@ -556,7 +556,7 @@ public:
             //for (uint8 i = 0; i != MAX_SPELL_SCHOOL; ++i)
             //    me->m_threatModifier[1] = 0.0f;
 
-            _blackArrowKillGUID = 0;
+            _blackArrowKillGUID = ObjectGuid::Empty;
 
             DefaultInit();
 
@@ -605,7 +605,7 @@ public:
         //    return &Darkranger_spells_support;
         //}
     private:
-        uint64 _blackArrowKillGUID;
+        ObjectGuid _blackArrowKillGUID;
         typedef std::set<Unit*> Summons;
         Summons _minions;
     };
