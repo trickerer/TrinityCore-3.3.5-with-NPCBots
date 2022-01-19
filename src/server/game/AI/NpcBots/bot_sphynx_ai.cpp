@@ -25,7 +25,7 @@ TODO:
 
 enum SphynxBaseSpells
 {
-    MAIN_ATTACK_1           = SPELL_SHADOW_BOLT,
+    MAIN_ATTACK_1           = SPELL_SHADOW_BOLT1,
     SPLASH_ATTACK_1         = SPELL_SHADOW_BLAST,
     DEVOUR_MAGIC_1          = SPELL_DEVOUR_MAGIC,
     DRAIN_MANA_1            = SPELL_DRAIN_MANA,

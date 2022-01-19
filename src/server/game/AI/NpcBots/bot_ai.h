@@ -120,8 +120,8 @@ class bot_ai : public CreatureAI
         void ApplyBotSpellRangeMods(SpellInfo const* spellInfo, float& maxrange) const;
         void ApplyBotSpellMaxTargetsMods(SpellInfo const* spellInfo, uint32& targets) const;
         void ApplyBotSpellChanceOfSuccessMods(SpellInfo const* spellInfo, float& chance) const;
-        void ApplyBotEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
-        void ApplyBotEffectMods(Unit const* target, SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
+        void ApplyBotEffectMods(WorldObject const* wtarget, SpellInfo const* spellInfo, uint8 effIndex, float& value) const;
+        void ApplyBotThreatMods(SpellInfo const* spellInfo, float& threat) const;
         virtual uint8 GetBotStance() const;
         uint32 GetBotRoles() const { return _roleMask; }
         bool HasRole(uint32 role) const { return _roleMask & role; }
@@ -133,6 +133,7 @@ class bot_ai : public CreatureAI
         bool IsOffTank(Unit const* unit = nullptr) const;
 
         uint32 GetLastZoneId() const { return _lastZoneId; }
+        bool IsInHeroicOrRaid() const;
 
         bool IAmFree() const;
 
@@ -395,8 +396,8 @@ class bot_ai : public CreatureAI
         virtual void ApplyClassSpellRangeMods(SpellInfo const* /*spellInfo*/, float& /*maxrange*/) const {}
         virtual void ApplyClassSpellMaxTargetsMods(SpellInfo const* /*spellInfo*/, uint32& /*targets*/) const {}
         virtual void ApplyClassSpellChanceOfSuccessMods(SpellInfo const* /*spellInfo*/, float& /*chance*/) const {}
-        virtual void ApplyClassEffectMods(SpellInfo const* /*spellInfo*/, uint8 /*effIndex*/, float& /*value*/) const {}
-        virtual void ApplyClassEffectModsTarget(Unit const* /*target*/, SpellInfo const* /*spellInfo*/, uint8 /*effIndex*/, float& /*value*/) const {}
+        virtual void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* /*spellInfo*/, uint8 /*effIndex*/, float& /*value*/) const {}
+        virtual void ApplyClassThreatMods(SpellInfo const* /*spellInfo*/, float& /*threat*/) const {}
 
         virtual void InitPowers() {}
         virtual void InitSpells() = 0;
@@ -426,6 +427,9 @@ class bot_ai : public CreatureAI
         void BotSay(const std::string &text, Player const* target = nullptr) const;
         void BotWhisper(const std::string &text, Player const* target = nullptr) const;
         void BotYell(const std::string &text, Player const* target = nullptr) const;
+        void BotSay(std::string&& text, Player const* target = nullptr) const;
+        void BotWhisper(std::string&& text, Player const* target = nullptr) const;
+        void BotYell(std::string&& text, Player const* target = nullptr) const;
 
         void ReportSpellCast(uint32 spellId, const std::string& followedByString, Player const* target) const;
 

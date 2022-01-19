@@ -4374,6 +4374,7 @@ NpcBot.Gossip.ShowEquipmentListItems = 0
 #                     1 - (NpcBot.NewClasses.Dreadlord.Enable)
 #                     1 - (NpcBot.NewClasses.SpellBreaker.Enable)
 #                     1 - (NpcBot.NewClasses.DarkRanger.Enable)
+#                     1 - (NpcBot.NewClasses.Necromancer.Enable)
 
 NpcBot.NewClasses.Blademaster.Enable       = 1
 NpcBot.NewClasses.ObsidianDestroyer.Enable = 1
@@ -4381,6 +4382,7 @@ NpcBot.NewClasses.Archmage.Enable          = 1
 NpcBot.NewClasses.Dreadlord.Enable         = 1
 NpcBot.NewClasses.SpellBreaker.Enable      = 1
 NpcBot.NewClasses.DarkRanger.Enable        = 1
+NpcBot.NewClasses.Necromancer.Enable       = 1
 
 #
 #    NpcBot.Stats.Limits.Enable

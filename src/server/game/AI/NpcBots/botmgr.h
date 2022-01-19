@@ -99,6 +99,7 @@ class BotMgr
         static void OnBotPartyEngage(Player const* owner);
         //mod hooks
         static void ApplyBotEffectMods(Unit const* caster, Unit const* target, SpellInfo const* spellInfo, uint8 effIndex, float& value);
+        static void ApplyBotThreatMods(Unit const* attacker, SpellInfo const* spellInfo, float& threat);
         static float GetBotDamageTakenMod(Creature const* bot, bool magic);
         static float GetBotDamageModPhysical();
         static float GetBotDamageModSpell();

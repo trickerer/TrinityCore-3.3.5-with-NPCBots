@@ -1449,7 +1449,9 @@ public:
                         Creature* bot = itr->second;
                         if (!bot || !bot->IsInCombat() || !bot->IsAlive() || bot->IsTempBot()) continue;
                         if (bot->GetPowerType() != POWER_MANA) continue;
-                        if (bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK || bot->GetBotClass() == BOT_CLASS_SPHYNX) continue;
+                        if (bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK ||
+                            bot->GetBotClass() == BOT_CLASS_SPHYNX || bot->GetBotClass() == BOT_CLASS_SPELLBREAKER ||
+                            bot->GetBotClass() == BOT_CLASS_NECROMANCER) continue;
                         if (me->GetExactDist(bot) > 30) continue;
                         if (GetManaPCT(bot) < minmanaval && !bot->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
                         {
@@ -1487,7 +1489,9 @@ public:
                             Creature* bot = it->second;
                             if (!bot || !bot->IsInCombat() || !bot->IsAlive() || bot->IsTempBot()) continue;
                             if (bot->GetPowerType() != POWER_MANA) continue;
-                            if (bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK || bot->GetBotClass() == BOT_CLASS_SPHYNX) continue;
+                            if (bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK ||
+                                bot->GetBotClass() == BOT_CLASS_SPHYNX || bot->GetBotClass() == BOT_CLASS_SPELLBREAKER ||
+                                bot->GetBotClass() == BOT_CLASS_NECROMANCER) continue;
                             if (me->GetExactDist(bot) > 30) continue;
                             if (GetManaPCT(bot) < minmanaval && !bot->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
                             {
@@ -2142,7 +2146,7 @@ public:
             targets = targets + bonusTargets;
         }
 
-        void ApplyClassEffectMods(SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
+        void ApplyClassEffectMods(WorldObject const* /*wtarget*/, SpellInfo const* spellInfo, uint8 effIndex, float& value) const override
         {
             uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
             float pctbonus = 1.0f;

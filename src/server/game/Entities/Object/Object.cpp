@@ -2336,7 +2336,7 @@ float WorldObject::ApplyEffectModifiers(SpellInfo const* spellInfo, uint8 effInd
 
     //npcbot: handle effect mods
     if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsNPCBot())
-        ToCreature()->ApplyCreatureEffectMods(spellInfo, effIndex, value);
+        ToCreature()->ApplyCreatureEffectMods(this, spellInfo, effIndex, value);
     //end npcbot
 
     return value;

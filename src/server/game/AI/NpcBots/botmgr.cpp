@@ -64,6 +64,7 @@ bool _enableclass_archmage;
 bool _enableclass_dreadlord;
 bool _enableclass_spellbreaker;
 bool _enableclass_darkranger;
+bool _enableclass_necromancer;
 bool _botStatLimits;
 float _botStatLimits_dodge;
 float _botStatLimits_parry;
@@ -91,9 +92,11 @@ void AddSC_archmage_bot();
 void AddSC_dreadlord_bot();
 void AddSC_spellbreaker_bot();
 void AddSC_dark_ranger_bot();
+void AddSC_necromancer_bot();
 void AddSC_archmage_bot_pets();
-void AddSC_dark_ranger_bot_pets();
 void AddSC_dreadlord_bot_pets();
+void AddSC_dark_ranger_bot_pets();
+void AddSC_necromancer_bot_pets();
 void AddSC_hunter_bot_pets();
 void AddSC_warlock_bot_pets();
 void AddSC_deathknight_bot_pets();
@@ -122,9 +125,11 @@ void AddNpcBotScripts()
     AddSC_dreadlord_bot();
     AddSC_spellbreaker_bot();
     AddSC_dark_ranger_bot();
+    AddSC_necromancer_bot();
     AddSC_archmage_bot_pets();
-    AddSC_dark_ranger_bot_pets();
     AddSC_dreadlord_bot_pets();
+    AddSC_dark_ranger_bot_pets();
+    AddSC_necromancer_bot_pets();
     AddSC_hunter_bot_pets();
     AddSC_warlock_bot_pets();
     AddSC_deathknight_bot_pets();
@@ -217,6 +222,7 @@ void BotMgr::LoadConfig(bool reload)
     _enableclass_dreadlord          = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.Dreadlord.Enable", true);
     _enableclass_spellbreaker       = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.SpellBreaker.Enable", true);
     _enableclass_darkranger         = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.DarkRanger.Enable", true);
+    _enableclass_necromancer        = sConfigMgr->GetBoolDefault("NpcBot.NewClasses.Necromancer.Enable", true);
     _botStatLimits                  = sConfigMgr->GetBoolDefault("NpcBot.Stats.Limits.Enable", false);
     _botStatLimits_dodge            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Dodge", 95.0f);
     _botStatLimits_parry            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Parry", 95.0f);
@@ -348,6 +354,8 @@ bool BotMgr::IsClassEnabled(uint8 m_class)
             return _enableclass_spellbreaker;
         case BOT_CLASS_DARK_RANGER:
             return _enableclass_darkranger;
+        case BOT_CLASS_NECROMANCER:
+            return _enableclass_necromancer;
         default:
             return true;
     }
@@ -1096,6 +1104,7 @@ uint32 BotMgr::GetNpcBotCost(uint8 level, uint8 botclass)
         case BOT_CLASS_BM:
         case BOT_CLASS_ARCHMAGE:
         case BOT_CLASS_SPELLBREAKER:
+        case BOT_CLASS_NECROMANCER:
             cost += cost; //200%
             break;
         case BOT_CLASS_SPHYNX:
@@ -1157,7 +1166,9 @@ uint8 BotMgr::BotClassByClassName(std::string const& className)
         { "spellbreaker", BOT_CLASS_SPELLBREAKER },
         { "spell_breaker", BOT_CLASS_SPELLBREAKER },
         { "darkranger", BOT_CLASS_DARK_RANGER },
-        { "dark_ranger", BOT_CLASS_DARK_RANGER }
+        { "dark_ranger", BOT_CLASS_DARK_RANGER },
+        { "necromancer", BOT_CLASS_NECROMANCER },
+        { "necro", BOT_CLASS_NECROMANCER }
     };
 
     //std::transform(className.begin(), className.end(), className.begin(), std::tolower);
@@ -1518,6 +1529,11 @@ void BotMgr::OnBotPartyEngage(Player const* owner)
 void BotMgr::ApplyBotEffectMods(Unit const* caster, Unit const* target, SpellInfo const* spellInfo, uint8 effIndex, float& value)
 {
     caster->ToCreature()->GetBotAI()->ApplyBotEffectMods(target, spellInfo, effIndex, value);
+}
+
+void BotMgr::ApplyBotThreatMods(Unit const* attacker, SpellInfo const* spellInfo, float& threat)
+{
+    attacker->ToCreature()->GetBotAI()->ApplyBotThreatMods(spellInfo, threat);
 }
 
 float BotMgr::GetBotDamageTakenMod(Creature const* bot, bool magic)
