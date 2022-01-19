@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "DBCStores.h"
+#include "GameClient.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "Item.h"
@@ -31,6 +32,9 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 #include "SpellMgr.h"
 #include "SpellPackets.h"
 #include "Totem.h"
@@ -325,6 +329,10 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 
     if (GameObject* go = GetPlayer()->GetGameObjectIfCanInteractWith(guid))
     {
+#ifdef ELUNA
+        if (sEluna->OnGameObjectUse(_player, go))
+            return;
+#endif
         if (go->AI()->OnReportUse(_player))
             return;
 
@@ -342,8 +350,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     TC_LOG_DEBUG("network", "WORLD: got cast spell packet, castCount: %u, spellId: %u, castFlags: %u, data length = %u", castCount, spellId, castFlags, (uint32)recvPacket.size());
 
     // ignore for remote control state (for player case)
-    Unit* mover = _player->GetCharmedOrSelf();
-    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
+    Unit* mover = GetGameClient()->GetActivelyMovedUnit();
+    if (!mover || (mover != _player && mover->GetTypeId() == TYPEID_PLAYER))
     {
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
@@ -552,10 +560,10 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPackets::Spells::Cance
 
 void WorldSession::HandleCancelChanneling(WorldPackets::Spells::CancelChannelling& cancelChanneling)
 {
-    Unit* mover = _player->GetCharmedOrSelf();
+    Unit* mover = GetGameClient()->GetActivelyMovedUnit();
 
     // ignore for remote control state (for player case)
-    if (_player->GetCharmed() && _player->GetCharmed()->GetTypeId() == TYPEID_PLAYER)
+    if (!mover)
         return;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(cancelChanneling.ChannelSpell);
