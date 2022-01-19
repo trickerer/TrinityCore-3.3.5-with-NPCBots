@@ -1,0 +1,1 @@
+Copy scripts from here into the lua_scripts exported folder after build
