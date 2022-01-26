@@ -11,6 +11,7 @@
 -- Configurable
 local SpawnMessage = 'Greetings $N, it looks like you are in need of assistance!'
 local RezMessage = '... Normally there is a fee, but I can waive it this time...'
+local SorryMessage = 'Oh dear... Sorry $N, but Kevin doesn\'t allow me to resurrect people that are not out in the open world...'
 local RezSpellToCast = 72429
 local LightbringerNPC = 376581
 local spawnHeight = 9
@@ -27,7 +28,7 @@ WorldDBQuery(creatureSQL)
 
 -- On Player Death by Creature we send the Calvery
 function OnPlayerKilledByCreature(event, killer, player)
-		
+
 	-- Spawn Healer
 	local creature = killer:SpawnCreature(
 		LightbringerNPC, 
@@ -40,13 +41,39 @@ function OnPlayerKilledByCreature(event, killer, player)
 	
 	-- Whisper the Player
 	creature:SendUnitWhisper(SpawnMessage, 0, player, false)
-	creature:SendUnitWhisper(RezMessage, 0, player, false)
-	creature:CastSpell(player, RezSpellToCast)
+	
+	-- If Player is rezable then rez
+	if (IsPlayerRezable(player:GetMap())) then
+	
+		-- Rez Spell cast/messages
+		creature:SendUnitWhisper(RezMessage, 0, player, false)
+		creature:CastSpell(player, RezSpellToCast)
+		
+	else -- Say your sorry
+	
+		creature:SendUnitWhisper(SorryMessage, 0, player, false)
+		
+	end
 	
 	-- Random Move
 	creature:MoveRandom(20)
+
 	
-	
+end
+
+-- function to make sure player is in open world
+function IsPlayerRezable(Map) 
+	if(
+		Map:IsDungeon() or
+		Map:IsArena() or
+		Map:IsRaid() or
+		Map:IsBattleground() or
+		Map:IsHeroic()
+	) then
+		return false
+	else
+		return true
+	end
 end
 
 RegisterPlayerEvent(PLAYER_EVENT_ON_KILLED_BY_CREATURE, OnPlayerKilledByCreature)
