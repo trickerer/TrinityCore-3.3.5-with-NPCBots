@@ -60,6 +60,7 @@ public:
             }
             CloseGossipMenuFor(player);
             player->UpdateWeaponsSkillsToMaxSkillsForLevel();
+            player->UpdateSkillsForLevel();
             ObjectAccessor::SaveAllPlayers();//Save
             return true;
         }
