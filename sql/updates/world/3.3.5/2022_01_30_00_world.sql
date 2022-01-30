@@ -1,5 +1,3 @@
-SET SQL_SAFE_UPDATES = 0;
-
 -- Updating normal mobs to react to ashbringer
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4295;
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4298;
@@ -12,8 +10,8 @@ UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=43
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4299;
 
 -- Adding Copys of the bosses
-INSERT INTO `creature_template` (`entry`,`difficulty_entry_1`,`difficulty_entry_2`,`difficulty_entry_3`,`KillCredit1`,`KillCredit2`,`modelid1`,`modelid2`,`modelid3`,`modelid4`,`name`,`subname`,`IconName`,`gossip_menu_id`,`minlevel`,`maxlevel`,`exp`,`faction`,`npcflag`,`speed_walk`,`speed_run`,`scale`,`rank`,`dmgschool`,`BaseAttackTime`,`RangeAttackTime`,`BaseVariance`,`RangeVariance`,`unit_class`,`unit_flags`,`unit_flags2`,`dynamicflags`,`family`,`type`,`type_flags`,`lootid`,`pickpocketloot`,`skinloot`,`PetSpellDataId`,`VehicleId`,`mingold`,`maxgold`,`AIName`,`MovementType`,`HoverHeight`,`HealthModifier`,`ManaModifier`,`ArmorModifier`,`DamageModifier`,`ExperienceModifier`,`RacialLeader`,`movementId`,`RegenHealth`,`mechanic_immune_mask`,`spell_school_immune_mask`,`flags_extra`,`ScriptName`,`VerifiedBuild`)
-VALUES
+DELETE FROM `creature_template` WHERE `entry` = 763976 OR `entry` = 764542;
+INSERT INTO `creature_template` (`entry`,`difficulty_entry_1`,`difficulty_entry_2`,`difficulty_entry_3`,`KillCredit1`,`KillCredit2`,`modelid1`,`modelid2`,`modelid3`,`modelid4`,`name`,`subname`,`IconName`,`gossip_menu_id`,`minlevel`,`maxlevel`,`exp`,`faction`,`npcflag`,`speed_walk`,`speed_run`,`scale`,`rank`,`dmgschool`,`BaseAttackTime`,`RangeAttackTime`,`BaseVariance`,`RangeVariance`,`unit_class`,`unit_flags`,`unit_flags2`,`dynamicflags`,`family`,`type`,`type_flags`,`lootid`,`pickpocketloot`,`skinloot`,`PetSpellDataId`,`VehicleId`,`mingold`,`maxgold`,`AIName`,`MovementType`,`HoverHeight`,`HealthModifier`,`ManaModifier`,`ArmorModifier`,`DamageModifier`,`ExperienceModifier`,`RacialLeader`,`movementId`,`RegenHealth`,`mechanic_immune_mask`,`spell_school_immune_mask`,`flags_extra`,`ScriptName`,`VerifiedBuild`) VALUES
 (763976,0,0,0,0,0,2042,0,0,0,'Scarlet Commander Mograine','',NULL,0,40,40,0,67,0,1,1.14286,1,1,0,2200,2000,1,1,2,64,2048,0,0,7,0,3976,3976,0,0,0,319,422,'',1,1,4.5,2,1,2.4,1,0,0,1,536941137,0,0,'npc_scarlet_commander_mograine',12340),
 (764542,0,0,0,0,0,2605,0,0,0,'High Inquisitor Fairbanks','',NULL,0,40,40,0,67,1,1,1.14286,1,1,0,2000,2000,1,1,2,32832,2048,0,0,6,0,4542,4542,0,0,0,329,434,'',1,1,5,2,1,2.4,1,0,0,1,545329745,0,2,'npc_fairbanks',12340);
 
@@ -154,5 +152,3 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES
 (100114, "Aye, I did. Much to the dismay of the lesser Mograine, I made my way back to the Scarlet Monastery. I shouted and screamed. I told the tale to any that would listen. And I would be murdered in cold blood for my actions, dragged to this chamber - the dark secret of the order. But some did listen... some heard my words. Thus was born the Argent Dawn..."),
 (100115, "I'm afraid that the blade which you hold in your hands is beyond saving. The hatred runs too deep. But do not lose hope, hero. Where one chapter has ended, a new one begins. $B Find his son - a more devout and pious man you may never meet.It is rumored that he is able to build the Ashbringer anew, without requiring the old, tainted blade."),
 (100116, "<High Inquisitor Fairbanks shakes his head.>\n\nNo, $C; only one of his sons is dead. The other lives...\n\n<High Inquisitor Fairbanks points to the sky>\n\nThe Outland... Find him there..."); 
-
-SET SQL_SAFE_UPDATES = 1;
