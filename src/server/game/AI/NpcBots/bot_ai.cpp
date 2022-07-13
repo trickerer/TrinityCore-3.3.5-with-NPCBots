@@ -4914,7 +4914,7 @@ void bot_ai::_updateMountedState()
     if (master->IsMounted() && !me->IsMounted() && !master->IsInCombat() && !me->IsInCombat() && !me->GetVictim())
     {
         uint32 mount = 0;
-        Unit::AuraEffectList const &mounts = master->GetAuraEffectsByType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED);
+        Unit::AuraEffectList const &mounts = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
         if (!mounts.empty())
         {
             //Winter Veil addition
@@ -4927,12 +4927,20 @@ void bot_ai::_updateMountedState()
         {
             if (me->HasAuraType(SPELL_AURA_MOUNTED))
                 me->RemoveAurasByType(SPELL_AURA_MOUNTED);
-            //if not flying mount and not in AQ40, get class specific mounts
-            uint32 mountSpeed = mounts.front()->GetAmount();
 
+            //lookup mount speed based on mount ID, defaulting to 0 so it reverts to old behavior if not found
+            uint32 mountSpeed = 0;
+            Aura *mountSpeedAura = master->GetAura(mount);
+            if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_0)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
+                mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_0)->GetAmount(); 
+            else if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_1)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
+                mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_1)->GetAmount();
+            else if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_2)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
+                mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_2)->GetAmount();
+            
+            //if not flying mount, and not in AQ40, and speed makes sense, get class specific mounts
             if (!master->CanFly() && me->GetMapId() != 531 && (mountSpeed < 130 && mountSpeed > 30))
             {
-
                 switch (me->GetBotClass())
                 {
                     case BOT_CLASS_DARK_RANGER:
@@ -4962,8 +4970,6 @@ void bot_ai::_updateMountedState()
                 }
             }
 
- 
-                    
             //me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_MOUNTED);
 
             //if (!GetSpell(mount))
