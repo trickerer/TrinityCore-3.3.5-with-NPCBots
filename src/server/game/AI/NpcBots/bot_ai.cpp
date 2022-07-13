@@ -4932,12 +4932,12 @@ void bot_ai::_updateMountedState()
             uint32 mountSpeed = 0;
             Aura *mountSpeedAura = master->GetAura(mount);
             if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_0)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
-                mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_0)->GetAmount(); 
+                mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_0)->GetAmount();
             else if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_1)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
                 mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_1)->GetAmount();
             else if (mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_2)->GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
                 mountSpeed = mountSpeedAura->GetEffect(AFLAG_EFF_INDEX_2)->GetAmount();
-            
+
             //if not flying mount, and not in AQ40, and speed makes sense, get class specific mounts
             if (!master->CanFly() && me->GetMapId() != 531 && (mountSpeed < 130 && mountSpeed > 30))
             {
