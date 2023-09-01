@@ -3477,6 +3477,9 @@ void SpellMgr::LoadSpellInfoCorrections()
         80933, // Bunny Mount
 	    80938, // FOX Mount
 	    80943, // HAND Mount
+        80990, // Blue Phönix
+        80995, // Orange Phönix
+        81000, // Katzenmount
         74856, // Blazing Hippogryph
         75614, // Celestial Steed
         75973  // X-53 Touring Rocket
