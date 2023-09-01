@@ -3474,6 +3474,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         65917, // Magic Rooster
         71342, // Big Love Rocket
         72286, // Invincible
+        80933, // Bunny Mount
+	    80938, // FOX Mount
+	    80943, // HAND Mount
+        80990, // Blue Phönix
+        80995, // Orange Phönix
+        81000, // Katzenmount
         74856, // Blazing Hippogryph
         75614, // Celestial Steed
         75973  // X-53 Touring Rocket
@@ -4956,6 +4962,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(5); // 40yd
     });
+
+    // CUSTOM: DK BOSS SCOURGE AURA
+    ApplySpellFix({ 60023 }, [](SpellInfo* spellInfo)
+        {
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
+        });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
