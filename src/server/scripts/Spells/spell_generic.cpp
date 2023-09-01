@@ -2201,6 +2201,42 @@ enum Mounts
     SPELL_INVINCIBLE_100                = 72282,
     SPELL_INVINCIBLE_150                = 72283,
     SPELL_INVINCIBLE_310                = 72284,
+    
+    // Bunny Mount
+    SPELL_BUNNY_60                 	    = 80929,
+    SPELL_BUNNY_100                	    = 80930,
+    SPELL_BUNNY_150                	    = 80931,
+    SPELL_BUNNY_310                	    = 80932,
+
+    // Blauer Phönix
+    SPELL_PHOENIX_A_60                  = 80986,
+    SPELL_PHOENIX_A_100                 = 80987,
+    SPELL_PHOENIX_A_150                 = 80988,
+    SPELL_PHOENIX_A_310                 = 80989,
+
+    // Oranger Phönix
+    SPELL_PHOENIX_B_60                  = 80991,
+    SPELL_PHOENIX_B_100                 = 80992,
+    SPELL_PHOENIX_B_150                 = 80993,
+    SPELL_PHOENIX_B_310                 = 80994,
+
+    // Katzenmount Phönix
+    SPELL_CATMOUNT_60                  = 80996,
+    SPELL_CATMOUNT_100                 = 80997,
+    SPELL_CATMOUNT_150                 = 80998,
+    SPELL_CATMOUNT_310                 = 80999,
+
+    // Fox Mount
+    SPELL_FOX_60                 	    = 80934,
+    SPELL_FOX_100                	    = 80935,
+    SPELL_FOX_150                	    = 80936,
+    SPELL_FOX_310                	    = 80937,
+
+    // Hand Mount
+    SPELL_HAND_60                 	    = 80939,
+    SPELL_HAND_100                	    = 80940,
+    SPELL_HAND_150                	    = 80941,
+    SPELL_HAND_310                	    = 80942,
 
     // Blazing Hippogryph
     SPELL_BLAZING_HIPPOGRYPH_150        = 74854,
@@ -4677,6 +4713,12 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100);
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_big_love_rocket", SPELL_BIG_LOVE_ROCKET_0, SPELL_BIG_LOVE_ROCKET_60, SPELL_BIG_LOVE_ROCKET_100, SPELL_BIG_LOVE_ROCKET_150, SPELL_BIG_LOVE_ROCKET_310);
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_invincible", 0, SPELL_INVINCIBLE_60, SPELL_INVINCIBLE_100, SPELL_INVINCIBLE_150, SPELL_INVINCIBLE_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_bunny", 0, SPELL_BUNNY_60, SPELL_BUNNY_100, SPELL_BUNNY_150, SPELL_BUNNY_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_phoenix_a", 0, SPELL_PHOENIX_A_60, SPELL_PHOENIX_A_100, SPELL_PHOENIX_A_150, SPELL_PHOENIX_A_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_phoenix_b", 0, SPELL_PHOENIX_B_60, SPELL_PHOENIX_B_100, SPELL_PHOENIX_B_150, SPELL_PHOENIX_B_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_catmount", 0, SPELL_CATMOUNT_60, SPELL_CATMOUNT_100, SPELL_CATMOUNT_150, SPELL_CATMOUNT_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_fox", 0, SPELL_FOX_60, SPELL_FOX_100, SPELL_FOX_150, SPELL_FOX_310);
+    RegisterSpellScriptWithArgs(spell_gen_mount, "spell_hand", 0, SPELL_HAND_60, SPELL_HAND_100, SPELL_HAND_150, SPELL_HAND_310);
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_blazing_hippogryph", 0, 0, 0, SPELL_BLAZING_HIPPOGRYPH_150, SPELL_BLAZING_HIPPOGRYPH_280);
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_celestial_steed", 0, SPELL_CELESTIAL_STEED_60, SPELL_CELESTIAL_STEED_100, SPELL_CELESTIAL_STEED_150, SPELL_CELESTIAL_STEED_280, SPELL_CELESTIAL_STEED_310);
     RegisterSpellScriptWithArgs(spell_gen_mount, "spell_x53_touring_rocket", 0, 0, 0, SPELL_X53_TOURING_ROCKET_150, SPELL_X53_TOURING_ROCKET_280, SPELL_X53_TOURING_ROCKET_310);
