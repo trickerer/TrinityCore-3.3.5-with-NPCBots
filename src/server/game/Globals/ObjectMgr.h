@@ -73,20 +73,15 @@ enum SummonerType
 struct TempSummonGroupKey
 {
     TempSummonGroupKey(uint32 summonerEntry, SummonerType summonerType, uint8 group)
-        : _summonerEntry(summonerEntry), _summonerType(summonerType), _summonGroup(group)
+        : SummonerEntry(summonerEntry), SummonerType(summonerType), SummonGroup(group)
     {
     }
 
-    bool operator<(TempSummonGroupKey const& rhs) const
-    {
-        return std::tie(_summonerEntry, _summonerType, _summonGroup) <
-            std::tie(rhs._summonerEntry, rhs._summonerType, rhs._summonGroup);
-    }
+    std::strong_ordering operator<=>(TempSummonGroupKey const& right) const = default;
 
-private:
-    uint32 _summonerEntry;      ///< Summoner's entry
-    SummonerType _summonerType; ///< Summoner's type, see SummonerType for available types
-    uint8 _summonGroup;         ///< Summon's group id
+    uint32 SummonerEntry;           ///< Summoner's entry
+    ::SummonerType SummonerType;    ///< Summoner's type, see SummonerType for available types
+    uint8 SummonGroup;              ///< Summon's group id
 };
 
 /// Stores data for temp summons
@@ -623,7 +618,6 @@ struct QuestRelationResult
                 }
 
                 bool operator==(Iterator const& other) const { return _it == other._it; }
-                bool operator!=(Iterator const& other) const { return _it != other._it; }
 
                 Iterator& operator++() { ++_it; skip(); return *this; }
                 Iterator operator++(int) { Iterator t = *this; ++*this; return t; }
