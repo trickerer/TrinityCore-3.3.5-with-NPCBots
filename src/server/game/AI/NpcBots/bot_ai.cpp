@@ -12271,7 +12271,7 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
     if (newItem->GetState() == ITEM_REMOVED)
     {
         TC_LOG_ERROR("entities.player",
-            "minion_ai::_equip(): player %s (%s) is trying to make bot %s (id: %u) equip item: %s (id: %u, %s) which has state ITEM_REMOVED!",
+            "minion_ai::_equip(): player {} ({}) is trying to make bot {} (id: {}) equip item: {} (id: {}, {}) which has state ITEM_REMOVED!",
             master->GetName(), master->GetGUID().ToString(), me->GetName(), me->GetEntry(), proto->Name1, proto->ItemId, newItem->GetGUID().ToString());
         return false;
     }
@@ -12305,7 +12305,7 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
             //BotWhisper(msg.str().c_str());
 
             TC_LOG_ERROR("entities.player",
-                "minion_ai::_equip(): player %s (%s) is trying to make bot %s (id: %u) equip item: %s (id: %u, %s) but either does not have this item or does not own it",
+                "minion_ai::_equip(): player {} ({}) is trying to make bot {} (id: {}) equip item: {} (id: {}, {}) but either does not have this item or does not own it",
                 master->GetName(), master->GetGUID().ToString(), me->GetName(), me->GetEntry(), proto->Name1, proto->ItemId, newItem->GetGUID().ToString());
             return false;
         }
