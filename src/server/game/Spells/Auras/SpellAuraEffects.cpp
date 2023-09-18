@@ -4494,6 +4494,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (target->GetTypeId() == TYPEID_PLAYER)
                         target->ToPlayer()->RemoveAmmo();      // not use ammo and not allow use
                     break;
+                case 81101:                                     // Requires No Ammo
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                        target->ToPlayer()->RemoveAmmo();      // not use ammo and not allow use
+                    break;
             }
         }
         // AT REMOVE
