@@ -12053,6 +12053,10 @@ InventoryResult Player::CanUseAmmo(uint32 item) const
         if (HasAura(46699))
             return EQUIP_ERR_BAG_FULL6;
 
+        // Requires No Ammo
+        if (HasAura(81101))
+            return EQUIP_ERR_BAG_FULL6;
+
         return EQUIP_ERR_OK;
     }
     return EQUIP_ERR_ITEM_NOT_FOUND;
