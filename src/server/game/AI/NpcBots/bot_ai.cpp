@@ -136,7 +136,7 @@ static constexpr uint32 EatSpells[MAX_FEAST_SPELLS][2] =
     { 75, 45548 },
     { 80, 45548 }
 };
-uint8 GroupIconsFlags[TARGETICONCOUNT] =
+uint8 GroupIconsFlags[TARGET_ICONS_COUNT] =
 {
     /*STAR        = */0x001,
     /*CIRCLE      = */0x002,
@@ -1312,7 +1312,7 @@ bool bot_ai::IsPointedTarget(Unit const* target, uint8 targetFlags) const
 {
     if (Group const* gr = (IAmFree() ? nullptr : master->GetGroup()))
         if (targetFlags)
-            for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
+            for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
                 if (targetFlags & GroupIconsFlags[i])
                     if (target->GetGUID() == gr->GetTargetIcons()[i])
                         return true;
@@ -1528,7 +1528,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         }
 
         //check if we have pointed heal target
-        for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
+        for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
         {
             if (BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i])
             {
@@ -3497,7 +3497,7 @@ bool bot_ai::IsInBotParty(Unit const* unit) const
         if (gr->IsMember(unit->GetGUID()))
             return true;
         //pointed target case
-        for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
+        for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if ((BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i]) &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags() | BotMgr::GetRangedDPSTargetIconFlags()) & GroupIconsFlags[i]))
                 if (ObjectGuid guid = gr->GetTargetIcons()[i])
@@ -3553,7 +3553,7 @@ bool bot_ai::IsInBotParty(ObjectGuid guid) const
         if (gr->IsMember(guid))
             return true;
         //pointed target case
-        for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
+        for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if ((BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i]) &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
                 if (ObjectGuid gguid = gr->GetTargetIcons()[i])
@@ -3734,7 +3734,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     if (gr && IsOffTank())
     {
         Unit* tankTar = nullptr;
-        for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+        for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
             if (BotMgr::GetOffTankTargetIconFlags() & GroupIconsFlags[i])
             {
@@ -3766,7 +3766,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     }
     if (gr)
     {
-        for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+        for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
             if (ObjectGuid guid = gr->GetTargetIcons()[i])
             {
@@ -4047,7 +4047,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         }
 
         Unit* tankTar = nullptr;
-        for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+        for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
             if (i == _primaryIconTank)
                 continue;
@@ -4109,7 +4109,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         }
 
         Unit* tankTar = nullptr;
-        for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+        for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
             if (i == _primaryIconTank)
                 continue;
@@ -4176,7 +4176,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
             }
         }
 
-        for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+        for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
             if (i == _primaryIconDamage)
                 continue;
@@ -10294,7 +10294,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             switch (role)
             {
                 case BOT_ROLE_TANK:
-                    for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+                    for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
                     {
                         bool prio = i == _primaryIconTank;
                         ObjectGuid guid = gr->GetTargetIcons()[i];
@@ -10304,7 +10304,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     AddGossipItemFor(player, (_primaryIconTank == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF - 1));
                     break;
                 case BOT_ROLE_DPS:
-                    for (int8 i = TARGETICONCOUNT - 1; i >= 0; --i)
+                    for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
                     {
                         bool prio = i == _primaryIconDamage;
                         ObjectGuid guid = gr->GetTargetIcons()[i];

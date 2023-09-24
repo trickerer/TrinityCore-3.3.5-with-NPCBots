@@ -71,7 +71,7 @@ float constexpr CryptLordPetPositionAnglesByPosNumber[CRYPT_LORD_MAX_PET_POSITIO
     3.9269910f //5*M_PI/4
 };
 
-extern uint8 GroupIconsFlags[TARGETICONCOUNT];
+extern uint8 GroupIconsFlags[TARGET_ICONS_COUNT];
 
 static uint16 __rand; //calculated for each bot separately once every updateAI tick
 
@@ -1428,7 +1428,7 @@ bool bot_pet_ai::IsInBotParty(Unit const* unit) const
         if (gr->IsMember(unit->GetGUID()))
             return true;
         //pointed target case
-        for (uint8 i = 0; i != TARGETICONCOUNT; ++i)
+        for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if (BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i] &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
                 if (ObjectGuid guid = gr->GetTargetIcons()[i])

@@ -821,7 +821,7 @@ uint8 BotMgr::GetNpcBotXpReductionStartingNumber()
 
 uint8 BotMgr::GetMaxNpcBots()
 {
-    return _maxNpcBots <= MAXRAIDSIZE - 1 ? _maxNpcBots : MAXRAIDSIZE - 1;
+    return _maxNpcBots <= MAX_RAID_SIZE - 1 ? _maxNpcBots : MAX_RAID_SIZE - 1;
 }
 
 int32 BotMgr::GetBotInfoPacketsLimit()
