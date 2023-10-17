@@ -3743,82 +3743,95 @@ bool Map::ActiveObjectsNearGrid(NGridType const& ngrid) const
     return false;
 }
 
-template<class T>
-void Map::AddToActive(T* obj)
+void Map::AddToActive(WorldObject* obj)
 {
     AddToActiveHelper(obj);
-}
 
-template <>
-void Map::AddToActive(Creature* c)
-{
-    AddToActiveHelper(c);
-
-    // also not allow unloading spawn grid to prevent creating creature clone at load
-    if (!c->IsPet() && c->GetSpawnId())
+    Optional<Position> respawnLocation;
+    switch (obj->GetTypeId())
     {
-        float x, y, z;
-        c->GetRespawnPosition(x, y, z);
-        GridCoord p = Trinity::ComputeGridCoord(x, y);
+        case TYPEID_UNIT:
+            if (Creature* creature = obj->ToCreature(); !creature->IsPet() && creature->GetSpawnId())
+            {
+                respawnLocation.emplace();
+                creature->GetRespawnPosition(respawnLocation->m_positionX, respawnLocation->m_positionY, respawnLocation->m_positionZ);
+            }
+            break;
+        case TYPEID_GAMEOBJECT:
+            if (GameObject* gameObject = obj->ToGameObject(); gameObject->GetSpawnId())
+            {
+                respawnLocation.emplace();
+                gameObject->GetRespawnPosition(respawnLocation->m_positionX, respawnLocation->m_positionY, respawnLocation->m_positionZ);
+            }
+            break;
+        default:
+            break;
+    }
+
+    if (respawnLocation)
+    {
+        GridCoord p = Trinity::ComputeGridCoord(respawnLocation->GetPositionX(), respawnLocation->GetPositionY());
         if (getNGrid(p.x_coord, p.y_coord))
             getNGrid(p.x_coord, p.y_coord)->incUnloadActiveLock();
         //npcbot
-        else if (c->IsNPCBot())
-            EnsureGridLoadedForActiveObject(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())), c);
+        else if (obj->IsNPCBot())
+            EnsureGridLoadedForActiveObject(Cell(Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY())), obj);
         //end npcbot
         else
         {
-            GridCoord p2 = Trinity::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
-            TC_LOG_ERROR("maps", "Active creature{} added to grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
-                c->GetGUID().ToString(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            GridCoord p2 = Trinity::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+            TC_LOG_ERROR("maps", "Active object {} added to grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
+                obj->GetGUID().ToString(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
         }
     }
 }
 
-template<>
-void Map::AddToActive(DynamicObject* d)
+void Map::RemoveFromActive(WorldObject* obj)
 {
-    AddToActiveHelper(d);
-}
+    RemoveFromActiveHelper(obj);
 
-template<class T>
-void Map::RemoveFromActive(T* /*obj*/) { }
-
-template <>
-void Map::RemoveFromActive(Creature* c)
-{
-    RemoveFromActiveHelper(c);
-
-    // also allow unloading spawn grid
-    if (!c->IsPet() && c->GetSpawnId())
+    Optional<Position> respawnLocation;
+    switch (obj->GetTypeId())
     {
-        float x, y, z;
-        //npcbot: prevent crash from accessing deleted creatureData
-        if (c->IsNPCBot())
-            c->GetHomePosition().GetPosition(x, y, z);
-        else
-        //end npcbot
-        c->GetRespawnPosition(x, y, z);
-        GridCoord p = Trinity::ComputeGridCoord(x, y);
+        case TYPEID_UNIT:
+            if (Creature* creature = obj->ToCreature(); !creature->IsPet() && creature->GetSpawnId())
+            {
+                respawnLocation.emplace();
+                //npcbot: prevent crash from accessing deleted creatureData
+                if (creature->IsNPCBot())
+                    creature->GetHomePosition().GetPosition(respawnLocation->m_positionX, respawnLocation->m_positionY, respawnLocation->m_positionZ);
+                else
+                //end npcbot
+                creature->GetRespawnPosition(respawnLocation->m_positionX, respawnLocation->m_positionY, respawnLocation->m_positionZ);
+            }
+            break;
+        case TYPEID_GAMEOBJECT:
+            if (GameObject* gameObject = obj->ToGameObject(); gameObject->GetSpawnId())
+            {
+                respawnLocation.emplace();
+                gameObject->GetRespawnPosition(respawnLocation->m_positionX, respawnLocation->m_positionY, respawnLocation->m_positionZ);
+            }
+            break;
+        default:
+            break;
+    }
+
+    if (respawnLocation)
+    {
+        GridCoord p = Trinity::ComputeGridCoord(respawnLocation->GetPositionX(), respawnLocation->GetPositionY());
         if (getNGrid(p.x_coord, p.y_coord))
             getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
         //npcbot
-        else if (c->IsNPCBot())
-            EnsureGridLoaded(Cell(Trinity::ComputeCellCoord(c->GetPositionX(), c->GetPositionY())));
+        else if (obj->IsNPCBot())
+            EnsureGridLoaded(Cell(Trinity::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY())));
         //end npcbot
         else
         {
-            GridCoord p2 = Trinity::ComputeGridCoord(c->GetPositionX(), c->GetPositionY());
-            TC_LOG_ERROR("maps", "Active creature {} removed from grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
-                c->GetGUID().ToString(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+            GridCoord p2 = Trinity::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+            TC_LOG_ERROR("maps", "Active object {} removed from grid[{}, {}] but spawn grid[{}, {}] was not loaded.",
+                obj->GetGUID().ToString(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
         }
     }
-}
-
-template<>
-void Map::RemoveFromActive(DynamicObject* obj)
-{
-    RemoveFromActiveHelper(obj);
 }
 
 template TC_GAME_API bool Map::AddToMap(Corpse*);
