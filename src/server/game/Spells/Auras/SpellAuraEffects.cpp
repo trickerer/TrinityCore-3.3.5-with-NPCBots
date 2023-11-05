@@ -2673,7 +2673,7 @@ void UpdateCustomMountDisplayId(Unit* target, uint32& creatureEntry)
 
         switch (active_spec)
         {
-        case HUNTER_BEASTMASTER:
+        case HUNTER_BEAST_MASTERY:
             creatureEntry = 32637;
             break;
         case HUNTER_MARKSMAN:
