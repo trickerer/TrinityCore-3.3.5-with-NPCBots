@@ -2607,6 +2607,86 @@ void AuraEffect::HandleAuraModSkill(AuraApplication const* aurApp, uint8 mode, b
 /****************************/
 /***       MOVEMENT       ***/
 /****************************/
+/* Wahl des Klassenmounts -> zum aktivieren ** entfernen
+enum ClassSpec
+{
+    MAGE_ARCANE          = 81,
+    MAGE_FIRE            = 41,
+    MAGE_FROST           = 61,
+
+    WARRIOR_ARMS         = 161,
+    WARRIOR_FURY         = 164,
+    WARRIOR_PROTECTION   = 163,
+
+    ROGUE_ASSASSINATION  = 182,
+    ROGUE_COMBAT         = 181,
+    ROGUE_SUBTLETY       = 183,
+
+    PRIEST_DISCIPLINE    = 201,
+    PRIEST_HOLY          = 202,
+    PRIEST_SHADOW        = 203,
+
+    SHAMAN_ELEMENTAL     = 261,
+    SHAMAN_ENHANCEMENT   = 263,
+    SHAMAN_RESTORATION   = 262,
+
+    DRUID_BALANCE        = 283,
+    DRUID_FERAL          = 281,
+    DRUID_RESTORATION    = 282,
+
+    WARLOCK_AFFLICTION   = 302,
+    WARLOCK_DEMONOLOGY   = 303,
+    WARLOCK_DESTRUCTION  = 301,
+
+    HUNTER_BEAST_MASTERY = 361,
+    HUNTER_MARKSMANSHIP  = 363,
+    HUNTER_SURVIVAL      = 362,
+
+    PALADIN_HOLY         = 382,
+    PALADIN_PROTECTION   = 383,
+    PALADIN_RETRIBUTION  = 381,
+
+    DEATH_KNIGHT_BLOOD   = 398,
+    DEATH_KNIGHT_FROST   = 399,
+    DEATH_KNIGHT_UNHOLY  = 400
+};
+
+void UpdateCustomMountDisplayId(Unit* target, uint32& creatureEntry)
+{
+        uint32 active_spec = target->ToPlayer()->GetMostPointsTalentTree();
+    if (target->HasAura(75620))
+    {
+
+        switch (active_spec)
+        {
+            case MAGE_ARCANE:
+                creatureEntry = 32637;
+                break;
+            case MAGE_FROST:
+                creatureEntry = 28531;
+                break;
+            case MAGE_FIRE:
+                creatureEntry = 40165;
+                break;
+        }
+    } else if (target->HasAura(80000)) {
+
+        switch (active_spec)
+        {
+        case HUNTER_BEASTMASTER:
+            creatureEntry = 32637;
+            break;
+        case HUNTER_MARKSMAN:
+            creatureEntry = 28531;
+            break;
+        case HUNTER_SURVIVAL:
+            creatureEntry = 40165;
+            break;
+        }
+
+    }
+}
+*/
 
 void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
@@ -2629,6 +2709,9 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
             else
                 creatureEntry = 15665;
         }
+
+        // Wahl des Klassenmounts -> zum aktivieren // Entfernen
+        // UpdateCustomMountDisplayId(target, creatureEntry);
 
         if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
