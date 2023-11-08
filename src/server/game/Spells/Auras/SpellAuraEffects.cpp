@@ -2610,80 +2610,84 @@ void AuraEffect::HandleAuraModSkill(AuraApplication const* aurApp, uint8 mode, b
 /* Wahl des Klassenmounts -> zum aktivieren ** entfernen
 enum ClassSpec
 {
-    MAGE_ARCANE          = 81,
-    MAGE_FIRE            = 41,
-    MAGE_FROST           = 61,
+    MAGE_ARCANE = 81,
+    MAGE_FIRE = 41,
+    MAGE_FROST = 61,
 
-    WARRIOR_ARMS         = 161,
-    WARRIOR_FURY         = 164,
-    WARRIOR_PROTECTION   = 163,
+    WARRIOR_ARMS = 161,
+    WARRIOR_FURY = 164,
+    WARRIOR_PROTECTION = 163,
 
-    ROGUE_ASSASSINATION  = 182,
-    ROGUE_COMBAT         = 181,
-    ROGUE_SUBTLETY       = 183,
+    ROGUE_ASSASSINATION = 182,
+    ROGUE_COMBAT = 181,
+    ROGUE_SUBTLETY = 183,
 
-    PRIEST_DISCIPLINE    = 201,
-    PRIEST_HOLY          = 202,
-    PRIEST_SHADOW        = 203,
+    PRIEST_DISCIPLINE = 201,
+    PRIEST_HOLY = 202,
+    PRIEST_SHADOW = 203,
 
-    SHAMAN_ELEMENTAL     = 261,
-    SHAMAN_ENHANCEMENT   = 263,
-    SHAMAN_RESTORATION   = 262,
+    SHAMAN_ELEMENTAL = 5,
+    SHAMAN_ENHANCEMENT = 7,
+    SHAMAN_RESTORATION = 6,
 
-    DRUID_BALANCE        = 283,
-    DRUID_FERAL          = 281,
-    DRUID_RESTORATION    = 282,
+    DRUID_BALANCE = 27,
+    DRUID_FERAL = 25,
+    DRUID_RESTORATION = 26,
 
-    WARLOCK_AFFLICTION   = 302,
-    WARLOCK_DEMONOLOGY   = 303,
-    WARLOCK_DESTRUCTION  = 301,
+    WARLOCK_AFFLICTION = 46,
+    WARLOCK_DEMONOLOGY = 47,
+    WARLOCK_DESTRUCTION = 45,
 
-    HUNTER_BEAST_MASTERY = 361,
-    HUNTER_MARKSMANSHIP  = 363,
-    HUNTER_SURVIVAL      = 362,
+    HUNTER_BEAST_MASTERY = 105,
+    HUNTER_MARKSMANSHIP = 107,
+    HUNTER_SURVIVAL = 106,
 
-    PALADIN_HOLY         = 382,
-    PALADIN_PROTECTION   = 383,
-    PALADIN_RETRIBUTION  = 381,
+    PALADIN_HOLY = 126,
+    PALADIN_PROTECTION = 127,
+    PALADIN_RETRIBUTION = 125,
 
-    DEATH_KNIGHT_BLOOD   = 398,
-    DEATH_KNIGHT_FROST   = 399,
-    DEATH_KNIGHT_UNHOLY  = 400
+    DEATH_KNIGHT_BLOOD = 142,
+    DEATH_KNIGHT_FROST = 143,
+    DEATH_KNIGHT_UNHOLY = 144
 };
 
 void UpdateCustomMountDisplayId(Unit* target, uint32& creatureEntry)
 {
-        uint32 active_spec = target->ToPlayer()->GetMostPointsTalentTree();
+    if (!target->ToPlayer())
+        return;
+
+    const uint32 active_spec = target->ToPlayer()->GetMostPointsTalentTree();
+
     if (target->HasAura(75620))
     {
 
         switch (active_spec)
         {
-            case MAGE_ARCANE:
-                creatureEntry = 32637;
-                break;
-            case MAGE_FROST:
-                creatureEntry = 28531;
-                break;
-            case MAGE_FIRE:
-                creatureEntry = 40165;
-                break;
-        }
-    } else if (target->HasAura(80000)) {
-
-        switch (active_spec)
-        {
-        case HUNTER_BEAST_MASTERY:
+        case MAGE_ARCANE:
             creatureEntry = 32637;
             break;
-        case HUNTER_MARKSMAN:
+        case MAGE_FROST:
             creatureEntry = 28531;
             break;
-        case HUNTER_SURVIVAL:
+        case MAGE_FIRE:
             creatureEntry = 40165;
             break;
         }
-
+    }
+    else if (target->HasAura(81240) || target->HasAura(81241) || target->HasAura(81242) || target->HasAura(81201))
+    {
+        switch (active_spec)
+        {
+        case WARLOCK_AFFLICTION:
+            creatureEntry = 100575;
+            break;
+        case WARLOCK_DESTRUCTION:
+            creatureEntry = 100579;
+            break;
+        case WARLOCK_DEMONOLOGY:
+            creatureEntry = 100580;
+            break;
+        }
     }
 }
 */
