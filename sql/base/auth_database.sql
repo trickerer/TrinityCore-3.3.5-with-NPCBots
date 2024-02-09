@@ -1,13 +1,13 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Linux (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.35, for Linux (x86_64)
 --
 -- Host: localhost    Database: auth
 -- ------------------------------------------------------
--- Server version	8.0.33-0ubuntu0.20.04.2
+-- Server version	8.0.35-0ubuntu0.20.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -46,6 +46,7 @@ CREATE TABLE `account` (
   `muteby` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `locale` tinyint unsigned NOT NULL DEFAULT '0',
   `os` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `timezone_offset` smallint NOT NULL DEFAULT '0',
   `recruiter` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_username` (`username`)
@@ -446,6 +447,7 @@ CREATE TABLE `rbac_linked_permissions` (
 LOCK TABLES `rbac_linked_permissions` WRITE;
 /*!40000 ALTER TABLE `rbac_linked_permissions` DISABLE KEYS */;
 INSERT INTO `rbac_linked_permissions` VALUES
+(192,7),
 (192,21),
 (192,42),
 (192,43),
@@ -472,6 +474,8 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (192,796),
 (192,835),
 (193,48),
+(193,52),
+(193,53),
 (193,194),
 (193,197),
 (194,1),
@@ -520,7 +524,6 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (195,24),
 (195,49),
 (195,199),
-(196,7),
 (196,202),
 (196,203),
 (196,204),
@@ -992,6 +995,8 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (197,863),
 (197,864),
 (197,865),
+(197,884),
+(197,885),
 (198,218),
 (198,300),
 (198,312),
@@ -1170,6 +1175,8 @@ INSERT INTO `rbac_permissions` VALUES
 (49,'Forces to enter the email for confirmation on password change'),
 (50,'Allow user to check his own email with .account'),
 (51,'Allow trading between factions'),
+(52,'No battleground deserter debuff'),
+(53,'Can be AFK on the battleground'),
 (192,'Role: Sec Level Administrator'),
 (193,'Role: Sec Level Gamemaster'),
 (194,'Role: Sec Level Moderator'),
@@ -1789,7 +1796,9 @@ INSERT INTO `rbac_permissions` VALUES
 (878,'Command: debug questreset'),
 (879,'Command: debug poolstatus'),
 (880,'Command: pdump copy'),
-(881,'Command: reload vehicle_template');
+(881,'Command: reload vehicle_template'),
+(884,'Command: bg start'),
+(885,'Command: bg stop');
 /*!40000 ALTER TABLE `rbac_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2008,7 +2017,13 @@ INSERT INTO `updates` VALUES
 ('2023_02_05_00_auth.sql','DC8A2046EB4201D55342C541A0E9C398499E12B1','ARCHIVED','2023-02-05 14:50:30',0),
 ('2023_02_05_01_auth.sql','336E62A8850A3E78A1D0BD3E81FFD5769184BDF8','ARCHIVED','2023-02-05 15:58:32',0),
 ('2023_05_05_00_auth.sql','DEEB1D5533658E3479FC3C988EF4B9816C511BC3','ARCHIVED','2023-05-07 11:52:00',0),
-('2023_06_14_00_auth.sql','BB8A7EB214F4F3632C4F54EA596CB7C8FBA305D5','ARCHIVED','2023-06-14 19:34:24',0);
+('2023_06_14_00_auth.sql','BB8A7EB214F4F3632C4F54EA596CB7C8FBA305D5','ARCHIVED','2023-06-14 19:34:24',0),
+('2023_11_21_00_auth.sql','146E5E6EF94C5DB78343372A8FDB32B062B80040','ARCHIVED','2023-11-21 11:24:11',0),
+('2024_01_06_00_auth.sql','767D697594D5471B67CC0FDF0D7BB15374116A71','ARCHIVED','2024-01-06 09:53:51',0),
+('2024_01_06_01_auth.sql','3D9E0A906A357877DB8E7B72E0797AB38EF884BC','ARCHIVED','2024-01-06 11:33:07',0),
+('2024_01_06_02_auth.sql','B14F889C198A4F640A968BAB8A4C262AC61634C7','ARCHIVED','2024-01-06 12:43:47',0),
+('2024_01_06_03_auth.sql','693BFD4326314659BAD9A2C70D9526FF4625B393','ARCHIVED','2024-01-06 12:55:07',0),
+('2024_01_21_00_auth.sql','B45B95D7B608D6ACF1BCBA656718C7DEED8CFF00','ARCHIVED','2024-01-21 11:38:22',0);
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2147,4 +2162,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-14 19:34:37
+-- Dump completed on 2024-01-21 11:38:23

@@ -234,9 +234,23 @@ public:
 
     SpellEffectInfo();
     explicit SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
-    SpellEffectInfo(SpellEffectInfo const&);
+    //npcbot
+    /*
+    //end npcbot
+    SpellEffectInfo(SpellEffectInfo const&) = delete;
+    //npcbot
+    */
+    SpellEffectInfo(SpellEffectInfo const&) = default;
+    //end npcbot
     SpellEffectInfo(SpellEffectInfo&&) noexcept;
-    SpellEffectInfo& operator=(SpellEffectInfo const&);
+    //npcbot
+    /*
+    //end npcbot
+    SpellEffectInfo& operator=(SpellEffectInfo const&) = delete;
+    //npcbot
+    */
+    SpellEffectInfo& operator=(SpellEffectInfo const&) = default;
+    //end npcbot
     SpellEffectInfo& operator=(SpellEffectInfo&&) noexcept;
     ~SpellEffectInfo();
 
@@ -267,7 +281,7 @@ public:
     SpellTargetObjectTypes GetUsedTargetObjectType() const;
 
     struct ImmunityInfo;
-    ImmunityInfo const* GetImmunityInfo() const { return _immunityInfo; }
+    ImmunityInfo const* GetImmunityInfo() const { return _immunityInfo.get(); }
 
 private:
     struct StaticData
@@ -277,7 +291,14 @@ private:
     };
     static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
 
-    ImmunityInfo* _immunityInfo;
+    //npcbot
+    /*
+    //end npcbot
+    std::unique_ptr<ImmunityInfo> _immunityInfo;
+    //npcbot
+    */
+    std::shared_ptr<ImmunityInfo> _immunityInfo;
+    //end npcbot
 };
 
 struct TC_GAME_API SpellDiminishInfo
