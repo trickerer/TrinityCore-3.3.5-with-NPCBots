@@ -12051,6 +12051,10 @@ InventoryResult Player::CanUseAmmo(uint32 item) const
         if (HasAura(46699))
             return EQUIP_ERR_BAG_FULL6;
 
+        // Requires No Ammo
+        if (HasAura(81101))
+            return EQUIP_ERR_BAG_FULL6;
+
         return EQUIP_ERR_OK;
     }
     return EQUIP_ERR_ITEM_NOT_FOUND;
@@ -27171,3 +27175,60 @@ GameClient* Player::GetGameClient() const
 {
     return GetSession()->GetGameClient();
 }
+
+// Wahl des Klassenmounts noch inaktiv -> Zum aktivieren /**/ entfernen
+/*
+uint8 Player::GetMostPointsTalentTree() const
+{
+    uint32 active_spec = GetActiveSpec();
+
+    std::unordered_map<uint32, uint32> spec_data;
+
+    for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
+    {
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
+
+        if (!talentInfo)
+            continue;
+
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
+
+        if (!talentTabInfo)
+            continue;
+
+        if ((GetClassMask() & talentTabInfo->ClassMask) == 0)
+            continue;
+
+        uint8 currentTalentRank = 0;
+        for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+        {
+            // skip non-existing talent ranks
+            if (talentInfo->SpellRank[rank] == 0)
+                continue;
+
+            SpellInfo const* _spellEntry = sSpellMgr->GetSpellInfo(talentInfo->SpellRank[rank]);
+            if (!_spellEntry)
+                continue;
+
+            // if he doesn't have the talent skip
+            if (!HasTalent(talentInfo->SpellRank[rank], active_spec))
+                continue;
+
+            currentTalentRank = rank + 1;
+            spec_data[talentTabInfo->ID] += currentTalentRank;
+        }
+    }
+
+    std::pair<uint32, uint32> max_spec = { 0, 0 };
+    for (const auto& [spec_id, talent_count] : spec_data)
+    {
+        if (talent_count > max_spec.second)
+        {
+            max_spec.first = spec_id;
+            max_spec.second = talent_count;
+        }
+    }
+
+    return max_spec.first;
+}
+*/

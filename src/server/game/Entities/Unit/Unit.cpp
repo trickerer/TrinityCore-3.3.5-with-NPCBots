@@ -12948,6 +12948,52 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId) const
     {
         switch (form)
         {
+            case FORM_DIREBEAR:
+            case FORM_BEAR:
+        {
+                if (player->HasAura(81139))
+                    return 32984; // Display ID
+                else if (player->HasAura(81141))
+                    return 32985; // Display ID
+                else if (player->HasAura(81143))
+                    return 32986; // Display ID
+                else if (player->HasAura(81145))
+                    return 32987; // Display ID
+                else if (player->HasAura(81147))
+                    return 32988; // Display ID
+                else if (player->HasAura(81149))
+                    return 32989; // Display ID
+                else if (player->HasAura(81151))
+                    return 32990; // Display ID
+                else if (player->HasAura(81153))
+                    return 32991; // Display ID
+                else if (player->HasAura(81155))
+                    return 32992; // Display ID
+                else if (player->HasAura(81157))
+                    return 32993; // Display ID
+                else if (player->HasAura(81159))
+                    return 32994; // Display ID
+                else if (player->HasAura(81161))
+                    return 32995; // Display ID
+                else if (player->HasAura(81163))
+                    return 32996; // Display ID
+                else if (player->HasAura(81165))
+                    return 32997; // Display ID
+                else if (player->HasAura(81167))
+                    return 32998; // Display ID
+                else if (player->HasAura(81169))
+                    return 32999; // Display ID
+                break;
+        }
+        default:
+            break;
+        }
+    }
+
+    if (Player const* player = ToPlayer())
+    {
+        switch (form)
+        {
             case FORM_CAT:
                 // Based on Hair color
                 if (GetRace() == RACE_NIGHTELF)
