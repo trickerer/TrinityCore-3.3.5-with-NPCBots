@@ -303,7 +303,7 @@ void BattlegroundWS::RespawnFlagAfterDrop(uint32 team)
     if (GameObject* obj = GetBgMap()->GetGameObject(GetDroppedFlagGUID(team)))
         obj->Delete();
     else
-        TC_LOG_ERROR("bg.battleground", "unknown dropped flag (%s)", GetDroppedFlagGUID(team).ToString().c_str());
+        TC_LOG_ERROR("bg.battleground", "unknown dropped flag ({})", GetDroppedFlagGUID(team).ToString());
 
     SetDroppedFlagGUID(ObjectGuid::Empty, GetTeamIndexByTeamId(team));
     _bothFlagsKept = false;
@@ -936,7 +936,7 @@ void BattlegroundWS::RemoveBot(ObjectGuid guid)
         Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
         if (!bot)
         {
-            TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot %u who has the FLAG!!", guid.GetEntry());
+            TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot {} who has the FLAG!!", guid.GetEntry());
             SetAllianceFlagPicker(ObjectGuid::Empty);
             RespawnFlag(ALLIANCE, false);
         }
@@ -948,7 +948,7 @@ void BattlegroundWS::RemoveBot(ObjectGuid guid)
         Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
         if (!bot)
         {
-            TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot %u who has the FLAG!!", guid.GetEntry());
+            TC_LOG_ERROR("bg.battleground", "BattlegroundWS: Removing offline bot {} who has the FLAG!!", guid.GetEntry());
             SetHordeFlagPicker(ObjectGuid::Empty);
             RespawnFlag(HORDE, false);
         }

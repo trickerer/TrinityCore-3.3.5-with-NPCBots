@@ -52,6 +52,15 @@ class TC_GAME_API Arena : public Battleground
         void AddPlayer(Player* player) override;
         void RemovePlayer(Player* /*player*/, ObjectGuid /*guid*/, uint32 /*team*/) override;
 
+        //npcbot
+        void AddBot(Creature* bot) override;
+        void RemoveBotAtLeave(ObjectGuid guid) override;
+        void RemoveBot(ObjectGuid /*guid*/) override;
+        void HandleBotKillPlayer(Creature* killer, Player* victim) override;
+        void HandleBotKillBot(Creature* killer, Creature* victim) override;
+        void HandlePlayerKillBot(Creature* victim, Player* killer) override;
+        //end npcbot
+
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
         void UpdateArenaWorldState();
 

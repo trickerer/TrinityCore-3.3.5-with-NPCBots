@@ -409,6 +409,24 @@ class BattlegroundEY : public Battleground
         void SetDroppedFlagGUID(ObjectGuid guid, int32 /*TeamID*/ = -1) override  { m_DroppedFlagGUID = guid; }
         ObjectGuid GetDroppedFlagGUID() const { return m_DroppedFlagGUID; }
 
+        //npcbot
+        void AddBot(Creature* bot) override;
+        WorldSafeLocsEntry const* GetClosestGraveyardForBot(WorldLocation const& curPos, uint32 team) const override;
+        void RemoveBot(ObjectGuid guid) override;
+        bool UpdateBotScore(Creature const* bot, uint32 type, uint32 value, bool doAddHonor = true) override;
+        void HandleBotKillPlayer(Creature* killer, Player* victim) override;
+        void HandleBotKillBot(Creature* killer, Creature* victim) override;
+        void HandlePlayerKillBot(Creature* victim, Player* killer) override;
+        void EventBotDroppedFlag(Creature* bot) override;
+        void EventBotClickedOnFlag(Creature* bot, GameObject* target_obj) override;
+        void HandleBotAreaTrigger(Creature* bot, uint32 trigger) override;
+        void EventBotCapturedFlag(Creature* bot, uint32 bgObjectType);
+        void EventBotTeamCapturedPoint(Creature const* bot, uint32 Point);
+        void EventBotTeamLostPoint(Creature const* bot, uint32 Point);
+        GuidVector const& GetPlayersNearPoint(uint8 point) const { return m_PlayersNearPoint[point]; }
+        TeamId GetPointOwner(uint8 point) const { return m_PointOwnedByTeam[point] == ALLIANCE ? TEAM_ALLIANCE : m_PointOwnedByTeam[point] == HORDE ? TEAM_HORDE : TEAM_NEUTRAL; }
+        //end npcbot
+
         /* Battleground Events */
         void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj) override;
         void EventPlayerDroppedFlag(Player* Source) override;

@@ -23,6 +23,8 @@
 #include "ObjectGuid.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "UniqueTrackablePtr.h"
+#include <deque>
 #include <map>
 
 namespace WorldPackets
@@ -445,6 +447,9 @@ class TC_GAME_API Battleground
         TeamId GetBotTeamId(ObjectGuid guid) const;
         TeamId GetOtherTeamId(TeamId teamId) const;
         void AddOrSetBotToCorrectBgGroup(Creature* bot, uint32 team);
+        void RewardXPAtKill(Player* killer, Creature* victim);
+        void RewardXPAtKill(Creature* killer, Player* victim);
+        void RewardXPAtKill(Creature* killer, Creature* victim);
         virtual void AddBot(Creature* bot);
         virtual void RemoveBotAtLeave(ObjectGuid guid);
         virtual WorldSafeLocsEntry const* GetClosestGraveyardForBot(WorldLocation const& curPos, uint32 team) const;
@@ -526,6 +531,9 @@ class TC_GAME_API Battleground
 
         // because BattleGrounds with different types and same level range has different m_BracketId
         uint8 GetUniqueBracketId() const;
+
+        Trinity::unique_weak_ptr<Battleground> GetWeakPtr() const { return m_weakRef; }
+        void SetWeakPtr(Trinity::unique_weak_ptr<Battleground> weakRef) { m_weakRef = std::move(weakRef); }
 
     protected:
         // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
@@ -628,7 +636,7 @@ class TC_GAME_API Battleground
 
         // Player lists
         GuidVector m_ResurrectQueue;                        // Player GUID
-        GuidDeque m_OfflineQueue;                           // Player GUID
+        std::deque<ObjectGuid> m_OfflineQueue;              // Player GUID
 
         // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
         // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG
@@ -661,5 +669,7 @@ class TC_GAME_API Battleground
         Position StartPosition[PVP_TEAMS_COUNT];
         float m_StartMaxDist;
         uint32 ScriptId;
+
+        Trinity::unique_weak_ptr<Battleground> m_weakRef;
 };
 #endif

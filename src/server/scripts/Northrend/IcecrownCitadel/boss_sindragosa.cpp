@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "icecrown_citadel.h"
 #include "CommonHelpers.h"
+#include "icecrown_citadel.h"
 #include "Containers.h"
 #include "GridNotifiers.h"
 #include "InstanceScript.h"
@@ -26,7 +26,10 @@
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
@@ -606,6 +609,20 @@ struct npc_ice_tomb : public ScriptedAI
     {
         me->RemoveAllGameObjects();
 
+        //npcbot
+        if (_trappedPlayerGUID.IsCreature())
+        {
+            if (Creature* bot = ObjectAccessor::GetCreature(*me, _trappedPlayerGUID))
+            {
+                _trappedPlayerGUID.Clear();
+                bot->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
+                bot->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
+                bot->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+            }
+            return;
+        }
+        //end npcbot
+
         if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
         {
             _trappedPlayerGUID.Clear();
@@ -622,6 +639,21 @@ struct npc_ice_tomb : public ScriptedAI
 
         if (_existenceCheckTimer <= diff)
         {
+            //npcbot
+            if (_trappedPlayerGUID.IsCreature())
+            {
+                Creature* bot = ObjectAccessor::GetCreature(*me, _trappedPlayerGUID);
+                if (!bot || !bot->IsAlive() || !bot->HasAura(SPELL_ICE_TOMB_DAMAGE))
+                {
+                    JustDied(me);
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+                _existenceCheckTimer = 1000;
+                return;
+            }
+            //end npcbot
+
             Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID);
             if (!player || player->isDead() || !player->HasAura(SPELL_ICE_TOMB_DAMAGE))
             {

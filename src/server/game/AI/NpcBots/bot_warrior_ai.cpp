@@ -3,6 +3,7 @@
 #include "botspell.h"
 #include "bottext.h"
 #include "bottraits.h"
+#include "Containers.h"
 #include "Group.h"
 #include "Item.h"
 #include "Map.h"
@@ -252,7 +253,7 @@ public:
         {
             //Victorious State spell
             //only on targets which give xp or honor
-            if (u->GetLevel() > Trinity::XP::GetGrayLevel(me->GetLevel()))
+            if (u->GetLevel() > Bcore::XP::GetGrayLevel(me->GetLevel()))
                 me->CastSpell(me, VICTORIOUS_SPELL, true);
 
             bot_ai::KilledUnit(u);
@@ -814,8 +815,10 @@ public:
                     return;
             }
             //SUNDER ARMOR
-            if (IsSpellReady(SUNDER_ARMOR_1, diff) && can_do_normal && IsTank() && Rand() < 55 && mytar->GetHealth() > me->GetMaxHealth() &&
-                dist < 5 && (!HasRole(BOT_ROLE_DPS) || !GetSpell(DEVASTATE_1)) && rage >= rcost(SUNDER_ARMOR_1))
+            if (IsSpellReady(SUNDER_ARMOR_1, diff) && !IAmFree() && can_do_normal && dist < 5 && Rand() < 45 &&
+                (IsTank() ? (mytar->GetHealth() > me->GetMaxHealth()) : (Rand() < 25 && mytar->GetHealth() > me->GetMaxHealth() * 2)) &&
+                (!HasRole(BOT_ROLE_DPS) || !CanBlock() || !GetSpell(DEVASTATE_1)) &&
+                (IsTank() || master->GetBotMgr()->HasBotWithSpec(BOT_SPEC_WARRIOR_PROTECTION, false)) && rage >= rcost(SUNDER_ARMOR_1))
             {
                 AuraEffect const* sunder = mytar->GetAuraEffect(SUNDER_ARMOR_DEBUFF, 0);
                 if ((!sunder || sunder->GetBase()->GetStackAmount() < 5 || sunder->GetBase()->GetDuration() < 20000) &&
@@ -1051,7 +1054,7 @@ public:
                 }
 
                 if (!targets.empty())
-                    target = targets.size() == 1 ? *targets.begin() : Trinity::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1 ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (!target && !IAmFree() && master->IsAlive() && me->IsWithinDistInMap(master, 30) && !master->HasAura(VIGILANCE))
@@ -1103,7 +1106,7 @@ public:
                     }
                 }
                 if (!targets.empty())
-                    target = targets.size() == 1u ? *targets.begin() : Trinity::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1u ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (target && (_inStance(2) || (GetSpec() == BOT_SPEC_WARRIOR_PROTECTION && me->GetLevel() >= 50) || stanceChange(diff, 2)) &&
@@ -1225,12 +1228,12 @@ public:
 
             //Recklessness: 100% additional critical chance for damaging abilities
             if (AuraEffect const* eff = me->GetAuraEffect(RECKLESSNESS_1, EFFECT_0))
-                if (eff->IsAffectedOnSpell(spellInfo))
+                if (eff->IsAffectingSpell(spellInfo))
                     crit_chance += 100.f;
             //Juggernaught: 25 additional critical chance for Mortal Strike and Slam
             if (lvl >= 45 && (baseId == SLAM_1 || baseId == MORTAL_STRIKE_1))
                 if (AuraEffect const* jugg = me->GetAuraEffect(JUGGERNAUGHT_BUFF, 0))
-                    if (jugg->IsAffectedOnSpell(spellInfo))
+                    if (jugg->IsAffectingSpell(spellInfo))
                         crit_chance += 25.f;
 
             //Poleaxe Specialization: 5% additional critical chance for all attacks
@@ -1651,12 +1654,12 @@ public:
 
             //Recklessness: handle charge drop
             AuraEffect const* reck = me->GetAuraEffect(RECKLESSNESS_1, EFFECT_0);
-            if (reck && reck->IsAffectedOnSpell(spell))
+            if (reck && reck->IsAffectingSpell(spell))
                 reck->GetBase()->DropCharge();
             //Juggernaught: consume buff
             if (baseId == SLAM_1 || baseId == MORTAL_STRIKE_1)
                 if (AuraEffect const* jugg = me->GetAuraEffect(JUGGERNAUGHT_BUFF, 0))
-                    if (jugg->IsAffectedOnSpell(spell))
+                    if (jugg->IsAffectingSpell(spell))
                         me->RemoveAurasDueToSpell(JUGGERNAUGHT_BUFF);
 
             if (baseId == THUNDER_CLAP_1 && lvl >= 10)
@@ -1904,7 +1907,7 @@ public:
             OnOwnerDamagedBy(u);
         }
 
-        void SetAIMiscValue(uint32 data, uint32 /*value*/) override
+        void SetAIMiscValue(uint32 data, uint32 value) override
         {
             switch (data)
             {
@@ -1917,6 +1920,8 @@ public:
                 default:
                     break;
             }
+
+            bot_ai::SetAIMiscValue(data, value);
         }
 
         void Reset() override

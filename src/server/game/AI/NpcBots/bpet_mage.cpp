@@ -75,7 +75,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((liveTimer += diff) >= uint32(IAmFree() ? (1 * HOUR * IN_MILLISECONDS) : ELEMENTAL_DURATION))
+            if ((liveTimer += diff) >= ELEMENTAL_DURATION * (IAmFree() ? 80u : 1u))
             {
                 canUpdate = false;
                 me->ToTempSummon()->UnSummon(1);

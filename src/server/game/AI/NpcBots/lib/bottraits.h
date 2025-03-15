@@ -73,8 +73,7 @@ all_schools_valid(School school, Schools... schools)
 }
 
 template<class...Schools>
-std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>,
-    std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>>
+std::enable_if_t<std::conjunction_v<std::is_same<Schools, SpellSchools>...>, std::array<std::pair<SpellSchools, bool>, sizeof...(Schools)>>
 CanAffectVictimSchools(Unit const* target, Schools... schools)
 {
     static_assert(sizeof...(Schools) > 0, "need at least 1 spell school to check for");
@@ -85,7 +84,7 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
 
     if (!all_schools_valid(schools...))
     {
-        TC_LOG_ERROR("entities.player", "bot_ai::CanAffectVictimSchools(): trying to check invalid spell school, first: %u", uint32(results.at(0).first));
+        BOT_LOG_ERROR("entities.player", "bot_ai::CanAffectVictimSchools(): trying to check invalid spell school, first: {}", uint32(results.at(0).first));
         return results;
     }
 

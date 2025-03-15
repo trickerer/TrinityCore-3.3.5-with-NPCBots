@@ -20,7 +20,27 @@ enum BotSpells : uint32
     SUMMONING_DISORIENTATION            = 32752,
     ACTIVATE_SPEC                       = 63645,//Activate Primary Spec
     WANDERER_HEARTHSTONE                = 54318,//"Hearthsone" no CD
+    SUMMONING_STONE_EFFECT              = 59782,//Cast time 5s + Channeled 2m
     SHOOT_WAND                          = 5019,
+    OPEN_FLAG_BG                        = 21651,
+    ARENA_FLAG_TEAM_A_GOLD              = 32724,
+    ARENA_FLAG_TEAM_A_GREEN             = 32725,
+    ARENA_FLAG_TEAM_H_GOLD              = 35774,
+    ARENA_FLAG_TEAM_H_GREEN             = 35775,
+///Portals
+    PORTAL_STORMWIND                    = 10059,
+    PORTAL_IRONFORGE                    = 11416,
+    PORTAL_DARNASSUS                    = 11419,
+    PORTAL_EXODAR                       = 32266,
+    PORTAL_SHATTRATH_A                  = 33691,
+    PORTAL_THERAMORE                    = 49360,
+    PORTAL_ORGRIMMAR                    = 11417,
+    PORTAL_UNDERCITY                    = 11418,
+    PORTAL_THUNDERBLUFF                 = 11420,
+    PORTAL_SILVERMOON                   = 32267,
+    PORTAL_SHATTRATH_H                  = 35717,
+    PORTAL_STONARD                      = 49361,
+    PORTAL_DALARAN                      = 53142,
 ///Passives
     DAMAGE_REDUCTION                    = 68066,//Vigilance, Blessing of Sanctuary, etc.
 ///Passives for Pets

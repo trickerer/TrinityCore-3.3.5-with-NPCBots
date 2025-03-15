@@ -3,6 +3,7 @@
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottraits.h"
+#include "Containers.h"
 #include "Creature.h"
 #include "ScriptMgr.h"
 /*
@@ -249,7 +250,7 @@ public:
             if (targets.empty())
                 return;
 
-            Unit* target = Trinity::Containers::SelectRandomContainerElement(targets);
+            Unit* target = Bcore::Containers::SelectRandomContainerElement(targets);
             if (doCast(target, GetSpell(DRAIN_MANA_1)))
                 return;
         }

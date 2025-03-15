@@ -2,6 +2,7 @@
 #include "botspell.h"
 #include "bpet_ai.h"
 #include "CellImpl.h"
+#include "Containers.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "MotionMaster.h"
@@ -251,8 +252,8 @@ public:
                 std::list<Unit*> targets;
                 if (petOwner->GetBotAI()->HasRole(BOT_ROLE_DPS) && !is_full && !expired)
                 {
-                    Trinity::AnyUnfriendlyUnitInObjectRangeCheck check(petOwner, petOwner, LOCUST_SWARM_EFFECTIVE_RADIUS);
-                    Trinity::UnitListSearcher searcher(petOwner, targets, check);
+                    Bcore::AnyUnfriendlyUnitInObjectRangeCheck check(petOwner, petOwner, LOCUST_SWARM_EFFECTIVE_RADIUS);
+                    Bcore::UnitListSearcher searcher(petOwner, targets, check);
                     Cell::VisitAllObjects(petOwner, searcher, LOCUST_SWARM_EFFECTIVE_RADIUS);
 
                     targets.remove_if([poguid = petOwner->GetGUID(), combat = petOwner->IsInCombat(), max_attackers = _attackers](Unit const* unit) {
@@ -267,7 +268,7 @@ public:
 
                 if (!targets.empty())
                 {
-                    opponent = targets.size() == 1 ? targets.front() : Trinity::Containers::SelectRandomContainerElement(targets);
+                    opponent = targets.size() == 1 ? targets.front() : Bcore::Containers::SelectRandomContainerElement(targets);
                     me->Attack(opponent, false);
                     me->GetMotionMaster()->MoveChase(opponent);
                 }

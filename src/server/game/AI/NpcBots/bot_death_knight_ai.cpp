@@ -18,10 +18,10 @@
 #include "World.h"
 /*
 Death Knight NpcBot by Trickerer onlysuffering@gmail.com
-Complete - around 85%
+Complete - around 92%
 Note: Rune system adapted from TC
 TODO: pet related
-Notes: raise dead / army of the dead not working off the bat, summon garg crash, dancing rune weapon crash, need ai workarounds
+Notes: army of the dead is not working off the bat, need ai workaround
 */
 
 enum DeathKnightBaseSpells
@@ -67,6 +67,9 @@ enum DeathKnightBaseSpells
     VAMPIRIC_BLOOD_1                    = 55233,
     UNBREAKABLE_ARMOR_1                 = 51271,
     BONE_SHIELD_1                       = 49222,
+
+    DANCING_RUNE_DEAPON_1               = 49028,
+    SUMMON_GARGOYLE_1                   = 49206,
 
     BLOOD_PRESENCE_1                    = 48266,
     FROST_PRESENCE_1                    = 48263,
@@ -117,7 +120,6 @@ enum DeathKnightPassives
     EBON_PLAGUEBRINGER                  = 51161,//rank 3
 
 //Other
-    //GLYPH_DANCING_RUNE_WEAPON           = 63330,
     GLYPH_DISEASE                       = 63334,
     GLYPH_CHAINS_OF_ICE                 = 58620,
     GLYPH_UNHOLY_BLIGHT                 = 63332,
@@ -156,7 +158,10 @@ enum DeathKnightSpecial
 
     GLYPH_HEART_STRIKE_DEBUFF           = 58617, //50% move slow
     GLYPH_RUNE_TAP_HEAL                 = 59754,
-    GLYPH_SCOURGE_STRIKE_EFFECT         = 69961
+    GLYPH_SCOURGE_STRIKE_EFFECT         = 69961,
+
+    NPC_EBON_GARGOYLE                   = 27829,
+    NPC_DANCING_RUNE_WEAPON             = 27893
 };
 
 static const uint32 Deathknight_spells_damage_arr[] =
@@ -328,7 +333,7 @@ public:
         void JustEnteredCombat(Unit* u) override { bot_ai::JustEnteredCombat(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { UnsummonAll(); bot_ai::JustDied(u); }
+        void JustDied(Unit* u) override { UnsummonAll(false); bot_ai::JustDied(u); }
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
 
         void DoNonCombatActions(uint32 diff)
@@ -468,7 +473,7 @@ public:
             if (presencetimer > diff || IAmFree() || IsCasting() || Rand() > 30)
                 return;
 
-            uint8 newpresence = IsTank() ? DEATH_KNIGHT_FROST_PRESENCE : DEATH_KNIGHT_BLOOD_PRESENCE;
+            uint8 newpresence = IsTank() ? DEATH_KNIGHT_FROST_PRESENCE : GetSpec() == BOT_SPEC_DK_UNHOLY ? DEATH_KNIGHT_UNHOLY_PRESENCE : DEATH_KNIGHT_BLOOD_PRESENCE;
             if (_presence == newpresence)
             {
                 presencetimer = 5000;
@@ -483,6 +488,11 @@ public:
             else if (newpresence == DEATH_KNIGHT_BLOOD_PRESENCE && HaveRunes(BLOOD_PRESENCE_1))
             {
                 if (doCast(me, BLOOD_PRESENCE_1))
+                    return;
+            }
+            else if (newpresence == DEATH_KNIGHT_UNHOLY_PRESENCE && HaveRunes(UNHOLY_PRESENCE_1))
+            {
+                if (doCast(me, UNHOLY_PRESENCE_1))
                     return;
             }
 
@@ -668,6 +678,7 @@ public:
             }
             //LICHBORNE + DEATH COIL
             if ((me->GetCreatureType() == CREATURE_TYPE_UNDEAD || IsSpellReady(LICHBORNE_1, diff, false)) &&
+                (IAmFree() || IsTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_HEAL) == 0) &&
                 IsSpellReady(DEATH_COIL_1, diff) && Rand() < 45 && GetHealthPCT(me) < 80 && runicpower >= rcost(DEATH_COIL_1))
             {
                 if (me->GetCreatureType() == CREATURE_TYPE_UNDEAD || doCast(me, GetSpell(LICHBORNE_1)))
@@ -786,8 +797,9 @@ public:
             bool noDiseases = (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1))));
             AuraEffect const* blop = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
             AuraEffect const* frof = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
+            AuraEffect const* ebop = (noDiseases || GetSpec() != BOT_SPEC_DK_UNHOLY) ? nullptr : mytar->GetAuraEffect(SPELL_AURA_LINKED, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x800, 0x0, me->GetGUID());
 
-            auto [can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
+            auto [can_do_nature, can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(mytar, SPELL_SCHOOL_NATURE, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
 
             //DISEASE SECTION
 
@@ -838,6 +850,23 @@ public:
             }
 
             //END DISEASE SECTION
+
+            //COMBAT SUMMONS SECTION
+
+            //SUMMON GARGOYLE
+            if (IsSpellReady(SUMMON_GARGOYLE_1, diff) && can_do_nature && Rand() < 60 && dist < 30 &&
+                (IAmFree() || mytar->GetHealth() > me->GetMaxHealth() / 4) && runicpower >= rcost(SUMMON_GARGOYLE_1))
+            {
+                if (doCast(mytar, GetSpell(SUMMON_GARGOYLE_1)))
+                    return;
+            }
+            //DANCING RUNE WEAPON
+            if (IsSpellReady(DANCING_RUNE_DEAPON_1, diff) && can_do_physical && (noDiseases || (blop && frof)) && Rand() < 60 && dist < 15 &&
+                (IAmFree() || mytar->GetHealth() > me->GetHealth() / 4) && runicpower >= rcost(DANCING_RUNE_DEAPON_1))
+            {
+                if (doCast(mytar, GetSpell(DANCING_RUNE_DEAPON_1)))
+                    return;
+            }
 
             //MELEE SECTION
 
@@ -900,7 +929,7 @@ public:
                     return;
             }
             //OBLITERATE
-            if (IsSpellReady(OBLITERATE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(OBLITERATE_1))
+            if (IsSpellReady(OBLITERATE_1, diff) && GetSpec() == BOT_SPEC_DK_FROST && blop && frof && HaveRunes(OBLITERATE_1))
             {
                 //DEATHCHILL
                 if (IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
@@ -915,18 +944,18 @@ public:
                 if (doCast(mytar, GetSpell(HEART_STRIKE_1)))
                     return;
             }
+            //SCOURGE STRIKE unused
+            if (IsSpellReady(SCOURGE_STRIKE_1, diff) && blop && frof && ebop && HaveRunes(SCOURGE_STRIKE_1))
+            {
+                if (doCast(mytar, GetSpell(SCOURGE_STRIKE_1)))
+                    return;
+            }
             //BLOOD STRIKE
             if (IsSpellReady(BLOOD_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(BLOOD_STRIKE_1))
             {
                 if (doCast(mytar, GetSpell(BLOOD_STRIKE_1)))
                     return;
             }
-            //SCOURGE STRIKE unused
-            //if (IsSpellReady(SCOURGE_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(SCOURGE_STRIKE_1))
-            //{
-            //    if (doCast(mytar, GetSpell(SCOURGE_STRIKE_1)))
-            //        return;
-            //}
 
             //END DISEASE SECTION
 
@@ -967,11 +996,11 @@ public:
 
             //Killing Machine
             if (AuraEffect const* mach = me->GetAuraEffect(KILLING_MACHINE_BUFF, 0))
-                if (mach->IsAffectedOnSpell(spellInfo))
+                if (mach->IsAffectingSpell(spellInfo))
                     crit_chance += 100.f;
             //Deathchill
             if (AuraEffect const* chil = me->GetAuraEffect(DEATHCHILL_1, 0))
-                if (chil->IsAffectedOnSpell(spellInfo))
+                if (chil->IsAffectingSpell(spellInfo))
                     crit_chance += 100.f;
 
             //Subversion: 9% additional critical chance for Blood Strike, Scourge Strike, Heart Strike and Obliterate
@@ -1456,9 +1485,9 @@ public:
             //Deathchill
             AuraEffect const* mach = me->GetAuraEffect(KILLING_MACHINE_BUFF, 0);
             AuraEffect const* chil = me->GetAuraEffect(DEATHCHILL_1, 0);
-            if (mach && mach->IsAffectedOnSpell(spell))
+            if (mach && mach->IsAffectingSpell(spell))
                 me->RemoveAurasDueToSpell(KILLING_MACHINE_BUFF);
-            else if (chil && chil->IsAffectedOnSpell(spell))
+            else if (chil && chil->IsAffectingSpell(spell))
                 me->RemoveAurasDueToSpell(DEATHCHILL_1);
 
             //Icy Touch tanking helper (TODO: remove this hack after threat mods implementation)
@@ -1674,7 +1703,7 @@ public:
         void SummonBotPet()
         {
             if (botPet)
-                UnsummonAll();
+                UnsummonAll(false);
 
             uint32 entry = BOT_PET_GHOUL;
 
@@ -1693,28 +1722,33 @@ public:
             botPet = myPet;
         }
 
-        void UnsummonAll() override
+        void JustSummoned(Creature* summon) override
         {
-            if (botPet)
-                botPet->ToTempSummon()->UnSummon();
-        }
-
-        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
-        {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
-            //if (summon == botPet)
-            //    botPet = nullptr;
+            switch (summon->GetEntry())
+            {
+                case NPC_DANCING_RUNE_WEAPON:
+                case NPC_EBON_GARGOYLE:
+                    summon->SetCreator(me);
+                    break;
+                default:
+                    break;
+            }
         }
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //all hunter bot pets despawn at death or manually (gossip, teleport, etc.)
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: {}'s {}", me->GetName(), summon->GetName());
             if (summon == botPet)
             {
                 petSummonTimer = 30000;
                 botPet = nullptr;
             }
+        }
+
+        void UnsummonAll(bool savePets = true) override
+        {
+            UnsummonPet(savePets);
         }
 
         uint32 GetAIMiscValue(uint32 data) const override
@@ -1730,7 +1764,7 @@ public:
 
         void Reset() override
         {
-            UnsummonAll();
+            UnsummonAll(false);
 
             petSummonTimer = 5000;
 
@@ -1812,6 +1846,7 @@ public:
   /*Talent*/lvl >= 61 && isBloo ? InitSpellMap(HYSTERIA_1) : RemoveSpell(HYSTERIA_1);
   /*Talent*/lvl >= 62 && isBloo ? InitSpellMap(VAMPIRIC_BLOOD_1) : RemoveSpell(VAMPIRIC_BLOOD_1);
   /*Talent*/lvl >= 63 && isBloo ? InitSpellMap(HEART_STRIKE_1) : RemoveSpell(HEART_STRIKE_1);
+  /*Talent*/lvl >= 65 && isBloo ? InitSpellMap(DANCING_RUNE_DEAPON_1) : RemoveSpell(DANCING_RUNE_DEAPON_1);
 
   /*Talent*/lvl >= 57 ? InitSpellMap(LICHBORNE_1) : RemoveSpell(LICHBORNE_1);
   /*Talent*/lvl >= 59 && isFros ? InitSpellMap(DEATHCHILL_1) : RemoveSpell(DEATHCHILL_1);
@@ -1823,6 +1858,7 @@ public:
   /*Talent*/lvl >= 61 && isUnho ? InitSpellMap(ANTI_MAGIC_ZONE_1) : RemoveSpell(ANTI_MAGIC_ZONE_1);
   /*Talent*/lvl >= 62 && isUnho ? InitSpellMap(BONE_SHIELD_1) : RemoveSpell(BONE_SHIELD_1);
   /*Talent*/lvl >= 63 && isUnho ? InitSpellMap(SCOURGE_STRIKE_1) : RemoveSpell(SCOURGE_STRIKE_1);
+  /*Talent*/lvl >= 65 && isUnho ? InitSpellMap(SUMMON_GARGOYLE_1) : RemoveSpell(SUMMON_GARGOYLE_1);
 
             InitSpellMap(BLOOD_PRESENCE_1, true);
             InitSpellMap(FROST_PRESENCE_1, true);
@@ -1879,7 +1915,6 @@ public:
             RefreshAura(WANDERING_PLAGUE, isUnho && level >= 63 ? 1 : 0);
             RefreshAura(EBON_PLAGUEBRINGER, isUnho && level >= 63 ? 1 : 0);
 
-            //RefreshAura(GLYPH_DANCING_RUNE_WEAPON, level >= 60 ? 1 : 0);
             RefreshAura(GLYPH_DISEASE);
             RefreshAura(GLYPH_CHAINS_OF_ICE);
             RefreshAura(GLYPH_UNHOLY_BLIGHT, level >= 60 ? 1 : 0);
@@ -1906,6 +1941,8 @@ public:
                 case VAMPIRIC_BLOOD_1:
                 case HYSTERIA_1:
                     return true;
+                case DEATH_COIL_1:
+                    return master->GetCreatureType() == CREATURE_TYPE_UNDEAD;
                 default:
                     return false;
             }

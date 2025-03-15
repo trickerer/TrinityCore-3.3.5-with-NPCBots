@@ -74,6 +74,18 @@ struct npc_pet_dk_ebon_gargoyle : CasterAI
         }
     }
 
+    //npcbot: allow bot summons to select bot's target without being engaged themselves
+    void UpdateAI(uint32 diff) override
+    {
+        if (Unit const* creator = me->GetCreator())
+            if (creator->IsCreature() && !me->GetVictim())
+                if (Unit* victim = creator->GetVictim())
+                    AttackStart(victim);
+
+        CasterAI::UpdateAI(diff);
+    }
+    //end npcbot
+
     void JustDied(Unit* /*killer*/) override
     {
         // Stop Feeding Gargoyle when it dies
@@ -250,6 +262,21 @@ private:
     // we prioritize between things that are in combat with owner based on the owner's threat to them
     bool UpdateRuneWeaponVictim()
     {
+        //npcbot
+        if (Unit const* creator = me->GetCreator())
+        {
+            if (creator->IsCreature())
+            {
+                if (Unit* victim = creator->GetVictim())
+                {
+                    if (me->GetVictim() != victim)
+                        AttackStart(victim);
+                    return true;
+                }
+            }
+        }
+        //end npcbot
+
         Unit* owner = me->GetOwner();
         if (!owner)
             return false;

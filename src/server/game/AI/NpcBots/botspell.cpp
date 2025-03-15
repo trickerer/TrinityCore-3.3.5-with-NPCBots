@@ -1,3 +1,4 @@
+#include "botdefine.h"
 #include "botspell.h"
 #include "DBCStores.h"
 #include "Log.h"
@@ -135,7 +136,7 @@ void GenerateBotCustomSpellProcs()
             {
                 if (spellEffectInfo.IsAura())
                 {
-                    TC_LOG_ERROR("scripts", "Bot spell %u has ProcFlags %u, but it's of non-proc aura type, needs a correction", spellInfo.Id, spellInfo.ProcFlags);
+                    BOT_LOG_ERROR("scripts", "Bot spell {} has ProcFlags {}, but it's of non-proc aura type, needs a correction", spellInfo.Id, spellInfo.ProcFlags);
                     break;
                 }
             }
@@ -199,7 +200,7 @@ void GenerateBotCustomSpellProcs()
         botSpellProcOverrides[spellInfo.Id] = std::move(procEntry);
     }
 
-    TC_LOG_INFO("server.loading", ">> Bot spell proc overrides generated for %u spells", uint32(botSpellProcOverrides.size()));
+    BOT_LOG_INFO("server.loading", ">> Bot spell proc overrides generated for {} spells", uint32(botSpellProcOverrides.size()));
 
 }
 
@@ -1080,7 +1081,7 @@ void GenerateBotCustomSpells()
     //sinfo->_effects[0].ApplyAuraName = SPELL_AURA_PERIODIC_DAMAGE;
     sinfo->_effects[0].BasePoints = 100;
     //sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 2.f;
+    sinfo->_effects[0].BonusMultiplier = 1.5f;
     sinfo->_effects[0].DamageMultiplier = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 10.f;
     //sinfo->_effects[0].ValueMultiplier = 1.f;
@@ -1407,7 +1408,6 @@ void GenerateBotCustomSpells()
     sinfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED | SPELL_ATTR1_CANT_BE_REFLECTED;
     sinfo->AttributesEx2 |= SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS/* | SPELL_ATTR2_CANT_CRIT*/;
     sinfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
-    sinfo->AttributesEx4 &= ~(SPELL_ATTR4_INHERIT_CRIT_FROM_AURA);
 
     sinfo->_effects[0].Effect = SPELL_EFFECT_WEAPON_DAMAGE;
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
@@ -1715,7 +1715,8 @@ void GenerateBotCustomSpells()
     sinfo->PowerType = POWER_MANA;
     sinfo->ManaCost = 100 * 5;
     sinfo->MaxAffectedTargets = 0;
-    sinfo->ChannelInterruptFlags = 0x100C;
+    sinfo->InterruptFlags = 0x1;
+    sinfo->ChannelInterruptFlags = 0x0;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); //0
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(5); //40 yds
     sinfo->DurationEntry = sSpellDurationStore.LookupEntry(592); //400ms
@@ -1901,7 +1902,8 @@ void GenerateBotCustomSpells()
     sinfo->PowerType = POWER_MANA;
     sinfo->ManaCost = 50 * 5;
     sinfo->MaxAffectedTargets = 1;
-    //sinfo->ChannelInterruptFlags = 0; // 0x100C
+    sinfo->InterruptFlags = 0x1;
+    sinfo->ChannelInterruptFlags = 0x100C;
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
     sinfo->DurationEntry = sSpellDurationStore.LookupEntry(327); //500ms // (36); // 1000ms // (327); //500ms
     sinfo->ExplicitTargetMask = TARGET_FLAG_CORPSE_ENEMY;
@@ -1939,6 +1941,7 @@ void GenerateBotCustomSpells()
     sinfo->ManaCost = 50 * 5;
     sinfo->MaxAffectedTargets = 0;
     sinfo->StackAmount = 0;
+    sinfo->InterruptFlags = 0x1;
     sinfo->ChannelInterruptFlags = 0x100C;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); //0
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
@@ -2073,6 +2076,12 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].DieSides = 0;
     //51) END ENERGIZE VISUAL
 
+    //XX) FIXES
+    spellId = 48155; // Mind Flay (Rank 8)
+    botSpellInfoOverrides.insert({ spellId, *sSpellMgr->GetSpellInfo(spellId) });
+    sinfo = &botSpellInfoOverrides.at(spellId);
+    sinfo->InterruptFlags &= SPELL_INTERRUPT_FLAG_MOVEMENT;
+
     for (auto& p : botSpellInfoOverrides)
     {
         for (auto& eff : p.second._effects)
@@ -2081,7 +2090,7 @@ void GenerateBotCustomSpells()
         }
     }
 
-    TC_LOG_INFO("server.loading", ">> Bot spellInfo overrides generated for %u spells", uint32(botSpellInfoOverrides.size()));
+    BOT_LOG_INFO("server.loading", ">> Bot spellInfo overrides generated for {} spells", uint32(botSpellInfoOverrides.size()));
 
     GenerateBotCustomSpellProcs();
 }

@@ -1,25 +1,33 @@
+#include "Bag.h"
 #include "bot_ai.h"
 #include "botdatamgr.h"
 #include "botdump.h"
 #include "botgearscore.h"
+#include "botlog.h"
 #include "botmgr.h"
 #include "botwanderful.h"
-#include "Bag.h"
-#include "Chat.h"
+#include "bot_InstanceEvents.h"
+#include "CellImpl.h"
 #include "CharacterCache.h"
+#include "Chat.h"
+#include "Containers.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
-#include "Language.h"
 #include "GameClient.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "Item.h"
+#include "Language.h"
 #include "Log.h"
 #include "Map.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "QueryPackets.h"
 #include "RBAC.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
@@ -30,7 +38,6 @@
 #include "World.h"
 #include "WorldDatabase.h"
 #include "WorldSession.h"
-#include "QueryPackets.h"
 
 /*
 Name: script_bot_commands
@@ -45,7 +52,7 @@ Category: commandscripts/custom/
 
 static bool isWPSpawnWarningGiven = false;
 
-using namespace Trinity::ChatCommands;
+using namespace Bcore::ChatCommands;
 
 static uint32 last_model_id = 0;
 
@@ -281,7 +288,7 @@ private:
                 default:                                                                   break;
             }
 
-            handler->PSendSysMessage(stream.str().c_str());
+            handler->SendSysMessage(stream.str());
         }
 #undef FILL_VISUALS_REPORT2
     }
@@ -354,7 +361,7 @@ private:
             case 493: // Moonglade
                 return { 46, 60 };
             default:
-                TC_LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId %u", zoneId);
+                BOT_LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
                 return { 1, 60 };
         }
     }
@@ -428,6 +435,12 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable npcbotLogCommandTable =
+        {
+            //{ "testwrite",  HandleNpcBotLogTestWriteCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_DUMP_WRITE,         Console::Yes },
+            { "clear",      HandleNpcBotLogClearCommand,            rbac::RBAC_PERM_COMMAND_NPCBOT_DUMP_WRITE,         Console::Yes },
+        };
+
         static ChatCommandTable npcbotToggleCommandTable =
         {
             { "flags",      HandleNpcBotToggleFlagsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_TOGGLE_FLAGS,       Console::No  },
@@ -444,13 +457,19 @@ public:
             { "list all",   HandleNpcBotWPListAllCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
             { "go",         HandleNpcBotWPGoCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setlevels",  HandleNpcBotWPSetLevelsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "setlevels z",HandleNpcBotWPSetLevelsZoneCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
+            { "setlevels z",HandleNpcBotWPSetLevelsZoneCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setflags",   HandleNpcBotWPSetFlagsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setflags z", HandleNpcBotWPSetFlagsZoneCommand,      rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setname",    HandleNpcBotWPSetNameCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "setlinks",   HandleNpcBotWPLinksSetCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "info",       HandleNpcBotWPCommand,                  rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "setlinks",   HandleNpcBotWPSetLinksCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "setweights", HandleNpcBotWPSetLinkWeightsCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "info",       HandleNpcBotWPInfoCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "links",      HandleNpcBotWPLinksCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+        };
+
+        static ChatCommandTable npcbotDebugEventCommandTable =
+        {
+            { "launch",     HandleNpcBotDebugEventLaunchCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
         };
 
         static ChatCommandTable npcbotDebugCommandTable =
@@ -464,6 +483,8 @@ public:
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "guids",      HandleNpcBotDebugGuidsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "wbequips",   HandleNpcBotDebugWBEquipsCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
+            { "wpreid",     HandleNpcBotDebugWPReidCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
+            { "event",      npcbotDebugEventCommandTable                                                                            },
         };
 
         static ChatCommandTable npcbotSetCommandTable =
@@ -508,6 +529,7 @@ public:
         static ChatCommandTable npcbotOrderCommandTable =
         {
             { "cast",       HandleNpcBotOrderCastCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_ORDER_CAST,         Console::No  },
+            { "pull",       HandleNpcBotOrderPullCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_ORDER_CAST,         Console::No  },
         };
 
         static ChatCommandTable npcbotVehicleCommandTable =
@@ -572,6 +594,7 @@ public:
             { "set",        npcbotSetCommandTable                                                                                   },
             { "add",        HandleNpcBotAddCommand,                 rbac::RBAC_PERM_COMMAND_NPCBOT_ADD,                Console::No  },
             { "remove",     HandleNpcBotRemoveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_REMOVE,             Console::No  },
+            { "free",       HandleNpcBotFreeCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_REMOVE,             Console::No  },
             { "createnew",  HandleNpcBotCreateNewCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_CREATENEW,          Console::Yes },
             { "spawn",      HandleNpcBotSpawnCommand,               rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "move",       HandleNpcBotMoveCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
@@ -589,6 +612,7 @@ public:
             { "recall",     npcbotRecallCommandTable                                                                                },
             { "kill",       HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
             { "suicide",    HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
+            { "fix",        HandleNpcBotFixCommand,                 rbac::RBAC_PERM_COMMAND_NPCBOT_REVIVE,             Console::No  },
             { "go",         HandleNpcBotGoCommand,                  rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
             { "gs",         HandleNpcBotGearScoreCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "sendto",     npcbotSendToCommandTable                                                                                },
@@ -597,6 +621,7 @@ public:
             { "vehicle",    npcbotVehicleCommandTable                                                                               },
             { "dump",       npcbotDumpCommandTable                                                                                  },
             { "wp",         npcbotWPCommandTable                                                                                    },
+            { "log",        npcbotLogCommandTable                                                                                   },
         };
 
         static ChatCommandTable commandTable =
@@ -606,10 +631,36 @@ public:
         return commandTable;
     }
 
+    static bool HandleNpcBotLogClearCommand(ChatHandler* handler)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        trans->Append("TRUNCATE TABLE `characters_npcbot_logs`");
+        trans->Append("ALTER TABLE `characters_npcbot_logs` AUTO_INCREMENT = 0");
+        CharacterDatabase.CommitTransaction(trans);
+        handler->SendSysMessage("Table `characters_npcbot_logs` was cleared and autoincrement was reset");
+        return true;
+    }
+
+    static bool HandleNpcBotLogTestWriteCommand(ChatHandler* handler, Optional<std::underlying_type_t<BotLogType>> log_type, Optional<uint32> entry, Optional<std::vector<std::string>> extra)
+    {
+        if (!log_type || !entry)
+        {
+            handler->PSendSysMessage(".npcbot log testwrite #log_type #entry #[owner] #[mapid] #[inmap] #[inworld] #[params[1-%u]]", MAX_BOT_LOG_PARAMS);
+            handler->SendSysMessage("Test `characters_npcbot_logs` table write 2");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        decltype(extra)::value_type extras{ extra.value_or(decltype(extra)::value_type{}) };
+        extras.resize(MAX_BOT_LOG_PARAMS, "");
+        BotLogger::Log(*log_type, *entry, extras[0], extras[1], extras[2], extras[3], extras[4]);
+        return true;
+    }
+
     static TempSummon* HandleWPSummon(WanderNode* wp, Map* map)
     {
-        CellCoord c = Trinity::ComputeCellCoord(wp->m_positionX, wp->m_positionY);
-        GridCoord g = Trinity::ComputeGridCoord(wp->m_positionX, wp->m_positionY);
+        CellCoord c = Bcore::ComputeCellCoord(wp->m_positionX, wp->m_positionY);
+        GridCoord g = Bcore::ComputeGridCoord(wp->m_positionX, wp->m_positionY);
         ASSERT(c.IsCoordValid(), "Invalid Cell coord!");
         ASSERT(g.IsCoordValid(), "Invalid Grid coord!");
         map->LoadGrid(wp->m_positionX, wp->m_positionY);
@@ -627,14 +678,18 @@ public:
         wpc->SetMaxHealth(wp->GetWPId());
         wpc->SetFullHealth();
         wpc->SetPowerType(POWER_MANA);
-        wpc->SetMaxPower(POWER_MANA, uint32(wp->GetLinks().size()));
+        wpc->SetMaxPower(POWER_MANA, wp->GetFlags());
         wpc->SetFullPower(POWER_MANA);
-        wpc->SetObjectScale(5.0f);
+        wpc->SetObjectScale(4.0f);
+        wp->SetupLinkFromAura();
+        wp->SetupLinkToAura();
         return wpc;
     }
 
     static bool HandleNpcBotWPGenerateCommand(ChatHandler* handler, Optional<bool> save)
     {
+        using WanderNodeLink = WanderNode::WanderNodeLink;
+
         WanderNode::RemoveAllWPs();
 
         handler->SendSysMessage("Generating wander nodes from POIs. No levels or flags will be set");
@@ -678,10 +733,10 @@ public:
             wp->SetFlags(flags);
             WanderNode::DoForAllMapWPs(poiMapId, [wp = wp](WanderNode const* mwp) {
                 if (mwp->GetWPId() != wp->GetWPId() && mwp->GetExactDist2d(wp) < MAX_VISIBILITY_DISTANCE)
-                    wp->Link(const_cast<WanderNode*>(mwp));
+                    wp->Link(WanderNodeLink{ .wp = const_cast<WanderNode*>(mwp), .weight = 0 });
             });
 
-            handler->SendSysMessage(wp->ToString().c_str());
+            handler->SendSysMessage(wp->ToString());
         }
 
         handler->PSendSysMessage("Generating wander nodes completed with %u nodes", uint32(WanderNode::GetAllWPsCount()));
@@ -716,11 +771,11 @@ public:
             ss << '(' << wp->GetWPId() << ',' << wp->GetMapId()
                 << ',' << wp->GetPositionX() << ',' << wp->GetPositionY() << ',' << wp->GetPositionZ() << ',' << wp->GetOrientation()
                 << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
-                << ',' << wp->GetFlags() << ",'" << wp->GetName().c_str() << "','" << wp->FormatLinks() << "'),";
+                << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
         });
         std::string val_str = ss.str();
         val_str.resize(val_str.size() - 1u);
-        trans->PAppend(val_str.c_str());
+        trans->Append(val_str.c_str());
         WorldDatabase.CommitTransaction(trans);
 
         handler->SendSysMessage("Saved.");
@@ -755,6 +810,8 @@ public:
 
     static bool HandleNpcBotWPLinksCommand(ChatHandler* handler)
     {
+        using WanderNodeLink = WanderNode::WanderNodeLink;
+
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
 
@@ -771,49 +828,125 @@ public:
         std::ostringstream ss;
         ss.setf(std::ios_base::fixed);
         ss.precision(2);
+        std::vector<WanderNode const*> to_links;
+        WanderNode::DoForAllMapWPs(wp->GetMapId(), [=, &to_links](WanderNode const* mwp) {
+            if (mwp != wp && mwp->HasLink(wp))
+                to_links.push_back(mwp);
+        });
         uint32 counter = 0;
-        ss << "WP " << wp->GetWPId() << " has " << uint32(links.size()) << " links:";
-        WanderNode::DoForContainerWPs(links, [&ss, &counter, wp = wp](WanderNode const* lwp) {
-            ss << "\n" << ++counter << ") " << lwp->ToString() << " (dist2d: " << wp->GetExactDist2d(lwp) << ")";
+        ss << uint32(to_links.size()) << " WPs have a link to WP " << wp->GetWPId() << ':';
+        WanderNode::DoForContainerWPs(to_links, [&ss, &counter, wp = wp](WanderNode const* lwp) {
+            ss << "\n" << ++counter << ") <- " << lwp->ToString() << " (dist2d: " << lwp->GetExactDist2d(wp) << ")";
+        });
+        counter = 0;
+        ss << "\nWP " << wp->GetWPId() << " has " << uint32(links.size()) << " links (avg weight " << wp->GetAverageLinkWeight() << "):";
+        WanderNode::DoForContainerWPLinks(links, [&ss, &counter, wp = wp](WanderNodeLink const& wlp) {
+            ss << "\n" << ++counter << ") -> " << wlp.wp->ToString(static_cast<int32>(wlp.weight)) << " (dist2d: " << wp->GetExactDist2d(wlp.wp) << ")";
         });
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
 
-        WanderNode::DoForContainerWPs(links, [wp = wp, wpc = wpc, handler = handler](WanderNode const* lwp) {
+        std::array vis_spell_ids = { static_cast<uint32>(2400u), 41637u };
+        WanderNode::DoForContainerWPs(to_links, [=](WanderNode const* lwp) {
             if (!lwp->GetCreature())
             {
-                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", wp->GetWPId(), lwp->GetWPId());
+                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", lwp->GetWPId(), wp->GetWPId());
                 return;
             }
-            wpc->CastSpell(lwp->GetCreature(), 2400, true);
-            wpc->CastSpell(lwp->GetCreature(), 41637, true);
+            for (uint32 spell_id : vis_spell_ids)
+                lwp->GetCreature()->CastSpell(wpc, spell_id, true);
+        });
+        WanderNode::DoForContainerWPLinks(links, [=](WanderNodeLink const& wlp) {
+            if (!wlp.wp->GetCreature())
+            {
+                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", wp->GetWPId(), wlp.wp->GetWPId());
+                return;
+            }
+            for (uint32 spell_id : vis_spell_ids)
+                wpc->CastSpell(wlp.wp->GetCreature(), spell_id, true);
         });
 
         return true;
     }
-    static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<uint32> linkIds, bool oneway = false)
+    static bool HandleExtractWPIdWeightPairs(ChatHandler* handler, std::vector<std::string_view> const& links_strings, std::vector<std::pair<uint32, int32>>& link_pairs)
     {
-        auto const linksCopy = wp->GetLinks();
+        bool result = true;
+        link_pairs.reserve(links_strings.size());
+        for (std::string_view newlink : links_strings)
+        {
+            std::vector<std::string_view> toks = Bcore::Tokenize(newlink, ':', false);
+            Optional<uint32> val1 = toks.size() >= 1 ? Bcore::StringTo<uint32>(toks[0]) : std::nullopt;
+            Optional<uint32> val2 = toks.size() >= 2 ? Bcore::StringTo<uint32>(toks[1]) : std::nullopt;
+            if (toks.size() > 2 || val1 == std::nullopt || val2 == std::nullopt)
+            {
+                handler->PSendSysMessage("Invalid link format: %s", newlink);
+                result = false;
+                continue;
+            }
+            link_pairs.emplace_back(*val1, val2.value_or(int32(-1)));
+        }
+        return result;
+    }
+    static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<std::pair<uint32, int32>> const& newlinks, bool oneway = false, bool on_delete = false)
+    {
+        using WanderNodeLink = WanderNode::WanderNodeLink;
 
-        std::set<decltype(linksCopy)::value_type> wps_updates;
-        std::copy(std::cbegin(linksCopy), std::cend(linksCopy), std::inserter(wps_updates, wps_updates.begin()));
+        if (oneway && on_delete)
+        {
+            handler->PSendSysMessage("Can't perform one-way delete!");
+            return;
+        }
 
-        std::set<decltype(linksCopy)::value_type> wps_relinks = wps_updates;
+        std::remove_cvref_t<decltype(wp->GetLinks())> links = wp->GetLinks(); //copy
+        uint32 average_weight = wp->GetAverageLinkWeight();
 
-        wps_updates.insert(wp);
+        std::unordered_set<WanderNode const*> wps_updates;
+        std::vector<WanderNodeLink const*> wps_relinks;
 
-        if (linksCopy.empty())
+        if (on_delete)
+        {
+            //Find all WPs having a link to us and remove those links
+            WanderNode::DoForAllMapWPs(wp->GetMapId(), [=, &links, &wps_updates](WanderNode const* mwp) {
+                if (mwp != wp && mwp->HasLink(wp) && std::ranges::none_of(links, [=](WanderNodeLink const& wpl) { return wpl.Id() == mwp->GetWPId(); }))
+                {
+                    handler->PSendSysMessage("Removing link %u->%u...", mwp->GetWPId(), wp->GetWPId());
+                    const_cast<WanderNode*>(mwp)->UnLink(wp);
+                    wps_updates.insert(mwp);
+                }
+            });
+        }
+        else
+        {
+            wps_updates.insert(wp);
+            //Re-create all links we are not updating in case of only setting one-way links, unless doing a full purge
+            if (oneway && !newlinks.empty())
+                for (std::remove_cvref_t<decltype(links)>::value_type const& wpl : links)
+                    wps_relinks.push_back(&wpl);
+        }
+
+        if (links.empty())
             handler->PSendSysMessage("WP %u had no links...", wp->GetWPId());
         else
         {
-            WanderNode::DoForContainerWPs(linksCopy, [wp = wp, handler = handler](WanderNode* lwp) {
-                handler->PSendSysMessage("Removing link %u<->%u...", wp->GetWPId(), lwp->GetWPId());
+            while (!wp->GetLinks().empty())
+            {
+                WanderNode* lwp = wp->GetLinks().front().wp;
+                bool removing_reverse_link = (!oneway || std::ranges::any_of(newlinks, [=](auto const& p) { return p.first == lwp->GetWPId(); })) && lwp->HasLink(wp);
+                handler->PSendSysMessage("Removing link %u%s%u...", wp->GetWPId(), removing_reverse_link ? "<->" : "->", lwp->GetWPId());
                 wp->UnLink(lwp);
-            });
+                if (removing_reverse_link)
+                {
+                    lwp->UnLink(wp);
+                    wps_updates.insert(lwp);
+                }
+            }
         }
 
-        for (uint32 lid : linkIds)
+        for (auto const& p : newlinks)
         {
+            uint32 lid = p.first;
+            uint32 lweight = p.second >= 0 ? uint32(p.second) : average_weight;
+
             if (lid == wp->GetWPId())
             {
                 handler->PSendSysMessage("Trying to add WP %u to its own links! Are you dumb?", lid);
@@ -827,45 +960,128 @@ public:
                 continue;
             }
 
-            if (wps_relinks.count(lwp) != 0)
-                wps_relinks.erase(lwp);
+            if (p.second < 0 && lweight)
+                handler->PSendSysMessage("Link %u%s%u has no weight assigned, using average (%u)!", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight);
 
-            handler->PSendSysMessage("Adding link %u%s%u...", wp->GetWPId(), oneway ? "->" : "<->", lid);
+            if (!wps_relinks.empty())
+            {
+                auto wpscit = std::ranges::find_if(wps_relinks, [=](WanderNodeLink const* wlp) { return wlp->Id() == lwp->GetWPId(); });
+                if (wpscit != wps_relinks.cend())
+                    wps_relinks.erase(wpscit);
+            }
+
+            handler->PSendSysMessage("Adding link %u%s%u (w=%u, avg was %u)...", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight, average_weight);
             if (wp->GetExactDist2d(lwp) > MAX_VISIBILITY_DISTANCE)
                 handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(lwp));
 
-            wp->Link(lwp, oneway);
-            wps_updates.insert(lwp);
+            wp->Link(WanderNodeLink{ .wp = lwp, .weight = lweight });
+            if (!oneway)
+            {
+                lwp->Link(WanderNodeLink{ .wp = wp, .weight = lwp->GetAverageLinkWeight() });
+                wps_updates.insert(lwp);
+            }
         }
 
-        if (oneway)
+        if (!on_delete)
         {
-            std::vector<decltype(linksCopy)::value_type> wps_relinks_vec;
-            wps_relinks_vec.reserve(wps_relinks.size());
-            for (WanderNode* rlwp : wps_relinks)
-                wps_relinks_vec.push_back(rlwp);
-            std::sort(wps_relinks_vec.begin(), wps_relinks_vec.end());
-            for (WanderNode* rlwp : wps_relinks_vec)
+            if (!wps_relinks.empty())
             {
-                handler->PSendSysMessage("Adding link %u<->%u...", wp->GetWPId(), rlwp->GetWPId());
-                if (wp->GetExactDist2d(rlwp) > MAX_VISIBILITY_DISTANCE)
-                    handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(rlwp));
-                wp->Link(rlwp);
+                std::sort(wps_relinks.begin(), wps_relinks.end(), [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) { return wlp1->Id() < wlp2->Id(); });
+                for (WanderNodeLink const* wlp : wps_relinks)
+                {
+                    handler->PSendSysMessage("Adding link %u->%u (w=%u)...", wp->GetWPId(), wlp->Id(), wlp->weight);
+                    if (wp->GetExactDist2d(wlp->wp) > MAX_VISIBILITY_DISTANCE)
+                        handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(wlp->wp));
+                    wp->Link(WanderNodeLink{ .wp = wlp->wp, .weight = wlp->weight });
+                }
+            }
+            if (!wp->GetLinks().empty() || !links.empty())
+            {
+                handler->PSendSysMessage("WP %u links %u -> %u, avg link weight %u -> %u...",
+                    wp->GetWPId(), uint32(links.size()), uint32(wp->GetLinks().size()), average_weight, wp->GetAverageLinkWeight());
             }
         }
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         WanderNode::DoForContainerWPs(wps_updates, [&trans](WanderNode const* uwp) {
-            if (Creature* wpc = uwp->GetCreature())
-            {
-                wpc->SetMaxPower(POWER_MANA, uint32(uwp->GetLinks().size()));
-                wpc->SetFullPower(POWER_MANA);
-            }
-            trans->PAppend("UPDATE creature_template_npcbot_wander_nodes SET links='%s' WHERE id=%u", uwp->FormatLinks().c_str(), uwp->GetWPId());
+            trans->PAppend("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", uwp->FormatLinks(), uwp->GetWPId());
         });
         WorldDatabase.DirectCommitTransaction(trans);
     }
-    static bool HandleNpcBotWPLinksSetCommand(ChatHandler* handler, Optional<std::vector<uint32>> linkIds, Optional<bool> oneway)
+    static void HandleWPUpdateLinkWeights(ChatHandler* handler, WanderNode* wp, std::vector<std::pair<uint32, int32>> const& link_weights)
+    {
+        using WanderNodeLink = WanderNode::WanderNodeLink;
+
+        bool dirty = false;
+        auto const& links = wp->GetLinks();
+        std::vector<uint32> avg_weight_links;
+
+        for (auto const& p : link_weights)
+        {
+            uint32 lid = p.first;
+
+            if (!WanderNode::FindInMapWPs(wp->GetMapId(), lid))
+            {
+                handler->PSendSysMessage("WP %u does not exist!", lid);
+                continue;
+            }
+
+            if (std::ranges::find_if(links, [=](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.cend())
+            {
+                handler->PSendSysMessage("WP %u has no link to WP %u!", wp->GetWPId(), lid);
+                continue;
+            }
+
+            dirty = true;
+
+            if (p.second < 0)
+            {
+                wp->SetLinkWeight(p.first, 0);
+                avg_weight_links.push_back(p.first);
+            }
+            else
+                wp->SetLinkWeight(p.first, static_cast<uint32>(p.second));
+        }
+
+        if (!avg_weight_links.empty())
+        {
+            uint32 average_weight = wp->GetAverageLinkWeight(true);
+            for (uint32 awlid : avg_weight_links)
+                wp->SetLinkWeight(awlid, average_weight);
+        }
+
+        if (dirty)
+            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", wp->FormatLinks(), wp->GetWPId());
+    }
+    static bool HandleNpcBotWPSetLinksCommand(ChatHandler* handler, Optional<std::vector<uint32>> links, Optional<bool> oneway)
+    {
+        if (!links)
+        {
+            handler->SendSysMessage("Syntax: npcbot wp setlinks #[id[:weight] ...] #[oneway: True/False] #[remove_rev_links: True/False]");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player* player = handler->GetPlayer();
+        Unit* wpc = player->GetSelectedUnit();
+        WanderNode* wp = wpc ? WanderNode::FindInAllWPs(wpc->ToCreature()) : nullptr;
+        if (!wp)
+        {
+            handler->SendSysMessage("No WP selected");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::vector<std::pair<uint32, int32>> pairs;
+        if (!(links->size() == 1 && links->front() == 0))
+            for (uint32 lid : *links)
+                pairs.emplace_back(lid, -1);
+
+        HandleWPUpdateLinks(handler, wp, pairs, oneway ? *oneway : false);
+
+        return true;
+    }
+    static bool HandleNpcBotWPSetLinkWeightsCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> link_weights)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -878,19 +1094,26 @@ public:
             return false;
         }
 
-        if (!linkIds)
+        if (!link_weights || link_weights->empty())
         {
-            handler->SendSysMessage("Syntax: npcbot wp links set #[ids...] #[oneway: true/false]");
+            handler->SendSysMessage("Syntax: npcbot wp setweights #[id:weight ...]");
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        HandleWPUpdateLinks(handler, wp, *linkIds, oneway ? *oneway : false);
+        std::vector<std::pair<uint32, int32>> pairs;
+        if (!HandleExtractWPIdWeightPairs(handler, *link_weights, pairs))
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        HandleWPUpdateLinkWeights(handler, wp, pairs);
 
         return true;
     }
 
-    static bool HandleNpcBotWPCommand(ChatHandler* handler, Optional<uint32> wpId)
+    static bool HandleNpcBotWPInfoCommand(ChatHandler* handler, Optional<uint32> wpId)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -933,13 +1156,12 @@ public:
         player->GetZoneAndAreaId(zoneId, areaId);
         handler->PSendSysMessage("Setting levels min=%u max=%u for zone %u", uint32(*minlevel), uint32(*maxlevel), zoneId);
         WanderNode::DoForAllZoneWPs(zoneId, [handler = handler, minl = *minlevel, maxl = *maxlevel](WanderNode const* wp) {
-            handler->PSendSysMessage("Setting levels min=%u max=%u for node %u '%s'",
-                uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName().c_str());
+            handler->PSendSysMessage("Setting levels min=%u max=%u for node %u '%s'", uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName());
             const_cast<WanderNode*>(wp)->SetLevels(minl, maxl);
             if (Creature* creature = wp->GetCreature())
                 if (creature->GetLevel() != minl)
                     creature->SetLevel(minl);
-            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET minlevel=%u, maxlevel=%u WHERE id=%u",
+            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET minlevel={}, maxlevel={} WHERE id={}",
                 uint32(minl), uint32(maxl), wp->GetWPId());
         });
 
@@ -975,14 +1197,13 @@ public:
         uint32 wpId = wp->GetWPId();
         auto [minlevel_cur, maxlevel_cur] = wp->GetLevels();
 
-        handler->PSendSysMessage("Changing WP %u '%s' levels from %u-%u to %u-%u",
-            wpId, wp->GetName().c_str(), uint32(minlevel_cur), uint32(maxlevel_cur), uint32(*minlevel), uint32(*maxlevel));
+        handler->PSendSysMessage("Changing WP %u '%s' levels from %u-%u to %u-%u", wpId, wp->GetName(), uint32(minlevel_cur), uint32(maxlevel_cur), uint32(*minlevel), uint32(*maxlevel));
         wp->SetLevels(*minlevel, *maxlevel);
         if (Creature* creature = wp->GetCreature())
             if (creature->GetLevel() != *minlevel)
                 creature->SetLevel(*minlevel);
 
-        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET minlevel=%u, maxlevel=%u WHERE id=%u",
+        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET minlevel={}, maxlevel={} WHERE id={}",
             uint32(*minlevel), uint32(*maxlevel), wpId);
 
         return true;
@@ -1005,15 +1226,15 @@ public:
             uint32 wpId = wp->GetWPId();
             if (flags < 0)
             {
-                handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(-flags));
+                handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName(), uint32(-flags));
                 const_cast<WanderNode*>(wp)->RemoveFlags(BotWPFlags(-flags));
             }
             else
             {
-                handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(flags));
+                handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName(), uint32(flags));
                 const_cast<WanderNode*>(wp)->SetFlags(BotWPFlags(flags));
             }
-            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET flags=%u WHERE id=%u", wp->GetFlags(), wpId);
+            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET flags={} WHERE id={}", wp->GetFlags(), wpId);
         });
 
         return true;
@@ -1042,16 +1263,16 @@ public:
 
         if (*flags < 0)
         {
-            handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(-*flags));
+            handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName(), uint32(-*flags));
             wp->RemoveFlags(BotWPFlags(-*flags));
         }
         else
         {
-            handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(*flags));
+            handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName(), uint32(*flags));
             wp->SetFlags(BotWPFlags(*flags));
         }
 
-        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET flags=%u WHERE id=%u", wp->GetFlags(), wpId);
+        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET flags={} WHERE id={}", wp->GetFlags(), wpId);
 
         return true;
     }
@@ -1077,10 +1298,10 @@ public:
 
         uint32 wpId = wp->GetWPId();
 
-        handler->PSendSysMessage("Changing WP %u '%s' name to '%s'", wpId, wp->GetName().c_str(), newname->c_str());
+        handler->PSendSysMessage("Changing WP %u '%s' name to '%s'", wpId, wp->GetName(), *newname);
         wp->SetName(*newname);
 
-        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET name='%s' WHERE id=%u", wp->GetName().c_str(), wpId);
+        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET name='{}' WHERE id={}", wp->GetName(), wpId);
 
         return true;
     }
@@ -1110,22 +1331,21 @@ public:
         if (Creature* creature = wp->GetCreature())
             creature->NearTeleportTo(*player);
 
-        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET x=%f,y=%f,z=%f,o=%f WHERE id=%u",
+        WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET x={},y={},z={},o={} WHERE id={}",
             wp->m_positionX, wp->m_positionY, wp->m_positionZ, wp->GetOrientation(), wp->GetWPId());
 
-        handler->PSendSysMessage("WP %u '%s' was successfully moved.", wp->GetWPId(), wp->GetName().c_str());
+        handler->PSendSysMessage("WP %u '%s' was successfully moved.", wp->GetWPId(), wp->GetName());
 
         return true;
     }
 
-    static bool HandleNpcBotWPAddCommand(ChatHandler* handler, Optional<uint32> flags, Optional<std::string> name,
-        Optional<uint8> minlevel, Optional<uint8> maxlevel)
+    static bool HandleNpcBotWPAddCommand(ChatHandler* handler, Optional<uint32> flags, Optional<std::string> name, Optional<uint8> minlevel, Optional<uint8> maxlevel)
     {
         Player* player = handler->GetPlayer();
 
         if (!flags || !name || (!player->GetMap()->GetEntry()->IsContinent() && !player->GetMap()->GetEntry()->IsBattlegroundOrArena()))
         {
-            handler->SendSysMessage("Syntax: npcbot wp add #[flags] #[name] #[minlevel #[maxlevel]]. World maps only");
+            handler->SendSysMessage("Syntax: npcbot wp add #[flags] #[name] #[minlevel #[maxlevel]]. World maps / BGs only");
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1157,7 +1377,7 @@ public:
 
         if (*flags >= AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END))
         {
-            handler->PSendSysMessage("Flags must below %u!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
+            handler->PSendSysMessage("Flags must be below %u!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1170,25 +1390,25 @@ public:
         wp->SetLevels((!minlevel && !maxlevel) ? GetZoneLevels(GetZoneIdOverride(zoneId)) : std::pair{minlevel ? *minlevel : uint8(1), maxlevel ? *maxlevel : uint8(DEFAULT_MAX_LEVEL)});
         wp->SetFlags(BotWPFlags(*flags));
 
-        std::vector<uint32> linkIds;
+        std::vector<std::pair<uint32, int32>> link_pairs;
         if (Unit* twpc = player->GetSelectedUnit())
             if (WanderNode const* twp = WanderNode::FindInMapWPs(player->GetMapId(), twpc->ToCreature()))
                 if (twp->GetWPId() != wp->GetWPId() - 1)
-                    linkIds.push_back(twp->GetWPId());
-        if (linkIds.empty())
+                    link_pairs.emplace_back(twp->GetWPId(), -1);
+        if (link_pairs.empty())
         {
             if (WanderNode const* pwp = WanderNode::FindInMapWPs(player->GetMapId(), wp->GetWPId() - 1))
                 if (wp->GetExactDist2d(pwp) < MAX_VISIBILITY_DISTANCE)
-                    linkIds.push_back(pwp->GetWPId());
+                    link_pairs.emplace_back(pwp->GetWPId(), -1);
         }
-        if (linkIds.empty())
+        if (link_pairs.empty())
         {
-            WanderNode::DoForAllMapWPs(wp->GetMapId(), [wp = wp, &linkIds](WanderNode const* mwp) {
+            WanderNode::DoForAllMapWPs(wp->GetMapId(), [wp = wp, &link_pairs](WanderNode const* mwp) {
                 if (wp->GetWPId() != mwp->GetWPId() && wp->GetExactDist2d(mwp) < MAX_VISIBILITY_DISTANCE)
-                    linkIds.push_back(mwp->GetWPId());
+                    link_pairs.emplace_back(mwp->GetWPId(), -1);
             });
         }
-        HandleWPUpdateLinks(handler, wp, linkIds);
+        HandleWPUpdateLinks(handler, wp, link_pairs);
 
         ASSERT_NOTNULL(HandleWPSummon(wp, player->GetMap()));
 
@@ -1207,7 +1427,7 @@ public:
 
         WorldDatabase.Execute(ss.str().c_str());
 
-        handler->PSendSysMessage("Created WP %u '%s' levels %u-%u flags %u", wpId, wpName.c_str(), uint32(minl), uint32(maxl), wpFlags);
+        handler->PSendSysMessage("Created WP %u '%s' levels %u-%u flags %u", wpId, wpName, uint32(minl), uint32(maxl), wpFlags);
 
         return true;
     }
@@ -1227,15 +1447,12 @@ public:
         uint32 wpId = wp->GetWPId();
         std::string wpName = wp->GetName();
 
-        HandleWPUpdateLinks(handler, wp, {});
-        wpc->ToCreature()->AIM_Destroy();
-        if (wpc->IsInWorld())
-            wpc->ToTempSummon()->DespawnOrUnsummon();
+        HandleWPUpdateLinks(handler, wp, {}, false, true);
         WanderNode::RemoveWP(wp);
 
-        WorldDatabase.PExecute("DELETE FROM creature_template_npcbot_wander_nodes WHERE id=%u", wpId);
+        WorldDatabase.PExecute("DELETE FROM creature_template_npcbot_wander_nodes WHERE id={}", wpId);
 
-        handler->PSendSysMessage("WP %u '%s' was successfully deleted.", wpId, wpName.c_str());
+        handler->PSendSysMessage("WP %u '%s' was successfully deleted.", wpId, wpName);
 
         return true;
     }
@@ -1268,13 +1485,13 @@ public:
             ss << "\n" << wp->ToString();
         });
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
     static bool HandleNpcBotWPListAllCommand(ChatHandler* handler)
     {
         WanderNode::DoForAllWPs([handler = handler](WanderNode* wp) {
-            handler->SendSysMessage(wp->ToString().c_str());
+            handler->SendSysMessage(wp->ToString());
         });
 
         return true;
@@ -1293,6 +1510,194 @@ public:
         }
 
         player->TeleportTo(WorldLocation(wp->GetMapId(), *wp), TELE_TO_GM_MODE);
+
+        return true;
+    }
+
+    static bool HandleNpcBotDebugEventLaunchCommand(ChatHandler* handler, Optional<uint32> event_num)
+    {
+        if (!event_num)
+        {
+            handler->SendSysMessage("Syntax: .npcbot debug event launch #event_num");
+            handler->SendSysMessage("Launches event for this instance");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player const* player = handler->GetPlayer();
+        if (!player->HaveBot())
+        {
+            handler->SendSysMessage("You have no bots!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Map* map = player->GetMap();
+        if (!map->IsDungeon())
+        {
+            handler->SendSysMessage("Must be in a dungeon/raid!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        InstanceScript* script = map->ToInstanceMap()->GetInstanceScript();
+        if (!script)
+        {
+            handler->PSendSysMessage("Instance script is not found for map %u!", map->GetId());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        switch (*event_num)
+        {
+            case 1:
+                switch (map->GetId())
+                {
+                    case 631: //Icecrown Citadel
+                    {
+                        if (player->GetAreaId() != 4859) // "Frozen Throne"
+                        {
+                            handler->SendSysMessage("Must be in Frozen Throne area!");
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                        GameObject* platform = nullptr;
+                        Bcore::NearestGameObjectEntryInObjectRangeCheck check(*player, 202161, 100.0f);
+                        Bcore::GameObjectSearcher<Bcore::NearestGameObjectEntryInObjectRangeCheck> searcher(player, platform, check);
+                        Cell::VisitAllObjects(player, searcher, 100.0f);
+                        if (!platform)
+                        {
+                            handler->SendSysMessage("Cannot find platform id 202161!");
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                        FrozenThronePlatformDestructionEvent(script, platform->GetPosition())();
+                        break;
+                    }
+                    default:
+                        handler->PSendSysMessage("Unknown event %u for map %u!", *event_num, map->GetId());
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                }
+                break;
+            default:
+                handler->PSendSysMessage("Unknown event %u!", *event_num);
+                handler->SetSentErrorMessage(true);
+                return false;
+        }
+
+        return true;
+    }
+
+    static bool HandleNpcBotDebugWPReidCommand(ChatHandler* handler, Optional<uint32> start_id, Optional<uint32> end_id, Optional<uint32> target_start_id)
+    {
+        if (!start_id)
+        {
+            handler->SendSysMessage(".npcbot debug wpreid #start_id [#end_id #target_start_id]");
+            handler->SendSysMessage("Compacts WP IDs to elimnate gaps between them, starting with <start_id>");
+            handler->SendSysMessage("If #end_id and #target_start_id are provided then instead relocates WPs with IDs <start_id>..<end_id> to <target_start_id>...");
+            handler->SendSysMessage("WARNING: THIS IS UNSAFE! Back-up your wander nodes table before proceeding");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!!end_id != !!target_start_id)
+        {
+            handler->SendSysMessage("Either both #end_id and #target_start_id or none required!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (end_id && *end_id < *start_id)
+        {
+            handler->SendSysMessage("End id must be equal or greater than start id!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (static bool all_wps_forced = false; !all_wps_forced)
+        {
+            all_wps_forced = true;
+            handler->SendSysMessage("Force loading all wander nodes...");
+            BotDataMgr::LoadWanderMap(true, true);
+        }
+
+        std::vector<WanderNode*> wander_nodes_copy;
+        wander_nodes_copy.reserve(WanderNode::GetAllWPsCount());
+        WanderNode::DoForAllWPs([&wander_nodes_copy](WanderNode* wp) { wander_nodes_copy.push_back(wp); });
+        std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
+
+        uint32 startid = *start_id;
+        uint32 endid = end_id.value_or(wander_nodes_copy.back()->GetWPId());
+        const uint32 reid_count = endid - startid + 1;
+        uint32 target_startid = target_start_id.value_or(startid);
+
+        if (target_start_id)
+        {
+            if (std::ranges::any_of(wander_nodes_copy, [st = *target_start_id, en = *target_start_id + reid_count - 1](WanderNode const* wpc) {
+                return wpc->GetWPId() >= st && wpc->GetWPId() <= en; }))
+            {
+                handler->SendSysMessage("Cannot reid onto existing WP ids!");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            handler->PSendSysMessage("Running re-id on %u..%u -> %u..%u", startid, endid, target_startid, uint32(target_startid + reid_count - 1));
+        }
+        else
+            handler->PSendSysMessage("Running re-id on %u..%u", startid, endid);
+
+        std::set<uint32> checked_map_ids;
+        std::vector<uint32> wander_node_deletes;
+        std::vector<WanderNode const*> wander_node_inserts;
+        for (WanderNode* wp : wander_nodes_copy)
+        {
+            if (wp->GetWPId() >= startid && wp->GetWPId() <= endid)
+            {
+                if (!checked_map_ids.contains(wp->GetMapId()))
+                {
+                    checked_map_ids.insert(wp->GetMapId());
+                    WanderNode::DoForAllMapWPs(wp->GetMapId(), [&wander_node_deletes, &wander_node_inserts](WanderNode const* uwp) {
+                        wander_node_deletes.push_back(uwp->GetWPId());
+                        wander_node_inserts.push_back(uwp);
+                    });
+                }
+                uint32 prev_id = wp->GetWPId();
+                wp->SetId(target_startid++);
+                handler->PSendSysMessage("%u => %u", prev_id, wp->GetWPId());
+            }
+        }
+
+        if (wander_node_deletes.empty() || wander_node_inserts.empty())
+        {
+            handler->SendSysMessage("No WPs found within given range");
+            return false;
+        }
+
+        std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
+        WanderNode::nextWPId = wander_nodes_copy.back()->GetWPId();
+
+        WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
+        std::ostringstream ss;
+        for (uint32 wpid : wander_node_deletes)
+            ss << wpid << ',';
+        std::string wp_range_str = ss.str();
+        wp_range_str.resize(wp_range_str.size() - 1u);
+        trans->PAppend("DELETE FROM `creature_template_npcbot_wander_nodes` WHERE id IN ({})", wp_range_str);
+        ss.str("");
+        ss << "INSERT INTO `creature_template_npcbot_wander_nodes` (id,mapid,x,y,z,o,zoneid,areaid,minlevel,maxlevel,flags,name,links) VALUES ";
+        WanderNode::DoForContainerWPs(wander_node_inserts, [&ss](WanderNode const* wp) {
+            auto [minl, maxl] = wp->GetLevels();
+            ss << '(' << wp->GetWPId() << ',' << wp->GetMapId()
+                << ',' << wp->GetPositionX() << ',' << wp->GetPositionY() << ',' << wp->GetPositionZ() << ',' << wp->GetOrientation()
+                << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
+                << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
+        });
+        std::string val_str = ss.str();
+        val_str.resize(val_str.size() - 1u);
+        trans->Append(val_str.c_str());
+        WorldDatabase.CommitTransaction(trans);
+
+        handler->SendSysMessage("Reid complete.");
 
         return true;
     }
@@ -1359,7 +1764,7 @@ public:
                             }
                         }
                     }
-                    handler->PSendSysMessage("%s", ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
                     ss.str("");
                 }
             }
@@ -1387,7 +1792,7 @@ public:
             << "\n  creator2 guid:\n" << (target->GetCreator() ? target->GetCreator()->GetGUID().ToString() : std::string{})
             << "\n  owner guid:\n" << target->GetOwnerGUID().ToString();
 
-        handler->SendSysMessage(gss.str().c_str());
+        handler->SendSysMessage(gss.str());
         return true;
     }
 
@@ -1461,7 +1866,7 @@ public:
                 ostr << "\nSpell type " << uint32(i) << ":\n" << curSpell->GetDebugInfo();
         }
 
-        handler->SendSysMessage(ostr.str().c_str());
+        handler->SendSysMessage(ostr.str());
         return true;
     }
 
@@ -1482,7 +1887,7 @@ public:
                 ostr << "\n    0x" << std::hex << (state);
         }
 
-        handler->SendSysMessage(ostr.str().c_str());
+        handler->SendSysMessage(ostr.str());
         return true;
     }
 
@@ -1523,7 +1928,7 @@ public:
             if (subBots[i] > 0)
                 sstr << uint32(subBots[i]) << " bots in subgroup " << uint32(i + 1) << "\n";
 
-        handler->SendSysMessage(sstr.str().c_str());
+        handler->SendSysMessage(sstr.str());
         delete[] subBots;
         return true;
     }
@@ -1666,6 +2071,155 @@ public:
         return true;
     }
 
+    static bool HandleNpcBotOrderPullCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string_view> target_token)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+        if (!owner->HaveBot() || !bot_name)
+        {
+            handler->SendSysMessage(".npcbot order pull #bot_name #[target_token]");
+            handler->SendSysMessage("Orders bot to pull target immediately");
+            return true;
+        }
+
+        if (owner->GetBotMgr()->IsPartyInCombat(false))
+        {
+            handler->SendSysMessage("Can't do that while in combat!");
+            return true;
+        }
+
+        for (std::decay_t<decltype(*bot_name)>::size_type i = 0u; i < bot_name->size(); ++i)
+            if ((*bot_name)[i] == '_')
+                (*bot_name)[i] = ' ';
+
+        Creature* bot = owner->GetBotMgr()->GetBotByName(*bot_name);
+        if (bot)
+        {
+            if (!bot->IsInWorld())
+            {
+                handler->PSendSysMessage("Bot %s is not found!", bot_name->c_str());
+                return true;
+            }
+            if (!bot->IsAlive())
+            {
+                handler->PSendSysMessage("%s is dead!", bot->GetName());
+                return true;
+            }
+            if (!bot->GetBotAI()->HasRole(BOT_ROLE_DPS) || bot->GetVictim() || bot->IsInCombat() || !bot->getAttackers().empty())
+            {
+                handler->PSendSysMessage("%s cannot pull target! Must be idle and have DPS role", bot->GetName());
+                return true;
+            }
+        }
+        else
+        {
+            auto const& class_name = *bot_name;
+            for (auto const c : class_name)
+            {
+                if (!std::islower(c))
+                {
+                    handler->SendSysMessage("Bot class name must be in lower case!");
+                    return true;
+                }
+            }
+
+            uint8 bot_class = BotMgr::BotClassByClassName(class_name);
+            if (bot_class == BOT_CLASS_NONE)
+            {
+                handler->PSendSysMessage("Unknown bot name or class %s!", class_name);
+                return true;
+            }
+
+            std::list<Creature*> cBots = owner->GetBotMgr()->GetAllBotsByClass(bot_class);
+
+            if (cBots.empty())
+            {
+                handler->PSendSysMessage("No bots of class %u found!", bot_class);
+                return true;
+            }
+
+            bot = cBots.size() == 1 ? cBots.front() : Bcore::Containers::SelectRandomContainerElement(cBots);
+
+            if (!bot)
+            {
+                handler->SendSysMessage("None of %u found bots can use pull yet!", cBots.size());
+                return true;
+            }
+        }
+
+        ObjectGuid target_guid = ObjectGuid::Empty;
+        bool token_valid = true;
+        if (!target_token || target_token == "mytarget")
+            target_guid = owner->GetTarget();
+        else if (Group const* group = owner->GetGroup())
+        {
+            if (target_token == "star")
+                target_guid = group->GetTargetIcons()[0];
+            else if (target_token == "circle")
+                target_guid = group->GetTargetIcons()[1];
+            else if (target_token == "diamond")
+                target_guid = group->GetTargetIcons()[2];
+            else if (target_token == "triangle")
+                target_guid = group->GetTargetIcons()[3];
+            else if (target_token == "moon")
+                target_guid = group->GetTargetIcons()[4];
+            else if (target_token == "square")
+                target_guid = group->GetTargetIcons()[5];
+            else if (target_token == "cross")
+                target_guid = group->GetTargetIcons()[6];
+            else if (target_token == "skull")
+                target_guid = group->GetTargetIcons()[7];
+            else if (target_token->size() == 1u && std::isdigit(target_token->front()))
+            {
+                uint8 digit = static_cast<uint8>(std::stoi(std::string(*target_token)));
+                switch (digit)
+                {
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                        target_guid = group->GetTargetIcons()[digit - 1];
+                        break;
+                    default:
+                        token_valid = false;
+                        break;
+                }
+            }
+            else
+                token_valid = false;
+        }
+        else
+            token_valid = false;
+
+        if (!token_valid)
+        {
+            handler->PSendSysMessage("Invalid target token '%s'!", *target_token);
+            handler->SendSysMessage("Valid target tokens:\n    '','mytarget', "
+                "'star','1', 'circle','2', 'diamond','3', 'triangle','4', 'moon','5', 'square','6', 'cross','7', 'skull','8'"
+                "\nNote that target icons tokens are only available while in group");
+            return true;
+        }
+
+        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
+        {
+            handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
+            return true;
+        }
+
+        bot_ai::BotOrder order(BOT_ORDER_PULL);
+        order.params.pullParams.targetGuid = target_guid.GetRawValue();
+
+        if (bot->GetBotAI()->AddOrder(std::move(order)))
+        {
+            if (DEBUG_BOT_ORDERS)
+                handler->PSendSysMessage("Order given: %s: pull %s", bot->GetName(), target ? target->GetName().c_str() : "unknown");
+        }
+        else
+        {
+            if (DEBUG_BOT_ORDERS)
+                handler->PSendSysMessage("Order failed: %s: pull %s", bot->GetName(), target ? target->GetName().c_str() : "unknown");
+        }
+
+        return true;
+    }
+
     static bool HandleNpcBotOrderCastCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string> spell_name, Optional<std::string_view> target_token)
     {
         Player* owner = handler->GetSession()->GetPlayer();
@@ -1700,25 +2254,25 @@ public:
             }
             if (!bot->IsAlive())
             {
-                handler->PSendSysMessage("%s is dead!", bot->GetName().c_str());
+                handler->PSendSysMessage("%s is dead!", bot->GetName());
                 return true;
             }
 
             base_spell = bot->GetBotAI()->GetBaseSpell(*spell_name, handler->GetSessionDbcLocale());
             if (!base_spell)
             {
-                handler->PSendSysMessage("%s doesn't have spell named '%s'!", bot->GetName().c_str(), spell_name->c_str());
+                handler->PSendSysMessage("%s doesn't have spell named '%s'!", bot->GetName(), spell_name->c_str());
                 return true;
             }
             if (!canBotUseSpell(bot, base_spell))
             {
-                handler->PSendSysMessage("%s's %s is not ready yet!", bot->GetName().c_str(), sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()]);
+                handler->PSendSysMessage("%s's %s is not ready yet!", bot->GetName(), sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()]);
                 return true;
             }
         }
         else
         {
-            auto class_name = *bot_name;
+            auto const& class_name = *bot_name;
             for (auto const c : class_name)
             {
                 if (!std::islower(c))
@@ -1731,7 +2285,7 @@ public:
             uint8 bot_class = BotMgr::BotClassByClassName(class_name);
             if (bot_class == BOT_CLASS_NONE)
             {
-                handler->PSendSysMessage("Unknown bot name or class %s!", class_name.c_str());
+                handler->PSendSysMessage("Unknown bot name or class %s!", class_name);
                 return true;
             }
 
@@ -1743,6 +2297,8 @@ public:
                 return true;
             }
 
+            uint32 found_bots_count = static_cast<uint32>(cBots.size());
+
             for (Creature const* fbot : cBots)
             {
                 base_spell = fbot->GetBotAI()->GetBaseSpell(*spell_name, handler->GetSessionDbcLocale());
@@ -1752,7 +2308,7 @@ public:
 
             if (!base_spell)
             {
-                handler->PSendSysMessage("None of %u found bots have spell named '%s'!", cBots.size(), spell_name->c_str());
+                handler->PSendSysMessage("None of %u found bots have spell named '%s'!", found_bots_count, spell_name->c_str());
                 return true;
             }
 
@@ -1776,18 +2332,19 @@ public:
                     ++it;
             }
 
-            bot = ccBots.empty() ? nullptr : ccBots.size() == 1 ? ccBots.front() : Trinity::Containers::SelectRandomContainerElement(ccBots);
+            bot = ccBots.empty() ? nullptr : ccBots.size() == 1 ? ccBots.front() : Bcore::Containers::SelectRandomContainerElement(ccBots);
             if (!bot)
-                bot = cBots.empty() ? nullptr : cBots.size() == 1 ? cBots.front() : Trinity::Containers::SelectRandomContainerElement(cBots);
+                bot = cBots.empty() ? nullptr : cBots.size() == 1 ? cBots.front() : Bcore::Containers::SelectRandomContainerElement(cBots);
 
             if (!bot)
             {
-                handler->PSendSysMessage("None of %u found bots can use %s yet!", cBots.size(), spell_name->c_str());
+                handler->PSendSysMessage("None of %u found bots can use %s yet!", found_bots_count, spell_name->c_str());
                 return true;
             }
         }
 
-        ObjectGuid target_guid;
+        ObjectGuid target_guid = ObjectGuid::Empty;
+        bool token_valid = true;
         if (!target_token || target_token == "bot" || target_token == "self")
             target_guid = bot->GetGUID();
         else if (target_token == "me" || target_token == "master")
@@ -1800,10 +2357,49 @@ public:
             target_guid = bot->GetTarget();
         else if (target_token == "mytarget")
             target_guid = owner->GetTarget();
+        else if (Group const* group = owner->GetGroup())
+        {
+            if (target_token == "star")
+                target_guid = group->GetTargetIcons()[0];
+            else if (target_token == "circle")
+                target_guid = group->GetTargetIcons()[1];
+            else if (target_token == "diamond")
+                target_guid = group->GetTargetIcons()[2];
+            else if (target_token == "triangle")
+                target_guid = group->GetTargetIcons()[3];
+            else if (target_token == "moon")
+                target_guid = group->GetTargetIcons()[4];
+            else if (target_token == "square")
+                target_guid = group->GetTargetIcons()[5];
+            else if (target_token == "cross")
+                target_guid = group->GetTargetIcons()[6];
+            else if (target_token == "skull")
+                target_guid = group->GetTargetIcons()[7];
+            else if (target_token->size() == 1u && std::isdigit(target_token->front()))
+            {
+                uint8 digit = static_cast<uint8>(std::stoi(std::string(*target_token)));
+                switch (digit)
+                {
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                        target_guid = group->GetTargetIcons()[digit - 1];
+                        break;
+                    default:
+                        token_valid = false;
+                        break;
+                }
+            }
+            else
+                token_valid = false;
+        }
         else
+            token_valid = false;
+
+        if (!token_valid)
         {
             handler->PSendSysMessage("Invalid target token '%s'!", *target_token);
-            handler->SendSysMessage("Valid target tokens:\n    '','bot','self', 'me','master', 'mypet', 'myvehicle', 'target', 'mytarget'");
+            handler->SendSysMessage("Valid target tokens:\n    '','bot','self', 'me','master', 'mypet', 'myvehicle', 'target', 'mytarget', "
+                "'star','1', 'circle','2', 'diamond','3', 'triangle','4', 'moon','5', 'square','6', 'cross','7', 'skull','8'"
+                "\nNote that target icons tokens are only available while in group");
             return true;
         }
 
@@ -1821,13 +2417,13 @@ public:
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
             if (DEBUG_BOT_ORDERS)
-                handler->PSendSysMessage("Order given: %s: %s on %s", bot->GetName().c_str(),
+                handler->PSendSysMessage("Order given: %s: %s on %s", bot->GetName(),
                     sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()], target ? target->GetName().c_str() : "unknown");
         }
         else
         {
             if (DEBUG_BOT_ORDERS)
-                handler->PSendSysMessage("Order failed: %s: %s on %s", bot->GetName().c_str(),
+                handler->PSendSysMessage("Order failed: %s: %s on %s", bot->GetName(),
                     sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()], target ? target->GetName().c_str() : "unknown");
         }
 
@@ -1980,15 +2576,18 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (owner->GetBotMgr()->IsPartyInCombat())
+        if (owner->GetBotMgr()->IsPartyInCombat(false))
         {
             handler->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        owner->GetBotMgr()->SetBotsHidden(true);
-        handler->SendSysMessage("Bots hidden");
+        if (!owner->GetBotMgr()->GetBotsHidden())
+        {
+            owner->GetBotMgr()->SetBotsHidden(true);
+            handler->SendSysMessage("Bots hidden");
+        }
         return true;
     }
 
@@ -2009,15 +2608,80 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
+        if (owner->GetBotMgr()->IsPartyInCombat(true))
         {
             handler->GetSession()->SendNotification("You can't do that while in PvP combat");
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        owner->GetBotMgr()->SetBotsHidden(false);
-        handler->SendSysMessage("Bots unhidden");
+        if (owner->GetBotMgr()->GetBotsHidden())
+        {
+            owner->GetBotMgr()->SetBotsHidden(false);
+            handler->SendSysMessage("Bots unhidden");
+        }
+        return true;
+    }
+
+    static bool HandleNpcBotFixCommand(ChatHandler* handler, Optional<Variant<std::string_view, uint32>> bot_id_or_name)
+    {
+        Creature const* target = handler->getSelectedCreature();
+
+        uint32 bot_id;
+        if (target && target->IsNPCBot())
+            bot_id = target->GetEntry();
+        else if (bot_id_or_name)
+        {
+            if (bot_id_or_name->holds_alternative<uint32>())
+                bot_id = bot_id_or_name->get<uint32>();
+            else if (Creature const* fbot = BotDataMgr::FindBot(bot_id_or_name->get<std::string_view>(), LocaleConstant(handler->GetSessionDbLocaleIndex())))
+            {
+                target = fbot;
+                bot_id = target->GetEntry();
+            }
+            else
+            {
+                char* cre_id = handler->extractKeyFromLink((char*)bot_id_or_name->get<std::string_view>().data(), "Hcreature_entry");
+                bot_id = uint32(atoi(cre_id));
+            }
+        }
+        else if (target)
+        {
+            handler->SendSysMessage("You must select a npcbot");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        else
+        {
+            handler->SendSysMessage(".npcbot fix #[id | name | link | <selection>]");
+            handler->SendSysMessage("Attempts to fix different bot's unit states and ai mishaps which stall its normal function");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature const* bot = target ? target : BotDataMgr::FindBot(bot_id);
+        if (!bot)
+        {
+            handler->PSendSysMessage("NpcBot %u is not found!", bot_id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
+        Player* owner = !bot->IsFreeBot() ? bot->GetBotOwner() : nullptr;
+        Player* tickler = handler->GetPlayer();
+
+        if (!tickler->IsGameMaster())
+        {
+            handler->SendSysMessage("Must be in GM mode to use this command!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage("Trying to fix bot %s (%u) owned by %s (%u)", bot->GetName(), bot_id,
+            owner ? owner->GetName().c_str() : "Unknown", owner ? owner->GetGUID().GetCounter() : bot_data->owner);
+
+        bot->GetBotAI()->ReceiveEmote(tickler, TEXT_EMOTE_TICKLE);
         return true;
     }
 
@@ -2070,7 +2734,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_APPEARING_AT, bot->GetName().c_str());
+        handler->PSendSysMessage(LANG_APPEARING_AT, bot->GetName());
 
         if (player->IsInFlight())
             player->FinishTaxiFlight();
@@ -2098,7 +2762,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Your next dest spell will send %u bot(s) to position...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Your next dest spell will send %s to position...", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Your next dest spell will send %s to position...", name_or_count.get<std::string>());
             return true;
         };
 
@@ -2159,7 +2823,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Moving %u bot(s) to previous position...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Moving %s to previous position...", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Moving %s to previous position...", name_or_count.get<std::string>());
             return true;
         };
 
@@ -2219,7 +2883,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Marked send point %u for %u bot(s)", *point_id, name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Marked send point %u for %s", *point_id, name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Marked send point %u for %s", *point_id, name_or_count.get<std::string>());
             return true;
         };
 
@@ -2280,7 +2944,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Moving %u bot(s) to point %u...", name_or_count.get<uint32>(), *point_id);
             else
-                chandler->PSendSysMessage("Moving %s to point %u...", name_or_count.get<std::string>().c_str(), *point_id);
+                chandler->PSendSysMessage("Moving %s to point %u...", name_or_count.get<std::string>(), *point_id);
             return true;
         };
 
@@ -2338,7 +3002,7 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (owner->GetBotMgr()->IsPartyInCombat())
+        if (owner->GetBotMgr()->IsPartyInCombat(false))
         {
             handler->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
@@ -2408,7 +3072,13 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-        if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
+        if (owner->GetBotMgr()->GetBotsHidden())
+        {
+            handler->GetSession()->SendNotification("You can't do that while bots are hidden");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        if (owner->GetBotMgr()->IsPartyInCombat(true))
         {
             handler->GetSession()->SendNotification("You can't do that while in PvP combat");
             handler->SetSentErrorMessage(true);
@@ -2453,7 +3123,7 @@ public:
         if (!setFlags)
             return false;
 
-        handler->PSendSysMessage("Toggling flag %u on %s", setFlags, unit->GetName().c_str());
+        handler->PSendSysMessage("Toggling flag %u on %s", setFlags, unit->GetName());
         unit->ToggleFlag(UNIT_FIELD_FLAGS, setFlags);
         return true;
     }
@@ -2486,7 +3156,7 @@ public:
         else if ((*factionStr)[0] == 'h')
             factionId = 1801; //Horde
         else if ((*factionStr)[0] == 'm')
-            factionId = 14; //Monsters
+            factionId = FACTION_TEMPLATE_NEUTRAL_HOSTILE; //Monsters
         else if ((*factionStr)[0] == 'f')
             factionId = 35; //Friendly to all
 
@@ -2506,7 +3176,7 @@ public:
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_FACTION, &factionId);
         bot->GetBotAI()->ReInitFaction();
 
-        handler->PSendSysMessage("%s's faction set to %u", bot->GetName().c_str(), factionId);
+        handler->PSendSysMessage("%s's faction set to %u", bot->GetName(), factionId);
         return true;
     }
 
@@ -2561,7 +3231,7 @@ public:
         bot->GetBotAI()->ReinitOwner();
         //bot->GetBotAI()->Reset();
 
-        handler->PSendSysMessage("%s's new owner is %s (guidlow: %u)", bot->GetName().c_str(), characterName.c_str(), guidlow);
+        handler->PSendSysMessage("%s's new owner is %s (guidlow: %u)", bot->GetName(), characterName, guidlow);
         return true;
     }
 
@@ -2595,7 +3265,7 @@ public:
 
         bot->GetBotAI()->SetSpec(*spec);
 
-        handler->PSendSysMessage("%s's new spec is %u", bot->GetName().c_str(), uint32(*spec));
+        handler->PSendSysMessage("%s's new spec is %u", bot->GetName(), uint32(*spec));
         return true;
     }
 
@@ -2672,8 +3342,7 @@ public:
 
             if (teamid)
             {
-                ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
-                uint32 faction = rentry ? rentry->FactionID : 14;
+                uint32 faction = BotDataMgr::GetDefaultFactionForBotRaceClass(_botExtras->bclass, race);
                 TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))
@@ -2728,9 +3397,89 @@ public:
                 default:                raceName = "Unknown";   break;
             }
 
-            handler->PSendSysMessage("%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r %s", itr->id, itr->id, itr->name.c_str(), raceName);
+            handler->PSendSysMessage("%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r %s", itr->id, itr->id, itr->name, raceName);
         }
 
+        return true;
+    }
+
+    static bool HandeNpcBotCleanUpAndRemoval(ChatHandler* handler, Creature* bot, Player const* chr/* = nullptr*/)
+    {
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
+
+        if (bot->GetBotAI()->HasRealEquipment())
+        {
+            ObjectGuid receiver =
+                botowner ? botowner->GetGUID() :
+                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+                chr ? chr->GetGUID() : ObjectGuid::Empty;
+
+            if (!botowner && chr && receiver != chr->GetGUID() && !sCharacterCache->HasCharacterCacheEntry(receiver))
+                receiver = chr->GetGUID();
+
+            if (receiver == ObjectGuid::Empty)
+            {
+                handler->PSendSysMessage("Cannot delete bot %s from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName());
+                return false;
+            }
+            if (bot->GetBotAI()->UnEquipAll(receiver, false) != BotEquipResult::BOT_EQUIP_RESULT_OK)
+            {
+                handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips manually first!", bot->GetName());
+                return false;
+            }
+        }
+
+        if (botowner)
+            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
+
+        return true;
+    }
+
+    static bool HandleNpcBotFreeCommand(ChatHandler* handler)
+    {
+        Player* chr = handler->GetSession()->GetPlayer();
+        Unit* ubot = chr->GetSelectedUnit();
+        if (!ubot)
+        {
+            handler->SendSysMessage(".npcbot free");
+            handler->SendSysMessage("Immediately cancels selected npcbot's ownership");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature* bot = ubot->ToCreature();
+        if (!bot || !bot->IsNPCBot() || !bot->GetBotAI()->GetBotOwnerGuid() || bot->IsTempBot())
+        {
+            handler->SendSysMessage("No owned npcbot selected");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 owner_guid = bot->GetBotAI()->GetBotOwnerGuid();
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
+        if (!HandeNpcBotCleanUpAndRemoval(handler, bot, chr))
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint8 spec = bot_ai::SelectSpecForClass(bot->GetBotClass());
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_SPEC, &spec);
+        uint32 roleMask = bot_ai::DefaultRolesForClass(bot->GetBotClass(), spec);
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ROLES, &roleMask);
+
+        if (!botowner)
+        {
+            uint32 newOwner = 0;
+            BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
+
+            if (Group* gr = bot->GetBotGroup())
+                gr->RemoveMember(bot->GetGUID());
+
+            bot->GetBotAI()->ResetBotAI(BOTAI_RESET_DISMISS);
+        }
+
+        handler->PSendSysMessage("Npcbot %s successfully freed, owner was %u", bot->GetName(), owner_guid);
         return true;
     }
 
@@ -2757,25 +3506,15 @@ public:
         if (bot->GetBotAI()->IsWanderer())
         {
             BotDataMgr::DespawnWandererBot(bot->GetEntry());
-            handler->PSendSysMessage("Wandering bot %u '%s' successfully deleted", bot->GetEntry(), bot->GetName().c_str());
+            handler->PSendSysMessage("Wandering bot %u '%s' successfully deleted", bot->GetEntry(), bot->GetName());
             return true;
         }
 
-        Player const* botowner = bot->GetBotOwner()->ToPlayer();
-
-        ObjectGuid receiver =
-            botowner ? botowner->GetGUID() :
-            bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
-            chr->GetGUID();
-        if (!bot->GetBotAI()->UnEquipAll(receiver))
+        if (!HandeNpcBotCleanUpAndRemoval(handler, bot, chr))
         {
-            handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        if (botowner)
-            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
 
         bot->CombatStop();
         bot->GetBotAI()->Reset();
@@ -2789,7 +3528,7 @@ public:
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
-        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName());
         return true;
     }
 
@@ -2813,45 +3552,32 @@ public:
 
         if (bot->GetBotAI()->IsWanderer())
         {
-            handler->SendSysMessage("Cannot delete wanderer npcbot");
+            BotDataMgr::DespawnWandererBot(bot->GetEntry());
+            handler->PSendSysMessage("Wandering bot %u '%s' successfully deleted", bot->GetEntry(), bot->GetName());
+            return true;
+        }
+
+        Player* chr = !handler->IsConsole() ? handler->GetSession()->GetPlayer() : nullptr;
+
+        if (!HandeNpcBotCleanUpAndRemoval(handler, const_cast<Creature*>(bot), chr))
+        {
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        Player* chr = !handler->IsConsole() ? handler->GetSession()->GetPlayer() : nullptr;
-        Player const* botowner = bot->GetBotOwner()->ToPlayer();
-
-        if (bot->GetBotAI()->HasRealEquipment())
-        {
-            ObjectGuid receiver =
-                botowner ? botowner->GetGUID() :
-                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
-                chr ? chr->GetGUID() : ObjectGuid::Empty;
-            if (receiver == ObjectGuid::Empty)
-            {
-                handler->PSendSysMessage("Cannot delete bot %s from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName().c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-            if (!bot->GetBotAI()->UnEquipAll(receiver))
-            {
-                handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-        }
-
-        if (botowner)
-            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
-
         const_cast<Creature*>(bot)->CombatStop();
         bot->GetBotAI()->Reset();
         bot->GetBotAI()->canUpdate = false;
+
+        CreatureData const* data = ASSERT_NOTNULL(sObjectMgr->GetCreatureData(bot->GetSpawnId()));
+        if (bot->IsInWorld() && data->mapId != bot->GetMap()->GetId())
+            bot->GetMap()->AddObjectToRemoveList(const_cast<Creature*>(bot));
+
         Creature::DeleteFromDB(bot->GetSpawnId());
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
-        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName());
         return true;
     }
 
@@ -2929,7 +3655,7 @@ public:
         cdata->mapId = player->GetMapId();
 
         WorldDatabase.PExecute(
-            "UPDATE creature SET position_x = %.3f, position_y = %.3f, position_z = %.3f, orientation = %.3f, map = %u WHERE guid = %u",
+            "UPDATE creature SET position_x = {}, position_y = {}, position_z = {}, orientation = {}, map = {} WHERE guid = {}",
             cdata->spawnPoint.GetPositionX(), cdata->spawnPoint.GetPositionY(), cdata->spawnPoint.GetPositionZ(), cdata->spawnPoint.GetOrientation(), uint32(cdata->mapId), lowguid);
 
         if (bot->GetBotAI()->IAmFree() && bot->IsInWorld() && !bot->IsInCombat() && bot->IsAlive())
@@ -2956,7 +3682,7 @@ public:
             return false;
         };
         static auto const ret_err_invalid_arg = [](ChatHandler* handler, char const* argname, Optional<uint8> argval = {}) {
-            handler->PSendSysMessage("Invalid %s%s!", argname, argval ?  (" " + std::to_string(*argval)).c_str() : "");
+            handler->PSendSysMessage("Invalid %s%s!", argname, argval ?  (" " + std::to_string(*argval)) : "");
             handler->SetSentErrorMessage(true);
             return false;
         };
@@ -3030,12 +3756,12 @@ public:
         uint32 modelId = can_change_appearance ? SoundSetModelsArray[RaceToRaceOffset[*race]][*gender][soundset ? *soundset - 1 : urand(0u, 2u)] : 0;
 
         uint32 newentry = 0;
-        QueryResult creres = WorldDatabase.PQuery("SELECT entry FROM creature_template WHERE entry = %u", BOT_ENTRY_CREATE_BEGIN);
+        QueryResult creres = WorldDatabase.PQuery("SELECT entry FROM creature_template WHERE entry = {}", BOT_ENTRY_CREATE_BEGIN);
         if (!creres)
             newentry = BOT_ENTRY_CREATE_BEGIN;
         else
         {
-            creres = WorldDatabase.PQuery("SELECT MIN(entry) FROM creature_template WHERE entry >= %u AND entry IN (SELECT entry FROM creature_template) AND entry+1 NOT IN (SELECT entry FROM creature_template)", BOT_ENTRY_CREATE_BEGIN);
+            creres = WorldDatabase.PQuery("SELECT MIN(entry) FROM creature_template WHERE entry >= {} AND entry IN (SELECT entry FROM creature_template) AND entry+1 NOT IN (SELECT entry FROM creature_template)", BOT_ENTRY_CREATE_BEGIN);
             ASSERT(creres);
             Field* field = creres->Fetch();
             newentry = field[0].GetUInt32() + 1;
@@ -3043,20 +3769,20 @@ public:
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         trans->Append("DROP TEMPORARY TABLE IF EXISTS creature_template_temp_npcbot_create");
-        trans->PAppend("CREATE TEMPORARY TABLE creature_template_temp_npcbot_create ENGINE=MEMORY SELECT * FROM creature_template WHERE entry = (SELECT entry FROM creature_template_npcbot_extras WHERE class = %u LIMIT 1)", uint32(*bclass));
-        trans->PAppend("UPDATE creature_template_temp_npcbot_create SET entry = %u, name = \"%s\"", newentry, namestr.c_str());
+        trans->PAppend("CREATE TEMPORARY TABLE creature_template_temp_npcbot_create ENGINE=MEMORY SELECT * FROM creature_template WHERE entry = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)", uint32(*bclass));
+        trans->PAppend("UPDATE creature_template_temp_npcbot_create SET entry = {}, name = \"{}\"", newentry, namestr);
         if (modelId)
-            trans->PAppend("UPDATE creature_template_temp_npcbot_create SET modelid1 = %u", modelId);
+            trans->PAppend("UPDATE creature_template_temp_npcbot_create SET modelid1 = {}", modelId);
         trans->Append("INSERT INTO creature_template SELECT * FROM creature_template_temp_npcbot_create");
         trans->Append("DROP TEMPORARY TABLE creature_template_temp_npcbot_create");
-        trans->PAppend("REPLACE INTO creature_template_npcbot_extras VALUES (%u, %u, %u)", newentry, uint32(*bclass), uint32(*race));
-        trans->PAppend("REPLACE INTO creature_equip_template SELECT %u, 1, ids.itemID1, ids.itemID2, ids.itemID3, -1 FROM (SELECT itemID1, itemID2, itemID3 FROM creature_equip_template WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = %u LIMIT 1)) ids", newentry, uint32(*bclass));
+        trans->PAppend("REPLACE INTO creature_template_npcbot_extras VALUES ({}, {}, {})", newentry, uint32(*bclass), uint32(*race));
+        trans->PAppend("REPLACE INTO creature_equip_template SELECT {}, 1, ids.itemID1, ids.itemID2, ids.itemID3, -1 FROM (SELECT itemID1, itemID2, itemID3 FROM creature_equip_template WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)) ids", newentry, uint32(*bclass));
         if (can_change_appearance)
-            trans->PAppend("REPLACE INTO creature_template_npcbot_appearance VALUES (%u, \"%s\", %u, %u, %u, %u, %u, %u)",
-                newentry, namestr.c_str(), uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
+            trans->PAppend("REPLACE INTO creature_template_npcbot_appearance VALUES ({}, \"{}\", {}, {}, {}, {}, {}, {})",
+                newentry, namestr, uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
         WorldDatabase.DirectCommitTransaction(trans);
 
-        handler->PSendSysMessage("New NPCBot %s (class %u) is created with entry %u and will be available for spawning after server restart.", namestr.c_str(), uint32(*bclass), newentry);
+        handler->PSendSysMessage("New NPCBot %s (class %u) is created with entry %u and will be available for spawning after server restart.", namestr, uint32(*bclass), newentry);
         return true;
     }
 
@@ -3204,11 +3930,11 @@ public:
                 ss << "\n" << counter << ") " << bot->GetEntry() << ": "
                     << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
                     << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << "\" - "
-                    << (bot->IsFreeBot() ? (bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : "free") : "active");
+                    << (bot->IsFreeBot() ? bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : bot->GetBotAI()->IsWanderer() ? "wandering" : "free" : "active");
             }
         }
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
 
@@ -3247,7 +3973,7 @@ public:
             }
         }
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
 
@@ -3278,7 +4004,7 @@ public:
             uint8 bot_class = BotMgr::BotClassByClassName(cname);
             if (bot_class == BOT_CLASS_NONE)
             {
-                handler->PSendSysMessage("Unknown bot name or class %s!", cname.c_str());
+                handler->PSendSysMessage("Unknown bot name or class %s!", cname);
                 return true;
             }
 
@@ -3295,7 +4021,7 @@ public:
         for (Creature const* bot : bots)
         {
             auto scores = bot->GetBotAI()->GetBotGearScores();
-            handler->PSendSysMessage("%s's GearScore total: %u, average: %u", bot->GetName().c_str(), uint32(scores.first), uint32(scores.second));
+            handler->PSendSysMessage("%s's GearScore total: %u, average: %u", bot->GetName(), uint32(scores.first), uint32(scores.second));
         }
 
         return true;
@@ -3546,7 +4272,7 @@ public:
         {
             if (!master_name.empty())
             {
-                handler->PSendSysMessage("Player '%s' is not found!", master_name.c_str());
+                handler->PSendSysMessage("Player '%s' is not found!", master_name);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -3564,7 +4290,7 @@ public:
         }
         if (BotDataMgr::GetOwnedBotsCount(master_guid) == 0)
         {
-            handler->PSendSysMessage("%s (%u) has no NpcBots!", master_name.c_str(), master_guid.GetCounter());
+            handler->PSendSysMessage("%s (%u) has no NpcBots!", master_name, master_guid.GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -3581,54 +4307,30 @@ public:
             ), std::end(guidvec));
         }
 
-        handler->PSendSysMessage("Listing NpcBots for %s, guid %u%s:", master_name.c_str(), master_guid.GetCounter(), !master ? " (offline)" : "");
+        handler->PSendSysMessage("Listing NpcBots for %s, guid %u%s:", master_name, master_guid.GetCounter(), !master ? " (offline)" : "");
         handler->PSendSysMessage("Owned NpcBots: %u (active: %u)", uint32(guidvec.size()) + map_size, map_size);
+        LocaleConstant loc = LocaleConstant(handler->GetSessionDbLocaleIndex());
         if (map)
         {
             for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
             {
-                uint8 count = 0;
-                uint8 alivecount = 0;
                 for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
                 {
                     if (Creature* cre = itr->second)
                     {
                         if (cre->GetBotClass() == i)
                         {
-                            ++count;
-                            if (cre->IsAlive())
-                                ++alivecount;
+                            std::string ccolor, cname;
+                            GetBotClassNameAndColor(i, ccolor, cname);
+                            std::string base_name = cre->GetName();
+                            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(cre->GetEntry()))
+                                if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
+                                    base_name = creatureLocale->Name[loc];
+
+                            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, cre->GetEntry(), "|c" + ccolor + cname + "|r", uint32(cre->IsAlive()));
                         }
                     }
                 }
-                if (count == 0)
-                    continue;
-
-                char const* bclass;
-                switch (i)
-                {
-                    case BOT_CLASS_WARRIOR:         bclass = "Warriors";        break;
-                    case BOT_CLASS_PALADIN:         bclass = "Paladins";        break;
-                    case BOT_CLASS_MAGE:            bclass = "Mages";           break;
-                    case BOT_CLASS_PRIEST:          bclass = "Priests";         break;
-                    case BOT_CLASS_WARLOCK:         bclass = "Warlocks";        break;
-                    case BOT_CLASS_DRUID:           bclass = "Druids";          break;
-                    case BOT_CLASS_DEATH_KNIGHT:    bclass = "Death Knights";   break;
-                    case BOT_CLASS_ROGUE:           bclass = "Rogues";          break;
-                    case BOT_CLASS_SHAMAN:          bclass = "Shamans";         break;
-                    case BOT_CLASS_HUNTER:          bclass = "Hunters";         break;
-                    case BOT_CLASS_BM:              bclass = "Blademasters";    break;
-                    case BOT_CLASS_SPHYNX:          bclass = "Destroyers";      break;
-                    case BOT_CLASS_ARCHMAGE:        bclass = "Archmagi";        break;
-                    case BOT_CLASS_DREADLORD:       bclass = "Dreadlords";      break;
-                    case BOT_CLASS_SPELLBREAKER:    bclass = "Spell Breakers";  break;
-                    case BOT_CLASS_DARK_RANGER:     bclass = "Dark Rangers";    break;
-                    case BOT_CLASS_NECROMANCER:     bclass = "Necromancers";    break;
-                    case BOT_CLASS_SEA_WITCH:       bclass = "Sea Witches";     break;
-                    case BOT_CLASS_CRYPT_LORD:      bclass = "Crypt Lords";     break;
-                    default:                        bclass = "Unknown Class";   break;
-                }
-                handler->PSendSysMessage("%s: %u (alive: %u)", bclass, count, alivecount);
             }
         }
 
@@ -3638,7 +4340,11 @@ public:
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
             std::string ccolor, cname;
             GetBotClassNameAndColor(bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE), ccolor, cname);
-            handler->PSendSysMessage("%s (%s)", bot ? bot->GetName().c_str() : "Unknown", "|c" + ccolor + cname + "|r");
+            std::string base_name = bot ? bot->GetName() : "Unknown";
+            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(guid.GetEntry()))
+                if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
+                    base_name = creatureLocale->Name[loc];
+            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, guid.GetEntry(), "|c" + ccolor + cname + "|r", bot ? uint32(bot->IsAlive()) : uint32(0));
         }
 
         return true;
@@ -3669,7 +4375,7 @@ public:
             msg = "Bots' command state set to 'STAY'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3698,7 +4404,7 @@ public:
             msg = "Bots' command state set to 'FULLSTOP'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3726,7 +4432,7 @@ public:
             msg = "Bots' command state 'NOLONGCAST' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3754,7 +4460,7 @@ public:
             msg = "Bots' command state 'NOCAST' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3782,7 +4488,7 @@ public:
             msg = "Bots' command state 'INACTION' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3811,7 +4517,7 @@ public:
             msg = "Bots' command state set to 'FOLLOW'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3840,7 +4546,7 @@ public:
             msg = "Bots' movement mode is set to 'RUN'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3869,7 +4575,7 @@ public:
             msg = "Bots' gossip is ENABLED";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -3886,7 +4592,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Successfully re-bound %u bot(s)", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>());
             return true;
         };
 
@@ -3905,7 +4611,7 @@ public:
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
                 {
-                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", bot->GetName().c_str());
+                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", bot->GetName());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -3932,7 +4638,7 @@ public:
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
                 {
-                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", name.c_str());
+                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", name);
                     handler->SetSentErrorMessage(true);
                     continue;
                 }
@@ -3963,7 +4669,7 @@ public:
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Successfully unbound %u bot(s)", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Successfully unbound %s", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Successfully unbound %s", name_or_count.get<std::string>());
             return true;
         };
 
@@ -4080,7 +4786,7 @@ public:
         {
             if (!master->HaveBot())
             {
-                handler->PSendSysMessage("%s has no npcbots!", master->GetName().c_str());
+                handler->PSendSysMessage("%s has no npcbots!", master->GetName());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -4095,13 +4801,13 @@ public:
             {
                 if (bot->IsAlive())
                 {
-                    handler->PSendSysMessage("%s is not dead", bot->GetName().c_str());
+                    handler->PSendSysMessage("%s is not dead", bot->GetName());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 BotMgr::ReviveBot(bot, (bot->GetBotOwner() == owner) ? owner->ToUnit() : bot->ToUnit());
-                handler->PSendSysMessage("%s revived", bot->GetName().c_str());
+                handler->PSendSysMessage("%s revived", bot->GetName());
                 return true;
             }
         }
@@ -4138,7 +4844,7 @@ public:
 
         if (owner->GetBotMgr()->AddBot(bot) == BOT_ADD_SUCCESS)
         {
-            handler->PSendSysMessage("%s is now your npcbot", bot->GetName().c_str());
+            handler->PSendSysMessage("%s is now your npcbot", bot->GetName());
             return true;
         }
 
@@ -4149,7 +4855,7 @@ public:
 
     static bool HandleNpcBotReloadConfigCommand(ChatHandler* handler)
     {
-        TC_LOG_INFO("misc", "Re-Loading config settings...");
+        BOT_LOG_INFO("misc", "Re-Loading config settings...");
         sWorld->LoadConfigSettings(true);
         sMapMgr->InitializeVisibilityDistanceInfo();
         handler->SendGlobalGMSysMessage("World config settings reloaded.");

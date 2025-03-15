@@ -154,7 +154,7 @@ public:
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { UnsummonAll(); bot_ai::JustDied(u); }
+        void JustDied(Unit* u) override { UnsummonAll(false); bot_ai::JustDied(u); }
         void DoNonCombatActions(uint32 /*diff*/) { }
 
         void CheckAura(uint32 diff)
@@ -363,8 +363,8 @@ public:
             if (damage && victim != me && spellInfo && spellInfo->GetFirstRankSpell()->Id == CARRION_SWARM_1)
             {
                 int32 basepoints0 = std::min<uint32>(damage, victim->GetHealth());
-                //TC_LOG_ERROR("entities.unit", "OnBotDamageDealt(drl): %s on %s base val %i (%s),",
-                //    me->GetName().c_str(), victim->GetName().c_str(), int32(damage), spellInfo->SpellName[0]);
+                //BOT_LOG_ERROR("entities.unit", "OnBotDamageDealt(drl): {} on {} base val {} ({}),",
+                //    me->GetName(), victim->GetName(), int32(damage), spellInfo->SpellName[0]);
                 CastSpellExtraArgs args(true);
                 args.AddSpellBP0(basepoints0);
                 me->CastSpell(me, SPELL_TRIGGERED_HEAL, args);
@@ -412,7 +412,7 @@ public:
         void SummonBotPet(Position const* sPos)
         {
             if (botPet)
-                UnsummonAll();
+                UnsummonAll(false);
 
             uint32 entry = BOT_PET_INFERNAL;
 
@@ -452,10 +452,9 @@ public:
             botPet = myPet;
         }
 
-        void UnsummonAll() override
+        void UnsummonAll(bool savePets = true) override
         {
-            if (botPet)
-                botPet->ToTempSummon()->UnSummon();
+            UnsummonPet(savePets);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
@@ -464,7 +463,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: {}'s {}", me->GetName(), summon->GetName());
             if (summon == botPet)
                 botPet = nullptr;
         }

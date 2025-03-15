@@ -24,8 +24,6 @@
 #include "Object.h"
 #include "SpellAuraDefines.h"
 
-#include <boost/container/flat_set.hpp>
-
 class AuraEffect;
 class Item;
 class Player;
@@ -208,6 +206,7 @@ private:
 
 class TC_GAME_API SpellEffectInfo
 {
+    friend class SpellInfo;
     SpellInfo const* _spellInfo;
 public:
     SpellEffIndex EffectIndex;
@@ -233,11 +232,27 @@ public:
     flag96    SpellClassMask;
     std::vector<Condition*>* ImplicitTargetConditions;
 
-    SpellEffectInfo() : _spellInfo(nullptr), EffectIndex(EFFECT_0), Effect(SPELL_EFFECT_NONE), ApplyAuraName(SPELL_AURA_NONE), Amplitude(0), DieSides(0),
-                        RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
-                        BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
-                        ItemType(0), TriggerSpell(0), ImplicitTargetConditions(nullptr) {}
-    SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
+    SpellEffectInfo();
+    explicit SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);
+    //npcbot
+    /*
+    //end npcbot
+    SpellEffectInfo(SpellEffectInfo const&) = delete;
+    //npcbot
+    */
+    SpellEffectInfo(SpellEffectInfo const&) = default;
+    //end npcbot
+    SpellEffectInfo(SpellEffectInfo&&) noexcept;
+    //npcbot
+    /*
+    //end npcbot
+    SpellEffectInfo& operator=(SpellEffectInfo const&) = delete;
+    //npcbot
+    */
+    SpellEffectInfo& operator=(SpellEffectInfo const&) = default;
+    //end npcbot
+    SpellEffectInfo& operator=(SpellEffectInfo&&) noexcept;
+    ~SpellEffectInfo();
 
     //npcbot
     void OverrideSpellInfo(SpellInfo const* spellInfo) { ASSERT_NOTNULL(spellInfo); _spellInfo = spellInfo; }
@@ -265,6 +280,9 @@ public:
     SpellEffectImplicitTargetTypes GetImplicitTargetType() const;
     SpellTargetObjectTypes GetUsedTargetObjectType() const;
 
+    struct ImmunityInfo;
+    ImmunityInfo const* GetImmunityInfo() const { return _immunityInfo.get(); }
+
 private:
     struct StaticData
     {
@@ -272,6 +290,15 @@ private:
         SpellTargetObjectTypes UsedTargetObjectType; // defines valid target object type for spell effect
     };
     static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
+
+    //npcbot
+    /*
+    //end npcbot
+    std::unique_ptr<ImmunityInfo> _immunityInfo;
+    //npcbot
+    */
+    std::shared_ptr<ImmunityInfo> _immunityInfo;
+    //end npcbot
 };
 
 struct TC_GAME_API SpellDiminishInfo
@@ -280,18 +307,6 @@ struct TC_GAME_API SpellDiminishInfo
     DiminishingReturnsType DiminishReturnType = DRTYPE_NONE;
     DiminishingLevels DiminishMaxLevel = DIMINISHING_LEVEL_IMMUNE;
     int32 DiminishDurationLimit = 0;
-};
-
-struct TC_GAME_API ImmunityInfo
-{
-    uint32 SchoolImmuneMask = 0;
-    uint32 ApplyHarmfulAuraImmuneMask = 0;
-    uint32 MechanicImmuneMask = 0;
-    uint32 DispelImmune = 0;
-    uint32 DamageSchoolMask = 0;
-
-    boost::container::flat_set<AuraType> AuraTypeImmune;
-    boost::container::flat_set<SpellEffects> SpellEffectImmune;
 };
 
 class TC_GAME_API SpellInfo
@@ -502,7 +517,7 @@ class TC_GAME_API SpellInfo
         int32 GetDiminishingReturnsLimitDuration(bool triggered) const;
 
         // spell immunities
-        void ApplyAllSpellImmunitiesTo(Unit* target, uint8 effIndex, bool apply) const;
+        void ApplyAllSpellImmunitiesTo(Unit* target, SpellEffectInfo const& spellEffectInfo, bool apply) const;
         bool CanSpellProvideImmunityAgainstAura(SpellInfo const* auraSpellInfo) const;
         bool SpellCancelsAuraEffect(AuraEffect const* aurEff) const;
 
@@ -536,8 +551,6 @@ class TC_GAME_API SpellInfo
         SpellDiminishInfo _diminishInfoTriggered;
 
         uint32 _allowedMechanicMask;
-
-        std::array<ImmunityInfo, MAX_SPELL_EFFECTS> _immunityInfo;
 };
 
 #endif // _SPELLINFO_H

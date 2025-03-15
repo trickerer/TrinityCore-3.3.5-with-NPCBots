@@ -1,6 +1,7 @@
 #include "bot_ai.h"
 #include "bot_GridNotifiers.h"
 #include "botspell.h"
+#include "Containers.h"
 #include "Creature.h"
 //#include "GridNotifiers.h"
 #include "ScriptMgr.h"
@@ -115,7 +116,7 @@ public:
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { /*UnsummonAll();*/ bot_ai::JustDied(u); }
+        void JustDied(Unit* u) override { /*UnsummonAll(false);*/ bot_ai::JustDied(u); }
         void DoNonCombatActions(uint32 /*diff*/) { }
 
         void UpdateAI(uint32 diff) override
@@ -357,7 +358,7 @@ public:
             static const uint32 sbDispelMask  = (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE);
             static const uint8 max_dispelled = 1;
 
-            //TC_LOG_ERROR("entities.unit", "ProcessSpellsteal: on %s, fr=%u", target->GetName().c_str(), uint32(isFriend));
+            //BOT_LOG_ERROR("entities.unit", "ProcessSpellsteal: on {}, fr={}", target->GetName(), uint32(isFriend));
 
             Unit::AuraMap const& auras = target->GetOwnedAuras();
             for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
@@ -379,7 +380,7 @@ public:
                 int32 chance = aura->CalcDispelChance(target, !isFriend);
                 if (!chance)
                     continue;
-                //TC_LOG_ERROR("entities.unit", "%s", aura->GetSpellInfo()->SpellName[0]);
+                //BOT_LOG_ERROR("entities.unit", "{}", aura->GetSpellInfo()->SpellName[0]);
 
                 // The charges / stack amounts don't count towards the total number of auras that can be dispelled.
                 // Ie: A dispel on a target with 5 stacks of Winters Chill and a Polymorph has 1 / (1 + 1) -> 50% chance to dispell
@@ -393,7 +394,7 @@ public:
             if (steal_list.empty())
                 return;
 
-            //TC_LOG_ERROR("entities.unit", "failcount...");
+            //BOT_LOG_ERROR("entities.unit", "failcount...");
 
             size_t remaining = steal_list.size();
             uint32 failCount = 0;
@@ -463,7 +464,7 @@ public:
             if (success_list.empty())
                 return;
 
-            //TC_LOG_ERROR("entities.unit", "logs and auras");
+            //BOT_LOG_ERROR("entities.unit", "logs and auras");
 
             WorldPacket dataSuccess(SMSG_SPELLSTEALLOG, 8+8+4+1+4+max_dispelled*5);
             dataSuccess << target->GetPackGUID();           // Victim GUID
@@ -486,8 +487,8 @@ public:
                         me->CanSeeOrDetect(u))
                         targets.push_back(u);
                 }
-                //Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck check(me, 50.f);
-                //Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(me, targets, check);
+                //Bcore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck check(me, 50.f);
+                //Bcore::UnitListSearcher<Bcore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(me, targets, check);
                 //me->VisitNearbyObject(50.f, searcher);
             }
             else
@@ -502,7 +503,7 @@ public:
                 std::list<Unit*> targetsCopy = targets;
                 targets.remove_if(BOTAI_PRED::AuraedTargetExclude(success_list.front().GetAura()->GetId()));
 
-                randomTarget = Trinity::Containers::SelectRandomContainerElement(!targets.empty() ? targets : targetsCopy);
+                randomTarget = Bcore::Containers::SelectRandomContainerElement(!targets.empty() ? targets : targetsCopy);
             }
 
             for (DispelChargesList::iterator itr = success_list.begin(); itr != success_list.end(); ++itr)

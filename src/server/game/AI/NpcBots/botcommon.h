@@ -1,6 +1,7 @@
 #ifndef _BOTCOMMON_H
 #define _BOTCOMMON_H
 
+#include "botdefine.h"
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
@@ -12,6 +13,11 @@
 NpcBot System by Trickerer (onlysuffering@gmail.com)
 Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
 */
+
+constexpr std::size_t MAX_BOT_LOG_PARAMS = 5;
+constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
+constexpr std::size_t MAX_BOT_ITEM_SET_NAME_LENGTH = 30;
+constexpr uint8 BOT_GOSSIP_MAX_ITEMS = 32; // Client limitation 3.3.5 code confirmed
 
 struct Position;
 
@@ -46,6 +52,8 @@ enum BotCommonValues
     REVIVE_TIMER_SHORT                  = 60000, //1 Minute
     INOUTDOORS_ENSURE_TIMER             = 1500,
     BOT_GROUP_UPDATE_TIMER              = 2000,
+    RENT_TIMER                          = 3600000, //1 Hour
+    RENT_COLLECT_TIMER                  = 600000, //10 Minutes
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity
@@ -85,11 +93,17 @@ enum BotCommonValues
     CREATURE_ICC_MUTATED_ABOMINATION7   = 38786,
     CREATURE_ICC_MUTATED_ABOMINATION8   = 38787,
 //COMMON AOE TRIGGERS
+    CREATURE_FOCUS_FIRE_N               = 18374,
+    CREATURE_FOCUS_FIRE_H               = 20308,
+    CREATURE_MT_PHOENIX                 = 24674,
+    CREATURE_MT_ARCANE_SPHERE_N         = 24708,
+    CREATURE_MT_ARCANE_SPHERE_H         = 25543,
     CREATURE_ZA_FIRE_BOMB               = 23920,
     CREATURE_UK_SHADOW_AXE_N            = 23997,
     CREATURE_UK_SHADOW_AXE_H            = 31835,
     CREATURE_EOE_STATIC_FIELD           = 30592,
     CREATURE_ICC_OOZE_PUDDLE            = 37690,
+    GAMEOBJECT_HOT_COAL                 = 178164,
 //COMMON ENEMY CREATURES
     CREATURE_BOSS_EREGOS_N              = 27656,
     CREATURE_BOSS_EREGOS_H              = 31561,
@@ -119,24 +133,39 @@ enum BotCommonValues
 //COMMON GAMEEVENTS
     GAME_EVENT_WINTER_VEIL              = 2,
 //COMMON FACTIONS
-    FACTION_TEMPLATE_HATES_EVERYTHING_1 = 2150, //faction 966 - Monster spar buddy
-//COMMON AI MISC VALUES
-    BOTAI_MISC_COMBO_POINTS             = 1,
-    BOTAI_MISC_DAGGER_MAINHAND,
-    BOTAI_MISC_DAGGER_OFFHAND,
-    BOTAI_MISC_ENCHANT_IS_AUTO_MH,
-    BOTAI_MISC_ENCHANT_IS_AUTO_OH,
-    BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH,
-    BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH,
-    BOTAI_MISC_ENCHANT_CURRENT_MH,
-    BOTAI_MISC_ENCHANT_CURRENT_OH,
+    FACTION_TEMPLATE_NEUTRAL_HOSTILE    = FACTION_CREATURE, // 2150 //Hates players and other bots, not attacked by guards
+  //SOUNDS
+    SOUND_FREEZE_IMPACT_WINDWALK        = 29,
+    SOUND_AXE_2H_IMPACT_FLESH_CRIT      = 158,
+    SOUND_ABSORB_GET_HIT                = 3334,
+    SOUND_MISS_WHOOSH_2H                = 7081,
+
+//UNUSED
+
+    //MAX_LOOT_ITEMS                      = 18 // Client limitation 3.3.5 code confirmed
+};
+
+enum BotMiscValues : uint32
+{
+//SAVED
+    BOTAI_MISC_ENCHANT_IS_AUTO_MH       = 1,
+    BOTAI_MISC_ENCHANT_IS_AUTO_OH       = 2,
+    BOTAI_MISC_ENCHANT_TIMER_MH         = 3,
+    BOTAI_MISC_ENCHANT_TIMER_OH         = 4,
+    BOTAI_MISC_ENCHANT_CURRENT_MH       = 5,
+    BOTAI_MISC_ENCHANT_CURRENT_OH       = 6,
+    BOTAI_MISC_PET_TYPE                 = 7,
+    BOTAI_MISC_AURA_TYPE                = 8,
+//INTERNAL
     BOTAI_MISC_ENCHANT_AVAILABLE_1,
     BOTAI_MISC_ENCHANT_AVAILABLE_2,
     BOTAI_MISC_ENCHANT_AVAILABLE_3,
     BOTAI_MISC_ENCHANT_AVAILABLE_4,
     BOTAI_MISC_ENCHANT_AVAILABLE_5,
     BOTAI_MISC_ENCHANT_AVAILABLE_6,
-    BOTAI_MISC_PET_TYPE,
+    BOTAI_MISC_COMBO_POINTS,
+    BOTAI_MISC_DAGGER_MAINHAND,
+    BOTAI_MISC_DAGGER_OFFHAND,
     BOTAI_MISC_PET_AVAILABLE_1,
     BOTAI_MISC_PET_AVAILABLE_2,
     BOTAI_MISC_PET_AVAILABLE_3,
@@ -150,20 +179,15 @@ enum BotCommonValues
     BOTAI_MISC_PET_AVAILABLE_11,
     BOTAI_MISC_WEAPON_SPEC,
     BOTPETAI_MISC_DURATION,
+    BOTPETAI_MISC_DURATION_MAX,
     BOTPETAI_MISC_MAXLEVEL,
     BOTPETAI_MISC_FIXEDLEVEL,
     BOTPETAI_MISC_CARRY,
     BOTPETAI_MISC_CAPACITY,
     BOTPETAI_MISC_MAX_ATTACKERS,
-  //SOUNDS
-    SOUND_FREEZE_IMPACT_WINDWALK        = 29,
-    SOUND_AXE_2H_IMPACT_FLESH_CRIT      = 158,
-    SOUND_ABSORB_GET_HIT                = 3334,
-    SOUND_MISS_WHOOSH_2H                = 7081,
 
-//UNUSED
-
-    //MAX_LOOT_ITEMS                      = 18 // Client limitation 3.3.5 code confirmed
+    BOT_MISCVALUE_SAVED_FIRST = BOTAI_MISC_ENCHANT_IS_AUTO_MH,
+    BOT_MISCVALUE_SAVED_LAST = BOTAI_MISC_AURA_TYPE
 };
 
 enum BotClasses : uint8
@@ -216,7 +240,7 @@ enum BotStances
     DRUID_TREE_FORM,
     DRUID_TRAVEL_FORM,
     DRUID_AQUATIC_FORM,
-    //DRUID_FLIGHT_FORM //NYI
+    DRUID_FLIGHT_FORM
 };
 
 enum BotRoles : uint32
@@ -362,9 +386,10 @@ enum BotPetTypes
 
     //DK
     BOT_PET_GHOUL                       = 70538,
-    BOT_PET_GARGOYLE                    = 70539,//NYI
-    BOT_PET_DANCING_RUNE_WEAPON         = 70540,//NYI
-    BOT_PET_AOD_GHOUL                   = 70541,//NYI
+
+    BOT_PET_REUSE_1                     = 70539,//REUSE, was BOT_PET_GARGOYLE
+    BOT_PET_REUSE_2                     = 70540,//REUSE, was BOT_PET_DANCING_RUNE_WEAPON
+    BOT_PET_REUSE_3                     = 70541,//REUSE, was BOT_PET_AOD_GHOUL
 
     //Priest
     BOT_PET_SHADOWFIEND                 = 70542,
@@ -442,6 +467,24 @@ enum BotEquipSlot : uint8
 };
 
 constexpr uint8 BOT_TRANSMOG_INVENTORY_SIZE = 13; // BOT_SLOT_BODY + 1
+constexpr uint8 MAX_BOT_EQUIPMENT_SETS = BOT_GOSSIP_MAX_ITEMS - 2;
+
+enum class BotEquipResult : uint8
+{
+    BOT_EQUIP_RESULT_OK                         = 0,
+
+    BOT_EQUIP_RESULT_FAIL_NO_BAG_SPACE          = 1, //unused
+    BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE         = 2,
+    BOT_EQUIP_RESULT_FAIL_NO_RECEIVER           = 3,
+    BOT_EQUIP_RESULT_FAIL_INVALID_RECEIVER      = 4,
+    BOT_EQUIP_RESULT_FAIL_NO_ITEM               = 5,
+    BOT_EQUIP_RESULT_FAIL_SAME_ID               = 6,
+    BOT_EQUIP_RESULT_FAIL_WANDERER              = 7,
+    BOT_EQUIP_RESULT_FAIL_LINKED_UNEQUIP_FAILED = 8,
+    BOT_EQUIP_RESULT_FAIL_LINKED_RESET_FAILED   = 9,
+    BOT_EQUIP_RESULT_FAIL_CANT_EQUIP            = 10,
+    BOT_EQUIP_RESULT_FAIL_ITEM_CONFLICT         = 11,
+};
 
 enum BotStatMods : uint8
 {
@@ -515,14 +558,15 @@ enum BotAIResetType
     BOTAI_RESET_LOGOUT                  = 0x08,
     BOTAI_RESET_FORCERECALL             = 0x10,
 
-    BOTAI_RESET_MASK_ABANDON_MASTER     = (BOTAI_RESET_INIT | BOTAI_RESET_DISMISS)
+    BOTAI_RESET_MASK_ABANDON_MASTER     = (BOTAI_RESET_INIT | BOTAI_RESET_DISMISS),
+    BOTAI_RESET_MASK_RESET_MASTER       = (BOTAI_RESET_INIT | BOTAI_RESET_DISMISS | BOTAI_RESET_UNBIND | BOTAI_RESET_LOGOUT)
 };
 
 enum BotMovementType
 {
     BOT_MOVE_POINT                      = 1,
-    //BOT_MOVE_FOLLOW
-    BOT_MOVE_CHASE
+    BOT_MOVE_CHASE,
+    BOT_MOVE_JUMP
 };
 
 enum BotCommandStates : uint32
@@ -559,7 +603,10 @@ constexpr size_t MAX_SEND_POINTS = 5u;
 enum BotOrderTypes
 {
     BOT_ORDER_NONE          = 0,
-    BOT_ORDER_SPELLCAST     = 1
+    BOT_ORDER_SPELLCAST     = 1,
+    BOT_ORDER_PULL          = 2,
+
+    BOT_ORDER_END
 };
 constexpr bool DEBUG_BOT_ORDERS = false;
 constexpr size_t MAX_BOT_ORDERS_QUEUE_SIZE = 3u;
