@@ -1714,8 +1714,7 @@ bool Creature::LoadFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, 
         }
     }
 
-    //CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
-	CreatureData const* data = generated ? nullptr : sObjectMgr->GetCreatureData(spawnId);
+    CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
 
     if (!data)
     {
