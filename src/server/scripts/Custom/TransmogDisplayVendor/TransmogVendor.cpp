@@ -429,7 +429,7 @@ public:
     {
         uint32 lowguid = player->GetGUID().GetCounter();
         auto trans = CharacterDatabase.BeginTransaction();
-        trans->PAppend("DELETE FROM `custom_transmogrification` WHERE `Owner` = %u", lowguid);
+        trans->PAppend("DELETE FROM `custom_transmogrification` WHERE `Owner` = {}", lowguid);
 
         if (!player->transmogMap.empty())
         {
