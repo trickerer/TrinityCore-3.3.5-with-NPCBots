@@ -93,7 +93,7 @@ public:
 		
         bool UpdateVoteTPData(Player* player, uint32 newwtime)
         {
-            WorldDatabase.PExecute("UPDATE `vote_tp` SET `tptime`='%d' WHERE `guid`='%d'", newwtime, player->GetSession()->GetAccountId());
+            WorldDatabase.PExecute("UPDATE `vote_tp` SET `tptime`='{}' WHERE `guid`='{}'", newwtime, player->GetSession()->GetAccountId());
             return true;
         }
 
@@ -117,7 +117,7 @@ public:
             }
             else
             {
-                result = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
+                result = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` >'{}' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
             }
             fiveminabusecheck = (tseconds - 300); // 5mins
             
