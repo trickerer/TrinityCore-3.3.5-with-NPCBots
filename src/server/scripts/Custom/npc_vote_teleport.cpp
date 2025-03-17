@@ -121,8 +121,8 @@ public:
             }
             fiveminabusecheck = (tseconds - 300); // 5mins
             
-            //result = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
-            //sLog->outError("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(),ttcheck);          
+            //result = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` >'{}' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
+            //sLog->outError("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` >'{}' LIMIT 1", player->GetSession()->GetAccountId(),ttcheck);          
 
             if (result)
             {
@@ -143,11 +143,11 @@ public:
 				{
 					AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_TPN01, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1050);
 					AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye!", GOSSIP_SENDER_MAIN, 2);
-					//sLog->outError("MGA: FAILED:: time from db = %d time we checking = %d", lasttptime,fiveminabusecheck);
+					//sLog->outError("MGA: FAILED:: time from db = {} time we checking = {}", lasttptime,fiveminabusecheck);
 				}
                 else
                 {
-                    //sLog->outError("MGA: WORKED:: time from db = %d time we checking = %d", lasttptime,fiveminabusecheck);
+                    //sLog->outError("MGA: WORKED:: time from db = {} time we checking = {}", lasttptime,fiveminabusecheck);
                     if (player->GetTeamId() == TEAM_HORDE || player->IsGameMaster())
                     {
                         // HORDE LOCATIONS

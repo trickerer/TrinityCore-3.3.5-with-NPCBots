@@ -63,7 +63,7 @@ public:
 		
 		bool UpdateReNameCharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_rename` SET `status`='%d' WHERE `charid`='%d' AND `status` = '0'", status, player->GetGUID());
+            WorldDatabase.PExecute("UPDATE `char_rename` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, player->GetGUID());
             return true;
         }
 

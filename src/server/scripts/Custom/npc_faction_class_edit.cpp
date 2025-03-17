@@ -48,7 +48,7 @@ public:
 		
         bool UpdateReNameCharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='%d' WHERE `charid`='%d' AND `status` = '0'", status, player->GetGUID());
+            WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, player->GetGUID());
             return true;
         }
 
@@ -56,7 +56,7 @@ public:
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             QueryResult result;
-            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='%d' AND `status`='0' LIMIT 1", player->GetGUID());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetGUID());
             if (result)
             {
                 //check to see faction/race chnage
