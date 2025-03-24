@@ -59,6 +59,7 @@
 #define GOSSIP_HELLO_L2  "City of Dalaran"
 #define GOSSIP_HELLO_L3  "Stairway to Heaven"
 #define GOSSIP_HELLO_L4  "Send Me Home!"
+#define GOSSIP_HELLO_L5  "Gadgetzan"
 
 #define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours, if you wish to use me please go and vote"
 #define GOSSIP_HELLO_TPN01  "You used me within the last 5 mins please wait a little longer."
@@ -182,6 +183,12 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_ASTP4, GOSSIP_SENDER_MAIN, 1029); // draenei start zone
                         AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_ASTP5, GOSSIP_SENDER_MAIN, 1030); // dwarf start zone
                     }
+					
+					if (player->GetLevel() > 40 || player->IsGameMaster())
+					{
+						// Gadg
+                        AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_L5, GOSSIP_SENDER_MAIN, 5001);
+					}
 
                     if (player->GetLevel() > 58 || player->IsGameMaster())
                     {
@@ -543,6 +550,16 @@ public:
                 player->SetPvP(false);
                 return false;
             }
+			case 5001:
+            {
+                CloseGossipMenuFor(player);
+                UpdateVoteTPData(player, ttseconds);
+                
+                player->TeleportTo(0, -7177.14f, -3785.34f, 8.39f, 5.37f); 
+                player->SetPvP(false);
+                return false;
+            }
+            break;
             break;
             }
 
