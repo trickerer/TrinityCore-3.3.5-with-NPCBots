@@ -555,7 +555,7 @@ public:
                 CloseGossipMenuFor(player);
                 UpdateVoteTPData(player, ttseconds);
                 
-                player->TeleportTo(0, -7177.14f, -3785.34f, 8.39f, 5.37f); 
+                player->TeleportTo(1, -7177.14f, -3785.34f, 8.09f, 5.37f); 
                 player->SetPvP(false);
                 return false;
             }
