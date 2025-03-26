@@ -29,7 +29,7 @@
 #define GOSSIP_HELLO_HTP1  "Orgrimmar"
 #define GOSSIP_HELLO_HTP2  "Undercity"
 #define GOSSIP_HELLO_HTP3  "Thunder Bluff"
-#define GOSSIP_HELLO_HTP4  "Silvermoon"
+#define GOSSIP_HELLO_HTP4  "Silvermoon City"
 // START LOCS
 #define GOSSIP_HELLO_HSTP1  "Orc Starting Zone"
 #define GOSSIP_HELLO_HSTP2  "Undead Starting Zone"
@@ -60,6 +60,7 @@
 #define GOSSIP_HELLO_L3  "Stairway to Heaven"
 #define GOSSIP_HELLO_L4  "Send Me Home!"
 #define GOSSIP_HELLO_L5  "Gadgetzan"
+#define GOSSIP_HELLO_L6  "Bootybay"
 
 #define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours, if you wish to use me please go and vote"
 #define GOSSIP_HELLO_TPN01  "You used me within the last 5 mins please wait a little longer."
@@ -188,6 +189,11 @@ public:
 					{
 						// Gadg
                         AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_L5, GOSSIP_SENDER_MAIN, 5001);
+					}
+					if (player->GetLevel() > 40 || player->IsGameMaster())
+					{
+						// bootybay
+                        AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_L6, GOSSIP_SENDER_MAIN, 5002);
 					}
 
                     if (player->GetLevel() > 58 || player->IsGameMaster())
@@ -550,6 +556,7 @@ public:
                 player->SetPvP(false);
                 return false;
             }
+			break;
 			case 5001:
             {
                 CloseGossipMenuFor(player);
@@ -559,7 +566,16 @@ public:
                 player->SetPvP(false);
                 return false;
             }
-            break;
+			break;
+			case 5002:
+            {
+                CloseGossipMenuFor(player);
+                UpdateVoteTPData(player, ttseconds);
+
+                player->TeleportTo(0, -14446.542969f, 15.206598f, 5.212281f, 5.37f); 
+                player->SetPvP(false);
+                return false;
+            }
             break;
             }
 
