@@ -2047,7 +2047,8 @@ void BotMgr::RemoveBotFromBGQueue(Creature const* bot)
 {
     for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
     {
-        if (BattlegroundQueueTypeId bgQueueTypeId = _owner->GetBattlegroundQueueTypeId(i))
+        BattlegroundQueueTypeId bgQueueTypeId = _owner->GetBattlegroundQueueTypeId(i);
+        if (bgQueueTypeId.BattlemasterListId)
             sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(bot->GetGUID(), true);
     }
 }

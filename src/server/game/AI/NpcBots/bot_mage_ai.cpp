@@ -1417,7 +1417,7 @@ public:
                                 InventoryResult msg = pTarget->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, count, &no_space);
                                 if (msg != EQUIP_ERR_OK)
                                 {
-                                    if (msg == EQUIP_ERR_INVENTORY_FULL || msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                                    if (msg == EQUIP_ERR_INV_FULL || msg == EQUIP_ERR_ITEM_MAX_COUNT)
                                         count -= no_space;
                                     else
                                     {

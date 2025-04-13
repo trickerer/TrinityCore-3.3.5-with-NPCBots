@@ -1978,7 +1978,7 @@ public:
             return true;
         }
 
-        target->SendPlaySpellVisual(kit.value_or(0));
+        target->SendPlaySpellVisualKit(1, kit.value_or(0));
         return true;
     }
 

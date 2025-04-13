@@ -375,9 +375,9 @@ public:
                 me->CastSpell(me, MH_OH_ATTACK_ANIM, true);
 
             if (baseId == REPLENISH_MANA_1)
-                me->SendPlaySpellVisual(425); //arcane cast omni
+                me->SendPlaySpellVisualKit(1, 425); //arcane cast omni
             if (baseId == REPLENISH_HEALTH_1)
-                me->SendPlaySpellVisual(21); //empty cast finish anim
+                me->SendPlaySpellVisualKit(1, 21); //empty cast finish anim
 
             if (baseId == REPLENISH_MANA_1 || baseId == REPLENISH_HEALTH_1)
                 me->SetPower(POWER_MANA, 0);
@@ -408,11 +408,11 @@ public:
             if (spellId == DRAIN_MANA_1)
             {
                 me->CastSpell(target, SPELL_DEVOUR_MAGIC_BEAM, true);
-                target->SendPlaySpellVisual(419); //drain impact visual
+                target->SendPlaySpellVisualKit(1, 419); //drain impact visual
             }
             if (spellId == REPLENISH_MANA_1)
                 if (target != me)
-                    target->SendPlaySpellVisual(524/*436*/); //mana gain visual//heal bigger crimson ish
+                    target->SendPlaySpellVisualKit(1, 524/*436*/); //mana gain visual//heal bigger crimson ish
 
             OnSpellHitTarget(target, spell);
         }
@@ -432,7 +432,7 @@ public:
             if (me != dispelled)
             {
                 me->CastSpell(dispelled, SPELL_DEVOUR_MAGIC_BEAM, true);
-                dispelled->SendPlaySpellVisual(357/*317*/); //purge visual
+                dispelled->SendPlaySpellVisualKit(1, 357/*317*/); //purge visual
             }
 
             dispelsDealt += num;
