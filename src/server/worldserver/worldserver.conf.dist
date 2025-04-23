@@ -4578,7 +4578,7 @@ NpcBot.GearBank.EquipmentSets = 0
 #                     1 - (NpcBot.Classes.Mage.Enable)
 #                     1 - (NpcBot.Classes.Warlock.Enable)
 #                     1 - (NpcBot.Classes.Druid.Enable)
-#                     0 - (NpcBot.Classes.Blademaster.Enable)
+#                     1 - (NpcBot.Classes.Blademaster.Enable)
 #                     1 - (NpcBot.Classes.ObsidianDestroyer.Enable)
 #                     1 - (NpcBot.Classes.Archmage.Enable)
 #                     1 - (NpcBot.Classes.Dreadlord.Enable)
@@ -4598,7 +4598,7 @@ NpcBot.Classes.Shaman.Enable            = 1
 NpcBot.Classes.Mage.Enable              = 1
 NpcBot.Classes.Warlock.Enable           = 1
 NpcBot.Classes.Druid.Enable             = 1
-NpcBot.Classes.Blademaster.Enable       = 0
+NpcBot.Classes.Blademaster.Enable       = 1
 NpcBot.Classes.ObsidianDestroyer.Enable = 1
 NpcBot.Classes.Archmage.Enable          = 1
 NpcBot.Classes.Dreadlord.Enable         = 1
@@ -4795,7 +4795,7 @@ NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC = 0
 #                     1 - (NpcBot.Classes.Mage.Enable)
 #                     1 - (NpcBot.Classes.Warlock.Enable)
 #                     1 - (NpcBot.Classes.Druid.Enable)
-#                     0 - (NpcBot.Classes.Blademaster.Enable)
+#                     1 - (NpcBot.Classes.Blademaster.Enable)
 #                     1 - (NpcBot.Classes.ObsidianDestroyer.Enable)
 #                     1 - (NpcBot.Classes.Archmage.Enable)
 #                     1 - (NpcBot.Classes.Dreadlord.Enable)
@@ -4815,7 +4815,7 @@ NpcBot.WanderingBots.Classes.Shaman.Enable            = 1
 NpcBot.WanderingBots.Classes.Mage.Enable              = 1
 NpcBot.WanderingBots.Classes.Warlock.Enable           = 1
 NpcBot.WanderingBots.Classes.Druid.Enable             = 1
-NpcBot.WanderingBots.Classes.Blademaster.Enable       = 0
+NpcBot.WanderingBots.Classes.Blademaster.Enable       = 1
 NpcBot.WanderingBots.Classes.ObsidianDestroyer.Enable = 1
 NpcBot.WanderingBots.Classes.Archmage.Enable          = 1
 NpcBot.WanderingBots.Classes.Dreadlord.Enable         = 1

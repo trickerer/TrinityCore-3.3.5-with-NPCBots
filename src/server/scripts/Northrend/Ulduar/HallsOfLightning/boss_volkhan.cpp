@@ -449,6 +449,11 @@ class spell_volkhan_cosmetic_stun_immune_permanent : public AuraScript
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        //npcbot
+        if (GetTarget()->IsNPCBotOrPet())
+            return;
+        //end npcbot
+
         if (Creature* target = GetTarget()->ToCreature())
             target->UpdateEntry(ENTRY_BRITTLE_GOLEM, nullptr, false);
     }
