@@ -208,7 +208,7 @@ public:
         }
 		bool UpdateInsta80CharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID());
+            WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetSession()->GetGUIDLow());
             return true;
         }
 		bool InsertInsta80CharData(Player* player, int16 acctid, int16 status)
