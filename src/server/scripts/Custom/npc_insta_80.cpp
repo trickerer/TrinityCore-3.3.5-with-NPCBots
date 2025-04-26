@@ -213,7 +213,7 @@ public:
         }
 		bool InsertInsta80CharData(Player* player, int16 acctid, int16 status)
         {
-            WorldDatabase.PExecute("INSERT INTO `char_Insta80` (`char_id`, `acct_id`, `status`) VALUES ({}, {}, {})", player->GetGUID(), acctid, status);
+            WorldDatabase.PExecute("INSERT INTO `char_Insta80` (`char_id`, `acct_id`, `status`) VALUES ({}, {}, {})", player->GetSession()->GetGUIDLow(), acctid, status);
             return true;
         }
 
