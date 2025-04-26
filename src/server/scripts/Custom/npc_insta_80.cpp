@@ -206,7 +206,7 @@ public:
 			//WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID());
             return true;
         }
-		bool UpdateInsta80CharData(Player* player, int32 status)
+		bool UpdateInsta80CharData(Player* player, int16 status)
         {
             WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID());
             return true;
