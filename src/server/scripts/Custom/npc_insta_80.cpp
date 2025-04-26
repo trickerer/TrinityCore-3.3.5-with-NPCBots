@@ -203,7 +203,7 @@ public:
         {
             WorldDatabase.PExecute("DELETE FROM `char_Insta80` WHERE `acct_id` = '{}'", player->GetSession()->GetAccountId());
 			WorldDatabase.PExecute("INSERT INTO `char_Insta80_done` (`char_id`, `acct_id`) VALUES ({}, {})", player->GetGUID(), player->GetSession()->GetAccountId());
-			WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID());
+			//WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID());
             return true;
         }
 		bool UpdateInsta80CharData(Player* player, int32 status)
