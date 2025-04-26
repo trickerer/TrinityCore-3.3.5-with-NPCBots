@@ -61,7 +61,6 @@
 #define GOSSIP_HELLO_L4  "Send Me Home!"
 #define GOSSIP_HELLO_L5  "Gadgetzan"
 #define GOSSIP_HELLO_L6  "Bootybay"
-#define GOSSIP_HELLO_L7  "Dark Portal"
 
 #define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours, if you wish to use me please go and vote"
 #define GOSSIP_HELLO_TPN01  "You used me within the last 5 mins please wait a little longer."
@@ -195,11 +194,6 @@ public:
 					{
 						// bootybay
                         AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_L6, GOSSIP_SENDER_MAIN, 5002);
-					}
-					if (player->GetLevel() > 58 || player->IsGameMaster())
-					{
-						// Dark Portal
-                        AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_L7, GOSSIP_SENDER_MAIN, 5003);
 					}
 
                     if (player->GetLevel() > 58 || player->IsGameMaster())
@@ -579,16 +573,6 @@ public:
                 UpdateVoteTPData(player, ttseconds);
 
                 player->TeleportTo(0, -14446.542969f, 15.206598f, 5.212281f, 5.37f); 
-                player->SetPvP(false);
-                return false;
-            }
-            break;
-			case 5003:
-            {
-                CloseGossipMenuFor(player);
-                UpdateVoteTPData(player, ttseconds);
-
-                player->TeleportTo(0, -11764.795898f, -3154.487305f, -21.453583f, 3.531522f); 
                 player->SetPvP(false);
                 return false;
             }

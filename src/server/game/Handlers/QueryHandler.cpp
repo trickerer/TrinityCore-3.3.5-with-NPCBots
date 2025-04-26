@@ -18,7 +18,6 @@
 #include "WorldSession.h"
 #include "CharacterCache.h"
 #include "Common.h"
-#include "Corpse.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "GameTime.h"
@@ -29,7 +28,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "QueryPackets.h"
-#include "Transport.h"
 #include "UpdateMask.h"
 #include "World.h"
 
@@ -182,13 +180,13 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPackets::Query::QueryGameObj
     }
 }
 
-void WorldSession::HandleQueryCorpseLocation(WorldPackets::Query::QueryCorpseLocationFromClient& /*queryCorpseLocation*/)
+void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
 {
     if (!_player->HasCorpse())
     {
-        WorldPackets::Query::CorpseLocation packet;
-        packet.Valid = false;                               // corpse not found
-        SendPacket(packet.Write());
+        WorldPacket data(MSG_CORPSE_QUERY, 1);
+        data << uint8(0);                                   // corpse not found
+        SendPacket(&data);
         return;
     }
 
@@ -219,13 +217,15 @@ void WorldSession::HandleQueryCorpseLocation(WorldPackets::Query::QueryCorpseLoc
         }
     }
 
-    WorldPackets::Query::CorpseLocation packet;
-    packet.Valid = true;
-    packet.MapID = corpseMapID;
-    packet.ActualMapID = mapID;
-    packet.Position = Position(x, y, z);
-    packet.Transport = 0;                   // TODO: If corpse is on transport, send transport offsets and transport guid
-    SendPacket(packet.Write());
+    WorldPacket data(MSG_CORPSE_QUERY, 1+(6*4));
+    data << uint8(1);                                       // corpse found
+    data << int32(mapID);
+    data << float(x);
+    data << float(y);
+    data << float(z);
+    data << int32(corpseMapID);
+    data << uint32(0);                                      // unknown
+    SendPacket(&data);
 }
 
 void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
@@ -353,22 +353,19 @@ void WorldSession::HandleQueryPageText(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleQueryCorpseTransport(WorldPackets::Query::QueryCorpseTransport& queryCorpseTransport)
+void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
 {
-    WorldPackets::Query::CorpseTransportQuery response;
-    if (Corpse const* corpse = _player->GetCorpse())
-    {
-        if (Transport const* transport = corpse->GetTransport())
-        {
-            if (transport->GetGUID().GetCounter() == queryCorpseTransport.Transport)
-            {
-                response.Position = transport->GetPosition();
-                response.Facing = transport->GetOrientation();
-            }
-        }
-    }
+    TC_LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 
-    SendPacket(response.Write());
+    uint32 unk;
+    recvData >> unk;
+
+    WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    data << float(0);
+    SendPacket(&data);
 }
 
 void WorldSession::HandleQuestPOIQuery(WorldPackets::Query::QuestPOIQuery& query)
