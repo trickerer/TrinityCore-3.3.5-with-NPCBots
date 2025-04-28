@@ -149,7 +149,7 @@ public:
                         }
 
                         SelectionStore::Selection temp = { item->GetEntry(), static_cast<uint8>(action), 0, 0 }; // entry, slot, offset, quality
-                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUIDLow().GetCounter(), temp);
+                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUID().GetCounter(), temp);
                         AddGossipItemFor(player, GOSSIP_ICON_TALK, "Back..", SENDER_BACK, 0);
                         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     } break;
@@ -408,26 +408,26 @@ public:
 
         for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_BAG_END; ++i)
             if (Item* pItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                itemlist.push_back(pItem->GetGUID());
+                itemlist.push_back(pItem->GetGUIDLow()());
 
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
             if (Bag* pBag = player->GetBagByPos(i))
                 for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
                     if (Item* pItem = pBag->GetItemByPos(j))
-                        itemlist.push_back(pItem->GetGUID());
+                        itemlist.push_back(pItem->GetGUIDLow()());
 
         for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
             if (Bag* pBag = player->GetBagByPos(i))
                 for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
                     if (Item* pItem = pBag->GetItemByPos(j))
-                        itemlist.push_back(pItem->GetGUID());
+                        itemlist.push_back(pItem->GetGUIDLow()());
 
         return itemlist;
     }
 
     void OnSave(Player* player) override
     {
-        uint32 lowguid = player->GetSession()->GetGUID().GetCounter();
+        uint32 lowguid = player->GetSession()->GetGUIDLow()().GetCounter();
         auto trans = CharacterDatabase.BeginTransaction();
         trans->PAppend("DELETE FROM `custom_transmogrification` WHERE `Owner` = {}", lowguid);
 
@@ -451,7 +451,7 @@ public:
 
     void OnLogin(Player* player, bool /*firstLogin*/) override
     {
-        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetSession()->GetGUID().GetCounter());
+        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetSession()->GetGUIDLow()().GetCounter());
 
         if (result)
         {
@@ -469,7 +469,7 @@ public:
                 {
                     // Ignore, will be erased on next save.
                     // Additionally this can happen if an item was deleted from DB but still exists for the player
-                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetSession()->GetGUID().GetCounter());
+                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetSession()->GetGUIDLow()().GetCounter());
                     // CharacterDatabase.PExecute("DELETE FROM custom_transmogrification WHERE FakeEntry = %u", fakeEntry);
                 }
             } while (result->NextRow());
@@ -491,7 +491,7 @@ public:
 
     void OnLogout(Player* player) override
     {
-        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUID().GetCounter());
+        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUIDLow()().GetCounter());
     }
 };
 #endif
