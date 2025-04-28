@@ -223,7 +223,7 @@ public:
                             return false; // cheat
 
                         SelectionStore::Selection selection;
-                        if (!TransmogDisplayVendorMgr::selectionStore.GetSelection(player->GetSession()->GetGUIDLow().GetCounter(), selection))
+                        if (!TransmogDisplayVendorMgr::selectionStore.GetSelection(player->GetSession()->GetGUID().GetCounter(), selection))
                             return false; // cheat
                         if (selection.offset != 0 || selection.quality != 0)
                             return false; // cheat (something is off)
@@ -231,7 +231,7 @@ public:
                         selection.offset = action;
                         selection.quality = sender;
                         uint32 slot = selection.slot; // slot
-                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUIDLow().GetCounter(), selection);
+                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUID().GetCounter(), selection);
 
                         if (const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(selection.item))
                         {
@@ -427,7 +427,7 @@ public:
 
     void OnSave(Player* player) override
     {
-        uint32 lowguid = player->GetSession()->GetGUIDLow().GetCounter();
+        uint32 lowguid = player->GetSession()->GetGUID().GetCounter();
         auto trans = CharacterDatabase.BeginTransaction();
         trans->PAppend("DELETE FROM `custom_transmogrification` WHERE `Owner` = {}", lowguid);
 
@@ -451,7 +451,7 @@ public:
 
     void OnLogin(Player* player, bool /*firstLogin*/) override
     {
-        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetSession()->GetGUIDLow().GetCounter());
+        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetSession()->GetGUID().GetCounter());
 
         if (result)
         {
@@ -469,7 +469,7 @@ public:
                 {
                     // Ignore, will be erased on next save.
                     // Additionally this can happen if an item was deleted from DB but still exists for the player
-                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetSession()->GetGUIDLow().GetCounter());
+                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetSession()->GetGUID().GetCounter());
                     // CharacterDatabase.PExecute("DELETE FROM custom_transmogrification WHERE FakeEntry = %u", fakeEntry);
                 }
             } while (result->NextRow());
@@ -491,7 +491,7 @@ public:
 
     void OnLogout(Player* player) override
     {
-        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUIDLow().GetCounter());
+        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUID().GetCounter());
     }
 };
 #endif
