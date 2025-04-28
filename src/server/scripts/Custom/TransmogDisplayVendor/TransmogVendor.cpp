@@ -149,7 +149,7 @@ public:
                         }
 
                         SelectionStore::Selection temp = { item->GetEntry(), static_cast<uint8>(action), 0, 0 }; // entry, slot, offset, quality
-                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUIDLow().GetCounter(), temp);
+                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetSession()->GetGUID().GetCounter(), temp);
                         AddGossipItemFor(player, GOSSIP_ICON_TALK, "Back..", SENDER_BACK, 0);
                         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     } break;
