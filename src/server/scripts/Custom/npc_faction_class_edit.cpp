@@ -48,7 +48,7 @@ public:
 		
         bool UpdateReNameCharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, player->GetGUID());
+            WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, pplayer->GetSession()->GetGUIDLow());
             return true;
         }
 
@@ -56,7 +56,7 @@ public:
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             QueryResult result;
-            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetGUID());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", pplayer->GetSession()->GetGUIDLow());
             if (result)
             {
                 //check to see faction/race chnage
@@ -111,7 +111,7 @@ public:
                 if (player->HasItemCount(21140, 1))
                 {
                     uint32 glId = player->GetGuildId();
-                    uint32 target_guid = player->GetGUID();
+                    uint32 target_guid = pplayer->GetSession()->GetGUIDLow();
                     uint32 guild = player->GetGuildId();
 
                     if (guild > 0) {
@@ -121,7 +121,7 @@ public:
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
                     player->DestroyItemCount(21140, 1, true);
-                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = %u", player->GetGUID());
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = %u", pplayer->GetSession()->GetGUIDLow());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
 					UpdateReNameCharData(player, 1);
@@ -144,7 +144,7 @@ public:
                     player->DestroyItemCount(21140, 1, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
-                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = %u", player->GetGUID());
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = %u", pplayer->GetSession()->GetGUIDLow());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);

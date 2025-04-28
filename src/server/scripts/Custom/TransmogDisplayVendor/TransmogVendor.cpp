@@ -56,7 +56,7 @@ public:
         static bool OnGossipHello(Player* player, Creature* creature)
         {
             ClearGossipMenuFor(player);
-            TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetGUID().GetCounter());
+            TransmogDisplayVendorMgr::selectionStore.RemoveSelection(pplayer->GetSession()->GetGUIDLow().GetCounter());
             WorldSession* session = player->GetSession();
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
             {
@@ -149,7 +149,7 @@ public:
                         }
 
                         SelectionStore::Selection temp = { item->GetEntry(), static_cast<uint8>(action), 0, 0 }; // entry, slot, offset, quality
-                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetGUID().GetCounter(), temp);
+                        TransmogDisplayVendorMgr::selectionStore.SetSelection(pplayer->GetSession()->GetGUIDLow().GetCounter(), temp);
                         AddGossipItemFor(player, GOSSIP_ICON_TALK, "Back..", SENDER_BACK, 0);
                         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     } break;
@@ -223,7 +223,7 @@ public:
                             return false; // cheat
 
                         SelectionStore::Selection selection;
-                        if (!TransmogDisplayVendorMgr::selectionStore.GetSelection(player->GetGUID().GetCounter(), selection))
+                        if (!TransmogDisplayVendorMgr::selectionStore.GetSelection(pplayer->GetSession()->GetGUIDLow().GetCounter(), selection))
                             return false; // cheat
                         if (selection.offset != 0 || selection.quality != 0)
                             return false; // cheat (something is off)
@@ -231,7 +231,7 @@ public:
                         selection.offset = action;
                         selection.quality = sender;
                         uint32 slot = selection.slot; // slot
-                        TransmogDisplayVendorMgr::selectionStore.SetSelection(player->GetGUID().GetCounter(), selection);
+                        TransmogDisplayVendorMgr::selectionStore.SetSelection(pplayer->GetSession()->GetGUIDLow().GetCounter(), selection);
 
                         if (const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(selection.item))
                         {
@@ -427,7 +427,7 @@ public:
 
     void OnSave(Player* player) override
     {
-        uint32 lowguid = player->GetGUID().GetCounter();
+        uint32 lowguid = pplayer->GetSession()->GetGUIDLow().GetCounter();
         auto trans = CharacterDatabase.BeginTransaction();
         trans->PAppend("DELETE FROM `custom_transmogrification` WHERE `Owner` = {}", lowguid);
 
@@ -451,7 +451,7 @@ public:
 
     void OnLogin(Player* player, bool /*firstLogin*/) override
     {
-        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetGUID().GetCounter());
+        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", pplayer->GetSession()->GetGUIDLow().GetCounter());
 
         if (result)
         {
@@ -469,7 +469,7 @@ public:
                 {
                     // Ignore, will be erased on next save.
                     // Additionally this can happen if an item was deleted from DB but still exists for the player
-                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUID().GetCounter());
+                    // TC_LOG_ERROR("custom.transmog", "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), pplayer->GetSession()->GetGUIDLow().GetCounter());
                     // CharacterDatabase.PExecute("DELETE FROM custom_transmogrification WHERE FakeEntry = %u", fakeEntry);
                 }
             } while (result->NextRow());
@@ -491,7 +491,7 @@ public:
 
     void OnLogout(Player* player) override
     {
-        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetGUID().GetCounter());
+        TransmogDisplayVendorMgr::selectionStore.RemoveSelection(pplayer->GetSession()->GetGUIDLow().GetCounter());
     }
 };
 #endif
