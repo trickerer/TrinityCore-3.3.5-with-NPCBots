@@ -56,7 +56,7 @@ public:
         static bool OnGossipHello(Player* player, Creature* creature)
         {
             ClearGossipMenuFor(player);
-            TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUIDLow().GetCounter());
+            TransmogDisplayVendorMgr::selectionStore.RemoveSelection(player->GetSession()->GetGUID().GetCounter());
             WorldSession* session = player->GetSession();
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
             {
