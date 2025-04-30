@@ -7,7 +7,8 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
-#include "BotMgr.h"
+#include "BotMgr.h"      // Required for GetBotMgr()
+#include "npcbotAI.h"    // If needed for deeper bot control
 #include <sstream>
 #include <string>
 
