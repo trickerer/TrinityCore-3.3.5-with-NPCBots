@@ -8,7 +8,7 @@
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
 #include "BotMgr.h"      // Required for GetBotMgr()
-#include "npcbotAI.h"    // If needed for deeper bot control
+#include "NpcBots/bot_ai.h"    // If needed for deeper bot control
 #include <sstream>
 #include <string>
 
@@ -16,7 +16,7 @@
 #define nemhtext42   -1700143 // tell player they not entilied
 #define nemhtext43   "You are missing a MGA Token!" // no mga token
 
-#define GOSSIP_HELLO_NEMH5  "Change My Faction - WARNING WILL REMOVE YOU FROM GUILD AND DELETE BOTS!"
+#define GOSSIP_HELLO_NEMH5  "Change My Faction - WARNING WILL REMOVE YOU FROM ANY GUILD AND DELETE BOTS!"
 #define GOSSIP_HELLO_NEMH6  "Change My Race"
 #define GOSSIP_HELLO_NEMH7  "You are not in the character editor system please visit the vote shop on the web site to enable faction or race swapping for this character. (near bottom of list on the shop)"
 
@@ -130,21 +130,10 @@ public:
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
-                    if (player->HaveBot())
-                    {
-                        std::list<Creature*> botList;
-                        player->GetBotMgr()->GetAllBotsByClass(botList);
-
-                        for (Creature* bot : botList)
-                        {
-                            player->GetBotMgr()->RemoveBot(bot->GetGUID());
-                        }
-
-                        me->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
-                    }
-					UpdateReNameCharData(player, 1);
-					me->PlayDirectSound(11466);
-                    return true;
+					if (player->HaveBot())
+					{
+						player->GetBotMgr()->RemoveAllBots();
+					}
 				
 				/*
                 if (player->HasItemCount(21140, 0))
