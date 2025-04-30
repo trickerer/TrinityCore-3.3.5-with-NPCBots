@@ -55,7 +55,7 @@ public:
 			WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, guidStr.c_str());
             return true;
         }
-
+ 
         bool OnGossipHello(Player* player) override
         {
             uint32 guidLow = player->GetGUID();
@@ -94,7 +94,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* cre, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* playe, uint32 /*menuId*/, uint32 gossipListId) override
         {
             WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
