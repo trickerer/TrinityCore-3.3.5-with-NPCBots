@@ -14,7 +14,7 @@
 #define nemhtext42   -1700143 // tell player they not entilied
 #define nemhtext43   "You are missing a MGA Token!" // no mga token
 
-#define GOSSIP_HELLO_NEMH5  "Change My Faction"
+#define GOSSIP_HELLO_NEMH5  "Change My Faction - WARNING WILL REMOVE YOU FROM ANY GUILD AND DELETE BOTS!"
 #define GOSSIP_HELLO_NEMH6  "Change My Race"
 #define GOSSIP_HELLO_NEMH7  "You are not in the character editor system please visit the vote shop on the web site to enable faction or race swapping for this character. (near bottom of list on the shop)"
 
@@ -124,10 +124,11 @@ public:
 					std::string guidStr = std::to_string(guidLow);
 					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
-                    player->DestroyItemCount(21140, 0, true);
+                    //player->DestroyItemCount(21140, 0, true);
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
+					player->GetBotMgr()->RemoveBot(bot->GetGUID());
 					UpdateReNameCharData(player, 1);
 					me->PlayDirectSound(11466);
                     return true;
@@ -168,7 +169,7 @@ public:
                 CloseGossipMenuFor(player);
 				
 				UpdateReNameCharData(player, 1);
-                    player->DestroyItemCount(21140, 0, true);
+                    //player->DestroyItemCount(21140, 0, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
 					uint32 guidLow = player->GetGUID();
 					std::string guidStr = std::to_string(guidLow);
