@@ -253,6 +253,7 @@ public:
             if (!player->HasItemCount(ITEMCOSTID, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, "You dont have a instant level voucher!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9997);
+				player->PlayDirectSound(11965);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "How do i get one?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9997);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
