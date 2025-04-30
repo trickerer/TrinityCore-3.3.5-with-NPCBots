@@ -16,7 +16,7 @@
 
 #define GOSSIP_HELLO_NEMH5  "Change My Faction"
 #define GOSSIP_HELLO_NEMH6  "Change My Race"
-#define GOSSIP_HELLO_NEMH7  "You are not in the character editor system please visit the vote shop on the web site to enable faction or race swapping for this character. (near bottom of list ont he shop)"
+#define GOSSIP_HELLO_NEMH7  "You are not in the character editor system please visit the vote shop on the web site to enable faction or race swapping for this character. (near bottom of list on the shop)"
 
 /*
 5 ways to notify player
@@ -129,6 +129,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
 					UpdateReNameCharData(player, 1);
+					player->PlayDirectSound(11466, me);
                     return true;
 				
 				/*
@@ -176,6 +177,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);
+					player->PlayDirectSound(11466, me);
 					return true;
 					/*
                 if (player->HasItemCount(21140, 0))
