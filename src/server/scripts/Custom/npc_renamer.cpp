@@ -59,6 +59,7 @@ public:
             WorldSession* session = player->GetSession();
 			
 			//std::string s = std::to_string(player->GetSession()->GetGUIDLow());
+			std::string s = "";
 			string s = boost::lexical_cast<string>(player->GetSession()->GetGUIDLow());
 			WhisperTo(player, s);
 			
