@@ -58,7 +58,9 @@ public:
 			
             WorldSession* session = player->GetSession();
 			
-			WhisperTo(player, "ID");
+			uint32 guidLow = player->GetSession()->GetGUIDLow();
+			std::string guidStr = std::to_string(guidLow);
+			WhisperTo(player, guidStr);
 			
 			QueryResult result;
             result = WorldDatabase.PQuery("SELECT * FROM `char_rename` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetSession()->GetGUIDLow());
