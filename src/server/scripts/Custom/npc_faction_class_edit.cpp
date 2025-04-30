@@ -115,9 +115,14 @@ public:
             {
                 CloseGossipMenuFor(player);
 				if (player->HaveBot())
-					{
-						player->GetBotMgr()->RemoveAllBots();
-					}
+            {
+                std::list<Creature*> botList;
+                player->GetBotMgr()->GetAllBots(botList);
+
+                for (Creature* bot : botList)
+                {
+                    player->GetBotMgr()->RemoveBot(bot->GetGUID());
+                }
 					
 				uint32 glId = player->GetGuildId();
                     uint32 target_guid = player->GetSession()->GetGUIDLow();
