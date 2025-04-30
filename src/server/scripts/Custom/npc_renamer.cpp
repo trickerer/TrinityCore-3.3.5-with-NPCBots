@@ -120,7 +120,7 @@ public:
                 //me->HandleEmoteCommand(EMOTE_STATE_TALK);
                 me->Say("To rename your char, goto players area on website, my info & click rename icon for this char", LANG_UNIVERSAL);
                 //WhisperTo(player, "To rename your char, goto players area on website, my info & click rename icon for this char");
-				player->PlayDirectSound(11965)
+				me->PlayDirectSound(11965)
 				CloseGossipMenuFor(player);
 				return true;
 			}
