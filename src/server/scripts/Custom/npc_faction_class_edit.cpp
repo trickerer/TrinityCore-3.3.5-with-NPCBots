@@ -92,7 +92,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, Creature* creature, uint32 gossipListId) override
         {
             WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
@@ -129,7 +129,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
 					UpdateReNameCharData(player, 1);
-					player->PlayDirectSound(11466, me);
+					player->PlayDirectSound(11466, creature);
                     return true;
 				
 				/*
@@ -177,7 +177,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);
-					player->PlayDirectSound(11466, me);
+					player->PlayDirectSound(11466, creature);
 					return true;
 					/*
                 if (player->HasItemCount(21140, 0))
