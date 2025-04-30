@@ -118,7 +118,7 @@ public:
 				    if (player->HaveBot())
 					{
                         player->GetBotMgr()->RemoveAllBots();
-						me->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
+						me->Yell("All bots dismissed.", LANG_UNIVERSAL, player);
 					}
 					else
 					{
