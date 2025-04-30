@@ -117,8 +117,7 @@ public:
 					
 				    if (player->HaveBot())
 					{
-                        Creature* cre = player->ToCreature();
-                        player->GetBotMgr()->RemoveBot(cre->GetGUID(), BOT_REMOVE_DISMISS);
+                        player->GetBotMgr()->RemoveBot(player->GetGUID(), BOT_REMOVE_DISMISS);
 						me->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
 					}
 					else
