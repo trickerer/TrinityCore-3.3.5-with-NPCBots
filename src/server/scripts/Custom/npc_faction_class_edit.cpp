@@ -117,11 +117,7 @@ public:
                 if (player->HaveBot())
                 {
                     player->GetBotMgr()->RemoveAllBots();
-                    me->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
-                }
-                else
-                {
-                    me->Whisper("You have no bots summoned.", LANG_UNIVERSAL, player);
+                    //me->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
                 }
 					
 				    uint32 glId = player->GetGuildId();
