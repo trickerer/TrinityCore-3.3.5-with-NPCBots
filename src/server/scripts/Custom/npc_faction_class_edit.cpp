@@ -112,6 +112,26 @@ public:
             case 1001:
             {
                 CloseGossipMenuFor(player);
+				uint32 glId = player->GetGuildId();
+                    uint32 target_guid = player->GetSession()->GetGUIDLow();
+                    uint32 guild = player->GetGuildId();
+
+                    if (guild > 0) {
+                        player->SetInGuild(0);
+                    }
+
+                    uint32 guidLow = player->GetGUID();
+					std::string guidStr = std::to_string(guidLow);
+					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                    UpdateReNameCharData(player, 1);
+                    player->DestroyItemCount(21140, 0, true);
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = {}", guidStr.c_str());
+                    me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
+					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
+					UpdateReNameCharData(player, 1);
+                    return true;
+				
+				/*
                 if (player->HasItemCount(21140, 0))
                 {
                     uint32 glId = player->GetGuildId();
@@ -139,6 +159,7 @@ public:
                     me->Say(nemhtext43, LANG_UNIVERSAL);
                     return false;
                 }
+				*/
             }
             break;
             case 1002:
