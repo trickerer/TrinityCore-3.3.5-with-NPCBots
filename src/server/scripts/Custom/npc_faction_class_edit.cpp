@@ -114,10 +114,15 @@ public:
             case 1001:
             {
                 CloseGossipMenuFor(player);
-				if (player->HaveBot())
-					{
-						player->GetBotMgr()->RemoveAllBots();
-					}
+                if (player->HaveBot())
+                {
+                    player->GetBotMgr()->RemoveAllBots();
+                    creature->Whisper("All bots dismissed.", LANG_UNIVERSAL, player);
+                }
+                else
+                {
+                    creature->Whisper("You have no bots summoned.", LANG_UNIVERSAL, player);
+                }
 					
 				    uint32 glId = player->GetGuildId();
                     uint32 target_guid = player->GetSession()->GetGUIDLow();
