@@ -117,12 +117,8 @@ public:
 					
 				    if (player->HaveBot())
 					{
-                        player->GetBotMgr()->RemoveAllBots();
-						me->Yell("All bots dismissed.", LANG_UNIVERSAL, player);
-					}
-					else
-					{
-						me->Whisper("You have no bots summoned.", LANG_UNIVERSAL, player);
+                        me->Whisper("YOU NEED TO REMOVE BOTS BEFORE FACTION SWAP!", LANG_UNIVERSAL, player);
+						return true;
 					}
 					
 					uint32 glId = player->GetGuildId();
