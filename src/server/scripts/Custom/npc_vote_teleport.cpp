@@ -144,6 +144,7 @@ public:
 				if (fiveminabusecheck < lasttptime)
 				{
 					AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_TPN01, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1050);
+					player->PlayDirectSound(11965);
 					AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye!", GOSSIP_SENDER_MAIN, 2);
 					//sLog->outError("MGA: FAILED:: time from db = {} time we checking = {}", lasttptime,fiveminabusecheck);
 				}
@@ -218,6 +219,7 @@ public:
             else
             {
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_TPNO, GOSSIP_SENDER_MAIN, 1050);
+				player->PlayDirectSound(11965);
 				AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye!", GOSSIP_SENDER_MAIN, 2);
             }
 			me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);

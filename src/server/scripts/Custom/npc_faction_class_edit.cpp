@@ -86,6 +86,7 @@ public:
             {
                 //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_NEMH7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_NEMH7, GOSSIP_SENDER_MAIN, 1003);
+				player->PlayDirectSound(11965);
             }
 			
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye", GOSSIP_SENDER_MAIN, 2);
@@ -185,7 +186,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);
-					me->PlayDirectSound(11466);
+					player->PlayDirectSound(11466);
 					return true;
 					/*
                 if (player->HasItemCount(21140, 0))
