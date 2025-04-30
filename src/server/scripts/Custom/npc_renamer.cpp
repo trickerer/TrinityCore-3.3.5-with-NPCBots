@@ -73,6 +73,7 @@ public:
             else
             {
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_NEMH4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+				player->PlayDirectSound(11965);
             }
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, GOSSIP_HELLO_NEMH5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -120,7 +121,6 @@ public:
                 //me->HandleEmoteCommand(EMOTE_STATE_TALK);
                 me->Say("To rename your char, goto players area on website, my info & click rename icon for this char", LANG_UNIVERSAL);
                 //WhisperTo(player, "To rename your char, goto players area on website, my info & click rename icon for this char");
-				player->PlayDirectSound(11965);
 				CloseGossipMenuFor(player);
 				return true;
 			}
