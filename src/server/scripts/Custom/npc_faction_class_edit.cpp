@@ -119,7 +119,7 @@ public:
 						player->GetBotMgr()->RemoveAllBots();
 					}
 					
-				uint32 glId = player->GetGuildId();
+				    uint32 glId = player->GetGuildId();
                     uint32 target_guid = player->GetSession()->GetGUIDLow();
                     uint32 guild = player->GetGuildId();
 
@@ -135,6 +135,7 @@ public:
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
+                    return true;
 					
 				
 				/*
