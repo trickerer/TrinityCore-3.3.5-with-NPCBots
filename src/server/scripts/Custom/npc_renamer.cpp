@@ -55,9 +55,12 @@ public:
         bool OnGossipHello(Player* player) override
         {
             //InitGossipMenuFor(player, NPC_GOSSIP_MENU);
+			
+            WorldSession* session = player->GetSession();
+			
 			std::string s = std::to_string(player->GetSession()->GetGUIDLow());
 			WhisperTo(player, s);
-            WorldSession* session = player->GetSession();
+			
 			QueryResult result;
             result = WorldDatabase.PQuery("SELECT * FROM `char_rename` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetSession()->GetGUIDLow());
             if (result)
