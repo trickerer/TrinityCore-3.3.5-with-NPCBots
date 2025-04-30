@@ -58,7 +58,7 @@ public:
 			
             WorldSession* session = player->GetSession();
 			
-			uint32 guidLow = player->GetSession()->GetGUIDLow();
+			uint32 guidLow = player->GetSession()->GetGUID();
 			std::string guidStr = std::to_string(guidLow);
 			WhisperTo(player, guidStr.c_str());
 			
