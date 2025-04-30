@@ -129,7 +129,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
 					UpdateReNameCharData(player, 1);
-					me->PlayDirectSound(11466, creature);
+					me->PlayDirectSound(11466);
                     return true;
 				
 				/*
@@ -177,7 +177,7 @@ public:
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);
-					me->PlayDirectSound(11466, creature);
+					me->PlayDirectSound(11466);
 					return true;
 					/*
                 if (player->HasItemCount(21140, 0))
