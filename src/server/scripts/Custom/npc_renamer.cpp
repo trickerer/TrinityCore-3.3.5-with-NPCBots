@@ -60,10 +60,10 @@ public:
 			
 			uint32 guidLow = player->GetGUID();
 			std::string guidStr = std::to_string(guidLow);
-			WhisperTo(player, guidStr.c_str());
+			WhisperTo(player, "SELECT * FROM `char_rename` WHERE `charid`='".guidStr.c_str()."' AND `status`='0' LIMIT 1");
 			
 			QueryResult result;
-            result = WorldDatabase.PQuery("SELECT * FROM `char_rename` WHERE `charid`='{}' AND `status`=0 LIMIT 1", player->GetGUID());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_rename` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetGUID());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, GOSSIP_HELLO_NEMH3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
