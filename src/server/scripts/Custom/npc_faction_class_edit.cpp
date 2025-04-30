@@ -165,6 +165,19 @@ public:
             case 1002:
             {
                 CloseGossipMenuFor(player);
+				
+				UpdateReNameCharData(player, 1);
+                    player->DestroyItemCount(21140, 0, true);
+                    //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
+					uint32 guidLow = player->GetGUID();
+					std::string guidStr = std::to_string(guidLow);
+                    player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = {}", guidStr.c_str());
+                    me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
+					session->SendNotification("Logout and back in you will be prompted to change your race.");
+					UpdateReNameCharData(player, 1);
+					return true;
+					/*
                 if (player->HasItemCount(21140, 0))
                 {
                     UpdateReNameCharData(player, 1);
@@ -185,6 +198,7 @@ public:
                     me->Say(nemhtext43, LANG_UNIVERSAL);
                     return false;
                 }
+				*/
             }
             break;
             case 1003:
