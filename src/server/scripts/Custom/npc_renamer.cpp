@@ -14,7 +14,7 @@
 #define nemhtext21   800014 // tell player they not entilied
 #define nemhtext31   800012 // no mga token
 
-#define GOSSIP_HELLO_NEMH3  "Rename Me (costs 1 MGA Token)"
+#define GOSSIP_HELLO_NEMH3  "Rename Me"
 #define GOSSIP_HELLO_NEMH4  "You are not in the rename system please visit the vote shop the web site to enable rename for this character. (near bottom of list ont he shop)"
 #define GOSSIP_HELLO_NEMH5  "Goodbye."
 

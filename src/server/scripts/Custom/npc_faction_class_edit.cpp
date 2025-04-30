@@ -48,15 +48,19 @@ public:
 		
         bool UpdateReNameCharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, player->GetSession()->GetGUIDLow());
+            uint32 guidLow = player->GetGUID();
+			std::string guidStr = std::to_string(guidLow);
+			WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, guidStr.c_str());
             return true;
         }
 
         bool OnGossipHello(Player* player) override
         {
-            me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
+            uint32 guidLow = player->GetGUID();
+			std::string guidStr = std::to_string(guidLow);
+			me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             QueryResult result;
-            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", guidStr.c_str());
             if (result)
             {
                 //check to see faction/race chnage
@@ -108,7 +112,7 @@ public:
             case 1001:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(21140, 1))
+                if (player->HasItemCount(21140, 0))
                 {
                     uint32 glId = player->GetGuildId();
                     uint32 target_guid = player->GetSession()->GetGUIDLow();
@@ -118,10 +122,12 @@ public:
                         player->SetInGuild(0);
                     }
 
-                    player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                    uint32 guidLow = player->GetGUID();
+					std::string guidStr = std::to_string(guidLow);
+					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
-                    player->DestroyItemCount(21140, 1, true);
-                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = %u", player->GetSession()->GetGUIDLow());
+                    player->DestroyItemCount(21140, 0, true);
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '64' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your Faction.");
 					UpdateReNameCharData(player, 1);
@@ -138,13 +144,15 @@ public:
             case 1002:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(21140, 1))
+                if (player->HasItemCount(21140, 0))
                 {
                     UpdateReNameCharData(player, 1);
-                    player->DestroyItemCount(21140, 1, true);
+                    player->DestroyItemCount(21140, 0, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
+					uint32 guidLow = player->GetGUID();
+					std::string guidStr = std::to_string(guidLow);
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
-                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = %u", player->GetSession()->GetGUIDLow());
+                    CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
 					session->SendNotification("Logout and back in you will be prompted to change your race.");
 					UpdateReNameCharData(player, 1);
