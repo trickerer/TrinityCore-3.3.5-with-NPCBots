@@ -94,7 +94,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* playe, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
