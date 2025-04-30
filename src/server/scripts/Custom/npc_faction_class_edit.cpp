@@ -94,7 +94,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) override
         {
             WorldSession* session = player->GetSession();
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
@@ -115,14 +115,9 @@ public:
             {
                 CloseGossipMenuFor(player);
 				if (player->HaveBot())
-            {
-                std::list<Creature*> botList;
-                player->GetBotMgr()->GetAllBots(botList);
-
-                for (Creature* bot : botList)
-                {
-                    player->GetBotMgr()->RemoveBot(bot->GetGUID());
-                }
+					{
+						player->GetBotMgr()->RemoveAllBots();
+					}
 					
 				uint32 glId = player->GetGuildId();
                     uint32 target_guid = player->GetSession()->GetGUIDLow();
