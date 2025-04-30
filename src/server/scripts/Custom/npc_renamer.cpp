@@ -62,7 +62,7 @@ public:
 			
 			uint32 guidLow = player->GetGUID();
 			std::string guidStr = std::to_string(guidLow);
-			WhisperTo(player, guidStr.c_str());
+			//WhisperTo(player, guidStr.c_str());
 			
 			QueryResult result;
             result = WorldDatabase.PQuery("SELECT * FROM `char_rename` WHERE `charid`='{}' AND `status`='0' LIMIT 1", guidStr.c_str());
@@ -89,7 +89,13 @@ public:
 			if (action == GOSSIP_ACTION_INFO_DEF + 1000)
 			{
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(21140, 1))
+				UpdateReNameCharData(player, 1);
+				player->SetAtLoginFlag(AT_LOGIN_RENAME);
+				me->Say(player->GetName()+" Logout and back in you will be prompted to change your name.", LANG_UNIVERSAL);
+				session->SendNotification("Logout and back in you will be prompted to change your name.");
+				return true;
+				
+               /* if (player->HasItemCount(21140, 1))
                 {
                     UpdateReNameCharData(player, 1);
                     player->DestroyItemCount(21140, 1, true);
@@ -107,6 +113,7 @@ public:
                     session->SendNotification("You need 1 MGA Token!");
                     return true;
                 }
+				*/
 			}
 			if (action == GOSSIP_ACTION_INFO_DEF + 1002)
 			{
