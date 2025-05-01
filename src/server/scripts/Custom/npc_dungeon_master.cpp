@@ -31,14 +31,14 @@ me->HandleEmoteCommand(EMOTE_STATE_TALK);
 */
 
 
-class npc_xp_mod : public CreatureScript
+class npc_dungeon_master : public CreatureScript
 {
 public:
-    npc_xp_mod() : CreatureScript("npc_xp_mod") { }
+    npc_dungeon_master() : CreatureScript("npc_dungeon_master") { }
 
-    struct npc_xp_modAI : public ScriptedAI
+    struct npc_dungeon_masterAI : public ScriptedAI
     {
-        npc_xp_modAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_dungeon_masterAI(Creature* creature) : ScriptedAI(creature) {}
 
         void WhisperTo(Player* player, char const* message)
         {
