@@ -71,14 +71,7 @@ public:
 
         bool OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 gossipListId) override
         {
-            uint32 goldCost = 100000; // 10 gold
-			if (player->GetMoney() < goldCost)
-			{
-				player->GetSession()->SendNotification("You need at least 10 gold to use transmog.");
-				return true; // Exit the function
-			}
-			player->ModifyMoney(-int32(goldCost));
-			uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
+            uint32 sender = player->PlayerTalkClass->GetGossipOptionSender(gossipListId);
             uint32 action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             return OnGossipSelect(player, me, sender, action);
         }
