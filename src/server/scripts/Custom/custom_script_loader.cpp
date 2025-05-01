@@ -31,6 +31,7 @@ void AddSC_npc_faction_class_edit();
 void AddSC_npc_proff_master();
 void AddSC_npc_xp_mod();
 void AddSC_npc_insta_80();
+void AddSC_npc_dungeon_master();
 
 void AddCustomScripts()
 {
@@ -44,4 +45,5 @@ void AddCustomScripts()
 	AddSC_npc_proff_master();
 	AddSC_npc_xp_mod();
 	AddSC_npc_insta_80();
+	AddSC_npc_dungeon_master();
 }
