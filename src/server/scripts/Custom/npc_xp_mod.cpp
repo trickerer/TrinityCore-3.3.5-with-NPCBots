@@ -13,8 +13,8 @@
 
 enum ItemIds
 {
-    itemId = 461141,  // 1x Rates
-    itemId2 = 461142, // XP BOOSTER item
+    itemId = 461141,  // 3x Rates
+    itemId2 = 461142, // 10x Rates
     itemId3 = 21140, // MGA TOKEN
 };
 
