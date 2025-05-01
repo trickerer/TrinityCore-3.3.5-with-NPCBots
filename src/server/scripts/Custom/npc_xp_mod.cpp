@@ -59,7 +59,7 @@ public:
 
             if (!player->HasItemCount(itemId, 1) && !player->HasItemCount(itemId2, 1))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Set XP Rates to 1x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 3x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
 
@@ -107,7 +107,7 @@ public:
                 {
                     Item* item = player->StoreNewItem(dest, itemId, 1, true);
                     player->SendNewItem(item, 1, true, false);
-                    me->Say("Here you go, carry this item and XP is set to 1x. Bank the item then you're done.", LANG_UNIVERSAL);
+                    me->Say("Here you go, carry this item and XP is boosted to 3x. Bank the item then you're done.", LANG_UNIVERSAL);
                 }
 
 			}
@@ -121,12 +121,12 @@ public:
                     return true;
                 }
 
-                if (!player->HasItemCount(itemId3, 1))
-                {
-                    me->Say("To boost XP to 10x, I need a MGA Token as payment! Let me know when you have one.", LANG_UNIVERSAL);
-                    return true;
-                }
-                player->DestroyItemCount(itemId3, 1, true);
+                //if (!player->HasItemCount(itemId3, 1))
+                //{
+                //    me->Say("To boost XP to 10x, I need a MGA Token as payment! Let me know when you have one.", LANG_UNIVERSAL);
+                //    return true;
+                //}
+                //player->DestroyItemCount(itemId3, 1, true);
 
                 ItemPosCountVec dest;
                 InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId2, 1);
