@@ -441,7 +441,7 @@ public:
                 if (it2 == player->transmogMap.end())
                     continue;
 
-                trans->PAppend("REPLACE INTO custom_transmogrification (GUID, FakeEntry, Owner) VALUES (%u, %u, %u)", it2->first.GetCounter(), it2->second, lowguid);
+                trans->PAppend("REPLACE INTO custom_transmogrification (GUID, FakeEntry, Owner) VALUES ({}, {}, {})", it2->first.GetCounter(), it2->second, lowguid);
             }
         }
 
