@@ -50,8 +50,7 @@ public:
         bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "COMING SOON!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-			AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "COMING SOON", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return true;
