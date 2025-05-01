@@ -51,6 +51,7 @@ public:
         {
             WorldSession* session = player->GetSession();
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "COMING SOON", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
+			AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return true;
@@ -66,6 +67,12 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 1000)
             {
                 me->Say("COMING SOON!!!", LANG_UNIVERSAL);
+                return true;
+            }
+			if (action == GOSSIP_ACTION_INFO_DEF + 2000)
+            {
+                me->Say(player->GetName() + " Bye.", LANG_UNIVERSAL);
+                CloseGossipMenuFor(player);
                 return true;
             }
 
