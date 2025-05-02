@@ -3682,7 +3682,7 @@ public:
             return false;
         };
         static auto const ret_err_invalid_arg = [](ChatHandler* handler, char const* argname, Optional<uint8> argval = {}) {
-            handler->PSendSysMessage("Invalid %s%s!", argname, argval ?  (" " + std::to_string(*argval)) : "");
+            handler->PSendSysMessage("Invalid %s%s!", argname, argval ? (" " + std::to_string(*argval)) : "");
             handler->SetSentErrorMessage(true);
             return false;
         };
@@ -3712,10 +3712,10 @@ public:
             return ret_err_invalid_arg(handler, "class", bclass);
 
         std::string namestr;
-        normalizePlayerName(namestr);
         if (!consoleToUtf8(*name, namestr))
             return ret_err_invalid_arg(handler, "name");
-        namestr[0] = std::toupper(namestr[0]);
+        if (!normalizePlayerName(namestr))
+            return ret_err_invalid_arg(handler, "name");
 
         if (race && !((1u << (*race - 1)) & RACEMASK_ALL_PLAYABLE))
             return ret_err_invalid_arg(handler, "race", race);
@@ -3770,16 +3770,30 @@ public:
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         trans->Append("DROP TEMPORARY TABLE IF EXISTS creature_template_temp_npcbot_create");
         trans->PAppend("CREATE TEMPORARY TABLE creature_template_temp_npcbot_create ENGINE=MEMORY SELECT * FROM creature_template WHERE entry = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)", uint32(*bclass));
-        trans->PAppend("UPDATE creature_template_temp_npcbot_create SET entry = {}, name = \"{}\"", newentry, namestr);
+        trans->PAppend("UPDATE creature_template_temp_npcbot_create SET entry = {}", newentry);
         if (modelId)
             trans->PAppend("UPDATE creature_template_temp_npcbot_create SET modelid1 = {}", modelId);
         trans->Append("INSERT INTO creature_template SELECT * FROM creature_template_temp_npcbot_create");
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_NPCBOT_NAME);
+        stmt->setString(0, namestr);
+        stmt->setUInt32(1, newentry);
+        trans->Append(stmt);
         trans->Append("DROP TEMPORARY TABLE creature_template_temp_npcbot_create");
         trans->PAppend("REPLACE INTO creature_template_npcbot_extras VALUES ({}, {}, {})", newentry, uint32(*bclass), uint32(*race));
         trans->PAppend("REPLACE INTO creature_equip_template SELECT {}, 1, ids.itemID1, ids.itemID2, ids.itemID3, -1 FROM (SELECT itemID1, itemID2, itemID3 FROM creature_equip_template WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)) ids", newentry, uint32(*bclass));
         if (can_change_appearance)
-            trans->PAppend("REPLACE INTO creature_template_npcbot_appearance VALUES ({}, \"{}\", {}, {}, {}, {}, {}, {})",
-                newentry, namestr, uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
+        {
+            stmt = WorldDatabase.GetPreparedStatement(WORLD_REP_NPCBOT_APPEARANCE);
+            stmt->setUInt32(0, newentry);
+            stmt->setString(1, namestr);
+            stmt->setUInt32(2, uint32(*gender));
+            stmt->setUInt32(3, uint32(*skin));
+            stmt->setUInt32(4, uint32(*face));
+            stmt->setUInt32(5, uint32(*hairstyle));
+            stmt->setUInt32(6, uint32(*haircolor));
+            stmt->setUInt32(7, uint32(*features));
+            trans->Append(stmt);
+        }
         WorldDatabase.DirectCommitTransaction(trans);
 
         handler->PSendSysMessage("New NPCBot %s (class %u) is created with entry %u and will be available for spawning after server restart.", namestr, uint32(*bclass), newentry);

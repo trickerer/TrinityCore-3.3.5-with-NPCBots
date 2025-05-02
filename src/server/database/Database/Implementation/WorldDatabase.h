@@ -101,6 +101,11 @@ enum WorldDatabaseStatements : uint32
     WORLD_DEL_SPAWNGROUP_MEMBER,
     WORLD_DEL_GAMEOBJECT_ADDON,
 
+    //npcbot
+    WORLD_UPD_NPCBOT_NAME,
+    WORLD_REP_NPCBOT_APPEARANCE,
+    //end npcbot
+
     MAX_WORLDDATABASE_STATEMENTS
 };
 
