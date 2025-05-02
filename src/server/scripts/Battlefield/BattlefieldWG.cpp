@@ -604,6 +604,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 	
 	// Set Sliders capture points data to his owners when battle start
+	WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
 for (auto const& [id, cp] : m_capturePoints)
 {
     GameObject* go = cp->GetCapturePointGo();
