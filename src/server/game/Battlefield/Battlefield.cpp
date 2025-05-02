@@ -36,11 +36,6 @@
 #include "WorldStatePackets.h"
 #include <G3D/g3dmath.h>
 
-#define GO_WINTERGRASP_FACTORY_BANNER_NE 190475
-#define GO_WINTERGRASP_FACTORY_BANNER_NW 190487
-#define GO_WINTERGRASP_FACTORY_BANNER_SE 194959
-#define GO_WINTERGRASP_FACTORY_BANNER_SW 194962
-
 Battlefield::Battlefield()
 {
     m_Timer = 0;
@@ -73,14 +68,6 @@ Battlefield::~Battlefield()
 {
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         delete itr->second;
-	
-	// Set Sliders capture points data to his owners when battle start
-    using CapturePointMap = std::map<uint32, BfCapturePoint*>;
-	for (CapturePointMap::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        (*itr)->second->SetCapturePointData((*itr)->second->GetCapturePointGo(),
-            (*itr)->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || (*itr)->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
-
-
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
         delete *itr;
