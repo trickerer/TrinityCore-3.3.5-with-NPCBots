@@ -487,16 +487,15 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE)
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
             workshop->GiveControlTo(GetDefenderTeam(), true);
-		
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
     }
-	
+
     // Spawn turrets and hide them per default
     for (uint8 i = 0; i < WG_MAX_TURRET; i++)
     {
@@ -549,8 +548,7 @@ bool BattlefieldWG::Update(uint32 diff)
     bool m_return = Battlefield::Update(diff);
     if (m_saveTimer <= diff)
     {
-        
-		sWorld->setWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
+        sWorld->setWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDER, m_DefenderTeam);
         sWorld->setWorldState(ClockWorldState[0], m_Timer);
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
@@ -604,7 +602,6 @@ void BattlefieldWG::OnBattleStart()
     // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
-	
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
