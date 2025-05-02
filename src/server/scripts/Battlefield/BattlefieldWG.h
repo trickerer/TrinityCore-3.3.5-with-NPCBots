@@ -552,21 +552,6 @@ public:
     void Save();
 };
 
-/* ######################### *
- *  WintergraspCapturePoint  *
- * ######################### */
-
-class WintergraspCapturePoint : public BfCapturePoint
-{
-public:
-    WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
-
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
-
-    void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
-}
-	
 // Structure for the 6 workshop
 struct WintergraspWorkshop
 {
