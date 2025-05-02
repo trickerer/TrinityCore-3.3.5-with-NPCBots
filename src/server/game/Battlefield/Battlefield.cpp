@@ -77,8 +77,8 @@ Battlefield::~Battlefield()
 	// Set Sliders capture points data to his owners when battle start
     using CapturePointMap = std::map<uint32, BfCapturePoint*>;
 	for (CapturePointMap::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(),
-            (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
+        (*itr)->second->SetCapturePointData((*itr)->second->GetCapturePointGo(),
+            (*itr)->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || (*itr)->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
 
 
 
