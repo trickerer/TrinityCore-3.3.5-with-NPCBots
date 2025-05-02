@@ -170,13 +170,13 @@ struct npc_wg_demolisher_engineer : public ScriptedAI
     }
 
 private:
-    bool CanBuild() const
+    bool canBuild(Creature* creature)
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
             return false;
 
-        switch (me->GetEntry())
+        switch (creature->GetEntry())
         {
             case NPC_GOBLIN_MECHANIC:
                 return (wintergrasp->GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H) > wintergrasp->GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
