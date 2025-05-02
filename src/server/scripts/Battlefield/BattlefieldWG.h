@@ -21,8 +21,6 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
-#include "WorldStateDefines.h"
-#include "WorldStatePackets.h"
 
 class Group;
 class BattlefieldWG;
