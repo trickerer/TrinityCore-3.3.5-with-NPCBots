@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AchievementCriteriaScript.h"
+#include "ScriptMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
