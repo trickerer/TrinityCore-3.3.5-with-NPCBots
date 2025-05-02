@@ -604,9 +604,20 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 	
 	// Set Sliders capture points data to his owners when battle start
-    for (BfCapturePointVector::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        itr->second->SetCapturePointData(itr->second->GetCapturePointGo(),
-            itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
+   for (auto const& [id, cp] : m_capturePoints)
+{
+    GameObject* go = cp->GetCapturePointGo();
+    if (!go)
+        continue;
+
+    uint32 entry = go->GetEntry();
+
+    TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
+                    ? GetAttackerTeam()
+                    : GetDefenderTeam();
+
+    cp->SetCapturePointData(entry, team);
+}
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
