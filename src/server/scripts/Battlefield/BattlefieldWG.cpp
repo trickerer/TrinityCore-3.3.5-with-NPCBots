@@ -605,7 +605,7 @@ void BattlefieldWG::OnBattleStart()
 	
 	// Set Sliders capture points data to his owners when battle start
     for (BfCapturePointVector::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        itr->second->SetCapturePointData((itr->second->GetCapturePointGo(),
+        itr->second->SetCapturePointData(itr->second->GetCapturePointGo(),
             itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
