@@ -68,10 +68,8 @@ enum Spells
 
 enum CreatureIds
 {
-    //NPC_GOBLIN_MECHANIC                 = 30400,
-    //NPC_GNOMISH_ENGINEER                = 30499,
-	NPC_GOBLIN_MECHANIC                 = 30499,
-	NPC_GNOMISH_ENGINEER				= 30400,
+    NPC_GOBLIN_MECHANIC                 = 30400,
+    NPC_GNOMISH_ENGINEER                = 30499,
 
     NPC_WINTERGRASP_CONTROL_ARMS        = 27852,
 
