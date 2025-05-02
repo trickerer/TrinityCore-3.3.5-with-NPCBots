@@ -170,7 +170,7 @@ struct npc_wg_demolisher_engineer : public ScriptedAI
     }
 
 private:
-    bool canBuild(Creature* creature)
+    bool CanBuild(Creature* creature)
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
