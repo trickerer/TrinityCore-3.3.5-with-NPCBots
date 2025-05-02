@@ -70,7 +70,7 @@ Battlefield::~Battlefield()
         delete itr->second;
 	
 	for (BfCapturePointMap::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo();
+        (*itr).second->SetCapturePointData((*itr).second->GetCapturePointGo());
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
         delete *itr;
