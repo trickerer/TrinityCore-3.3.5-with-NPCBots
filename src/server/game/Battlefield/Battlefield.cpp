@@ -36,6 +36,8 @@
 #include "WorldStatePackets.h"
 #include <G3D/g3dmath.h>
 
+#define GO_WINTERGRASP_FACTORY_BANNER_SW 190123
+
 Battlefield::Battlefield()
 {
     m_Timer = 0;
