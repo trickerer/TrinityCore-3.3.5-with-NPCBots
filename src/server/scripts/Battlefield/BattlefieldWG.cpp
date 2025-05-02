@@ -618,7 +618,7 @@ for (auto const& [id, cp] : m_capturePoints)
                     : GetDefenderTeam();
 
     // Call with values, not references
-    cp->SetCapturePointData(entry, teamId);
+    cp->SetCapturePointData(entry, TeamId);
 }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
