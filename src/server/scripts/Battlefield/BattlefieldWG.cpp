@@ -502,10 +502,10 @@ bool BattlefieldWG::SetupBattlefield()
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);	
         if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+            workshop->GiveControlTo(GetAttackerTeam(), true);
 		
 		else
-			workshop->GiveControlTo(GetAttackerTeam(), true);
+			workshop->GiveControlTo(GetDefenderTeam(), true);
 		
 
         // Note: Capture point is added once the gameobject is created.
