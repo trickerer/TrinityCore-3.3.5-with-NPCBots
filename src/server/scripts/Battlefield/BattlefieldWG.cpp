@@ -677,11 +677,6 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, 1);
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, 1);
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, 1);
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, 1);
-
     // Remove relic
     if (m_titansRelicGUID)
         if (GameObject* relic = GetGameObject(m_titansRelicGUID))
