@@ -502,7 +502,7 @@ bool BattlefieldWG::SetupBattlefield()
             
         //SOUTH
         if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
+            workshop->GiveControlTo(GetDefenderTeam(), true);  // HMM WRONG WAY 
             
         //FORTRESS
         if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i < BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
