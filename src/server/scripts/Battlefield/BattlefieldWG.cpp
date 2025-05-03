@@ -677,6 +677,11 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
+    SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
+    SetData(BATTLEFIELD_WG_DATA_DEF_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_DEFENDED_A)));
+    SetData(BATTLEFIELD_WG_DATA_WON_H, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_H)));
+    SetData(BATTLEFIELD_WG_DATA_DEF_H, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_DEFENDED_H)));
+
     // Remove relic
     if (m_titansRelicGUID)
         if (GameObject* relic = GetGameObject(m_titansRelicGUID))
@@ -695,6 +700,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // successful attack (note that teams have already been swapped, so defender team is the one who won)
     else
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? BATTLEFIELD_WG_DATA_WON_H : BATTLEFIELD_WG_DATA_WON_A, 1);
+
 
     // Remove turret
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
