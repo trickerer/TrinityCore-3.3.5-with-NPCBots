@@ -613,7 +613,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 
 
-/*	
+	
 	// Set Sliders capture points data to his owners when battle start
 for (auto const& [id, cp] : m_capturePoints)
 {
@@ -631,7 +631,7 @@ for (auto const& [id, cp] : m_capturePoints)
     // Call with values, not references
     cp->SetCapturePointData(go);
 }
-*/
+
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
