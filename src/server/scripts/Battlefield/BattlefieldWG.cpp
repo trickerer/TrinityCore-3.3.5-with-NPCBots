@@ -786,8 +786,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
 
 
-    SendWarning(TEST);
-    // DO MAP UPDATE ???
+    // UPDATE MAP TEXT
+    //SendWarning(TEST);
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Creature* creature = GetCreature(*itr))
@@ -811,22 +811,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
     // SEMD WORLD UPDATE??
-    for (auto const& [id, cp] : m_capturePoints)
-    {
-        GameObject* go = cp->GetCapturePointGo();
-        if (!go)
-            continue;
-
-        uint32 entry = go->GetEntry();
-
-        // No need for reference, pass by value
-        TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
-            ? GetAttackerTeam()
-            : GetDefenderTeam();
-
-        // Call with values, not references
-        cp->SetCapturePointData(go);
-    }
+    // NEED TO RESET THE CAP BAR
 
 }
 
