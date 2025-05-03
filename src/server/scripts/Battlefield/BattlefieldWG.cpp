@@ -491,6 +491,7 @@ bool BattlefieldWG::SetupBattlefield()
         m_GraveyardList[i] = graveyard;
     }
 
+    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDER, m_DefenderTeam);
 
     Workshops.resize(WG_MAX_WORKSHOP);
     // Spawn workshop creatures and gameobjects
