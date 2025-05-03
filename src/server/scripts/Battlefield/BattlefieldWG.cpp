@@ -506,10 +506,10 @@ bool BattlefieldWG::SetupBattlefield()
             
         //FORTRESS
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
+            workshop->GiveControlTo(GetAttackerTeam(), true);  //BACKWARDS???
 
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+            workshop->GiveControlTo(GetAttackerTeam(), true);  //BACKWARDS???
 
 
         // Note: Capture point is added once the gameobject is created.
