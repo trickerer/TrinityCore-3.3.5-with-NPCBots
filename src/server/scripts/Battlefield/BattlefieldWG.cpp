@@ -785,34 +785,33 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     else // defend alli/horde
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
 
-    if (!endByTimer)
+
+    SendWarning(TEST);
+    // DO MAP UPDATE ???
+    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
-        SendWarning(TEST);
-        // DO MAP UPDATE ???
-        for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
+        if (Creature* creature = GetCreature(*itr))
         {
-            if (Creature* creature = GetCreature(*itr))
-            {
-                ShowNpc(creature, true);
-                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-            }
+            ShowNpc(creature, true);
+            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
         }
-        for (WintergraspWorkshop* workshop : Workshops)
-            workshop->UpdateGraveyardAndWorkshop();
-
-        for (BfWGGameObjectBuilding* building : BuildingsInZone)
-        {
-            building->Rebuild();
-            building->UpdateTurretAttack(false);
-        }
-
-        SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
-        SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
-        SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
-        SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
-        //SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
-        //sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
     }
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
+
+    for (BfWGGameObjectBuilding* building : BuildingsInZone)
+    {
+        building->Rebuild();
+        building->UpdateTurretAttack(false);
+    }
+
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
+    //SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
+    //sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
+
 }
 
 // *******************************************************
