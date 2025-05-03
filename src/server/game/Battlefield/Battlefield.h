@@ -22,6 +22,8 @@
 #include "SharedDefines.h"
 #include "ZoneScript.h"
 #include <map>
+typedef std::map<uint32, BfCapturePoint*> BfCapturePointVector;
+typedef std::vector<BfCapturePoint*> BfCapturePointVector;
 
 enum BattlefieldTypes
 {
@@ -381,6 +383,7 @@ class TC_GAME_API Battlefield : public ZoneScript
 
         // Map of the objectives belonging to this OutdoorPvP
         BfCapturePointMap m_capturePoints;
+        BfCapturePointVector m_capturePoints;
 
         // Players info maps
         GuidUnorderedSet m_players[PVP_TEAMS_COUNT];                      // Players in zone

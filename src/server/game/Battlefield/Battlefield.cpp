@@ -66,11 +66,13 @@ Battlefield::Battlefield()
 
 Battlefield::~Battlefield()
 {
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        delete itr->second;
+    for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        delete* itr;
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
-        delete *itr;
+        delete* itr;
+
+    m_capturePoints.clear();
 }
 
 // Called when a player enters the zone
