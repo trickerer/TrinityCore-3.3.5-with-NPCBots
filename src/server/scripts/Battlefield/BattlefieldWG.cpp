@@ -611,7 +611,9 @@ void BattlefieldWG::OnBattleStart()
     // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
-	
+
+
+/*	
 	// Set Sliders capture points data to his owners when battle start
 for (auto const& [id, cp] : m_capturePoints)
 {
@@ -629,7 +631,7 @@ for (auto const& [id, cp] : m_capturePoints)
     // Call with values, not references
     cp->SetCapturePointData(go);
 }
-
+*/
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -693,11 +695,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // successful attack (note that teams have already been swapped, so defender team is the one who won)
     else
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? BATTLEFIELD_WG_DATA_WON_H : BATTLEFIELD_WG_DATA_WON_A, 1);
-
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, GetData(BATTLEFIELD_WG_DATA_DEF_A));
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
-    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
 
     // Remove turret
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
