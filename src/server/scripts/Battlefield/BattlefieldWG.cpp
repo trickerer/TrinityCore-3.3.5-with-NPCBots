@@ -797,6 +797,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
             }
         }
+        for (WintergraspWorkshop* workshop : Workshops)
+            workshop->UpdateGraveyardAndWorkshop();
         //SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
         //sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
     }
