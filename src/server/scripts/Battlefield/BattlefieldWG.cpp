@@ -789,9 +789,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // UPDATE MAP TEXT
     //SendWarning(TEST);
 
-    for (WintergraspWorkshop* workshop : Workshops)
-        workshop->UpdateGraveyardAndWorkshop();
-
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
     {
         building->Rebuild();
@@ -838,17 +835,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         Workshops[i] = workshop;
     }
 
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
-    {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i < BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
 
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
-    }
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
+
     // SEMD WORLD UPDATE??
     // NEED TO RESET THE CAP BAR
 
