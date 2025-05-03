@@ -491,6 +491,7 @@ bool BattlefieldWG::SetupBattlefield()
         m_GraveyardList[i] = graveyard;
     }
 
+    sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDER, uint64(urand(0, 1)));
     Workshops.resize(WG_MAX_WORKSHOP);
     // Spawn workshop creatures and gameobjects
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
@@ -506,7 +507,7 @@ bool BattlefieldWG::SetupBattlefield()
             
         //FORTRESS  
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetDefenderTeam(), true); //BACKWARDS??? WHY IS THIS???
+            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS??? WHY IS THIS???
 
 
 
