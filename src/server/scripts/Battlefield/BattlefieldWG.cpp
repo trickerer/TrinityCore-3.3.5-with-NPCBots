@@ -518,6 +518,17 @@ bool BattlefieldWG::SetupBattlefield()
         Workshops[i] = workshop;
     }
 
+    // Spawn workshop creatures and gameobjects FORTRESS
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i < BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
     // Spawn turrets and hide them per default
     for (uint8 i = 0; i < WG_MAX_TURRET; i++)
     {
