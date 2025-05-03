@@ -828,7 +828,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SE)
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetDefenderTeam(), true); 
         else
             workshop->GiveControlTo(GetAttackerTeam(), true);
