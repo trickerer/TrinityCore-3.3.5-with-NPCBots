@@ -696,6 +696,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     else
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? BATTLEFIELD_WG_DATA_WON_H : BATTLEFIELD_WG_DATA_WON_A, 1);
 
+    SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
+    sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
 
     // Remove turret
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
