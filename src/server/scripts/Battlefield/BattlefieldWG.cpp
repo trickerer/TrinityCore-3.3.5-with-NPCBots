@@ -232,104 +232,54 @@ WintergraspTowerData const AttackTowers[WG_MAX_ATTACKTOWERS] =
     // West tower
     {
         190356,
-        6,
         {
-            { 4559.109863f, 3606.219971f, 419.998993f, -1.483530f, 192488, 192501 },    // Flag on tower
-            { 4539.419922f, 3622.489990f, 420.033997f, -3.071770f, 192488, 192501 },    // Flag on tower
-            { 4555.259766f, 3641.649902f, 419.973999f, 1.675510f, 192488, 192501 },     // Flag on tower
-            { 4574.870117f, 3625.909912f, 420.079010f, 0.080117f, 192488, 192501 },     // Flag on tower
-            { 4433.899902f, 3534.139893f, 360.274994f, -1.850050f, 192269, 192278 },    // Flag near workshop
-            { 4572.930176f, 3475.520020f, 363.009003f, 1.42240f, 192269, 192278 }       // Flag near bridge
+            { { 4559.113f, 3606.216f, 419.9992f, 4.799657f }, { 0.f, 0.f, -0.67558960f, 0.73727790f }, 192488, 192501 },    // Flag on tower
+            { { 4539.420f, 3622.490f, 420.0342f, 3.211419f }, { 0.f, 0.f, -0.99939060f, 0.03490613f }, 192488, 192501 },    // Flag on tower
+            { { 4555.258f, 3641.648f, 419.9740f, 1.675514f }, { 0.f, 0.f,  0.74314400f, 0.66913150f }, 192488, 192501 },    // Flag on tower
+            { { 4574.872f, 3625.911f, 420.0792f, 0.087266f }, { 0.f, 0.f,  0.04361916f, 0.99904820f }, 192488, 192501 },    // Flag on tower
+            { { 4433.899f, 3534.142f, 360.2750f, 4.433136f }, { 0.f, 0.f, -0.79863550f, 0.60181500f }, 192269, 192278 },    // Flag near workshop
+            { { 4572.933f, 3475.519f, 363.0090f, 1.422443f }, { 0.f, 0.f,  0.65275960f, 0.75756520f }, 192269, 192277 }     // Flag near bridge
         },
-        6,
         {
-            { 4418.688477f, 3506.251709f, 358.975494f, 4.293305f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Roaming Guard
-            { 4570.86f, 3581.62f, 393.77f, 4.76f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },
-            { 4551.70f, 3579.83f, 394.21f, 4.80f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },
-            { 4559.91f, 3536.51f, 380.17f, 4.66f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },
-            { 4508.64f, 3608.25f, 392.50f, 3.27f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },
-            { 4504.68f, 3629.90f, 393.19f, 3.71f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-        },
-        0,
-        {
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
+            { { 4418.688477f, 3506.251709f, 358.975494f,  4.293305f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }      // Roaming Guard
         }
     },
-
     // South Tower
     {
         190357,
-        5,
         {
-            { 4416.000000f, 2822.669922f, 429.851013f, -0.017452f, 192488, 192501 },    // Flag on tower
-            { 4398.819824f, 2804.699951f, 429.791992f, -1.588250f, 192488, 192501 },    // Flag on tower
-            { 4387.620117f, 2719.570068f, 389.934998f, -1.544620f, 192366, 192414 },    // Flag near tower
-            { 4464.120117f, 2855.449951f, 406.110992f, 0.829032f, 192366, 192429 },     // Flag near tower
-            { 4526.459961f, 2810.179932f, 391.200012f, -2.993220f, 192269, 192278 },    // Flag near bridge
-            { 0, 0, 0, 0, 0, 0 },
+            { { 4416.004f, 2822.666f, 429.8512f, 6.2657330f }, { 0.f, 0.f, -0.00872612f, 0.99996190f }, 192488, 192501 },    // Flag on tower
+            { { 4398.819f, 2804.698f, 429.7920f, 4.6949370f }, { 0.f, 0.f, -0.71325020f, 0.70090960f }, 192488, 192501 },    // Flag on tower
+            { { 4387.622f, 2719.566f, 389.9351f, 4.7385700f }, { 0.f, 0.f, -0.69779010f, 0.71630230f }, 192366, 192414 },    // Flag near tower
+            { { 4464.124f, 2855.453f, 406.1106f, 0.8290324f }, { 0.f, 0.f,  0.40274720f, 0.91531130f }, 192366, 192429 },    // Flag near tower
+            { { 4526.457f, 2810.181f, 391.1997f, 3.2899610f }, { 0.f, 0.f, -0.99724960f, 0.07411628f }, 192269, 192278 }     // Flag near bridge
         },
-        6,
         {
-            { 4452.859863f, 2808.870117f, 402.604004f, 6.056290f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4455.899902f, 2835.958008f, 401.122559f, 0.034907f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4412.649414f, 2953.792236f, 374.799957f, 0.980838f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Roaming Guard
-            { 4362.089844f, 2811.510010f, 407.337006f, 3.193950f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4412.290039f, 2753.790039f, 401.015015f, 5.829400f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4421.939941f, 2773.189941f, 400.894989f, 5.707230f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 0, 0, 0, 0, 0, 0},
-            { 0, 0, 0, 0, 0, 0},
-            { 0, 0, 0, 0, 0, 0},
-        },
-        0,
-        {
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-        },
+            { { 4452.859863f, 2808.870117f, 402.604004f, 6.056290f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4455.899902f, 2835.958008f, 401.122559f, 0.034907f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4412.649414f, 2953.792236f, 374.799957f, 0.980838f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Roaming Guard
+            { { 4362.089844f, 2811.510010f, 407.337006f, 3.193950f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4412.290039f, 2753.790039f, 401.015015f, 5.829400f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4421.939941f, 2773.189941f, 400.894989f, 5.707230f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }      // Standing Guard
+        }
     },
-
     // East Tower
     {
         190358,
-        4,
         {
-            { 4466.790039f, 1960.420044f, 459.144012f, 1.151920f, 192488, 192501 },     // Flag on tower
-            { 4475.350098f, 1937.030029f, 459.070007f, -0.43633f, 192488, 192501 },     // Flag on tower
-            { 4451.759766f, 1928.099976f, 459.075989f, -2.00713f, 192488, 192501 },     // Flag on tower
-            { 4442.990234f, 1951.900024f, 459.092987f, 2.740160f, 192488, 192501 },     // Flag on tower
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
+            { { 4466.793f, 1960.418f, 459.1437f, 1.151916f }, { 0.f, 0.f,  0.5446386f, 0.8386708f }, 192488, 192501 },     // Flag on tower
+            { { 4475.351f, 1937.031f, 459.0702f, 5.846854f }, { 0.f, 0.f, -0.2164392f, 0.9762961f }, 192488, 192501 },     // Flag on tower
+            { { 4451.758f, 1928.104f, 459.0759f, 4.276057f }, { 0.f, 0.f, -0.8433914f, 0.5372996f }, 192488, 192501 },     // Flag on tower
+            { { 4442.987f, 1951.898f, 459.0930f, 2.740162f }, { 0.f, 0.f,  0.9799242f, 0.1993704f }, 192488, 192501 }      // Flag on tower
         },
-        5,
         {
-            { 4501.060059f, 1990.280029f, 431.157013f, 1.029740f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4463.830078f, 2015.180054f, 430.299988f, 1.431170f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4494.580078f, 1943.760010f, 435.627014f, 6.195920f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4437.090000f, 1985.960000f, 434.607000f, 0.870000f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 4483.816895f, 1999.649290f, 429.788239f, 1.219750f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-        },
-        0,
-        {
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0 },
-        },
-    },
+            { { 4501.060059f, 1990.280029f, 431.157013f, 1.029740f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4463.830078f, 2015.180054f, 430.299988f, 1.431170f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4494.580078f, 1943.760010f, 435.627014f, 6.195920f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4450.149902f, 1897.579956f, 435.045013f, 4.398230f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },     // Standing Guard
+            { { 4428.870117f, 1906.869995f, 432.648010f, 3.996800f }, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }      // Standing Guard
+        }
+    }
 };
 
 struct WintergraspTowerCannonData
@@ -860,30 +810,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             HideNpc(creature);
         }
     }
-    // Spawn workshop creatures and gameobjects
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
-    {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
 
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
-    }
-
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
-    {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetAttackerTeam(), true); 
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
-
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
-    }
 
 
     for (WintergraspWorkshop* workshop : Workshops)
