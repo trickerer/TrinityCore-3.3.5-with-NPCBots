@@ -799,6 +799,17 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         }
         for (WintergraspWorkshop* workshop : Workshops)
             workshop->UpdateGraveyardAndWorkshop();
+
+        for (BfWGGameObjectBuilding* building : BuildingsInZone)
+        {
+            building->Rebuild();
+            building->UpdateTurretAttack(false);
+        }
+
+        SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
+        SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
+        SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
+        SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
         //SetData(BATTLEFIELD_WG_DATA_WON_A, uint32(sWorld->getWorldState(WS_BATTLEFIELD_WG_ATTACKED_A)));
         //sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
     }
