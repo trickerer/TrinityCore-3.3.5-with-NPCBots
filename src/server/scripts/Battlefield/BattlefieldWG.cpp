@@ -497,19 +497,17 @@ bool BattlefieldWG::SetupBattlefield()
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
         //NORTH
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS???
             
         //SOUTH
-        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetAttackerTeam(), true); 
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true); //BACKWARDS???
             
         //FORTRESS
-        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
             workshop->GiveControlTo(GetAttackerTeam(), true);  //BACKWARDS???
 
-        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);  //BACKWARDS???
 
 
         // Note: Capture point is added once the gameobject is created.
