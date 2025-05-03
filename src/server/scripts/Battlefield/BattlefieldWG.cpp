@@ -502,11 +502,11 @@ bool BattlefieldWG::SetupBattlefield()
             
         //SOUTH
         if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetDefenderTeam(), true); //BACKWARDS???
+            workshop->GiveControlTo(GetAttackerTeam(), true); 
             
         //FORTRESS
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);  //BACKWARDS???
+            workshop->GiveControlTo(GetDefenderTeam(), true);
 
 
 
