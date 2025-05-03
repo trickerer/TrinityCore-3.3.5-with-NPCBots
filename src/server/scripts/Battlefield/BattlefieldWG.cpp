@@ -1802,34 +1802,26 @@ uint8 WintergraspWorkshop::GetId() const
 
 void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 {
-    switch (teamId)
+    if (teamId == TEAM_NEUTRAL)
     {
-        case TEAM_NEUTRAL:
-        {
             // Send warning message to all player for inform a faction attack a workshop
             // alliance / horde attacking workshop
             _wg->SendWarning(_teamControl == TEAM_ALLIANCE ? _staticInfo->TextIds.HordeAttack : _staticInfo->TextIds.AllianceAttack);
-            break;
-        }
-        case TEAM_ALLIANCE:
-        case TEAM_HORDE:
-        {
-            // Update worldstate
-            _state = teamId == TEAM_HORDE? BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT: BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
+    }else{
+        // Update worldstate
+        _state = teamId == TEAM_HORDE? BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT: BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
+        _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
 
-            // Warning message
-            if (!init)
-                _wg->SendWarning(teamId == TEAM_HORDE? _staticInfo->TextIds.HordeCapture: _staticInfo->TextIds.AllianceCapture); // workshop taken - horde
+        // Warning message
+        if (!init)
+            _wg->SendWarning(teamId == TEAM_HORDE? _staticInfo->TextIds.HordeCapture: _staticInfo->TextIds.AllianceCapture); // workshop taken - horde
 
-            // Update graveyard control
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(teamId);
+        // Update graveyard control
+        if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+            if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
+                gy->GiveControlTo(teamId);
 
-            _teamControl = teamId;
-            break;
-        }
+        _teamControl = teamId;
     }
     if (!init){
         _wg->UpdateCounterVehicle(false);
