@@ -505,8 +505,12 @@ bool BattlefieldWG::SetupBattlefield()
             workshop->GiveControlTo(GetDefenderTeam(), true);  // HMM WRONG WAY 
             
         //FORTRESS
-        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i < BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
+        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
             workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
