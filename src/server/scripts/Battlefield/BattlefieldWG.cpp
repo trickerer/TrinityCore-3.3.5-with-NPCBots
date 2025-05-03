@@ -407,6 +407,15 @@ BattlefieldWG::~BattlefieldWG()
         delete building;
 }
 
+void BattlefieldWG::CapturePointTaken(uint32 areaId)
+{
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+        for (GuidUnorderedSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                if (player->GetAreaId() == areaId)
+                    player->UpdateAreaDependentAuras(areaId);
+}
+
 bool BattlefieldWG::SetupBattlefield()
 {
     m_TypeId = BATTLEFIELD_WG;                              // See enum BattlefieldTypes
@@ -1803,44 +1812,29 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
             break;
         }
         case TEAM_ALLIANCE:
-        {
-            // Updating worldstate
-            _state = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
-
-            // Warning message
-            if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.AllianceCapture); // workshop taken - alliance
-
-            // Found associate graveyard and update it
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_ALLIANCE);
-
-            _teamControl = teamId;
-            break;
-        }
         case TEAM_HORDE:
         {
             // Update worldstate
-            _state = BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
+            _state = teamId == TEAM_HORDE? BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT: BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
             _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
 
             // Warning message
             if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.HordeCapture); // workshop taken - horde
+                _wg->SendWarning(teamId == TEAM_HORDE? _staticInfo->TextIds.HordeCapture: _staticInfo->TextIds.AllianceCapture); // workshop taken - horde
 
             // Update graveyard control
             if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
                 if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_HORDE);
+                    gy->GiveControlTo(teamId);
 
             _teamControl = teamId;
             break;
         }
     }
-    if (!init)
+    if (!init){
         _wg->UpdateCounterVehicle(false);
+        _wg->CapturePointTaken(_staticInfo->WorkshopId);
+    }
 }
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()
