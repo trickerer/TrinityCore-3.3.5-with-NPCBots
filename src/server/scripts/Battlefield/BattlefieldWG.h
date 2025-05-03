@@ -41,7 +41,6 @@ struct WintergraspObjectPositionData;
 typedef std::vector<BfWGGameObjectBuilding*> GameObjectBuildingVect;
 typedef std::vector<WintergraspWorkshop*> WorkshopVect;
 typedef std::map<uint32, BfCapturePoint*> BfCapturePointVector;
-typedef std::vector<BfCapturePoint*> BfCapturePointVector;
 
 enum WintergraspSpells
 {
