@@ -498,7 +498,7 @@ bool BattlefieldWG::SetupBattlefield()
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
         //NORTH
         if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS???
+            workshop->GiveControlTo(GetDefenderTeam(), true);
             
         //SOUTH
         if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
@@ -506,7 +506,7 @@ bool BattlefieldWG::SetupBattlefield()
             
         //FORTRESS
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS???
 
 
 
