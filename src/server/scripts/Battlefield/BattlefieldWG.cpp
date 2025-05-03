@@ -506,7 +506,7 @@ bool BattlefieldWG::SetupBattlefield()
             
         //FORTRESS  
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS??? WHY IS THIS???
+            workshop->GiveControlTo(GetDefenderTeam(), true); //BACKWARDS??? WHY IS THIS???
 
 
 
