@@ -492,7 +492,7 @@ bool BattlefieldWG::SetupBattlefield()
     }
 
     Workshops.resize(WG_MAX_WORKSHOP);
-    // Spawn workshop creatures and gameobjects
+    // Spawn workshop creatures and gameobjects NORTH!
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
@@ -500,6 +500,19 @@ bool BattlefieldWG::SetupBattlefield()
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
             workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    // Spawn workshop creatures and gameobjects SOUTH!
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true); 
+        else
+            workshop->GiveControlTo(GetAttackerTeam(), true);
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
@@ -818,6 +831,18 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
             workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true); 
+        else
+            workshop->GiveControlTo(GetAttackerTeam(), true);
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
