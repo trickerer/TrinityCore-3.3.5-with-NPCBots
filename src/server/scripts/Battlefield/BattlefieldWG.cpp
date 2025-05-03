@@ -803,6 +803,29 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
+    // Remove turret
+    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
+    {
+        if (Creature* creature = GetCreature(*itr))
+        {
+            if (!endByTimer)
+                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+            HideNpc(creature);
+        }
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
     // SEMD WORLD UPDATE??
     // NEED TO RESET THE CAP BAR
 
