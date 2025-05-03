@@ -470,7 +470,8 @@ enum WintergraspText
     BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DESTROY            = 36,
 
     BATTLEFIELD_WG_TEXT_RANK_CORPORAL                   = 37,
-    BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT           = 38
+    BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT           = 38,
+    TEST                                                = 39
 };
 
 enum WintergraspGameObject
