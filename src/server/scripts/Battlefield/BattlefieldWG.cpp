@@ -788,14 +788,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     // UPDATE MAP TEXT
     //SendWarning(TEST);
-    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
-    {
-        if (Creature* creature = GetCreature(*itr))
-        {
-            ShowNpc(creature, true);
-            creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-        }
-    }
+
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
