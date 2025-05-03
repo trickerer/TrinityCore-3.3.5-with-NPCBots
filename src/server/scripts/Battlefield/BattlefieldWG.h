@@ -337,6 +337,7 @@ class BattlefieldWG : public Battlefield
 
         void UpdateVehicleCountWG();
         void UpdateCounterVehicle(bool init);
+        void CapturePointTaken(uint32 areaId);
 
         void SendInitWorldStatesToAll() override;
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
