@@ -811,6 +811,17 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         }
     }
 
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
 
 
     for (WintergraspWorkshop* workshop : Workshops)
