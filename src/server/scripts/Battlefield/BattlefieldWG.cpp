@@ -656,6 +656,8 @@ void BattlefieldWG::OnBattleStart()
             }
         }
     }
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
 
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
