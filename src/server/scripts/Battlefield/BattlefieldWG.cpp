@@ -574,6 +574,8 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
+    TC_LOG_INFO("bg.battlefield", "SetCapturePointData called for GO %u", go->GetEntry());
+
     // Your implementation logic here
     // For example:
     if (!go)
