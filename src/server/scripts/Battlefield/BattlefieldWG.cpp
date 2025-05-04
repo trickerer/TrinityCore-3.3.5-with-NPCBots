@@ -617,12 +617,6 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
-    for (WintergraspWorkshop* workshop : Workshops)
-        workshop->UpdateGraveyardAndWorkshop();
-
-
-
     // Set Sliders capture points data to his owners when battle start
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
@@ -666,6 +660,7 @@ void BattlefieldWG::OnBattleStart()
         Workshops[i] = workshop;
     }
 
+    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
