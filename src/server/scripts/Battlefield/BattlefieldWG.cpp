@@ -635,13 +635,7 @@ void BattlefieldWG::OnBattleStart()
 
     // Set Sliders capture points data to his owners when battle start
 
-    for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-    {
-        BfCapturePoint* capturePoint = itr->second;
-        TeamId ownerTeam = capturePoint->GetTeamId();
-        GameObject* capturePointGO = capturePoint->GetCapturePointGo();
-        capturePoint->SetCapturePointData(capturePointGO);  
-    }
+
     /*
     for (auto const& [id, cp] : m_capturePoints)
     {
