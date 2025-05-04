@@ -627,14 +627,8 @@ void BattlefieldWG::OnBattleStart()
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
 
-        SendWarning(TEST);
-        SendWarning(TEST);
+        SendWarning (TEST);
 
-
-        // Call with values, not references
-
-        //cp->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
-        //cp->SetCapturePointData(go);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -679,6 +673,7 @@ void BattlefieldWG::OnBattleStart()
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+    m_tenacityStack = 0;
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
