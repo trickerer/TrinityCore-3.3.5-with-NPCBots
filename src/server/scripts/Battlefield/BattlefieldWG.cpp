@@ -664,6 +664,9 @@ void BattlefieldWG::OnBattleStart()
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->Save();
+
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
     // Send start warning to all players
