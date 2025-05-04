@@ -574,8 +574,9 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void WintergraspCapturePoint::ChangeTeam(TeamId oldteam)
 {
-    // Implement your logic here, or leave it empty for now
+    oldteam = GetTeamId();
 }
+
 
 void BattlefieldWG::OnBattleStart()
 {
