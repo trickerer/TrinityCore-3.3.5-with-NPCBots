@@ -631,17 +631,16 @@ void BattlefieldWG::OnBattleStart()
             continue;
 
         uint32 entry = go->GetEntry();
-
+        SendWarning(TEST);
         // No need for reference, pass by value
         TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
             ? GetAttackerTeam()
             : GetDefenderTeam();
 
         // Call with values, not references
-        Player* player;
-        player->GetName() + "FACTION SWAPPING!", LANG_UNIVERSAL;
+
         //cp->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
-        cp->SetCapturePointData(go);
+        //cp->SetCapturePointData(go);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
