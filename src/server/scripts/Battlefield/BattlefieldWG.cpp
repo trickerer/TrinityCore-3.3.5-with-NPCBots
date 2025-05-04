@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -572,6 +572,23 @@ bool BattlefieldWG::Update(uint32 diff)
     return m_return;
 }
 
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
+{
+    // Your implementation logic here
+    // For example:
+    if (!go)
+        return;
+
+    // Example logic — adjust as needed
+    uint32 entry = go->GetEntry();
+    TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_NE || entry == GO_WINTERGRASP_FACTORY_BANNER_NW)
+        ? TEAM_ALLIANCE
+        : TEAM_HORDE;
+
+    m_team = team;
+
+    // Possibly notify linked workshop or set flags
+}
 
 void BattlefieldWG::OnBattleStart()
 {
@@ -622,7 +639,7 @@ void BattlefieldWG::OnBattleStart()
 
         uint32 entry = go->GetEntry();
 
-        // No need for reference, pass by value
+       // No need for reference, pass by value
         TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_NE || entry == GO_WINTERGRASP_FACTORY_BANNER_NW)
             ? GetAttackerTeam()
             : GetDefenderTeam();
