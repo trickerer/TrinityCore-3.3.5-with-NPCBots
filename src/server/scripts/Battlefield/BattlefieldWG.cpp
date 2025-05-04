@@ -628,6 +628,7 @@ void BattlefieldWG::OnBattleStart()
     {
 
         SendWarning(TEST);
+        SendWarning(TEST);
 
 
         // Call with values, not references
