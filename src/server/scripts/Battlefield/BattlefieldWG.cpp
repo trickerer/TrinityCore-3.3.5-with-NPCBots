@@ -621,7 +621,7 @@ void BattlefieldWG::OnBattleStart()
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
 
-        SendWarning (TEST);
+        SendWarning (DOCAPUPDATETEXT);
         //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
 
     }
