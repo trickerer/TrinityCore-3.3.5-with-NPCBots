@@ -572,6 +572,8 @@ bool BattlefieldWG::Update(uint32 diff)
     return m_return;
 }
 
+
+
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
@@ -622,13 +624,17 @@ void BattlefieldWG::OnBattleStart()
         uint32 entry = go->GetEntry();
 
         // No need for reference, pass by value
-        TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
+        TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_NE || entry == GO_WINTERGRASP_FACTORY_BANNER_NW)
             ? GetAttackerTeam()
             : GetDefenderTeam();
 
-        // Call with values, not references
+        // Pass team as an argument
+        cp->ChangeTeam(team);
         cp->SetCapturePointData(go);
     }
+
+    //UPDATE CAPTURE POINTS
+
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
