@@ -496,10 +496,19 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
+        //NORTH
+        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        //SOUTH
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        //FORTRESS  
+        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
+            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS??? WHY IS THIS???
+
+
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
@@ -571,28 +580,6 @@ bool BattlefieldWG::Update(uint32 diff)
 
     return m_return;
 }
-/*
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
-{
-    TC_LOG_INFO("bg.battlefield", "SetCapturePointData called for GO %u", go->GetEntry());
-
-    // Your implementation logic here
-    // For example:
-    if (!go)
-        return;
-
-    // Example logic — adjust as needed
-    uint32 entry = go->GetEntry();
-    TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
-        ? TEAM_ALLIANCE
-        : TEAM_HORDE;
-
-    m_team = team;
-
-    // Possibly notify linked workshop or set flags
-}
-*/
-
 
 void BattlefieldWG::OnBattleStart()
 {
@@ -634,10 +621,9 @@ void BattlefieldWG::OnBattleStart()
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
+
+
     // Set Sliders capture points data to his owners when battle start
-
-
-    
     for (auto const& [id, cp] : m_capturePoints)
     {
         GameObject* go = cp->GetCapturePointGo();
@@ -646,18 +632,14 @@ void BattlefieldWG::OnBattleStart()
 
         uint32 entry = go->GetEntry();
 
-       // No need for reference, pass by value
-        TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_NE || entry == GO_WINTERGRASP_FACTORY_BANNER_NW)
+        // No need for reference, pass by value
+        TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
             ? GetAttackerTeam()
             : GetDefenderTeam();
 
-        // Pass team as an argument
-        cp->ChangeTeam(team);
+        // Call with values, not references
         cp->SetCapturePointData(go);
     }
-    
-    
-
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
@@ -812,27 +794,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     else // defend alli/horde
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
 
-    for (BfWGGameObjectBuilding* building : BuildingsInZone)
-    {
-        building->Rebuild();
-        building->UpdateTurretAttack(false);
-    }
-
-    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
-    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
-    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
-    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
-
-    // Remove turret
-    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
-    {
-        if (Creature* creature = GetCreature(*itr))
-        {
-            if (!endByTimer)
-                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-            HideNpc(creature);
-        }
-    }
 
     // UPDATE MAP TEXT
     //SendWarning(TEST);
@@ -859,9 +820,37 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         }
     }
 
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+        else
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
 
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
+
+    // SEMD WORLD UPDATE??
+    // NEED TO RESET THE CAP BAR
+
 }
 
 // *******************************************************
@@ -1056,15 +1045,12 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
         {
             WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
 
-            // Set data and link to workshop
             capturePoint->SetCapturePointData(go);
             capturePoint->LinkToWorkshop(workshop);
             AddCapturePoint(capturePoint);
             break;
         }
     }
-
-
 }
 
 // Called when player kill a unit in wg zone
@@ -1917,7 +1903,6 @@ void WintergraspWorkshop::UpdateGraveyardAndWorkshop()
 {
     if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_NE)
         GiveControlTo(_wg->GetAttackerTeam(), true);
-        
     else
         GiveControlTo(_wg->GetDefenderTeam(), true);
 }
