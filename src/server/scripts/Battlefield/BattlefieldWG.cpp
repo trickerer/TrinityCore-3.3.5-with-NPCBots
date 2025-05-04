@@ -887,7 +887,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
         if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+            workshop->GiveControlTo(GetAttackerTeam(), true);
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
