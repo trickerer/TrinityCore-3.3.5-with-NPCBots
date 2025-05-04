@@ -1058,23 +1058,30 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
     {
         if (workshop->GetId() == workshopId)
         {
+            // Get the team controlling the workshop
             TeamId ownerTeam = workshop->GetTeamControl();
+
+            // Create the capture point with the neutral team as default
             WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_NEUTRAL);
+
+            // Set the capture point's team based on the owner team
             if (ownerTeam == TEAM_HORDE)
             {
-                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_HORDE);
+                capturePoint = new WintergraspCapturePoint(this, TEAM_HORDE);
             }
             else
             {
-                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_ALLIANCE);
+                capturePoint = new WintergraspCapturePoint(this, TEAM_ALLIANCE);
             }
 
+            // Set data and link to workshop
             capturePoint->SetCapturePointData(go);
             capturePoint->LinkToWorkshop(workshop);
             AddCapturePoint(capturePoint);
             break;
         }
     }
+
 }
 
 // Called when player kill a unit in wg zone
