@@ -571,7 +571,7 @@ bool BattlefieldWG::Update(uint32 diff)
 
     return m_return;
 }
-
+/*
 void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
     TC_LOG_INFO("bg.battlefield", "SetCapturePointData called for GO %u", go->GetEntry());
@@ -591,7 +591,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 
     // Possibly notify linked workshop or set flags
 }
-
+*/
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
