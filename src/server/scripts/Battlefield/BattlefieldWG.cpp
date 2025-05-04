@@ -638,6 +638,9 @@ void BattlefieldWG::OnBattleStart()
             : GetDefenderTeam();
 
         // Call with values, not references
+        Player* player;
+        player->GetName() + "FACTION SWAPPING!", LANG_UNIVERSAL;
+        //cp->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
         cp->SetCapturePointData(go);
     }
 
