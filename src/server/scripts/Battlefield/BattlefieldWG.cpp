@@ -583,7 +583,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 
     // Example logic — adjust as needed
     uint32 entry = go->GetEntry();
-    TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_NE || entry == GO_WINTERGRASP_FACTORY_BANNER_NW)
+    TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
         ? TEAM_ALLIANCE
         : TEAM_HORDE;
 
@@ -633,7 +633,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 
     // Set Sliders capture points data to his owners when battle start
-    
+    /*
     for (auto const& [id, cp] : m_capturePoints)
     {
         GameObject* go = cp->GetCapturePointGo();
@@ -651,7 +651,7 @@ void BattlefieldWG::OnBattleStart()
         //cp->ChangeTeam(team);
         cp->SetCapturePointData(go);
     }
-    
+    */
     
 
 
