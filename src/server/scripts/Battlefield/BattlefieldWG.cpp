@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -581,7 +581,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
     if (!go)
         return;
 
-    // Example logic - adjust as needed
+    // Example logic — adjust as needed
     uint32 entry = go->GetEntry();
     TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
         ? TEAM_ALLIANCE
@@ -850,6 +850,59 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
         if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+        else
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
+
+    // UPDATE MAP TEXT
+//SendWarning(TEST);
+
+    for (BfWGGameObjectBuilding* building : BuildingsInZone)
+    {
+        building->Rebuild();
+        building->UpdateTurretAttack(false);
+    }
+
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
+
+    // Remove turret
+    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
+    {
+        if (Creature* creature = GetCreature(*itr))
+        {
+            if (!endByTimer)
+                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+            HideNpc(creature);
+        }
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
         else
             workshop->GiveControlTo(GetAttackerTeam(), true);
