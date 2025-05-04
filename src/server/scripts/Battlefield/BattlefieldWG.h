@@ -203,7 +203,6 @@ class WintergraspCapturePoint : public BfCapturePoint
         //void SetTeam(TeamId team) { m_team = team; }
 
         void SetCapturePointData(GameObject*);  // or just declared, not implemented
-        void ChangeTeam(TeamId) override;
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
