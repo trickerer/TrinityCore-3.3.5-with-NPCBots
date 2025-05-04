@@ -626,8 +626,9 @@ void BattlefieldWG::OnBattleStart()
     // Set Sliders capture points data to his owners when battle start
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
-        // TO DO ADD CAP POINT UPDATE SYSTEM
-        SendWarning(TEST);
+
+        SendWarning (TEST);
+
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -672,7 +673,7 @@ void BattlefieldWG::OnBattleStart()
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
-    m_tenacityStack = 0;
+
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
