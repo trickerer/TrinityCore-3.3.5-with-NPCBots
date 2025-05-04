@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -581,7 +581,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
     if (!go)
         return;
 
-    // Example logic — adjust as needed
+    // Example logic - adjust as needed
     uint32 entry = go->GetEntry();
     TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
         ? TEAM_ALLIANCE
@@ -1054,8 +1054,6 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
         if (workshop->GetId() == workshopId)
         {
             WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
-
-            TeamId ownerTeam = workshop->GetTeamControl();
 
             // Set data and link to workshop
             capturePoint->SetCapturePointData(go);
