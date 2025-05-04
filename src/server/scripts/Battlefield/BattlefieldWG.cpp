@@ -624,7 +624,7 @@ void BattlefieldWG::OnBattleStart()
 
 
     // Set Sliders capture points data to his owners when battle start
-    for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
         // TO DO ADD CAP POINT UPDATE SYSTEM
         SendWarning(TEST);
