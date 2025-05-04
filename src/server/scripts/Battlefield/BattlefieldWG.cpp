@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -581,7 +581,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
     if (!go)
         return;
 
-    // Example logic - adjust as needed
+    // Example logic — adjust as needed
     uint32 entry = go->GetEntry();
     TeamId team = (entry == GO_WINTERGRASP_FACTORY_BANNER_SE || entry == GO_WINTERGRASP_FACTORY_BANNER_SW)
         ? TEAM_ALLIANCE
@@ -592,6 +592,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
     // Possibly notify linked workshop or set flags
 }
 */
+
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
@@ -634,12 +635,12 @@ void BattlefieldWG::OnBattleStart()
 
     // Set Sliders capture points data to his owners when battle start
 
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
-        BfCapturePoint* capturePoint = itr->second;  // Access the second part of the pair to get the pointer
-        //TeamId ownerTeam = capturePoint->GetTeamId();
+        BfCapturePoint* capturePoint = itr->second;
+        TeamId ownerTeam = capturePoint->GetTeamId();
         GameObject* capturePointGO = capturePoint->GetCapturePointGo();
-        capturePoint->SetCapturePointData(capturePointGO);
+        capturePoint->SetCapturePointData(capturePointGO, ownerTeam);  // Use two arguments
     }
     /*
     for (auto const& [id, cp] : m_capturePoints)

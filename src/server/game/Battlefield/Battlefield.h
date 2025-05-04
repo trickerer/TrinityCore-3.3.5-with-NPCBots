@@ -114,7 +114,7 @@ class TC_GAME_API BfCapturePoint
         virtual void ChangeTeam(TeamId /*oldTeam*/) { }
         virtual void SendChangePhase();
 
-        bool SetCapturePointData(GameObject* capturePoint);
+        bool SetCapturePointData(GameObject* capturePoint, TeamId ownerTeam);
         GameObject* GetCapturePointGo();
         uint32 GetCapturePointEntry() const { return m_capturePointEntry; }
 
