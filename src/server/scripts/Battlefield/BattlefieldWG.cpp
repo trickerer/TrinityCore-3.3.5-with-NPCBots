@@ -1056,7 +1056,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
             TeamId ownerTeam = workshop->GetTeamControl();
 
             // Create the capture point with the neutral team as default
-            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_NEUTRAL);
+            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
 
             // Set the capture point's team based on the owner team
             if (ownerTeam == TEAM_HORDE)
