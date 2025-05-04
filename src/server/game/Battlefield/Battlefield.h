@@ -419,6 +419,7 @@ class TC_GAME_API Battlefield : public ZoneScript
         std::vector<uint64> m_Data64;
         std::vector<uint32> m_Data32;
 
+
         void KickAfkPlayers();
 
         // use for switch off all worldstate for client
