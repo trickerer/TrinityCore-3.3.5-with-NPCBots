@@ -572,7 +572,7 @@ bool BattlefieldWG::Update(uint32 diff)
     return m_return;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId oldteam)
+void WintergraspCapturePoint::SetTeam(TeamId oldteam)
 {
     oldteam = GetTeamId();
 }
