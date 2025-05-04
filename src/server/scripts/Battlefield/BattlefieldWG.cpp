@@ -571,7 +571,7 @@ bool BattlefieldWG::Update(uint32 diff)
 
     return m_return;
 }
-/*
+
 void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
     TC_LOG_INFO("bg.battlefield", "SetCapturePointData called for GO %u", go->GetEntry());
@@ -591,7 +591,7 @@ void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 
     // Possibly notify linked workshop or set flags
 }
-*/
+
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
@@ -633,7 +633,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->UpdateGraveyardAndWorkshop();
 
     // Set Sliders capture points data to his owners when battle start
-    /*
+    
     for (auto const& [id, cp] : m_capturePoints)
     {
         GameObject* go = cp->GetCapturePointGo();
@@ -648,11 +648,11 @@ void BattlefieldWG::OnBattleStart()
             : GetDefenderTeam();
 
         // Pass team as an argument
-        cp->ChangeTeam(team);
+        //cp->ChangeTeam(team);
         cp->SetCapturePointData(go);
     }
-    */
-    //UPDATE CAPTURE POINTS
+    
+    
 
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
