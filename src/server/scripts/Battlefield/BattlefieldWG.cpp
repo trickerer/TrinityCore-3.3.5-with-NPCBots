@@ -640,7 +640,7 @@ void BattlefieldWG::OnBattleStart()
         BfCapturePoint* capturePoint = itr->second;
         TeamId ownerTeam = capturePoint->GetTeamId();
         GameObject* capturePointGO = capturePoint->GetCapturePointGo();
-        capturePoint->SetCapturePointData(capturePointGO, ownerTeam);  // Use two arguments
+        capturePoint->SetCapturePointData(capturePointGO);  
     }
     /*
     for (auto const& [id, cp] : m_capturePoints)
@@ -1058,7 +1058,16 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
     {
         if (workshop->GetId() == workshopId)
         {
-            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
+            TeamId ownerTeam = workshop->GetTeamControl();
+            WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_NEUTRAL);
+            if (ownerTeam == TEAM_HORDE)
+            {
+                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_HORDE);
+            }
+            else
+            {
+                WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, TEAM_ALLIANCE);
+            }
 
             capturePoint->SetCapturePointData(go);
             capturePoint->LinkToWorkshop(workshop);

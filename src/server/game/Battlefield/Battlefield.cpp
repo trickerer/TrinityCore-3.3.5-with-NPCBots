@@ -907,7 +907,7 @@ void BfCapturePoint::SendChangePhase()
     }
 }
 
-bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId ownerTeam)
+bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 {
     ASSERT(capturePoint);
 
