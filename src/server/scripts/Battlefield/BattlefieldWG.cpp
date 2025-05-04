@@ -578,6 +578,7 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldteam)
 }
 
 
+
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
