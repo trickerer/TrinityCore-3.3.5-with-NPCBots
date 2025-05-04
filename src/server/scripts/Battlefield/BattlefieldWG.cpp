@@ -572,6 +572,11 @@ bool BattlefieldWG::Update(uint32 diff)
     return m_return;
 }
 
+void WintergraspCapturePoint::SetCapturePointData(GameObject* /*go*/)
+{
+    // Empty for now
+}
+
 void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
     // Your implementation logic here
