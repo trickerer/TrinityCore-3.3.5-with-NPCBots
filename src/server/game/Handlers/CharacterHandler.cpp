@@ -1011,7 +1011,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
 
-    TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     // say something as player logs in
     //if (pCurrChar->IsAlive())
     //{
@@ -1026,6 +1025,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data << uint64(pCurrChar->GetGUID());
 
     pCurrChar->GetSession()->SendPacket(&data);
+	
+	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
 }
 
