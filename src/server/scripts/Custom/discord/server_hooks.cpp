@@ -17,6 +17,7 @@ public:
 
     void OnStartup() override
     {
+        // Fetch Webhook URL from configuration
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -24,6 +25,7 @@ public:
             return;
         }
 
+        // Send Discord Webhook
         SendDiscordWebhook(webhookUrl, "✅ **Server has started successfully!**");
     }
 
@@ -31,29 +33,43 @@ public:
     {
         try
         {
+            // Parse the URL
             Poco::URI uri(url);
             std::string path = uri.getPathAndQuery();
             if (path.empty()) path = "/";
 
+            // Format the payload
             std::string payload = "{\"content\":\"" + message + "\"}";
 
+            // Set up HTTP client session
             Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
             Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
             request.setContentType("application/json");
             request.setContentLength(payload.length());
 
+            // Send request with payload
             std::ostream& os = session.sendRequest(request);
             os << payload;
 
+            // Get and process the response from Discord
             Poco::Net::HTTPResponse response;
             std::istream& rs = session.receiveResponse(response);
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
 
-            TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", ss.str().c_str());
+            // Log the response for debugging
+            std::string responseBody = ss.str();
+            TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", responseBody.c_str());
+
+            // Check for error in response
+            if (responseBody.find("error") != std::string::npos)
+            {
+                TC_LOG_ERROR("server.hooks", "Discord Webhook Error: %s", responseBody.c_str());
+            }
         }
         catch (const Poco::Exception& ex)
         {
+            // Log exceptions and errors
             TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
         }
     }
