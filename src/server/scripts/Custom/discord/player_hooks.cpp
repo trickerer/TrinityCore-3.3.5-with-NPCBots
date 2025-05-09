@@ -1,7 +1,5 @@
 #include "ScriptMgr.h"
 #include "Player.h"
-#include "World.h"
-#include "WorldSession.h"
 #include "Config.h"
 #include "Log.h"
 
@@ -15,29 +13,19 @@
 #include <sstream>
 #include <memory>
 
-class DiscordWebhookPlayerActivity : public AccountScript
+class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
-    DiscordWebhookPlayerActivity() : AccountScript("DiscordWebhookPlayerActivity") { }
+    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    void OnAccountLogin(uint32 accountId) override
+    void OnLogin(Player* player) override
     {
-        if (WorldSession* session = sWorld->FindSession(accountId))
-        {
-            Player* player = session->GetPlayer();
-            if (player && player->IsInWorld())
-                Notify(player, true);
-        }
+        Notify(player, true);
     }
 
-    void OnAccountLogout(uint32 accountId) override
+    void OnLogout(Player* player) override
     {
-        if (WorldSession* session = sWorld->FindOfflineSession(accountId))
-        {
-            Player* player = session->GetPlayer();
-            if (player)
-                Notify(player, false);
-        }
+        Notify(player, false);
     }
 
 private:
@@ -51,7 +39,7 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string ip = player->GetSession() ? player->GetSession()->GetRemoteAddress() : "Unknown";
+        std::string ip = player->GetSession()->GetRemoteAddress();
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
