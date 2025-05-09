@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Config.h"
 #include "Log.h"
+#include "WorldSession.h"
 
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPSClientSession.h>
