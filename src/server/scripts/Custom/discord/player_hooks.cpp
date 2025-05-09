@@ -15,17 +15,17 @@ class DiscordWebhookPlayerActivity : public PlayerScript
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    void OnLogin(Player* player) //override 
-{
-    TC_LOG_INFO("player.hooks", "Player logged in: %s", player->GetName().c_str());
-    Notify(player, true);  
-}
+    void OnLogin(Player* player) // No override needed in 3.3.5a
+    {
+        TC_LOG_INFO("player.hooks", "Player logged in: %s", player->GetName().c_str());
+        Notify(player, true);  
+    }
 
-void OnLogout(Player* player) //override 
-{
-    TC_LOG_INFO("player.hooks", "Player logged out: %s", player->GetName().c_str());
-    Notify(player, false); 
-}
+    void OnLogout(Player* player) // No override needed in 3.3.5a
+    {
+        TC_LOG_INFO("player.hooks", "Player logged out: %s", player->GetName().c_str());
+        Notify(player, false); 
+    }
 
 private:
     bool IsWebhookEnabled()
