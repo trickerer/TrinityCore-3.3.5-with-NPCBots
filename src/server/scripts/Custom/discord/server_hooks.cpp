@@ -4,6 +4,7 @@
 #include "WebhookMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include <string>
 
 // Add player scripts
 class WebhookServerScripts : public WorldScript
