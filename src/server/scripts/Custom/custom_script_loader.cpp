@@ -48,4 +48,5 @@ void AddCustomScripts()
 	AddSC_npc_insta_80();
 	AddSC_npc_dungeon_master();
 	AddDiscordWebhookServerHookScripts();
+	AddDiscordWebhookPlayerLoginScripts();
 }
