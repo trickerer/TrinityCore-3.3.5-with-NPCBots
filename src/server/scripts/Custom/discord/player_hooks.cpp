@@ -23,14 +23,14 @@ class DiscordWebhookPlayerActivity : public PlayerScript
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    // Override OnLogin from PlayerScript
-    void OnLogin(Player* player) override
+    // Handle player login - no override keyword in TrinityCore 3.3.5a
+    void OnLogin(Player* player) 
     {
         Notify(player, true);  // Notify when player logs in
     }
 
-    // Override OnLogout from PlayerScript
-    void OnLogout(Player* player) override
+    // Handle player logout - no override keyword in TrinityCore 3.3.5a
+    void OnLogout(Player* player) 
     {
         Notify(player, false); // Notify when player logs out
     }
