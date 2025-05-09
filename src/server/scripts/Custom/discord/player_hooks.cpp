@@ -82,7 +82,7 @@ private:
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
 
-            // Simplified logging to avoid ambiguity
+            // Use std::ostringstream for log message
             std::ostringstream logMessage;
             logMessage << "Webhook HTTP status: " << response.getStatus() << " " << response.getReason();
             TC_LOG_INFO("player.hooks", logMessage.str());
