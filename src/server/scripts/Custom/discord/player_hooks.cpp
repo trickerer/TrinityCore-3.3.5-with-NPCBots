@@ -11,7 +11,6 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
-#include <Poco/Format.h>
 #include <sstream>
 #include <memory>
 
@@ -21,13 +20,13 @@ public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
     // Handle player login
-    void OnLogin(Player* player) //override
+    void OnLogin(Player* player) override
     {
         Notify(player, true);
     }
 
     // Handle player logout
-    void OnLogout(Player* player) //override
+    void OnLogout(Player* player) override
     {
         Notify(player, false);
     }
@@ -81,7 +80,8 @@ private:
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
 
-            TC_LOG_INFO("player.hooks", "Webhook status: %d %s", response.getStatus(), response.getReason().c_str());
+            // Simplified logging to avoid ambiguity
+            TC_LOG_INFO("player.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
         }
         catch (const Poco::Exception& ex)
         {
