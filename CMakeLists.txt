@@ -105,4 +105,4 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-target_link_libraries(your_target Poco::Net)
+target_link_libraries(worldserver PRIVATE Poco::Net)
