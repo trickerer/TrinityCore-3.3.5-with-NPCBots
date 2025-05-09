@@ -98,7 +98,8 @@ private:
 };
 
 // Register the script
-void AddDiscordWebhookPlayerLoginScripts()
+void AddSC_DiscordWebhookPlayerActivity()
 {
     new DiscordWebhookPlayerActivity();
 }
+
