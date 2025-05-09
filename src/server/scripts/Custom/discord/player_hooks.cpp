@@ -19,13 +19,13 @@ public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
     // Handle player login
-    void OnLogin(Player* player) override
+    void OnLogin(Player* player)
     {
         Notify(player, true);
     }
 
     // Handle player logout
-    void OnLogout(Player* player) override
+    void OnLogout(Player* player)
     {
         Notify(player, false);
     }
