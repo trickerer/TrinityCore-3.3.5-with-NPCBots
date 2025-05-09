@@ -15,6 +15,7 @@
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "Log.h"
+#include "PlayerScript.h"
 
 // Inherit from PlayerScript (which is already part of TrinityCore)
 class DiscordWebhookPlayerActivity : public PlayerScript
