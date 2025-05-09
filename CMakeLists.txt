@@ -105,4 +105,9 @@ if(BUILD_TESTING)
   endif()
 endif()
 
+# Set the path where Poco libraries are located if they're not in the default location
+link_directories(/usr/lib/x86_64-linux-gnu)  # Adjust this path if your libraries are elsewhere
+
+# Now link Poco::Net
 target_link_libraries(worldserver PRIVATE Poco::Net)
+
