@@ -21,11 +21,13 @@ class DiscordWebhookPlayerActivity : public PlayerScript
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
+    // Handle player login (Override the correct method here)
     void OnLogin(Player* player) override
     {
         Notify(player, true);
     }
 
+    // Handle player logout (Override the correct method here)
     void OnLogout(Player* player) override
     {
         Notify(player, false);
@@ -45,17 +47,17 @@ private:
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        std::string content = gmTag + "**Player " + status + "**\nName: `" + name + "`";
+        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`";
 
-        SendDiscordWebhook(webhookUrl, content);
+        SendDiscordWebhook(webhookUrl, message);
     }
 
-    void SendDiscordWebhook(const std::string& url, const std::string& content)
+    void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
         try
         {
             Poco::JSON::Object json;
-            json.set("content", content);
+            json.set("content", message);
             std::stringstream jsonStream;
             Poco::JSON::Stringifier::stringify(json, jsonStream);
             std::string payload = jsonStream.str();
