@@ -4,6 +4,7 @@
 
 #include "Config.h"
 #include "Chat.h"
+#include "Log.h"
 
 class WebhookMgr {
 
