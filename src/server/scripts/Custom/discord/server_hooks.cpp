@@ -59,7 +59,10 @@ public:
 
             // Log the response for debugging
             std::string responseBody = ss.str();
-            TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", responseBody.c_str());
+			if (!responseBody.empty())
+				TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", responseBody.c_str());
+			else
+				TC_LOG_INFO("server.hooks", "Discord webhook sent. No response body received.");
 
             // Check for error in response
             if (responseBody.find("error") != std::string::npos)
