@@ -11,8 +11,6 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Stringifier.h>
 #include <sstream>
 #include <memory>
 
@@ -21,13 +19,13 @@ class DiscordWebhookPlayerActivity : public PlayerScript
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    // Handle player login (Override the correct method here)
+    // Handle player login
     void OnLogin(Player* player) override
     {
         Notify(player, true);
     }
 
-    // Handle player logout (Override the correct method here)
+    // Handle player logout
     void OnLogout(Player* player) override
     {
         Notify(player, false);
@@ -56,16 +54,12 @@ private:
     {
         try
         {
-            Poco::JSON::Object json;
-            json.set("content", message);
-            std::stringstream jsonStream;
-            Poco::JSON::Stringifier::stringify(json, jsonStream);
-            std::string payload = jsonStream.str();
-
             Poco::URI uri(url);
             std::string path = uri.getPathAndQuery();
             if (path.empty())
                 path = "/";
+
+            std::string payload = "{\"content\":\"" + message + "\"}";
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
@@ -95,6 +89,7 @@ private:
     }
 };
 
+// Register the script
 void AddDiscordWebhookPlayerLoginScripts()
 {
     new DiscordWebhookPlayerActivity();
