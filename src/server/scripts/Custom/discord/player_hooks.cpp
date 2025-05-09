@@ -10,22 +10,28 @@
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
 
+// Custom player activity script to send a Discord webhook on login/logout
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
-    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
+    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") 
+    {
+        // Registering the hooks manually
+        AddHook(OnPlayerLogin, &DiscordWebhookPlayerActivity::OnLogin);
+        AddHook(OnPlayerLogout, &DiscordWebhookPlayerActivity::OnLogout);
+    }
 
-    void OnLogin(Player* player) override 
-	{
-		TC_LOG_INFO("player.hooks", "Player logged in: %s", player->GetName().c_str());
-		Notify(player, true);  
-	}
+    void OnLogin(Player* player) 
+    {
+        TC_LOG_INFO("player.hooks", "Player logged in: %s", player->GetName().c_str());
+        Notify(player, true);
+    }
 
-	void OnLogout(Player* player) override 
-	{
-		TC_LOG_INFO("player.hooks", "Player logged out: %s", player->GetName().c_str());
-		Notify(player, false); 
-	}
+    void OnLogout(Player* player) 
+    {
+        TC_LOG_INFO("player.hooks", "Player logged out: %s", player->GetName().c_str());
+        Notify(player, false);
+    }
 
 private:
     bool IsWebhookEnabled()
@@ -39,7 +45,7 @@ private:
         if (webhookUrl.empty())
         {
             TC_LOG_ERROR("player.hooks", "No webhook URL configured!");
-            return;  
+            return;
         }
 
         std::string name = player->GetName();
@@ -84,7 +90,6 @@ private:
             Poco::StreamCopier::copyStream(rs, ss);
 
             std::string responseBody = ss.str();
-
             if (!responseBody.empty())
                 TC_LOG_INFO("player.hooks", "Webhook response body: %s", responseBody.c_str());
             else
