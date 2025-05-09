@@ -40,7 +40,7 @@ public:
 
 		std::string rawRealmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 		std::string realmName = EscapeForJson(rawRealmName);
-		std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
+		std::string message = "✅ Server is up! (testing)";
 
         SendDiscordWebhook(webhookUrl, message);
     }
