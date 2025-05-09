@@ -79,7 +79,7 @@ private:
             Poco::StreamCopier::copyStream(rs, ss);
             std::string responseBody = ss.str();
 
-            TC_LOG_INFO("server.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
+            //TC_LOG_INFO("server.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
             if (!responseBody.empty())
                 TC_LOG_INFO("server.hooks", "Webhook response body: %s", responseBody.c_str());
             else
@@ -87,7 +87,7 @@ private:
         }
         catch (const Poco::Exception& ex)
         {
-            TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
+            //TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
         }
     }
 };
