@@ -1,7 +1,6 @@
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "Log.h"
-#include "World.h"  // Include World to get the realm name
 
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPSClientSession.h>
@@ -27,7 +26,9 @@ public:
             return;
         }
 
-        std::string realmName = sWorld->GetRealmName();  // Fetch the realm name
+        // Fetch the realm name from the config file
+        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+
         std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
 
         SendDiscordWebhook(webhookUrl, message);
