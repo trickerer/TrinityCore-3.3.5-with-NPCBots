@@ -27,9 +27,9 @@ public:
         }
 
         // Fetch the realm name from the config file
-        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        //std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
-        std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
+        std::string message = "✅ **Server has started successfully!**";
 
         SendDiscordWebhook(webhookUrl, message);
     }
