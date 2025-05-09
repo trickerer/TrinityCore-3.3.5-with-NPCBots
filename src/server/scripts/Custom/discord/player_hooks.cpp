@@ -16,22 +16,23 @@
 #include "Config.h"
 #include "Log.h"
 
-// Use the existing PlayerScript class from TrinityCore
+// Inherit from PlayerScript (which is already part of TrinityCore)
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
+    // Constructor to set up the script
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    // Handle player login
+    // This function is called when a player logs in
     void OnLogin(Player* player) override
     {
-        Notify(player, true);
+        Notify(player, true); // Call the Notify function when the player logs in
     }
 
-    // Handle player logout
+    // This function is called when a player logs out
     void OnLogout(Player* player) override
     {
-        Notify(player, false);
+        Notify(player, false); // Call the Notify function when the player logs out
     }
 
 private:
@@ -43,20 +44,23 @@ private:
 
     void Notify(Player* player, bool loggingIn)
     {
+        // Fetch the Webhook URL from the configuration
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
-            return;  // No webhook URL configured
+            return;  // No webhook URL configured, exit
         }
 
+        // Player's name and status (Logged In/Logged Out)
         std::string name = player->GetName();
-        std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
+        std::string gmTag = player->IsGameMaster() ? "🛡️ " : ""; // Add "🛡️" for GM players
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        // Use stringstream to build the message
+        // Build the message to send to Discord
         std::ostringstream messageStream;
         messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
+        // Send the webhook with the message
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
@@ -71,20 +75,24 @@ private:
 
             std::string payload = "{\"content\":\"" + message + "\"}";
 
+            // Create an HTTPS session for the request
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
                 session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
             else
                 session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
 
+            // Create the POST request
             Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
             request.setHost(uri.getHost());
             request.setContentType("application/json");
             request.setContentLength(static_cast<int>(payload.size()));
 
+            // Send the request
             std::ostream& os = session->sendRequest(request);
             os << payload;
 
+            // Receive the response
             Poco::Net::HTTPResponse response;
             std::istream& rs = session->receiveResponse(response);
             std::stringstream ss;
@@ -92,7 +100,7 @@ private:
 
             std::string responseBody = ss.str();
 
-            // Log the response if needed
+            // Log the response
             if (!responseBody.empty())
                 TC_LOG_INFO("player.hooks", "Webhook response body: %s", responseBody.c_str());
             else
@@ -109,5 +117,5 @@ private:
 // Register the script
 void AddDiscordWebhookPlayerLoginScripts()
 {
-    new DiscordWebhookPlayerActivity();
+    new DiscordWebhookPlayerActivity(); // Register the script to be loaded
 }
