@@ -1,3 +1,4 @@
+#define _GLIBCXX_USE_CXX11_ABI 1
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "Log.h"
