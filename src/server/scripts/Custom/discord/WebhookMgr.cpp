@@ -5,6 +5,7 @@
 #include "WebhookMgr.h"
 #include "Chat.h"
 #include "Log.h"
+#include "Config.h"
 #include <csignal>
 
 WebhookMgr* WebhookMgr::instance()
