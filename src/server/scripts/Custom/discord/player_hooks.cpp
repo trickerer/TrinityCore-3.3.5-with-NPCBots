@@ -37,7 +37,7 @@ private:
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
-            TC_LOG_ERROR("player.hooks", "Webhook URL is not configured.");
+            //TC_LOG_ERROR("player.hooks", "Webhook URL is not configured.");
             return;
         }
 
@@ -89,7 +89,7 @@ private:
         }
         catch (const Poco::Exception& ex)
         {
-            TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
+            //TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
         }
     }
 };
