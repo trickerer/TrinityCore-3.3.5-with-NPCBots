@@ -85,7 +85,7 @@ private:
             // Use std::ostringstream for log message
             std::ostringstream logMessage;
             logMessage << "Webhook HTTP status: " << response.getStatus() << " " << response.getReason();
-            TC_LOG_INFO("player.hooks", logMessage.str());
+            //TC_LOG_INFO("player.hooks", logMessage.str());
         }
         catch (const Poco::Exception& ex)
         {
