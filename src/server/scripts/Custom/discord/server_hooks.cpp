@@ -12,6 +12,18 @@
 #include <sstream>
 #include <memory>
 
+std::string EscapeForJson(const std::string& input)
+{
+    std::string output = input;
+    size_t pos = 0;
+    while ((pos = output.find("\"", pos)) != std::string::npos)
+    {
+        output.replace(pos, 1, "\\\"");
+        pos += 2;
+    }
+    return output;
+}
+
 class DiscordWebhookServerHook : public WorldScript
 {
 public:
@@ -26,10 +38,9 @@ public:
             return;
         }
 
-        // Fetch the realm name from the config file
-        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
-
-        std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
+		std::string rawRealmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+		std::string realmName = EscapeForJson(rawRealmName);
+		std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
 
         SendDiscordWebhook(webhookUrl, message);
     }
