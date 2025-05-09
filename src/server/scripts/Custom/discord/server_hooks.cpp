@@ -9,20 +9,10 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
+#include <Poco/JSON/Object.h>
+#include <Poco/JSON/Stringifier.h>
 #include <sstream>
 #include <memory>
-
-std::string EscapeForJson(const std::string& input)
-{
-    std::string output = input;
-    size_t pos = 0;
-    while ((pos = output.find("\"", pos)) != std::string::npos)
-    {
-        output.replace(pos, 1, "\\\"");
-        pos += 2;
-    }
-    return output;
-}
 
 class DiscordWebhookServerHook : public WorldScript
 {
@@ -38,9 +28,8 @@ public:
             return;
         }
 
-		std::string rawRealmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
-		std::string realmName = EscapeForJson(rawRealmName);
-		std::string message = "✅ Server is up! (testing)";
+        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        std::string message = "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
 
         SendDiscordWebhook(webhookUrl, message);
     }
@@ -55,7 +44,13 @@ private:
             if (path.empty())
                 path = "/";
 
-            std::string payload = "{\"content\":\"" + message + "\"}";
+            // Construct JSON payload safely
+            Poco::JSON::Object json;
+            json.set("content", message);
+
+            std::stringstream ssPayload;
+            Poco::JSON::Stringifier::stringify(json, ssPayload);
+            std::string payload = ssPayload.str();
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
