@@ -1,7 +1,5 @@
-#include "ScriptMgr.h"
-#include "Config.h"
-#include "Log.h"
-#include "Player.h"
+// Workaround for GCC 13: avoid ambiguity between std::format and Poco::format
+#define format __poco_format_workaround
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPSClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
@@ -9,6 +7,14 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
+#include <Poco/JSON/Object.h>
+#include <Poco/JSON/Stringifier.h>
+#undef format
+
+// TrinityCore headers
+#include "ScriptMgr.h"
+#include "Config.h"
+#include "Log.h"
 
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
