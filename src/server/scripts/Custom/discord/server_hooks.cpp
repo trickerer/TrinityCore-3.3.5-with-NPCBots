@@ -29,19 +29,20 @@ public:
         }
 
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
-        std::ostringstream oss;
-		oss << "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
-		std::string message = oss.str();
 
+        // Use Poco::format if you want formatted strings
+        std::string message = Poco::format("✅ **Server has started successfully!**\nRealm: **%s**", realmName.c_str());
+
+        // Send the webhook with the message
         SendDiscordWebhook(webhookUrl, message);
     }
 
 private:
-	bool IsWebhookEnabled()
-		{
-			// Check if the Webhook is enabled in the config file
-			return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
-		}
+    bool IsWebhookEnabled()
+    {
+        // Check if the Webhook is enabled in the config file
+        return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
+    }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
@@ -81,7 +82,6 @@ private:
             Poco::StreamCopier::copyStream(rs, ss);
             std::string responseBody = ss.str();
 
-            //TC_LOG_INFO("server.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
             if (!responseBody.empty())
                 TC_LOG_INFO("server.hooks", "Webhook response body: %s", responseBody.c_str());
             else
@@ -89,7 +89,7 @@ private:
         }
         catch (const Poco::Exception& ex)
         {
-            //TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
+            TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
         }
     }
 };
