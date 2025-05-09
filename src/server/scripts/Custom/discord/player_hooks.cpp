@@ -45,9 +45,11 @@ private:
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`";
+        // Use stringstream to build the message
+        std::ostringstream messageStream;
+        messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
-        SendDiscordWebhook(webhookUrl, message);
+        SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
@@ -81,7 +83,9 @@ private:
             Poco::StreamCopier::copyStream(rs, ss);
 
             // Simplified logging to avoid ambiguity
-            TC_LOG_INFO("player.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
+            std::ostringstream logMessage;
+            logMessage << "Webhook HTTP status: " << response.getStatus() << " " << response.getReason();
+            TC_LOG_INFO("player.hooks", logMessage.str());
         }
         catch (const Poco::Exception& ex)
         {
