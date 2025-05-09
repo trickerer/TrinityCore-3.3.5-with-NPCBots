@@ -1,4 +1,4 @@
-#include "WorldScript.h"
+//#include "WorldScript.h"
 #include "Config.h"
 #include "WebhookMgr.h"
 
