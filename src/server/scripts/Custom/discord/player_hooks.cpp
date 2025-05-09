@@ -13,7 +13,7 @@
 #include <Poco/Exception.h>
 #include <sstream>
 #include <memory>
-
+ 
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
