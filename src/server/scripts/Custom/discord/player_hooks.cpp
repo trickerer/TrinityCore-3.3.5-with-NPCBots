@@ -11,6 +11,7 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
+#include <Poco/Format.h>
 #include <sstream>
 #include <memory>
  
