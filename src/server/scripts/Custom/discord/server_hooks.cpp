@@ -1,41 +1,65 @@
-//#include "WorldScript.h"
-#include "Log.h"
+#include "ScriptMgr.h"
 #include "Config.h"
-#include "WebhookMgr.h"
-#include "World.h"
-#include "WorldSession.h"
-#include <string>
+#include "Log.h"
 
-// Add player scripts
-class WebhookServerScripts : public WorldScript
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/URI.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Exception.h>
+#include <sstream>
+
+class DiscordWebhookServerHook : public WorldScript
 {
 public:
-    WebhookServerScripts() : WorldScript("WebhookServerScripts") { }
+    DiscordWebhookServerHook() : WorldScript("DiscordWebhookServerHook") { }
 
     void OnStartup() override
     {
-        //std::string webhookUrl = "https://discord.com/api/webhooks/1317301859865726977/Qs9DOX26Lh89rQe8zXyDApj7dLz6QijPMyB_gSSSsGBVx7cJgZZ7Fdn_-NeiYvzR34Fh";
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-        if (std::empty(webhookUrl)) {
-            TC_LOG_ERROR("server.worldserver", "Webhook url is empty. Disabling module. Please provide a valid url.");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("server.hooks", "Webhook URL is not configured.");
             return;
         }
 
-        TC_LOG_INFO("server.worldserver", ">> Webhook module initialized.");
-        sWebhookMgr->SetWebhookUrl(webhookUrl);
-        sWebhookMgr->Start();
+        SendDiscordWebhook(webhookUrl, "✅ **Server has started successfully!**");
     }
 
-    void OnShutdown() override
+    void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
-        TC_LOG_INFO("server.worldserver", "Stopping webhook queue...");
-        sWebhookMgr->Stop();
-        return;
+        try
+        {
+            Poco::URI uri(url);
+            std::string path = uri.getPathAndQuery();
+            if (path.empty()) path = "/";
+
+            std::string payload = "{\"content\":\"" + message + "\"}";
+
+            Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+            request.setContentType("application/json");
+            request.setContentLength(payload.length());
+
+            std::ostream& os = session.sendRequest(request);
+            os << payload;
+
+            Poco::Net::HTTPResponse response;
+            std::istream& rs = session.receiveResponse(response);
+            std::stringstream ss;
+            Poco::StreamCopier::copyStream(rs, ss);
+
+            TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", ss.str().c_str());
+        }
+        catch (const Poco::Exception& ex)
+        {
+            TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
+        }
     }
 };
 
-// Add all scripts in one
-void AddWebhookServerScripts()
+void AddDiscordWebhookServerHookScripts()
 {
-    new WebhookServerScripts();
+    new DiscordWebhookServerHook();
 }

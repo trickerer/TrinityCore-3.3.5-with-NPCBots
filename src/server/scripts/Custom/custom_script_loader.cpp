@@ -32,7 +32,7 @@ void AddSC_npc_proff_master();
 void AddSC_npc_xp_mod();
 void AddSC_npc_insta_80();
 void AddSC_npc_dungeon_master();
-void AddWebhookServerScripts();
+void AddDiscordWebhookServerHookScripts();
 
 void AddCustomScripts()
 {
@@ -47,5 +47,5 @@ void AddCustomScripts()
 	AddSC_npc_xp_mod();
 	AddSC_npc_insta_80();
 	AddSC_npc_dungeon_master();
-	AddWebhookServerScripts();
+	AddDiscordWebhookServerHookScripts();
 }
