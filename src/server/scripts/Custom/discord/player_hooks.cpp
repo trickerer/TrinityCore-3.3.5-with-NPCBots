@@ -32,6 +32,11 @@ public:
     }
 
 private:
+	bool IsWebhookEnabled()
+		{
+			// Check if the Webhook is enabled in the config file
+			return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
+		}
     void Notify(Player* player, bool loggingIn)
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");

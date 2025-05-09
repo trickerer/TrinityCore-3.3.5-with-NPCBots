@@ -35,6 +35,12 @@ public:
     }
 
 private:
+	bool IsWebhookEnabled()
+		{
+			// Check if the Webhook is enabled in the config file
+			return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
+		}
+
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
         try
