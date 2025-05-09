@@ -46,7 +46,7 @@ private:
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`\nIP: `" + ip + "`";
+        std::string message = gmTag + "**Player " + status + "**\nName: `" + name;
 
         SendDiscordWebhook(webhookUrl, message);
     }
