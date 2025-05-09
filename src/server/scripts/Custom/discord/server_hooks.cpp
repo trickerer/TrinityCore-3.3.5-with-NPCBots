@@ -26,6 +26,7 @@ public:
         }
 
         // Send Discord Webhook
+		// TODO GET REALM NAME!
         SendDiscordWebhook(webhookUrl, "✅ **Server has started successfully!**");
     }
 
