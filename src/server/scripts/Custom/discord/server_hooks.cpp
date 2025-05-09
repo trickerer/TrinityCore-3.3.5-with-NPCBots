@@ -2,6 +2,12 @@
 #include "Config.h"
 #include "Log.h"
 
+#include <Poco/Net/HTTPClientSession.h>
+#include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPResponse.h>
+#include <Poco/URI.h>
+#include <Poco/StreamCopier.h>
+#include <Poco/Exception.h>
 #include <sstream>
 
 class DiscordWebhookServerHook : public WorldScript
