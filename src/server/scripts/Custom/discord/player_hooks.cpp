@@ -25,9 +25,11 @@ public:
 
     // Handle player login - no override keyword in TrinityCore 3.3.5a
     void OnLogin(Player* player) 
-    {
-        Notify(player, true);  // Notify when player logs in
-    }
+	{
+		TC_LOG_INFO("player.hooks", "Player %s has logged in.", player->GetName().c_str());
+		Notify(player, true);  // Notify when player logs in
+	}
+
 
     // Handle player logout - no override keyword in TrinityCore 3.3.5a
     void OnLogout(Player* player) 
