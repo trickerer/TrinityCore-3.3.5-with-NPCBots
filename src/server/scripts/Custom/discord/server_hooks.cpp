@@ -30,8 +30,10 @@ public:
 
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
-        // Use Poco::format if you want formatted strings
-        std::string message = Poco::format("✅ **Server has started successfully!**\nRealm: **%s**", realmName.c_str());
+        // Use stringstream to format the message
+        std::stringstream messageStream;
+        messageStream << "✅ **Server has started successfully!**\nRealm: **" << realmName << "**";
+        std::string message = messageStream.str();
 
         // Send the webhook with the message
         SendDiscordWebhook(webhookUrl, message);
