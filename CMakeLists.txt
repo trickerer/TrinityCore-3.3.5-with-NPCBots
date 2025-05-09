@@ -104,3 +104,5 @@ if(BUILD_TESTING)
     set_property(GLOBAL PROPERTY USE_FOLDERS OFF)
   endif()
 endif()
+
+target_link_libraries(your_target Poco::Net)
