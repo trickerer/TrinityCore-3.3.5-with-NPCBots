@@ -78,7 +78,7 @@ void WebhookMgr::ProcessMessages()
         std::this_thread::sleep_for(std::chrono::milliseconds(600)); // Break for rate limit. Currently, 5 requests per 2 seconds
     }
 
-    LOG_INFO("server.worldserver", "Webhook processor closed.");
+    TC_LOG_INFO("server.worldserver", "Webhook processor closed.");
 }
 
 void WebhookMgr::SendDiscordWebhook(const std::string& rawMessage)
@@ -90,7 +90,7 @@ void WebhookMgr::SendDiscordWebhook(const std::string& rawMessage)
 
         if (std::empty(_webhookUrl))
         {
-            LOG_ERROR("server.loading", "The webhook url is empty. Please provide one.");
+            TC_LOG_ERROR("server.loading", "The webhook url is empty. Please provide one.");
             Stop();
             return;
         }
@@ -98,7 +98,7 @@ void WebhookMgr::SendDiscordWebhook(const std::string& rawMessage)
         size_t apiStart = _webhookUrl.find("/api/webhooks");
         if (apiStart == std::string::npos)
         {
-            LOG_ERROR("server.worldserver", "Invalid webhook url provided. Stopping module.");
+            TC_LOG_ERROR("server.worldserver", "Invalid webhook url provided. Stopping module.");
             Stop();
             return;
         }
@@ -148,14 +148,14 @@ void WebhookMgr::SendDiscordWebhook(const std::string& rawMessage)
         {
             std::ostringstream ss;
             ss << "Failed to send webhook.HTTP Status : " << status_code << " " << status_message << std::endl;
-            LOG_ERROR("server.worldserver", ss.str());
+            TC_LOG_ERROR("server.worldserver", ss.str());
         }
     }
     catch (const std::exception& e)
     {
         std::ostringstream ss;
         ss << "Error: " << e.what() << std::endl;
-        LOG_ERROR("server.worldserver", ss.str());
+        TC_LOG_ERROR("server.worldserver", ss.str());
     }
 }
 
