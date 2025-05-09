@@ -33,8 +33,8 @@ void AddSC_npc_xp_mod();
 void AddSC_npc_insta_80();
 void AddSC_npc_dungeon_master();
 void AddDiscordWebhookServerHookScripts();
-void AddDiscordWebhookPlayerLoginScripts();
-
+void AddDiscordWebhookPlayerLoginScripts(); 
+ 
 void AddCustomScripts()
 {
 	AddSC_npc_voters_zone();
