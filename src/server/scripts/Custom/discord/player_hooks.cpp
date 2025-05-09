@@ -20,30 +20,30 @@ public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
     // Handle player login
-    void OnLogin(Player* player) //override
+    void OnLogin(Player* player) override
     {
         Notify(player, true);
     }
 
     // Handle player logout
-    void OnLogout(Player* player) //override
+    void OnLogout(Player* player) override
     {
         Notify(player, false);
     }
 
 private:
-	bool IsWebhookEnabled()
-		{
-			// Check if the Webhook is enabled in the config file
-			return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
-		}
+    bool IsWebhookEnabled()
+    {
+        // Check if the Webhook is enabled in the config file
+        return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
+    }
+
     void Notify(Player* player, bool loggingIn)
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
-            //TC_LOG_ERROR("player.hooks", "Webhook URL is not configured.");
-            return;
+            return;  // No webhook URL configured
         }
 
         std::string name = player->GetName();
@@ -87,14 +87,18 @@ private:
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
 
-            // Use std::ostringstream for log message
-            std::ostringstream logMessage;
-            logMessage << "Webhook HTTP status: " << response.getStatus() << " " << response.getReason();
-            //TC_LOG_INFO("player.hooks", logMessage.str());
+            std::string responseBody = ss.str();
+
+            // Log the response if needed
+            if (!responseBody.empty())
+                TC_LOG_INFO("player.hooks", "Webhook response body: %s", responseBody.c_str());
+            else
+                TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
         }
         catch (const Poco::Exception& ex)
         {
-            //TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
+            // Log the error if the webhook fails
+            TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
         }
     }
 };
