@@ -42,11 +42,10 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string ip = player->GetSession() ? player->GetSession()->GetRemoteAddress() : "Unknown";
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        std::string message = gmTag + "**Player " + status + "**\nName: `" + name;
+        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`";
 
         SendDiscordWebhook(webhookUrl, message);
     }
