@@ -105,10 +105,6 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-# Find the Poco library
-find_package(Poco REQUIRED Net)
-
-
-# Link Poco::Net to worldserver
-target_link_libraries(worldserver PRIVATE Poco::Net)
+find_package(Poco REQUIRED Net NetSSL Util)
+target_link_libraries(worldserver PRIVATE Poco::Net Poco::NetSSL Poco::Util)
 
