@@ -1,4 +1,5 @@
 //#include "WorldScript.h"
+#include "Log.h"
 #include "Config.h"
 #include "WebhookMgr.h"
 
