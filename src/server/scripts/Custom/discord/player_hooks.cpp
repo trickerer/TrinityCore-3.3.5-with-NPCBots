@@ -13,12 +13,23 @@
 #include <sstream>
 #include <memory>
 
-class DiscordWebhookPlayerLogin : public PlayerScript
+class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
-    DiscordWebhookPlayerLogin() : PlayerScript("DiscordWebhookPlayerLogin") { }
+    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
     void OnLogin(Player* player) override
+    {
+        Notify(player, true);
+    }
+
+    void OnLogout(Player* player) override
+    {
+        Notify(player, false);
+    }
+
+private:
+    void Notify(Player* player, bool loggingIn)
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
@@ -29,12 +40,14 @@ public:
 
         std::string name = player->GetName();
         std::string ip = player->GetSession()->GetRemoteAddress();
-        std::string message = "🟢 **Player Logged In**\nName: `" + name + "`\nIP: `" + ip + "`";
+        std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
+        std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
+
+        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`\nIP: `" + ip + "`";
 
         SendDiscordWebhook(webhookUrl, message);
     }
 
-private:
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
         try
@@ -62,10 +75,8 @@ private:
 
             Poco::Net::HTTPResponse response;
             std::istream& rs = session->receiveResponse(response);
-
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
-            std::string responseBody = ss.str();
 
             TC_LOG_INFO("player.hooks", "Webhook status: %d %s", response.getStatus(), response.getReason().c_str());
         }
@@ -78,5 +89,5 @@ private:
 
 void AddDiscordWebhookPlayerLoginScripts()
 {
-    new DiscordWebhookPlayerLogin();
+    new DiscordWebhookPlayerActivity();
 }
