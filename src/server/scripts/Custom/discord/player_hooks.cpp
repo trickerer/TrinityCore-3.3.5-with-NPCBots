@@ -11,6 +11,8 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
+#include <Poco/JSON/Object.h>
+#include <Poco/JSON/Stringifier.h>
 #include <sstream>
 #include <memory>
 
@@ -19,14 +21,12 @@ class DiscordWebhookPlayerActivity : public PlayerScript
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    // Handle player login
-    void OnLogin(Player* player)
+    void OnLogin(Player* player) override
     {
         Notify(player, true);
     }
 
-    // Handle player logout
-    void OnLogout(Player* player)
+    void OnLogout(Player* player) override
     {
         Notify(player, false);
     }
@@ -45,21 +45,25 @@ private:
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        std::string message = gmTag + "**Player " + status + "**\nName: `" + name + "`";
+        std::string content = gmTag + "**Player " + status + "**\nName: `" + name + "`";
 
-        SendDiscordWebhook(webhookUrl, message);
+        SendDiscordWebhook(webhookUrl, content);
     }
 
-    void SendDiscordWebhook(const std::string& url, const std::string& message)
+    void SendDiscordWebhook(const std::string& url, const std::string& content)
     {
         try
         {
+            Poco::JSON::Object json;
+            json.set("content", content);
+            std::stringstream jsonStream;
+            Poco::JSON::Stringifier::stringify(json, jsonStream);
+            std::string payload = jsonStream.str();
+
             Poco::URI uri(url);
             std::string path = uri.getPathAndQuery();
             if (path.empty())
                 path = "/";
-
-            std::string payload = "{\"content\":\"" + message + "\"}";
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
