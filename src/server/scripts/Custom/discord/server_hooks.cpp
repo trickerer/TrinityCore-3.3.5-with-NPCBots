@@ -30,52 +30,51 @@ public:
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
+{
+    try
     {
-        try
-        {
-            // Parse the URL
-            Poco::URI uri(url);
-            std::string path = uri.getPathAndQuery();
-            if (path.empty()) path = "/";
+        Poco::URI uri(url);
+        std::string path = uri.getPathAndQuery();
+        if (path.empty())
+            path = "/";
 
-            // Format the payload
-            std::string payload = "{\"content\":\"" + message + "\"}";
+        std::string payload = "{\"content\":\"" + message + "\"}";
 
-            // Set up HTTP client session
-            Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
-            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
-            request.setContentType("application/json");
-            request.setContentLength(payload.length());
+        // Setup session and request
+        Poco::Net::HTTPClientSession session(uri.getHost(), uri.getPort());
+        if (uri.getScheme() == "https")
+            session.setSecure(true); // Optional, only if SSL is required
 
-            // Send request with payload
-            std::ostream& os = session.sendRequest(request);
-            os << payload;
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+        request.setHost(uri.getHost());
+        request.setContentType("application/json");
+        request.setContentLength(static_cast<int>(payload.size()));
 
-            // Get and process the response from Discord
-            Poco::Net::HTTPResponse response;
-            std::istream& rs = session.receiveResponse(response);
-            std::stringstream ss;
-            Poco::StreamCopier::copyStream(rs, ss);
+        // Send the request
+        std::ostream& os = session.sendRequest(request);
+        os << payload;
 
-            // Log the response for debugging
-            std::string responseBody = ss.str();
-			if (!responseBody.empty())
-				TC_LOG_INFO("server.hooks", "Discord webhook sent. Response: %s", responseBody.c_str());
-			else
-				TC_LOG_INFO("server.hooks", "Discord webhook sent. No response body received.");
+        // Get the response
+        Poco::Net::HTTPResponse response;
+        std::istream& rs = session.receiveResponse(response);
 
-            // Check for error in response
-            if (responseBody.find("error") != std::string::npos)
-            {
-                TC_LOG_ERROR("server.hooks", "Discord Webhook Error: %s", responseBody.c_str());
-            }
-        }
-        catch (const Poco::Exception& ex)
-        {
-            // Log exceptions and errors
-            TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
-        }
+        std::stringstream ss;
+        Poco::StreamCopier::copyStream(rs, ss);
+        std::string responseBody = ss.str();
+
+        // Log status
+        TC_LOG_INFO("server.hooks", "Webhook HTTP status: %d %s", response.getStatus(), response.getReason().c_str());
+
+        if (!responseBody.empty())
+            TC_LOG_INFO("server.hooks", "Webhook response body: %s", responseBody.c_str());
+        else
+            TC_LOG_INFO("server.hooks", "Webhook response body is empty (expected for 204).");
     }
+    catch (const Poco::Exception& ex)
+    {
+        TC_LOG_ERROR("server.hooks", "Discord webhook failed: %s", ex.displayText().c_str());
+    }
+}
 };
 
 void AddDiscordWebhookServerHookScripts()
