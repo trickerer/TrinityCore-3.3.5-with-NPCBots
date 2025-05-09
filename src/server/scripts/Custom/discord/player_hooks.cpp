@@ -1,5 +1,7 @@
-// Workaround for GCC 13: avoid ambiguity between std::format and Poco::format
-#define format __poco_format_workaround
+#include "ScriptMgr.h"
+#include "Config.h"
+#include "Log.h"
+#include "Player.h"
 #include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPSClientSession.h>
 #include <Poco/Net/HTTPRequest.h>
@@ -7,40 +9,25 @@
 #include <Poco/URI.h>
 #include <Poco/StreamCopier.h>
 #include <Poco/Exception.h>
-#include <Poco/JSON/Object.h>
-#include <Poco/JSON/Stringifier.h>
-#undef format
 
-// TrinityCore headers
-#include "ScriptMgr.h"
-#include "Config.h"
-#include "Log.h"
-#include "Player.h"  // Include Player.h to ensure PlayerScript is available
-
-// PlayerScript should be properly inherited
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
     DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
 
-    // Handle player login - no override keyword in TrinityCore 3.3.5a
     void OnLogin(Player* player) 
-	{
-		TC_LOG_INFO("player.hooks", "Player %s has logged in.", player->GetName().c_str());
-		Notify(player, true);  // Notify when player logs in
-	}
+    {
+        Notify(player, true);  
+    }
 
-
-    // Handle player logout - no override keyword in TrinityCore 3.3.5a
     void OnLogout(Player* player) 
     {
-        Notify(player, false); // Notify when player logs out
+        Notify(player, false); 
     }
 
 private:
     bool IsWebhookEnabled()
     {
-        // Check if the Webhook is enabled in the config file
         return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
     }
 
@@ -49,17 +36,18 @@ private:
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
-            return;  // No webhook URL configured
+            TC_LOG_ERROR("player.hooks", "No webhook URL configured!");
+            return;  
         }
 
         std::string name = player->GetName();
         std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
-        // Use stringstream to build the message
         std::ostringstream messageStream;
         messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
+        TC_LOG_INFO("player.hooks", "Sending webhook for player: %s", name.c_str());
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
@@ -95,7 +83,6 @@ private:
 
             std::string responseBody = ss.str();
 
-            // Log the response if needed
             if (!responseBody.empty())
                 TC_LOG_INFO("player.hooks", "Webhook response body: %s", responseBody.c_str());
             else
@@ -103,7 +90,6 @@ private:
         }
         catch (const Poco::Exception& ex)
         {
-            // Log the error if the webhook fails
             TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
         }
     }
