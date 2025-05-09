@@ -28,6 +28,7 @@ public:
             return;
         }
 
+        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
         std::ostringstream oss;
 		oss << "✅ **Server has started successfully!**\nRealm: **" + realmName + "**";
 		std::string message = oss.str();
