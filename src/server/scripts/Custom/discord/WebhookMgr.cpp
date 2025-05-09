@@ -6,6 +6,7 @@
 #include "Chat.h"
 #include "Log.h"
 #include "Config.h"
+#include "World.h"
 #include <csignal>
 
 WebhookMgr* WebhookMgr::instance()
@@ -40,7 +41,7 @@ void WebhookMgr::Stop()
         std::lock_guard<std::mutex> lock(_queueMutex);
         _stopWorker = true; // Signal the thread to stop
     }
-    _condition.notify_all(); // Wake up the thread if it’s waiting
+    _condition.notify_all(); // Wake up the thread if it's waiting
 
     if (_workerThread.joinable())
     {
