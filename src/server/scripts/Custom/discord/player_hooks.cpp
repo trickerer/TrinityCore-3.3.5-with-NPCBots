@@ -24,24 +24,19 @@ public:
 		TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
 	}
 
-    void OnLogin(Player* player) // No override needed in 3.3.5a
+    void OnLogin(Player* player)
     {
-        TC_LOG_INFO("player.hooks", "Player logged in: {}", player->GetName()); // Check if this log appears
-        Notify(player, true);  
+        TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
+        Notify(player, true);
     }
 
-    void OnLogout(Player* player) // No override needed in 3.3.5a
+    void OnLogout(Player* player)
     {
         TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
         Notify(player, false); 
     }
 
 private:
-    bool IsWebhookEnabled()
-    {
-        return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
-    }
-
     void Notify(Player* player, bool loggingIn)
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
@@ -59,8 +54,6 @@ private:
         messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
-
-        // Log the message content being sent
         TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
 
         SendDiscordWebhook(webhookUrl, messageStream.str());
@@ -82,7 +75,6 @@ private:
             json.stringify(payloadStream);
             std::string payload = payloadStream.str();
 
-            // Log the payload being sent to ensure it's correctly formatted
             TC_LOG_INFO("player.hooks", "Payload being sent: {}", payload.c_str());
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
@@ -106,7 +98,6 @@ private:
 
             std::string responseBody = ss.str();
 
-            // Log the response body to check if the webhook was accepted
             if (!responseBody.empty())
                 TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
             else
@@ -118,6 +109,7 @@ private:
         }
     }
 };
+
 
 // Register the script
 void AddSC_DiscordWebhookPlayerActivity()
