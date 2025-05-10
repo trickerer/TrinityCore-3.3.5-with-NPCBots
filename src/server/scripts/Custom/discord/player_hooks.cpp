@@ -26,14 +26,16 @@ public:
 
     void OnLogin(Player* player)
     {
-        TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
+        // NEED TO FIX LOGIN NOT BEING CALLED!!
+		TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
         Notify(player, true);
     }
 
     void OnLogout(Player* player)
     {
-        TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
-        Notify(player, false); 
+        
+		TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
+        //Notify(player, false);  TO PREVENT LOGOUT MESSAGE UNTIL LOGIN WORKING
     }
 
 private:
