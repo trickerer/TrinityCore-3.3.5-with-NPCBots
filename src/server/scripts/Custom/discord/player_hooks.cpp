@@ -63,52 +63,55 @@ private:
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
+{
+    try
     {
-        try
-        {
-            Poco::URI uri(url);
-            std::string path = uri.getPathAndQuery();
-            if (path.empty())
-                path = "/";
+        Poco::URI uri(url);
+        std::string path = uri.getPathAndQuery();
+        if (path.empty())
+            path = "/";
 
-            Poco::JSON::Object json;
-			json.set("content", message);
+        Poco::JSON::Object json;
+        json.set("content", message);
 
-			std::stringstream payloadStream;
-			json.stringify(payloadStream);
-			std::string payload = payloadStream.str();
+        std::stringstream payloadStream;
+        json.stringify(payloadStream);
+        std::string payload = payloadStream.str();
 
-            std::unique_ptr<Poco::Net::HTTPClientSession> session;
-            if (uri.getScheme() == "https")
-                session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
-            else
-                session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
+        // Log the payload being sent
+        TC_LOG_INFO("player.hooks", "Payload being sent: {}", payload.c_str());
 
-            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
-            request.setHost(uri.getHost());
-            request.setContentType("application/json");
-            request.setContentLength(static_cast<int>(payload.size()));
+        std::unique_ptr<Poco::Net::HTTPClientSession> session;
+        if (uri.getScheme() == "https")
+            session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
+        else
+            session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
 
-            std::ostream& os = session->sendRequest(request);
-            os << payload;
+        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+        request.setHost(uri.getHost());
+        request.setContentType("application/json");
+        request.setContentLength(static_cast<int>(payload.size()));
 
-            Poco::Net::HTTPResponse response;
-            std::istream& rs = session->receiveResponse(response);
-            std::stringstream ss;
-            Poco::StreamCopier::copyStream(rs, ss);
+        std::ostream& os = session->sendRequest(request);
+        os << payload;
 
-            std::string responseBody = ss.str();
+        Poco::Net::HTTPResponse response;
+        std::istream& rs = session->receiveResponse(response);
+        std::stringstream ss;
+        Poco::StreamCopier::copyStream(rs, ss);
 
-            if (!responseBody.empty())
-                TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
-            else
-                TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
-        }
-        catch (const Poco::Exception& ex)
-        {
-            TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
-        }
-    }
+        std::string responseBody = ss.str();
+
+        if (!responseBody.empty())
+            TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
+        else
+            TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
+		}
+		catch (const Poco::Exception& ex)
+		{
+			TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
+		}
+	}
 };
 
 // Register the script
