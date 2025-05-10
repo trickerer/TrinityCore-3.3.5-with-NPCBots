@@ -809,7 +809,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 	sScriptMgr->OnLogin(pCurrChar);
-	m_player = pCurrChar;
+	//m_player = pCurrChar;
 
     //Show cinematic at the first time that player login
     if (!pCurrChar->getCinematic())
