@@ -19,17 +19,20 @@
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
-    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity") { }
+    DiscordWebhookPlayerActivity() : PlayerScript("DiscordWebhookPlayerActivity")
+	{
+		TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
+	}
 
     void OnLogin(Player* player) // No override needed in 3.3.5a
     {
-        TC_LOG_INFO("player.hooks", "Player logged in: %s", player->GetName().c_str());
+        TC_LOG_INFO("player.hooks", "Player logged in: {}", player->GetName());
         Notify(player, true);  
     }
 
     void OnLogout(Player* player) // No override needed in 3.3.5a
     {
-        TC_LOG_INFO("player.hooks", "Player logged out: %s", player->GetName().c_str());
+        TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
         Notify(player, false); 
     }
 
@@ -55,7 +58,7 @@ private:
         std::ostringstream messageStream;
         messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
-        TC_LOG_INFO("player.hooks", "Sending webhook for player: %s", name.c_str());
+        TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
@@ -92,13 +95,13 @@ private:
             std::string responseBody = ss.str();
 
             if (!responseBody.empty())
-                TC_LOG_INFO("player.hooks", "Webhook response body: %s", responseBody.c_str());
+                TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
             else
                 TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
         }
         catch (const Poco::Exception& ex)
         {
-            TC_LOG_ERROR("player.hooks", "Webhook failed: %s", ex.displayText().c_str());
+            TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
         }
     }
 };
