@@ -71,7 +71,12 @@ private:
             if (path.empty())
                 path = "/";
 
-            std::string payload = "{\"content\":\"" + message + "\"}";
+            Poco::JSON::Object json;
+			json.set("content", message);
+
+			std::stringstream payloadStream;
+			json.stringify(payloadStream);
+			std::string payload = payloadStream.str();
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
