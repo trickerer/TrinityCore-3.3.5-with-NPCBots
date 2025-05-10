@@ -757,7 +757,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     pCurrChar->GetMotionMaster()->Initialize();
     pCurrChar->SendDungeonDifficulty(false);
 	
-	DiscordWebhookPlayerActivity().OnLogin(pCurrChar);
+	//DiscordWebhookPlayerActivity().OnLogin(pCurrChar);
 
     WorldPackets::Character::LoginVerifyWorld loginVerifyWorld;
     loginVerifyWorld.MapID = pCurrChar->GetMapId();
