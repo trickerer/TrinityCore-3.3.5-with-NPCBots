@@ -27,7 +27,7 @@ public:
     void OnLogin(Player* player)
     {
         TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
-        Notify(player, true);
+        Notify(player, false);
     }
 
     void OnLogout(Player* player)
