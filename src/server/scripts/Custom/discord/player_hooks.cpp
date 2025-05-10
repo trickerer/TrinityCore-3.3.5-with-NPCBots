@@ -27,7 +27,7 @@ public:
     void OnLogin(Player* player)
     {
         TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
-        Notify(player, false);
+        Notify(player, true);
     }
 
     void OnLogout(Player* player)
@@ -105,7 +105,7 @@ private:
         }
         catch (const Poco::Exception& ex)
         {
-            TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
+            TC_LOG_INFO("player.hooks", "Webhook failed: {}", ex.displayText());
         }
     }
 };
