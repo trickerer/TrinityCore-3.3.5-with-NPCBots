@@ -53,7 +53,7 @@ private:
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
         std::ostringstream messageStream;
-        messageStream << gmTag << "**Player " << status << "**\nName: `" << name.c_str() << "`";
+        messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for player: %s", name.c_str());
         SendDiscordWebhook(webhookUrl, messageStream.str());
