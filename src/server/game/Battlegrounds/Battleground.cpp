@@ -1174,21 +1174,20 @@ void Battleground::StartBattleground()
 {
     SetStartTime(0);
     SetLastResurrectTime(0);
-    // add BG to free slot queue
     AddToBGFreeSlotQueue();
-
-    // add bg to update list
-    // This must be done here, because we need to have already invited some players when first BG::Update() method is executed
-    // and it doesn't matter if we call StartBattleground() more times, because m_Battlegrounds is a map and instance id never changes
     sBattlegroundMgr->AddBattleground(this);
-	
-	std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-	if (!webhookUrl.empty())
-	{
-		uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
-		uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
-		SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
-	}
+
+    // Ensure webhook URL is fetched from the configuration
+    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+
+    if (!webhookUrl.empty())  // Only proceed if webhook URL is not empty
+    {
+        uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+        uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+
+        // Call the function to send the webhook
+        SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
+    }
 
     if (m_IsRated)
         TC_LOG_DEBUG("bg.arena", "Arena match type: {} for Team1Id: {} - Team2Id: {} started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
