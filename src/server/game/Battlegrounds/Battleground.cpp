@@ -1177,20 +1177,25 @@ void Battleground::StartBattleground()
     AddToBGFreeSlotQueue();
     sBattlegroundMgr->AddBattleground(this);
 
-    // Declare the webhook URL and get the value from the config
+    // Declare webhookUrl inside the function to ensure it's in scope
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
 
-    if (!webhookUrl.empty())  // Only proceed if webhook URL is not empty
+    // Ensure the webhookUrl is valid before proceeding
+    if (!webhookUrl.empty())
     {
+        // Get the player counts for both factions
         uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
         uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
 
-        // Send the webhook notification
+        // Send the webhook with battleground details
         SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
     }
 
+    // If it's a rated battleground, log the details
     if (m_IsRated)
+    {
         TC_LOG_DEBUG("bg.arena", "Arena match type: {} for Team1Id: {} - Team2Id: {} started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
+    }
 }
 
 void Battleground::AddPlayer(Player* player)
