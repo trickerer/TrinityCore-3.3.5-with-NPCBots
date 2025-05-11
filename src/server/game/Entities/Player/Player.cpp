@@ -179,18 +179,9 @@ static uint32 corpseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
 uint32 const MAX_MONEY_AMOUNT = static_cast<uint32>(std::numeric_limits<int32>::max());
 
-bool Player::IsInChannel(const std::string& name)
+bool Player::IsInChannel(const std::string& name) const
 {
-    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
-    {
-        // ID 0 is used for custom channels
-        if (Channel* chn = cMgr->GetChannel(0, name, this, false))
-        {
-            const auto& players = chn->GetPlayers(); // std::map<ObjectGuid, Channel::PlayerInfo>
-            return players.find(GetGUID()) != players.end();
-        }
-    }
-    return false;
+    return _joinedChannels.count(name);
 }
 
 Player::Player(WorldSession* session): Unit(true)
