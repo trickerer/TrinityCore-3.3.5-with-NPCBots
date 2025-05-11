@@ -47,6 +47,10 @@ public:
 
     void OnLogout(Player* player)
 	{
+		if (serverShuttingDown)
+		{
+			return;
+		}
 		uint64 guid = player->GetGUID();
 		LoggedInGuids.erase(guid);
 
