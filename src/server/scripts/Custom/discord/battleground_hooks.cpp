@@ -18,13 +18,15 @@
 #include "Config.h"
 #include "Log.h"
 
-class DiscordWebhookBattlegroundScript : public BGScript
+class BattlegroundWS_DiscordHook : public BattlegroundWS
 {
 public:
-    DiscordWebhookBattlegroundScript() : BGScript("DiscordWebhookBattlegroundScript") { }
+    BattlegroundWS_DiscordHook() : BattlegroundWS() { }
 
-    void OnBattlegroundStart(Battleground* bg)
+    void StartingEventCloseDoors() override
     {
+        BattlegroundWS::StartingEventCloseDoors(); // Keep original behavior
+
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -32,13 +34,11 @@ public:
             return;
         }
 
-        std::string bgName = bg->GetName();
         std::stringstream message;
-        message << "⚔️ **Battleground Started!**\n"
-                << "**Name:** " << bgName << "\n"
+        message << "⚔️ **Warsong Gulch Started!**\n"
                 << "**Players:** "
-                << bg->GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
-                << bg->GetPlayersCountByTeam(HORDE) << " Horde";
+                << GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
+                << GetPlayersCountByTeam(HORDE) << " Horde";
 
         SendDiscordWebhook(webhookUrl, message.str());
     }
@@ -83,7 +83,18 @@ private:
     }
 };
 
+class BG_WS_DiscordHookScript : public BattlegroundScript
+{
+public:
+    BG_WS_DiscordHookScript() : BattlegroundScript("BG_WS_DiscordHookScript") { }
+
+    Battleground* GetBattleground() const override
+    {
+        return new BattlegroundWS_DiscordHook();
+    }
+};
+
 void AddBattlegroundDiscordHookScripts()
 {
-    new DiscordWebhookBattlegroundScript();
+    new BG_WS_DiscordHookScript();
 }
