@@ -15,7 +15,7 @@
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "Log.h"
-#include "WorldSession.h"
+#include "World.h"
 
 class DiscordWebhookServerHook : public WorldScript
 {
