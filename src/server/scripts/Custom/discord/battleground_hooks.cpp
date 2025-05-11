@@ -24,15 +24,20 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 
 // Function definitions
 
-void OnBattlegroundStart(Battleground* bg)
+void Battleground::StartBattleground()
 {
-    TC_LOG_INFO("bg.hooks", "Battleground %s is starting.", bg->GetName().c_str());
+    TC_LOG_INFO("bg.hooks", "StartBattleground called for: %s", GetName().c_str());
 
-    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-    if (webhookUrl.empty())
+    // Add this block:
     {
-        TC_LOG_ERROR("bg.hooks", "Webhook URL is not configured.");
-        return;
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (!webhookUrl.empty())
+        {
+            uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+            uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+
+            SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
+        }
     }
 
     uint32 alliancePlayers = bg->GetPlayersCountByTeam(ALLIANCE);
