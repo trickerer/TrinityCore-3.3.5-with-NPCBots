@@ -32,22 +32,28 @@ public:
 
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
-        // Use stringstream to format the message
         std::stringstream messageStream;
-        messageStream << "✅ **Server has started successfully!**\nRealm: **" << realmName << "**";
-        std::string message = messageStream.str();
+        messageStream << "✅ **Server is online **\nRealm: **" << realmName << "**";
+        SendDiscordWebhook(webhookUrl, messageStream.str());
+    }
 
-        // Send the webhook with the message
-        SendDiscordWebhook(webhookUrl, message);
+    void OnShutdown() override
+    {
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("server.hooks", "Webhook URL is not configured.");
+            return;
+        }
+
+        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+
+        std::stringstream messageStream;
+        messageStream << "🛑 **Server is restarting 1 min downtime..**\nRealm: **" << realmName << "**";
+        SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
 private:
-    bool IsWebhookEnabled()
-    {
-        // Check if the Webhook is enabled in the config file
-        return sConfigMgr->GetBoolDefault("Webhook.Enabled", true);
-    }
-
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
         try
@@ -57,7 +63,6 @@ private:
             if (path.empty())
                 path = "/";
 
-            // Construct JSON payload safely
             Poco::JSON::Object json;
             json.set("content", message);
 
