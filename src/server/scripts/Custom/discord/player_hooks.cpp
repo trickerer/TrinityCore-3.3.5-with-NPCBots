@@ -11,6 +11,10 @@
 #include <Poco/JSON/Stringifier.h>
 #undef format
 
+#include <unordered_set>
+
+static std::unordered_set<uint64> LoggedInGuids;
+
 // TrinityCore headers
 #include "ScriptMgr.h"
 #include "Config.h"
