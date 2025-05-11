@@ -40,8 +40,8 @@ void Battleground::StartBattleground()
         }
     }
 
-    uint32 alliancePlayers = bg->GetPlayersCountByTeam(ALLIANCE);
-    uint32 hordePlayers = bg->GetPlayersCountByTeam(HORDE);
+    uint32 alliancePlayers = this->GetPlayersCountByTeam(ALLIANCE);
+    uint32 hordePlayers = this->GetPlayersCountByTeam(HORDE);
     SendBattlegroundDiscordWebhook(webhookUrl, bg->GetName(), alliancePlayers, hordePlayers);
 }
 
@@ -116,5 +116,5 @@ public:
 
 void AddBattlegroundDiscordHookScripts()
 {
-    new BattlegroundScript_DiscordHook();
+    //new BattlegroundScript_DiscordHook();
 }
