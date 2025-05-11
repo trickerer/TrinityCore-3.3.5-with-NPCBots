@@ -2540,9 +2540,6 @@ public:
         TimeTracker m_groupUpdateTimer;
 
     private:
-
-    std::set<std::string> _joinedChannels; // ✅ Move this here, not in PlayerTalentInfo
-
         /*****************************************************************/
         /***                        NPCBOT SYSTEM                      ***/
         /*****************************************************************/
