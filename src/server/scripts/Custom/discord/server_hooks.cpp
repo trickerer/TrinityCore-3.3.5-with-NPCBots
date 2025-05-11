@@ -19,7 +19,9 @@
 #include "WorldSession.h"
 #include "server_shutdown.h"
 
-bool serverShuttingDown = false;  // Global flag to track server shutdown
+// Global variable to hold the countdown timer and remaining time
+int shutdownTimer = 0;  // Time in seconds until the server shuts down
+bool countdownInProgress = false;  // Flag to check if a countdown is in progress
 
 class DiscordWebhookServerHook : public WorldScript
 {
@@ -44,9 +46,11 @@ public:
 
     void OnShutdown() override
     {
-        // Set the flag that the server is shutting down
-        serverShuttingDown = true;
+        // Prevent starting multiple countdowns
+        if (countdownInProgress)
+            return;
 
+        countdownInProgress = true;
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -54,41 +58,49 @@ public:
             return;
         }
 
-        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        // Start countdown, example 30 seconds before shutdown
+        shutdownTimer = 30;  // Set countdown time (in seconds)
+        
+        // Start sending periodic messages to Discord
+        SendShutdownCountdown(webhookUrl);
 
+        // Optionally, add a final message right before shutdown
         std::stringstream messageStream;
-        messageStream << "🛑 **Server is restarting, 1 min downtime..**\nRealm: **" << realmName << "**";
+        messageStream << "🛑 **Server is restarting, 1 min downtime..**\nRealm: **" << sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm") << "**";
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
-    // You can modify the Notify function if required
-    void Notify(Player* player, bool loggingIn)
+    // This function sends periodic countdown messages every 10 seconds
+    void SendShutdownCountdown(const std::string& webhookUrl)
     {
-        // Check if the server is shutting down, and prevent notifications if true
-        if (serverShuttingDown)
-        {
-            TC_LOG_INFO("server.hooks", "Server is shutting down, not sending login/logout notifications.");
-            return;
-        }
+        // Schedule the periodic countdown
+        World::AddWorldTimedTask(10, [this, webhookUrl]() {
+            if (shutdownTimer > 0)
+            {
+                std::stringstream messageStream;
+                messageStream << "⚠️ **Server restarting in " << shutdownTimer << " seconds**";
+                SendDiscordWebhook(webhookUrl, messageStream.str());
 
-        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-        if (webhookUrl.empty())
-        {
-            TC_LOG_ERROR("server.hooks", "No webhook URL configured!");
-            return;
-        }
+                // Decrease the timer
+                shutdownTimer -= 10;
 
-        std::string name = player->GetName();
-        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "";
-        std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
-
-        std::ostringstream messageStream;
-        messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
-
-        TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
-        TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
-
-        SendDiscordWebhook(webhookUrl, messageStream.str());
+                // If time is up, send the final shutdown message
+                if (shutdownTimer <= 0)
+                {
+                    std::stringstream finalMessage;
+                    finalMessage << "🛑 **Server is shutting down now!**";
+                    SendDiscordWebhook(webhookUrl, finalMessage.str());
+                    
+                    // You can trigger the actual shutdown here if needed
+                    // Example: World::StopAll();
+                }
+                else
+                {
+                    // Reschedule the next countdown update
+                    SendShutdownCountdown(webhookUrl);
+                }
+            }
+        });
     }
 
 private:
