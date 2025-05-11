@@ -101,10 +101,9 @@ private:
 
             Poco::JSON::Object json;
             json.set("content", message);
-			json.set("avatar_url",
-            "https://i0.wp.com/mgawow.online/wp-content/uploads/2025/05/"
-            "ChatGPT-Image-May-9-2025-12_32_25-PM-Photoroom.png?resize=600%2C600&ssl=1"
-			);
+			std::string avatarUrl = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
+			if (!avatarUrl.empty())
+				json.set("avatar_url", avatarUrl);
 
             std::stringstream payloadStream;
             json.stringify(payloadStream);
