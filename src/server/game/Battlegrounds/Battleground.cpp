@@ -1177,7 +1177,7 @@ void Battleground::StartBattleground()
     AddToBGFreeSlotQueue();
     sBattlegroundMgr->AddBattleground(this);
 
-    // Ensure webhook URL is fetched from the configuration
+    // Declare the webhook URL and get the value from the config
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
 
     if (!webhookUrl.empty())  // Only proceed if webhook URL is not empty
@@ -1185,8 +1185,8 @@ void Battleground::StartBattleground()
         uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
         uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
 
-        // Call the function to send the webhook
-        SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
+        // Send the webhook notification
+        SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
     }
 
     if (m_IsRated)
