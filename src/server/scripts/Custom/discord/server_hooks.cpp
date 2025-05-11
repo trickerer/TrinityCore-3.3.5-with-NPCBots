@@ -57,7 +57,7 @@ public:
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
         std::stringstream messageStream;
-        messageStream << "🛑 **Server is restarting, 1 min downtime..**\nRealm: **" << realmName << "**";
+        messageStream << "🛑 **Server is restarting, 2 mins downtime..**\nRealm: **" << realmName << "**";
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
