@@ -42,11 +42,13 @@ public:
 	}
 
     void OnLogout(Player* player)
-    {
-        
+	{
+		uint64 guid = player->GetGUID();
+		LoggedInGuids.erase(guid);
+
 		TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
-        Notify(player, false);  
-    }
+		Notify(player, false);  
+	}
 
 private:
     void Notify(Player* player, bool loggingIn)
@@ -59,7 +61,7 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
+        std::string gmTag = player->HasFlag(PLAYER_FLAGS_GM) ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
         std::ostringstream messageStream;
