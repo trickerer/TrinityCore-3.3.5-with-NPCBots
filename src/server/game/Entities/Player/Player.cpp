@@ -183,14 +183,11 @@ bool Player::IsInChannel(const std::string& name)
 {
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
     {
-        // You need to use MakeChannelId to resolve the channel type (general, trade, etc.)
-        uint32 channelId = ChatHandler::MakeChannelId(*this, name.c_str());
-
-        // Now try to get the channel
-        if (Channel* chn = cMgr->GetChannel(channelId, name, this))
+        // Just use name and this player to find the channel
+        if (Channel* chn = cMgr->GetChannel(name, this))
         {
-            // Use the IsOn function to check membership
-            return chn->IsOn(this);
+            // Use GetGUID() to check membership
+            return chn->IsOn(GetGUID());
         }
     }
     return false;
