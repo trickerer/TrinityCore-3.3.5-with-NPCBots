@@ -42,7 +42,7 @@ void Battleground::StartBattleground()
 
     uint32 alliancePlayers = this->GetPlayersCountByTeam(ALLIANCE);
     uint32 hordePlayers = this->GetPlayersCountByTeam(HORDE);
-    SendBattlegroundDiscordWebhook(webhookUrl, bg->GetName(), alliancePlayers, hordePlayers);
+    SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
 }
 
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
