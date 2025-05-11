@@ -85,6 +85,10 @@ enum LootType : uint8;
 class BotMgr;
 // end NpcBot mod
 
+
+public:
+    bool IsInChannel(const std::string& channelName);
+
 typedef std::deque<Mail*> PlayerMails;
 
 #define PLAYER_MAX_SKILLS           128
