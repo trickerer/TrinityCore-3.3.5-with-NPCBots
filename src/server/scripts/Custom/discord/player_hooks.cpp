@@ -24,7 +24,7 @@ public:
 		TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
 	}
 
-    void OnLogin(Player* player)
+    void OnLogin(Player* player, bool /*firstLogin*/)
     {
         // NEED TO FIX LOGIN NOT BEING CALLED!!
 		TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
