@@ -17,12 +17,12 @@
 #include "Config.h"
 #include "Log.h"
 
-class DiscordWebhookBattlegroundHook : public BGScript
+class DiscordWebhookBattlegroundHook : public BattlegroundScript
 {
 public:
-    DiscordWebhookBattlegroundHook() : BGScript("DiscordWebhookBattlegroundHook") { }
+    DiscordWebhookBattlegroundHook() : BattlegroundScript("DiscordWebhookBattlegroundHook") { }
 
-    void OnBattlegroundStarted(Battleground* bg)
+    void OnBattlegroundStarted(Battleground* bg) override
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
@@ -90,4 +90,4 @@ private:
 void AddBattlegroundDiscordHookScripts()
 {
     new DiscordWebhookBattlegroundHook();
-} 
+}
