@@ -1172,7 +1172,7 @@ void Battleground::Reset()
 
 void Battleground::StartBattleground()
 {
-    // Initialize webhook URL first
+    // Declare the webhookUrl variable here to ensure it's in scope
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
 
     // Add BG to free slot queue and to the update list
@@ -1181,14 +1181,14 @@ void Battleground::StartBattleground()
     AddToBGFreeSlotQueue();
     sBattlegroundMgr->AddBattleground(this);
 
-    // If the webhook URL is configured, send the Discord webhook
+    // Send Discord webhook if URL is defined
     if (!webhookUrl.empty())
     {
         uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
         uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
 
-        // Send the webhook
-        SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
+        // Call the function to send the webhook
+        SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
     }
 
     // Log if the battleground is rated
