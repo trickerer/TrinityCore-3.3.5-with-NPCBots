@@ -23,7 +23,7 @@
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers);
 
 // Function definitions
-
+/*
 void Battleground::StartBattleground()
 {
     // Ensure webhookUrl is declared before its usage
@@ -39,7 +39,7 @@ void Battleground::StartBattleground()
         SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
     }
 }
-
+*/
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
 {
     try
