@@ -63,7 +63,7 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string gmTag = player->HasFlag(UNIT_FIELD_PLAYER_FLAGS, PLAYER_FLAGS_GM) ? "🛡️ " : "";
+        std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
         std::ostringstream messageStream;
