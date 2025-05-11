@@ -21,6 +21,7 @@ static std::unordered_set<uint64> LoggedInGuids;
 #include "Log.h"
 #include "Player.h"
 
+
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
 public:
@@ -62,7 +63,7 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string gmTag = player->HasFlag(PLAYER_FLAGS_GM) ? "🛡️ " : "";
+        std::string gmTag = player->HasFlag(UNIT_FIELD_PLAYER_FLAGS, PLAYER_FLAGS_GM) ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
         std::ostringstream messageStream;
