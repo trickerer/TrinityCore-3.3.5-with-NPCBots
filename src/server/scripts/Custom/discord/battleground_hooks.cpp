@@ -18,12 +18,7 @@
 #include "Config.h"
 #include "Log.h"
 
-#include "ScriptMgr.h"
-#include "Battleground.h"
-#include "BattlegroundMgr.h"
-#include "Player.h"
-#include "Config.h"
-#include "Log.h"
+
 
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
 {
@@ -82,6 +77,12 @@ public:
         uint32 alliancePlayers = bg->GetPlayersCountByTeam(ALLIANCE);
         uint32 hordePlayers = bg->GetPlayersCountByTeam(HORDE);
         SendBattlegroundDiscordWebhook(webhookUrl, bg->GetName(), alliancePlayers, hordePlayers);
+    }
+
+    // Implement the missing GetBattleground method
+    virtual Battleground* GetBattleground() const override
+    {
+        return nullptr; // Or you can implement a more specific logic here depending on the battleground
     }
 };
 
