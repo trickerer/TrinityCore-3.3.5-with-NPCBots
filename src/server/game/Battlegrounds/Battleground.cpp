@@ -49,6 +49,7 @@
 //end npcbot
 
 #include "DiscordWebhookMgr.h"
+#include "Config.h"
 
 void BattlegroundScore::AppendToPacket(WorldPacket& data)
 {
