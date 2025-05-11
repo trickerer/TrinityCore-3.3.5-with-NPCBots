@@ -35,7 +35,7 @@ public:
     {
         
 		TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
-        //Notify(player, false);  TO PREVENT LOGOUT MESSAGE UNTIL LOGIN WORKING
+        Notify(player, false); 
     }
 
 private:
