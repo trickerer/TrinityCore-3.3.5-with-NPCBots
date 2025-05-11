@@ -22,6 +22,7 @@ static std::unordered_set<uint64> LoggedInGuids;
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "server_shutdown.h"
 
 
 class DiscordWebhookPlayerActivity : public PlayerScript

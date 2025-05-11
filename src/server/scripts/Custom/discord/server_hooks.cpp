@@ -17,8 +17,9 @@
 #include "Log.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "server_shutdown.h"
 
-static bool serverShuttingDown = false;  // Custom flag to track server shutdown
+bool serverShuttingDown = false;  // Global flag to track server shutdown
 
 class DiscordWebhookServerHook : public WorldScript
 {
