@@ -26,23 +26,30 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 
 void Battleground::StartBattleground()
 {
-    TC_LOG_INFO("bg.hooks", "StartBattleground called for: %s", GetName().c_str());
+    // Ensure webhookUrl is declared before its usage
+    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
 
-    // Add this block:
+    // Check if webhook URL is valid before sending it
+    if (!webhookUrl.empty())
     {
-        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-        if (!webhookUrl.empty())
-        {
-            uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
-            uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+        uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+        uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
 
-            SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
-        }
+        // Ensure the webhook function is correctly called here
+        SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
     }
 
-    uint32 alliancePlayers = this->GetPlayersCountByTeam(ALLIANCE);
-    uint32 hordePlayers = this->GetPlayersCountByTeam(HORDE);
-    SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
+    // Proceed with other logic in the function
+    SetStartTime(0);
+    SetLastResurrectTime(0);
+    AddToBGFreeSlotQueue();
+    sBattlegroundMgr->AddBattleground(this);
+
+    // Log additional information for rated battlegrounds
+    if (m_IsRated)
+    {
+        TC_LOG_DEBUG("bg.arena", "Arena match type: {} for Team1Id: {} - Team2Id: {} started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
+    }
 }
 
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
