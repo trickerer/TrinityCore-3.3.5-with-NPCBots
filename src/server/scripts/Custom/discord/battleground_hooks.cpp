@@ -22,7 +22,7 @@ class DiscordWebhookBattlegroundHook : public BGScript
 public:
     DiscordWebhookBattlegroundHook() : BGScript("DiscordWebhookBattlegroundHook") { }
 
-    void OnBattlegroundStarted(Battleground* bg) override
+    void OnBattlegroundStarted(Battleground* bg)
     {
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
