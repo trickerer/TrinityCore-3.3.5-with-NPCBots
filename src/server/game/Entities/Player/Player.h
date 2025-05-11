@@ -934,10 +934,6 @@ struct PlayerTalentInfo
     uint8 ActiveSpec;
     uint8 SpecsCount;
 
-private:
-    PlayerTalentInfo(PlayerTalentInfo const&);
-};
-
 class TC_GAME_API Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
@@ -952,6 +948,12 @@ public:
     {
         return _joinedChannels.find(name) != _joinedChannels.end();
     }
+
+private:
+    std::set<std::string> _joinedChannels; // Correct location for private members
+
+    PlayerTalentInfo(PlayerTalentInfo const&);
+};
 		
         explicit Player(WorldSession* session);
         ~Player();
