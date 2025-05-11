@@ -227,7 +227,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
             pinfo.SetModerator(true);
         }
     }
-	player->TrackJoinedChannel(_name);
+	player->TrackJoinedChannel(GetName());
 }
 
 void Channel::LeaveChannel(Player* player, bool send)
@@ -293,7 +293,7 @@ void Channel::LeaveChannel(Player* player, bool send)
         }
     }
 	
-	player->TrackLeftChannel(_name);
+	player->TrackLeftChannel(GetName());
 }
 
 void Channel::KickOrBan(Player const* player, std::string const& badname, bool ban)
