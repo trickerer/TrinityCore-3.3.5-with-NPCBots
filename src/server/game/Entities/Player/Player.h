@@ -952,10 +952,6 @@ public:
     {
         return _joinedChannels.find(name) != _joinedChannels.end();
     }
-
-private:
-    std::set<std::string> _joinedChannels; // ✅ Move this here, not in PlayerTalentInfo
-};
 		
         explicit Player(WorldSession* session);
         ~Player();
@@ -2540,6 +2536,9 @@ private:
         TimeTracker m_groupUpdateTimer;
 
     private:
+
+    std::set<std::string> _joinedChannels; // ✅ Move this here, not in PlayerTalentInfo
+
         /*****************************************************************/
         /***                        NPCBOT SYSTEM                      ***/
         /*****************************************************************/
