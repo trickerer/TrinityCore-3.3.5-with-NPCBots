@@ -27,6 +27,8 @@
 #include <deque>
 #include <map>
 
+void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers);
+
 namespace WorldPackets
 {
     namespace WorldState
