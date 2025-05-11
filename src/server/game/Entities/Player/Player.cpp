@@ -181,10 +181,17 @@ uint32 const MAX_MONEY_AMOUNT = static_cast<uint32>(std::numeric_limits<int32>::
 
 bool Player::IsInChannel(const std::string& name)
 {
-    if (ChannelMgr* cMgr = ChannelMgr(this->GetTeam()))
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
     {
-        if (Channel* chn = cMgr->GetChannel(name, this))
-            return chn->IsMember(this->GetGUID());
+        // You need to use MakeChannelId to resolve the channel type (general, trade, etc.)
+        uint32 channelId = ChatHandler::MakeChannelId(*this, name.c_str());
+
+        // Now try to get the channel
+        if (Channel* chn = cMgr->GetChannel(channelId, name, this))
+        {
+            // Use the IsOn function to check membership
+            return chn->IsOn(this);
+        }
     }
     return false;
 }
