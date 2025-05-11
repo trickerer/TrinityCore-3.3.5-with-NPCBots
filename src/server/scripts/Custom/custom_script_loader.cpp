@@ -34,7 +34,7 @@ void AddSC_npc_insta_80();
 void AddSC_npc_dungeon_master();
 void AddDiscordWebhookServerHookScripts();
 void AddSC_DiscordWebhookPlayerActivity();
-void AddSC_AddBattlegroundDiscordHookScripts();
+void AddBattlegroundDiscordHookScripts();
  
 void AddCustomScripts()
 {

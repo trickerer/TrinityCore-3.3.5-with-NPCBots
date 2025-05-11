@@ -90,4 +90,4 @@ private:
 void AddBattlegroundDiscordHookScripts()
 {
     new DiscordWebhookBattlegroundHook();
-}
+} 
