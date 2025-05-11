@@ -34,6 +34,19 @@
 #include <queue>
 #include <unordered_set>
 
+#include <set>
+
+private:
+    std::set<std::string> _joinedChannels;
+
+public:
+    void TrackJoinedChannel(const std::string& name) { _joinedChannels.insert(name); }
+    void TrackLeftChannel(const std::string& name) { _joinedChannels.erase(name); }
+    bool IsInChannel(const std::string& name) const
+    {
+        return _joinedChannels.find(name) != _joinedChannels.end();
+    }
+
 struct AccessRequirement;
 struct AchievementEntry;
 struct AreaTableEntry;
