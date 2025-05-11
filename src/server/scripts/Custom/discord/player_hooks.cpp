@@ -25,11 +25,17 @@ public:
 	}
 
     void OnLogin(Player* player, bool /*firstLogin*/)
-    {
-        // NEED TO FIX LOGIN NOT BEING CALLED!!
-		TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName()); // This will log if triggered
-        Notify(player, true); 
-    }
+	{
+		uint64 guid = player->GetGUID();
+
+		if (LoggedInGuids.find(guid) != LoggedInGuids.end())
+			return; // Already notified
+
+		LoggedInGuids.insert(guid);
+
+		TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName());
+		Notify(player, true); 
+	}
 
     void OnLogout(Player* player)
     {
