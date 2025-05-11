@@ -937,7 +937,7 @@ struct PlayerTalentInfo
 private:
     std::set<std::string> _joinedChannels; // Correct location for private members
 
-    PlayerTalentInfo(PlayerTalentInfo const&);
+    
 };
 
 class TC_GAME_API Player : public Unit, public GridObject<Player>
