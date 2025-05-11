@@ -63,7 +63,7 @@ private:
         }
 
         std::string name = player->GetName();
-        std::string gmTag = player->IsGameMaster() ? "🛡️ " : "";
+        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "";
         std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
 
         std::ostringstream messageStream;
