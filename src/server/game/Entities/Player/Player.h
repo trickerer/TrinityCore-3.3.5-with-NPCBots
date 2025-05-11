@@ -933,6 +933,9 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     friend void AddItemToUpdateQueueOf(Item* item, Player* player);
     friend void RemoveItemFromUpdateQueueOf(Item* item, Player* player);
     public:
+		void TrackJoinedChannel(const std::string& name) { _joinedChannels.insert(name); }
+		void TrackLeftChannel(const std::string& name) { _joinedChannels.erase(name); }
+		bool IsInChannel(const std::string& name) const { return _joinedChannels.count(name); }
         explicit Player(WorldSession* session);
         ~Player();
 
