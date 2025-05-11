@@ -109,7 +109,7 @@ public:
 
         TC_LOG_INFO("bg.hooks", "Sending webhook with %u Alliance vs %u Horde", alliancePlayers, hordePlayers);
 
-        SendBattlegroundDiscordWebhook(webhookUrl, bg->GetName(), alliancePlayers, hordePlayers);
+        SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
     }
 };
 
