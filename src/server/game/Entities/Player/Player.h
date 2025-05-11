@@ -36,9 +36,6 @@
 
 #include <set>
 
-private:
-    std::set<std::string> _joinedChannels;
-
 public:
     void TrackJoinedChannel(const std::string& name) { _joinedChannels.insert(name); }
     void TrackLeftChannel(const std::string& name) { _joinedChannels.erase(name); }
@@ -46,6 +43,11 @@ public:
     {
         return _joinedChannels.find(name) != _joinedChannels.end();
     }
+
+private:
+    std::set<std::string> _joinedChannels;
+
+
 
 struct AccessRequirement;
 struct AchievementEntry;
