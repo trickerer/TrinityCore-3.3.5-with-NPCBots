@@ -48,6 +48,8 @@
 #include "botmgr.h"
 //end npcbot
 
+#include "DiscordWebhookMgr.h"
+
 void BattlegroundScore::AppendToPacket(WorldPacket& data)
 {
     data << uint64(PlayerGuid);
@@ -1178,6 +1180,14 @@ void Battleground::StartBattleground()
     // This must be done here, because we need to have already invited some players when first BG::Update() method is executed
     // and it doesn't matter if we call StartBattleground() more times, because m_Battlegrounds is a map and instance id never changes
     sBattlegroundMgr->AddBattleground(this);
+	
+	std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+	if (!webhookUrl.empty())
+	{
+		uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+		uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+		SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers);
+	}
 
     if (m_IsRated)
         TC_LOG_DEBUG("bg.arena", "Arena match type: {} for Team1Id: {} - Team2Id: {} started.", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE]);
