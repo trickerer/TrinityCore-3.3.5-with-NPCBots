@@ -17,6 +17,8 @@
 #include "Log.h"
 #include "World.h"
 
+static bool serverShuttingDown = false;  // Custom flag to track server shutdown
+
 class DiscordWebhookServerHook : public WorldScript
 {
 public:
@@ -34,12 +36,15 @@ public:
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
         std::stringstream messageStream;
-        messageStream << "✅ **Server is online **\nRealm: **" << realmName << "**";
+        messageStream << "✅ **Server is online**\nRealm: **" << realmName << "**";
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
     void OnShutdown() override
     {
+        // Set the flag that the server is shutting down
+        serverShuttingDown = true;
+
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -50,11 +55,38 @@ public:
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
         std::stringstream messageStream;
-        messageStream << "🛑 **Server is restarting 1 min downtime..**\nRealm: **" << realmName << "**";
+        messageStream << "🛑 **Server is restarting, 1 min downtime..**\nRealm: **" << realmName << "**";
         SendDiscordWebhook(webhookUrl, messageStream.str());
+    }
 
-        // Set flag to prevent player logouts from triggering webhook during shutdown
-        sWorld->SetServerShutdownInProgress(true);
+    // You can modify the Notify function if required
+    void Notify(Player* player, bool loggingIn)
+    {
+        // Check if the server is shutting down, and prevent notifications if true
+        if (serverShuttingDown)
+        {
+            TC_LOG_INFO("server.hooks", "Server is shutting down, not sending login/logout notifications.");
+            return;
+        }
+
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("server.hooks", "No webhook URL configured!");
+            return;
+        }
+
+        std::string name = player->GetName();
+        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "";
+        std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
+
+        std::ostringstream messageStream;
+        messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
+
+        TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
+        TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
+
+        SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
 private:
