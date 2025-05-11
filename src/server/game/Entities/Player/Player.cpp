@@ -183,11 +183,11 @@ bool Player::IsInChannel(const std::string& name)
 {
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeam()))
     {
-        // Just use name and this player to find the channel
-        if (Channel* chn = cMgr->GetChannel(name, this))
+        // ID 0 is used for custom channels
+        if (Channel* chn = cMgr->GetChannel(0, name, this, false))
         {
-            // Use GetGUID() to check membership
-            return chn->IsOn(GetGUID());
+            const auto& players = chn->GetPlayers(); // std::map<ObjectGuid, Channel::PlayerInfo>
+            return players.find(GetGUID()) != players.end();
         }
     }
     return false;
