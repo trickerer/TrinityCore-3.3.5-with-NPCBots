@@ -2519,6 +2519,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         TimeTracker m_groupUpdateTimer;
 
     private:
+		std::set<std::string> _joinedChannels;
         /*****************************************************************/
         /***                        NPCBOT SYSTEM                      ***/
         /*****************************************************************/
