@@ -16,6 +16,7 @@
 #include "Config.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldSession.h"
 
 static bool serverShuttingDown = false;  // Custom flag to track server shutdown
 
