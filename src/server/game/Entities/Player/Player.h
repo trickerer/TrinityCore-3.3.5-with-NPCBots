@@ -34,15 +34,6 @@
 #include <queue>
 #include <unordered_set>
 
-#include <set>
-
-
-
-private:
-    std::set<std::string> _joinedChannels;
-
-
-
 struct AccessRequirement;
 struct AchievementEntry;
 struct AreaTableEntry;
@@ -93,9 +84,6 @@ enum LootType : uint8;
 // NpcBot mod
 class BotMgr;
 // end NpcBot mod
-
-
-
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -933,11 +921,9 @@ struct PlayerTalentInfo
     time_t ResetTalentsTime;
     uint8 ActiveSpec;
     uint8 SpecsCount;
-	
-private:
-    std::set<std::string> _joinedChannels; // Correct location for private members
 
-    
+private:
+    PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
 class TC_GAME_API Player : public Unit, public GridObject<Player>
@@ -946,17 +932,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     friend class CinematicMgr;
     friend void AddItemToUpdateQueueOf(Item* item, Player* player);
     friend void RemoveItemFromUpdateQueueOf(Item* item, Player* player);
-
-public:
-    void TrackJoinedChannel(const std::string& name) { _joinedChannels.insert(name); }
-    void TrackLeftChannel(const std::string& name) { _joinedChannels.erase(name); }
-    bool IsInChannel(const std::string& name) const
-    {
-        return _joinedChannels.find(name) != _joinedChannels.end();
-    }
-
-
-		
+    public:
         explicit Player(WorldSession* session);
         ~Player();
 
