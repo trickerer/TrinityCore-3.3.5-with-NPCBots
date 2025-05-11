@@ -25,7 +25,7 @@ public:
 
     void StartingEventCloseDoors() override
     {
-        BattlegroundWS::StartingEventCloseDoors(); // Keep original behavior
+        BattlegroundWS::StartingEventCloseDoors();
 
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
@@ -36,6 +36,201 @@ public:
 
         std::stringstream message;
         message << "⚔️ **Warsong Gulch Started!**\n"
+                << "**Players:** "
+                << GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
+                << GetPlayersCountByTeam(HORDE) << " Horde";
+
+        SendDiscordWebhook(webhookUrl, message.str());
+    }
+
+private:
+    void SendDiscordWebhook(const std::string& url, const std::string& message)
+    {
+        try
+        {
+            Poco::URI uri(url);
+            std::string path = uri.getPathAndQuery();
+            if (path.empty()) path = "/";
+
+            Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+            json->set("content", message);
+
+            std::stringstream payload;
+            Poco::JSON::Stringifier::stringify(json, payload);
+
+            std::unique_ptr<Poco::Net::HTTPClientSession> session;
+            if (uri.getScheme() == "https")
+                session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
+            else
+                session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
+
+            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+            request.setContentType("application/json");
+            request.setContentLength((int)payload.str().size());
+
+            std::ostream& os = session->sendRequest(request);
+            os << payload.str();
+
+            Poco::Net::HTTPResponse response;
+            std::istream& rs = session->receiveResponse(response);
+            std::stringstream ss;
+            Poco::StreamCopier::copyStream(rs, ss);
+        }
+        catch (const Poco::Exception& ex)
+        {
+            TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
+        }
+    }
+};
+
+class BattlegroundAB_DiscordHook : public BattlegroundAB
+{
+public:
+    BattlegroundAB_DiscordHook() : BattlegroundAB() { }
+
+    void StartingEventCloseDoors() override
+    {
+        BattlegroundAB::StartingEventCloseDoors();
+
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("bg.hooks", "Webhook URL is not configured.");
+            return;
+        }
+
+        std::stringstream message;
+        message << "⚔️ **Arathi Basin Started!**\n"
+                << "**Players:** "
+                << GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
+                << GetPlayersCountByTeam(HORDE) << " Horde";
+
+        SendDiscordWebhook(webhookUrl, message.str());
+    }
+
+private:
+    void SendDiscordWebhook(const std::string& url, const std::string& message)
+    {
+        try
+        {
+            Poco::URI uri(url);
+            std::string path = uri.getPathAndQuery();
+            if (path.empty()) path = "/";
+
+            Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+            json->set("content", message);
+
+            std::stringstream payload;
+            Poco::JSON::Stringifier::stringify(json, payload);
+
+            std::unique_ptr<Poco::Net::HTTPClientSession> session;
+            if (uri.getScheme() == "https")
+                session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
+            else
+                session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
+
+            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+            request.setContentType("application/json");
+            request.setContentLength((int)payload.str().size());
+
+            std::ostream& os = session->sendRequest(request);
+            os << payload.str();
+
+            Poco::Net::HTTPResponse response;
+            std::istream& rs = session->receiveResponse(response);
+            std::stringstream ss;
+            Poco::StreamCopier::copyStream(rs, ss);
+        }
+        catch (const Poco::Exception& ex)
+        {
+            TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
+        }
+    }
+};
+
+class BattlegroundAV_DiscordHook : public BattlegroundAV
+{
+public:
+    BattlegroundAV_DiscordHook() : BattlegroundAV() { }
+
+    void StartingEventCloseDoors() override
+    {
+        BattlegroundAV::StartingEventCloseDoors();
+
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("bg.hooks", "Webhook URL is not configured.");
+            return;
+        }
+
+        std::stringstream message;
+        message << "⚔️ **Alterac Valley Started!**\n"
+                << "**Players:** "
+                << GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
+                << GetPlayersCountByTeam(HORDE) << " Horde";
+
+        SendDiscordWebhook(webhookUrl, message.str());
+    }
+
+private:
+    void SendDiscordWebhook(const std::string& url, const std::string& message)
+    {
+        try
+        {
+            Poco::URI uri(url);
+            std::string path = uri.getPathAndQuery();
+            if (path.empty()) path = "/";
+
+            Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
+            json->set("content", message);
+
+            std::stringstream payload;
+            Poco::JSON::Stringifier::stringify(json, payload);
+
+            std::unique_ptr<Poco::Net::HTTPClientSession> session;
+            if (uri.getScheme() == "https")
+                session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
+            else
+                session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
+
+            Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
+            request.setContentType("application/json");
+            request.setContentLength((int)payload.str().size());
+
+            std::ostream& os = session->sendRequest(request);
+            os << payload.str();
+
+            Poco::Net::HTTPResponse response;
+            std::istream& rs = session->receiveResponse(response);
+            std::stringstream ss;
+            Poco::StreamCopier::copyStream(rs, ss);
+        }
+        catch (const Poco::Exception& ex)
+        {
+            TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
+        }
+    }
+};
+
+class BattlegroundEotS_DiscordHook : public BattlegroundEotS
+{
+public:
+    BattlegroundEotS_DiscordHook() : BattlegroundEotS() { }
+
+    void StartingEventCloseDoors() override
+    {
+        BattlegroundEotS::StartingEventCloseDoors();
+
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("bg.hooks", "Webhook URL is not configured.");
+            return;
+        }
+
+        std::stringstream message;
+        message << "⚔️ **Eye of the Storm Started!**\n"
                 << "**Players:** "
                 << GetPlayersCountByTeam(ALLIANCE) << " Alliance vs "
                 << GetPlayersCountByTeam(HORDE) << " Horde";
@@ -94,7 +289,43 @@ public:
     }
 };
 
+class BG_AB_DiscordHookScript : public BattlegroundScript
+{
+public:
+    BG_AB_DiscordHookScript() : BattlegroundScript("BG_AB_DiscordHookScript") { }
+
+    Battleground* GetBattleground() const override
+    {
+        return new BattlegroundAB_DiscordHook();
+    }
+};
+
+class BG_AV_DiscordHookScript : public BattlegroundScript
+{
+public:
+    BG_AV_DiscordHookScript() : BattlegroundScript("BG_AV_DiscordHookScript") { }
+
+    Battleground* GetBattleground() const override
+    {
+        return new BattlegroundAV_DiscordHook();
+    }
+};
+
+class BG_EotS_DiscordHookScript : public BattlegroundScript
+{
+public:
+    BG_EotS_DiscordHookScript() : BattlegroundScript("BG_EotS_DiscordHookScript") { }
+
+    Battleground* GetBattleground() const override
+    {
+        return new BattlegroundEotS_DiscordHook();
+    }
+};
+
 void AddBattlegroundDiscordHookScripts()
 {
-    new BG_WS_DiscordHookScript();
+	new BG_WS_DiscordHookScript();
+	new BG_AB_DiscordHookScript();
+	new BG_AV_DiscordHookScript();
+	new BG_EotS_DiscordHookScript();
 }
