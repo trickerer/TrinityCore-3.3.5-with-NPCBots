@@ -86,8 +86,7 @@ class BotMgr;
 // end NpcBot mod
 
 
-public:
-    bool IsInChannel(const std::string& channelName);
+
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -937,6 +936,8 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     friend void AddItemToUpdateQueueOf(Item* item, Player* player);
     friend void RemoveItemFromUpdateQueueOf(Item* item, Player* player);
     public:
+		bool IsInChannel(const std::string& channelName);
+		
         explicit Player(WorldSession* session);
         ~Player();
 
