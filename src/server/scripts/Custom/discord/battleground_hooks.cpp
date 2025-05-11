@@ -19,6 +19,11 @@
 #include "Log.h"
 
 
+// Declare the function before its use
+void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers);
+
+// Function definitions
+
 void OnBattlegroundStart(Battleground* bg)
 {
     TC_LOG_INFO("bg.hooks", "Battleground %s is starting.", bg->GetName().c_str());
