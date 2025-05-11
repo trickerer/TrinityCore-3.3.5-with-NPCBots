@@ -19,6 +19,7 @@ static std::unordered_set<uint64> LoggedInGuids;
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "Log.h"
+#include "Player.h"
 
 class DiscordWebhookPlayerActivity : public PlayerScript
 {
