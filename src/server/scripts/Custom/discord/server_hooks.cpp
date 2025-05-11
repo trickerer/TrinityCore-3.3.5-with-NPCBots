@@ -51,6 +51,9 @@ public:
         std::stringstream messageStream;
         messageStream << "🛑 **Server is restarting 1 min downtime..**\nRealm: **" << realmName << "**";
         SendDiscordWebhook(webhookUrl, messageStream.str());
+
+        // Set flag to prevent player logouts from triggering webhook during shutdown
+        sWorld->SetServerShutdownInProgress(true);
     }
 
 private:
