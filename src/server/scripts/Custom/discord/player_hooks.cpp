@@ -49,9 +49,17 @@ public:
     void OnLogout(Player* player)
 	{
 		if (serverShuttingDown)
-		{
-			return;
-		}
+    {
+        std::string message = "All players have been logged out..";
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (!webhookUrl.empty())
+        {
+            SendDiscordWebhook(webhookUrl, message);  // You need to call the SendDiscordWebhook function
+        }
+
+        // Prevent further logout actions when the server is shutting down
+        return;
+    }
 		uint64 guid = player->GetGUID();
 		LoggedInGuids.erase(guid);
 
