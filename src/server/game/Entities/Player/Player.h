@@ -952,7 +952,6 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
     {
         return _joinedChannels.find(name) != _joinedChannels.end();
     }
-		bool IsInChannel(const std::string& channelName);
 		
         explicit Player(WorldSession* session);
         ~Player();
