@@ -88,7 +88,7 @@ public:
         TC_LOG_INFO("bg.hooks", "BattlegroundScript_DiscordHook registered successfully.");
     }
 
-    void OnBattlegroundStart(Battleground* bg) override
+    void OnBattlegroundStart(Battleground* bg)
     {
         TC_LOG_INFO("bg.hooks", "OnBattlegroundStart triggered for: %s", bg->GetName().c_str());
 
