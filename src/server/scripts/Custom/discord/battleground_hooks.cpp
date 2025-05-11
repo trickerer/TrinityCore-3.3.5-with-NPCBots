@@ -104,8 +104,8 @@ public:
             return;
         }
 
-        uint32 alliancePlayers = bg->GetPlayersCountByTeam(ALLIANCE);
-        uint32 hordePlayers = bg->GetPlayersCountByTeam(HORDE);
+        uint32 alliancePlayers = this->GetPlayersCountByTeam(ALLIANCE);
+        uint32 hordePlayers = this->GetPlayersCountByTeam(HORDE);
 
         TC_LOG_INFO("bg.hooks", "Sending webhook with %u Alliance vs %u Horde", alliancePlayers, hordePlayers);
 
