@@ -85,33 +85,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
     }
 }
 
-class BattlegroundScript_DiscordHook : public BattlegroundScript
-{
-public:
-    BattlegroundScript_DiscordHook() : BattlegroundScript("BattlegroundScript_DiscordHook")
-    {
-        TC_LOG_INFO("bg.hooks", "BattlegroundScript_DiscordHook registered successfully.");
-    }
 
-    void OnBattlegroundStart(Battleground* bg)
-    {
-        TC_LOG_INFO("bg.hooks", "OnBattlegroundStart triggered for: %s", bg->GetName().c_str());
-
-        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
-        if (webhookUrl.empty())
-        {
-            TC_LOG_ERROR("bg.hooks", "Webhook URL is not configured.");
-            return;
-        }
-
-        uint32 alliancePlayers = this->GetPlayersCountByTeam(ALLIANCE);
-        uint32 hordePlayers = this->GetPlayersCountByTeam(HORDE);
-
-        TC_LOG_INFO("bg.hooks", "Sending webhook with %u Alliance vs %u Horde", alliancePlayers, hordePlayers);
-
-        SendBattlegroundDiscordWebhook(webhookUrl, this->GetName(), alliancePlayers, hordePlayers);
-    }
-};
 
 
 void AddBattlegroundDiscordHookScripts()
