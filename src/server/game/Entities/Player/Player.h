@@ -936,6 +936,7 @@ struct PlayerTalentInfo
 
 private:
     PlayerTalentInfo(PlayerTalentInfo const&);
+	std::set<std::string> _joinedChannels;
 };
 
 class TC_GAME_API Player : public Unit, public GridObject<Player>
