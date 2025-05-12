@@ -580,7 +580,7 @@ bool BattlefieldWG::Update(uint32 diff)
         std::string timerMessage = "Wintergrasp timer: " + std::to_string(m_Timer / 1000) + " seconds remaining.";
         SendDiscordMessage(timerMessage);
 
-        std::string owner = (this->IsHordeControlled()) ? "Horde" : "Alliance";
+        std::string owner = (this->GetControllingTeam() == TEAM_HORDE) ? "Horde" : "Alliance";
         SendDiscordMessage("Wintergrasp is currently controlled by: " + owner);
 
         m_saveTimer = 60 * IN_MILLISECONDS;
