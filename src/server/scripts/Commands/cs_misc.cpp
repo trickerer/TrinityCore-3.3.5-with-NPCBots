@@ -65,7 +65,7 @@ using namespace Trinity::ChatCommands;
 
 namespace {
 
-bool HandleSendWorld(ChatHandler* handler, std::string message)
+bool HandleSendWorld(ChatHandler* handler, char const* message)
 {
 	if (message.empty())
 		return false;
