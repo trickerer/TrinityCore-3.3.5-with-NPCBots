@@ -137,28 +137,43 @@ public:
     }
 
     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
-	{
-		if (!*args)
-			return false;
+    {
+        if (!*args)
+            return false;
 
-		std::string message = args;
+        std::string message = args;
 
-		// Get the world channel
-		Channel* worldChannel = sWorld->GetChannelMgr().GetChannel("world");
+        // Find or create the "world" channel
+        uint32 channelId = 1; // Let's assume channel 1 is our world channel
+        Channel* worldChannel = sWorld->GetChannelMgr().GetChannel(channelId);
 
-		if (worldChannel)
-		{
-			// Send the message to the "world" channel
-			worldChannel->SendMessage(nullptr, message.c_str());
-			handler->SendSysMessage("World message sent.");
-			return true;
-		}
-		else
-		{
-			handler->SendSysMessage("World channel not found.");
-			return false;
-		}
-	}
+        // If the world channel does not exist, create it
+        if (!worldChannel)
+        {
+            worldChannel = sWorld->GetChannelMgr().CreateChannel("world", channelId, false, true);
+        }
+
+        // Send the message to the "world" channel
+        WorldPacket data(SMSG_MESSAGECHAT, 500);
+        data << uint8(CHAT_MSG_CHANNEL);
+        data << uint32(LANG_UNIVERSAL);
+        data << ObjectGuid::Empty;
+        data << uint64(0);  // receiver GUID (0 means everyone in the channel)
+        data << message;
+        data << uint8(0);  // chat tag
+
+        for (const auto& pair : ObjectAccessor::GetPlayers())
+        {
+            Player* player = pair.second;
+            if (player && player->IsInWorld() && worldChannel->HasMember(player))
+            {
+                player->GetSession()->SendPacket(&data);
+            }
+        }
+
+        handler->SendSysMessage("World message sent.");
+        return true;
+    }
 	
 	static bool HandlePvPstatsCommand(ChatHandler* handler)
     {
