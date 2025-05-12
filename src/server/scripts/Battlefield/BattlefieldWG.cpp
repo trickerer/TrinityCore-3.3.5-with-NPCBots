@@ -576,12 +576,6 @@ bool BattlefieldWG::Update(uint32 diff)
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
 
-        // Discord webhook message
-        std::string timerMessage = "Wintergrasp timer: " + std::to_string(m_Timer / 1000) + " seconds remaining.";
-        SendDiscordMessage(timerMessage);
-
-        std::string owner = (this->GetControllingTeam() == TEAM_HORDE) ? "Horde" : "Alliance";
-        SendDiscordMessage("Wintergrasp is currently controlled by: " + owner);
 
         m_saveTimer = 60 * IN_MILLISECONDS;
     }
