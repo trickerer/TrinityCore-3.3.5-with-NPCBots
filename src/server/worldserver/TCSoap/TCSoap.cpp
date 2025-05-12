@@ -28,26 +28,22 @@
 // SOAP Handler Class
 class SOAPHandler {
 public:
-    bool SOAPHandler::HandleSendWorldMessage(const std::string& message)
-	{
-		// Create an instance of the fully qualified SendWorldMessageCommand
-		Trinity::ChatCommands::SendWorldMessageCommand cmd;
+    bool HandleSendWorldMessage(const std::string& message) // Accept const reference
+    {
+        SendWorldMessageCommand cmd;
+        bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
 
-		// Call the HandleCommand method and store the result in 'success'
-		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
-
-		if (success)
-		{
-			// Successfully sent the message, return 0 or some success code
-			return 0;
-		}
-		else
-		{
-			// If the message was not successfully sent, return an error code
-			return -1;
-		}
-	}
-
+        if (success)
+        {
+            TC_LOG_INFO("network.soap", "World message successfully sent: {}", message);
+            return true;
+        }
+        else
+        {
+            TC_LOG_ERROR("network.soap", "Failed to send world message: {}", message);
+            return false;
+        }
+    }
 };
 
 // Main SOAP Thread
