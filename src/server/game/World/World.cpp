@@ -2253,14 +2253,16 @@ void World::CreateWorldChannel()
 {
     uint32 worldChannelId = 1000;
 
-    ChannelMgr* mgr = ChannelMgr::forTeam(0); // Assuming you are using a specific team (0 = Horde, 1 = Alliance)
-    uint32 channelId = 0; // Use an actual channel ID or a default value
-    Channel* worldChannel = mgr->GetChannel(channelId, "World", nullptr, false);
+    // Access the ChannelMgr for team 0 (Horde)
+    ChannelMgr* mgr = ChannelMgr::forTeam(0);  // Assuming you are using a specific team (0 = Horde, 1 = Alliance)
 
+    // Attempt to get the "World" channel
+    Channel* worldChannel = mgr->GetChannel(worldChannelId, "World", nullptr, false);
+
+    // If no channel found, create a new one
     if (!worldChannel)
     {
-        ChannelMgr* mgr = ChannelMgr::forTeam(0); // Access ChannelMgr for team 0 (Horde)
-        worldChannel = mgr->CreateChannel("World", nullptr, worldChannelId);
+        worldChannel = mgr->CreateChannel("World", nullptr, worldChannelId);  // CreateChannel should be called only if needed
         TC_LOG_INFO("misc", "World channel created at startup.");
     }
 }
