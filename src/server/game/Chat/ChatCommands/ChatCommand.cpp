@@ -46,10 +46,15 @@ public:
             // Send a message back to the GM if no message is specified
             Player* player = session->GetPlayer();  // Get the player from the session
             if (player)
-                player->SendDirectMessage("You must specify a message."); // Use the player's SendSysMessage
+            {
+                WorldPacket data(SMSG_MESSAGECHAT, 500);  // Create a WorldPacket for the message
+                data << uint8(CHAT_MSG_SYSTEM);            // Set the chat type to SYSTEM
+                data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
+                data << "You must specify a message.";     // The message text
+                player->GetSession()->SendPacket(&data);   // Send the packet
+            }
             return false;
         }
-
         // Loop through all online players and send them the message
         for (auto& itr : ObjectAccessor::GetPlayers())
         {
