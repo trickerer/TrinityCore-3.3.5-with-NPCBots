@@ -44,7 +44,9 @@ public:
         if (args.empty())
         {
             // Send a message back to the GM if no message is specified
-            session->SendSysMessage("You must specify a message.");
+            Player* player = session->GetPlayer();  // Get the player from the session
+            if (player)
+                player->SendSysMessage("You must specify a message."); // Use the player's SendSysMessage
             return false;
         }
 
