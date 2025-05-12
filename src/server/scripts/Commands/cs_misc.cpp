@@ -67,38 +67,37 @@ namespace {
     class SendWorldMessageCommand
     {
     public:
-        static bool HandleSendWorld(ChatHandler* handler, std::string message)
-        {
-            if (message.empty())
-                return false;
+        bool HandleSendWorld(ChatHandler* handler, std::string message)
+		{
+			if (message.empty())
+				return false;
 
-            for (auto const& pair : ObjectAccessor::GetPlayers())
-            {
-                Player* player = pair.second;
-                if (player && player->IsInWorld())
-                {
-                    WorldPacket data(SMSG_MESSAGECHAT, 500);
-                    data << uint8(CHAT_MSG_SAY);
-                    data << uint32(LANG_UNIVERSAL);
-                    data << ObjectGuid::Empty;
-                    data << uint64(0); // whisper target if needed
-                    data << std::string("[World] ") + message;
-                    data << uint8(0);  // chat tag
+			for (auto const& pair : ObjectAccessor::GetPlayers())
+			{
+				Player* player = pair.second;
+				if (player && player->IsInWorld())
+				{
+					WorldPacket data(SMSG_MESSAGECHAT, 500);
+					data << uint8(CHAT_MSG_SAY);
+					data << uint32(LANG_UNIVERSAL);
+					data << ObjectGuid::Empty;
+					data << uint64(0); // For whisper target if needed
+					data << std::string("[World] ") + message;
+					data << uint8(0);  // Chat tag
 
-                    player->GetSession()->SendPacket(&data);
-                }
-            }
+					player->GetSession()->SendPacket(&data);
+				}
+			}
 
-            handler->SendSysMessage("World message sent.");
-            return true;
-        }
+			return true;
+		}
     };
 
     ChatCommandTable GetCustomCommandTable()
 	{
 		static ChatCommandTable customCommandTable =
 		{
-			ChatCommandBuilder("sendworld", SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
+			ChatCommandBuilder("sendworld", HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
 		};
 		return customCommandTable;
 	}
