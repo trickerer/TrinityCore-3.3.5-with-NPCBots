@@ -1033,9 +1033,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     pCurrChar->GetSession()->SendPacket(&data);
     */
-    if (Channel* worldChannel = channelMgr->GetChannel("World", player, true))
+    if (Player* player = GetPlayer())
     {
-        worldChannel->JoinChannel(GetSession(), "");
+        if (ChannelMgr* mgr = channelMgr())
+        {
+            if (Channel* worldChannel = mgr->GetChannel("World", player, true))
+            {
+                worldChannel->JoinChannel(this, "");
+            }
+        }
     }
 	
 	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
