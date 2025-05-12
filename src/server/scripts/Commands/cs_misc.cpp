@@ -95,13 +95,13 @@ namespace {
     };
 
     ChatCommandTable GetCustomCommandTable()
-    {
-        static ChatCommandTable customCommandTable =
-        {
-            { "sendworld", SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes }
-        };
-        return customCommandTable;
-    }
+	{
+		static ChatCommandTable customCommandTable =
+		{
+			ChatCommandBuilder("sendworld", SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
+		};
+		return customCommandTable;
+	}
 }
 
 // Register your command under the appropriate group
