@@ -582,13 +582,13 @@ bool BattlefieldWG::Update(uint32 diff)
     else
         m_saveTimer -= diff;
 
-    if (this->IsEventEnded())
+    if (this->IsEventEnded()) 
     {
-        // Check the team that controls Wintergrasp
-        TeamId controllingTeam = this->GetTeamControl();  // This should exist in TC 3.3.5a
+        // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
+        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
-        // If controllingTeam is 1, it's the Horde, otherwise it's the Alliance
-        std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // TEAM_HORDE is defined in TC 3.3.5a
+        // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
+        std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
 
         // Prepare the Discord message
         std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
