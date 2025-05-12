@@ -588,8 +588,6 @@ bool BattlefieldWG::Update(uint32 diff)
     else
         m_saveTimer -= diff;
 
-    std::string owner = (this->IsHordeControlled()) ? "Horde" : "Alliance";
-
     if (this->IsEventEnded())
     {
         // Assuming you are checking the Wintergrasp control here:
