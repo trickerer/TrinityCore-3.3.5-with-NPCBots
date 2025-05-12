@@ -106,21 +106,18 @@ namespace {
     ChatCommandTable GetCustomCommandTable()
     {
         static ChatCommandTable customCommandTable;
-        
+
         // Register the 'sendworld' command
         customCommandTable.push_back(ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes));
-        
+
         return customCommandTable;
     }
 
     // Register the command script
     void AddSC_misc_commandscript()
     {
-        // Access the global singleton for ChatHandler (assuming you have access to it)
-        ChatHandler* handler = new ChatHandler(); // Use the actual handler initialization if needed
-        
-        // Register the custom command
-        handler->RegisterCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, &SendWorldMessageCommand::HandleSendWorld);
+        // Register the 'sendworld' command under "misc" script
+        sScriptMgr->RegisterScriptCommandTable(GetCustomCommandTable());
     }
 
     // Register the custom command table under "custom"
