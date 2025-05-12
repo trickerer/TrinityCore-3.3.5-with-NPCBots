@@ -19,53 +19,58 @@
 
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
 {
-    try
+    CURL* curl = curl_easy_init();
+    if (curl)
     {
-        Poco::URI uri(webhookUrl);
-        std::string path = uri.getPathAndQuery();
-        if (path.empty()) path = "/";
+        // Construct the message with battleground information
+        std::string message = battlegroundName + " has started with " + std::to_string(alliancePlayers) + " Alliance players and " + std::to_string(hordePlayers) + " Horde players.";
 
-        Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-        json->set("content", "⚔️ **" + battlegroundName + " Started!**\n"
-                             + "**Players:** " + std::to_string(alliancePlayers) + " Alliance vs "
-                             + std::to_string(hordePlayers) + " Horde");
+        // Prepare JSON payload
+        std::string jsonPayload = "{\"content\": \"" + message + "\"}";
 
-        std::stringstream payload;
-        Poco::JSON::Stringifier::stringify(json, payload);
+        // Set options for CURL
+        curl_easy_setopt(curl, CURLOPT_URL, webhookUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonPayload.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, "Content-Type: application/json");
 
-        std::unique_ptr<Poco::Net::HTTPClientSession> session;
-        if (uri.getScheme() == "https")
-            session = std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort());
-        else
-            session = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
+        // Perform the request
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+        {
+            std::cerr << "Error sending battleground webhook: " << curl_easy_strerror(res) << std::endl;
+        }
 
-        Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, path, "HTTP/1.1");
-        request.setContentType("application/json");
-        request.setContentLength((int)payload.str().size());
-
-        std::ostream& os = session->sendRequest(request);
-        os << payload.str();
-
-        Poco::Net::HTTPResponse response;
-        std::istream& rs = session->receiveResponse(response);
-        std::stringstream ss;
-        Poco::StreamCopier::copyStream(rs, ss);
-
-        TC_LOG_INFO("bg.hooks", "Sent Battleground start webhook to Discord.");
-    }
-    catch (const Poco::Exception& ex)
-    {
-        TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
+        curl_easy_cleanup(curl);
     }
 }
 
 
-void SendDiscordMessage(const std::string& message)
+void DiscordWebhookMgr::SendDiscordMessage(const std::string& message)
 {
-    std::string url = sConfigMgr->GetStringDefault("Discord.WebhookURL", "");
-    if (!url.empty())
+    // Example code to send a POST request to the Discord webhook (using libcurl)
+    CURL* curl = curl_easy_init();
+    if (curl)
     {
-        DiscordWebhook webhook(url);
-        webhook.SendMessage(message);
+        curl_easy_setopt(curl, CURLOPT_URL, "YOUR_DISCORD_WEBHOOK_URL");
+
+        // Create JSON body
+        std::string jsonBody = "{\"content\": \"" + message + "\"}";
+
+        // Set up the request
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonBody.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, "Content-Type: application/json");
+
+        // Perform the request
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+        {
+            // Handle error
+            std::cerr << "Error sending message to Discord: " << curl_easy_strerror(res) << std::endl;
+        }
+
+        // Clean up
+        curl_easy_cleanup(curl);
     }
 }
+
+
