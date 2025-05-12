@@ -143,11 +143,21 @@ public:
 
 		std::string message = args;
 
-		// This simulates the .world command properly
-		sWorld->SendGlobalText((std::string("|cff00ccff[World]|r ") + message).c_str(), NULL);
+		// Get the world channel
+		Channel* worldChannel = sWorld->GetChannelMgr().GetChannel("world");
 
-		handler->SendSysMessage("World message sent.");
-		return true;
+		if (worldChannel)
+		{
+			// Send the message to the "world" channel
+			worldChannel->SendMessage(nullptr, message.c_str());
+			handler->SendSysMessage("World message sent.");
+			return true;
+		}
+		else
+		{
+			handler->SendSysMessage("World channel not found.");
+			return false;
+		}
 	}
 	
 	static bool HandlePvPstatsCommand(ChatHandler* handler)
