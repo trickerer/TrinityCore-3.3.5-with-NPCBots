@@ -201,20 +201,15 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
 Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
 {
     std::wstring channelName;
-    if (!Utf8toWStr(name, channelName))
+    if (!Utf8toWStr(name, channelName))  // Convert to wide string
         return nullptr;
 
-    wstrToLower(channelName);
-
-    Channel*& c = _customChannels[channelName];
-    if (c)
-        return nullptr;
-
-    // Assuming Channel constructor needs name and team
-    Channel* newChannel = new Channel(name, _team);  // Make sure this matches your Channel constructor
+    // Now use channelName which is a std::wstring
+    Channel* newChannel = new Channel(channelName, _team);
     newChannel->SetDirty();
 
-    c = newChannel;
+    // Add it to the map (or handle it as per your logic)
+    _customChannels[channelName] = newChannel;
     return newChannel;
 }
 
