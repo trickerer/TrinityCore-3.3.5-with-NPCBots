@@ -1021,6 +1021,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
+    /*
     if (!pCurrChar->IsInChannel("world"))
 	{
 		std::string m_name = "world";  // in game channel name
@@ -1031,6 +1032,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 	}
 
     pCurrChar->GetSession()->SendPacket(&data);
+    */
+    if (Channel* worldChannel = channelMgr->GetChannel("World", player, true))
+    {
+        worldChannel->JoinChannel(GetSession(), "");
+    }
 	
 	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 

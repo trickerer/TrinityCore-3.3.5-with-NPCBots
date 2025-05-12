@@ -2258,9 +2258,7 @@ void World::CreateWorldChannel()
     if (!worldChannel)
     {
         worldChannel = channelMgr->CreateChannel("World", nullptr, worldChannelId);
-
-        // Broadcast to all players
-        sWorld->SendGlobalText("[World Channel] The World channel has been created.", nullptr);
+        TC_LOG_INFO("misc", "World channel created at startup.");
     }
 }
 
