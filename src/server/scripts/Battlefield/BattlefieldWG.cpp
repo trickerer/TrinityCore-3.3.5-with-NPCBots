@@ -592,7 +592,8 @@ bool BattlefieldWG::Update(uint32 diff)
 
     if (this->IsEventEnded())
     {
-        std::string winner = (this->GetWinner() == 0) ? "Alliance" : "Horde";
+        std::string owner = (m_TeamControl == TEAM_HORDE) ? "Horde" : "Alliance";
+        std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
         SendDiscordMessage(winnerMessage);
     }
 
