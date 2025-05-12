@@ -135,8 +135,9 @@ public:
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
             { "sendworld", 		  HandleSendWorldCommand, 		 rbac::RBAC_PERM_COMMAND_SENDWORLD, 	   Console::Yes },
         };
-        return commandTable;
-    }
+    
+    return commandTable;
+}
 
     bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
