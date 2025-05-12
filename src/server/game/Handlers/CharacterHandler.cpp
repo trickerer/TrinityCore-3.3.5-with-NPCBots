@@ -1033,16 +1033,30 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     pCurrChar->GetSession()->SendPacket(&data);
     */
-    if (Player* player = GetPlayer())
+    Player* player = handler->GetSession()->GetPlayer();
+    if (!player)
+        return false;
+
+    uint32 channelId = 1000; // Use a consistent ID for both sides
+    std::string channelName = "world";
+    uint32 teamId = player->GetTeamId(); // 0 = Horde, 1 = Alliance
+
+    ChannelMgr* mgr = ChannelMgr::forTeam(teamId);
+    if (!mgr)
+        return false;
+
+    // Try to get the channel for the player’s faction
+    Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
+    if (!worldChannel)
     {
-        if (ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeam()))
-        {
-            if (Channel* worldChannel = mgr->GetChannel(0, "World", player, true))
-            {
-                worldChannel->JoinChannel(player, "");
-            }
-        }
+        worldChannel = mgr->CreateChannel(channelName, player, channelId);
+        if (worldChannel)
+            worldChannel->Say(nullptr, "Welcome to MGAWoW!", nullptr, false);
     }
+
+    // Join player to the channel
+    if (worldChannel && !worldChannel->HasMember(player))
+        worldChannel->JoinChannel(player->GetSession(), "");
 	
 	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 

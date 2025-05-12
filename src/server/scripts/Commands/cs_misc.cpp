@@ -54,7 +54,9 @@
 
 #include "WorldPacket.h"
 
-
+#include "ChannelMgr.h"
+#include "Channel.h"
+#include "Player.h"
 
 
 
@@ -145,12 +147,13 @@ public:
 
         // Find or create the "world" channel
         uint32 channelId = 1; // Let's assume channel 1 is our world channel
-        Channel* worldChannel = sWorld->GetChannelMgr().GetChannel(channelId);
+        ChannelMgr* mgr = ChannelMgr::forTeam(0); // 0 = HORDE, 1 = ALLIANCE
+        Channel* worldChannel = mgr->GetChannel(channelId, "world", player, true);
 
         // If the world channel does not exist, create it
         if (!worldChannel)
         {
-            worldChannel = sWorld->GetChannelMgr().CreateChannel("world", channelId, false, true);
+            worldChannel = mgr->CreateChannel("world", player, channelId);
         }
 
         // Send the message to the "world" channel
