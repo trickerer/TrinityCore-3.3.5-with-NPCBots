@@ -586,7 +586,7 @@ bool BattlefieldWG::Update(uint32 diff)
     {
         // Assuming you are checking the Wintergrasp control here:
         // Check the team that is controlling Wintergrasp
-        TeamId controllingTeam = this->GetControlTeamId();  // Ensure this function exists in TC 3.3.5a
+        TeamId controllingTeam = this->m_ControlTeamId;  // Ensure this function exists in TC 3.3.5a
 
         // If controllingTeam is 1, it's the Horde, otherwise it's the Alliance
         std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // TEAM_HORDE is defined in TC 3.3.5a
