@@ -52,6 +52,9 @@
 #include "World.h"
 #include "WorldSession.h"
 
+#include "WorldPacket.h"
+
+
 
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
@@ -65,28 +68,43 @@
 using namespace Trinity::ChatCommands;
 
 namespace {
-
-bool HandleSendWorld(ChatHandler* handler, char const* message)
-{
-    if (!message || !*message)
-        return false;
-
-    std::string msg = "[World] ";
-    msg += message;
-
-    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.c_str());
-    return true;
-}
-
-ChatCommandTable GetCustomCommandTable()
-{
-    static ChatCommandTable customCommandTable =
+    class SendWorldMessageCommand
     {
-        ChatCommandBuilder("sendworld", HandleSendWorld, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes)
-    };
-    return customCommandTable;
-}
+    public:
+        bool HandleSendWorld(ChatHandler* handler, std::string message)
+        {
+            if (message.empty())
+                return false;
 
+            for (auto const& pair : ObjectAccessor::GetPlayers())
+            {
+                Player* player = pair.second;
+                if (player && player->IsInWorld())
+                {
+                    WorldPacket data(SMSG_MESSAGECHAT, 500);
+                    data << uint8(CHAT_MSG_SAY);
+                    data << uint32(LANG_UNIVERSAL);
+                    data << ObjectGuid::Empty;
+                    data << uint64(0); // For whisper target if needed
+                    data << std::string("[World] ") + message;
+                    data << uint8(0);  // Chat tag
+
+                    player->GetSession()->SendPacket(&data);
+                }
+            }
+
+            return true;
+        }
+    };
+	// Register the custom command table
+    ChatCommandTable GetCustomCommandTable()
+    {
+        static ChatCommandTable customCommandTable =
+        {
+            ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
+        };
+        return customCommandTable;
+    }
 }
 
 // Register your command under the appropriate group
@@ -2686,5 +2704,5 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
-    sScriptMgr->RegisterCommandTable(GetCustomCommandTable());
+    sScriptMgr->AddScriptCommandTable(GetCustomCommandTable());
 }
