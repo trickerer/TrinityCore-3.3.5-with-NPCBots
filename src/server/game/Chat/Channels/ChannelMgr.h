@@ -61,7 +61,7 @@ class TC_GAME_API ChannelMgr
 
     private:
         CustomChannelContainer _customChannels;
-        BuiltinChannelContainer _channels; // Keep this one!
+        std::map<std::string, Channel*> _channels;
         uint32 const _team;
 
         std::map<std::string, Channel*> _customWorldChannels; //
