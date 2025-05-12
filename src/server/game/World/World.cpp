@@ -89,6 +89,10 @@
 #include "WhoListStorage.h"
 #include "WorldSession.h"
 
+
+#include "Channel.h"
+#include "WorldPacket.h"
+
 #include <boost/asio/ip/address.hpp>
 
 TC_GAME_API std::atomic<bool> World::m_stopEvent(false);
