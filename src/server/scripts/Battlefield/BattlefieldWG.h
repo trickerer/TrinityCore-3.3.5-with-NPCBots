@@ -217,8 +217,16 @@ class WintergraspCapturePoint : public BfCapturePoint
 
 class BattlefieldWG : public Battlefield
 {
+    private:
+        bool m_EventEnded;       // To track if the event is finished
+        int m_WinnerTeam;        // To store the winning team (0 - Alliance, 1 - Horde)
+
     public:
+        BattlefieldWG();          // Constructor to initialize variables
         ~BattlefieldWG();
+        bool IsEventEnded();      // Returns whether the event is ended
+        int GetWinner();          // Returns the winner (0 = Alliance, 1 = Horde)
+        void EndEvent(bool isAllianceWinner); // Method to mark event as ended
         /**
          * \brief Called when the battle start
          * - Spawn relic and turret
