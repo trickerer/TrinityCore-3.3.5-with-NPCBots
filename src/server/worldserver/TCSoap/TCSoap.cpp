@@ -22,27 +22,22 @@
 #include "AccountMgr.h"
 #include "Log.h"
 
-#include "Chat/ChatCommands/ChatCommand.h"  // Include the header for SendWorldMessageCommand
+#include "ChatCommand.h"  // Include the header for SendWorldMessageCommand
+#include <string>
 
 // SOAP Handler Class
 class SOAPHandler {
 public:
-    bool HandleSendWorldMessage(const std::string& message) // Accept const reference
-    {
-        SendWorldMessageCommand cmd;
-        bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
+    bool HandleSendWorldMessage(const std::string& message)
+	{
+		// Create an instance of the fully qualified SendWorldMessageCommand
+		Trinity::ChatCommands::SendWorldMessageCommand cmd;
 
-        if (success)
-        {
-            TC_LOG_INFO("network.soap", "World message successfully sent: {}", message);
-            return true;
-        }
-        else
-        {
-            TC_LOG_ERROR("network.soap", "Failed to send world message: {}", message);
-            return false;
-        }
-    }
+		// Call the HandleCommand method and store the result in 'success'
+		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
+
+		return success;  // Return true for success, false for failure
+	}
 };
 
 // Main SOAP Thread
@@ -131,23 +126,19 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     // Convert char* to std::string before passing to HandleSendWorldMessage
     std::string commandStr(command);
 
+    // Example of how you can call HandleSendWorldMessage
     SOAPHandler handler;
-    bool SOAPHandler::HandleSendWorldMessage(const std::string& message)
-	{
-		SendWorldMessageCommand cmd;  // Create an instance of the SendWorldMessageCommand
-		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session since we don't have one in this context
-		return success;
-	}
+    bool success = handler.HandleSendWorldMessage(commandStr); // Convert to std::string
 
     if (success)
     {
-        *result = soap_strdup(soap, "World message sent successfully");
+        *result = "Message sent successfully"; // Correctly using 'result'
         return SOAP_OK;
     }
     else
     {
-        *result = soap_strdup(soap, "Failed to send world message");
-        return soap_sender_fault(soap, "Failed to send message", "An error occurred while sending the world message");
+        *result = "Failed to send message"; // Correctly using 'result'
+        return SOAP_ERR;
     }
 }
 
