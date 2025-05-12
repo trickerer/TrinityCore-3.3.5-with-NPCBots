@@ -47,6 +47,16 @@ class TC_GAME_API ChannelMgr
         Channel* GetCustomChannel(std::string const& name) const;
         Channel* GetChannel(uint32 channelId, std::string const& name, Player* player, bool pkt = true, AreaTableEntry const* zoneEntry = nullptr) const;
         void LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry);
+        
+        void AddCustomChannel(std::string const& name, Channel* channel)
+        {
+            std::wstring wname;
+            if (!Utf8toWStr(name, wname))
+                return;
+
+            wstrToLower(wname);
+            _customChannels[wname] = channel;
+        }
 
     private:
         CustomChannelContainer _customChannels;
@@ -54,6 +64,9 @@ class TC_GAME_API ChannelMgr
         uint32 const _team;
 
         static void MakeNotOnPacket(WorldPacket* data, std::string const& name);
+        
+    // Add this public or protected accessor:
+    std::map<std::string, Channel*> _channels;
 };
 
 #endif

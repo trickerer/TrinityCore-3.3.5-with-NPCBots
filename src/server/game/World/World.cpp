@@ -2240,7 +2240,16 @@ void World::SetInitialWorldSettings()
             }
         });
     }
-    CreateWorldChannel();
+    // Create "World" channel on startup
+    if (ChannelMgr* mgr = ChannelMgr::forTeam(0)) // 0 = team neutral (both factions see it)
+    {
+        if (!mgr->GetCustomChannel("World"))
+        {
+            Channel* worldChannel = mgr->CreateCustomChannel("World");
+            mgr->AddCustomChannel("World", worldChannel);
+            LOG_INFO("server.world", "Created global World channel.");
+        }
+    }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
@@ -2251,16 +2260,18 @@ void World::SetInitialWorldSettings()
 
 void World::CreateWorldChannel()
 {
-    uint32 worldChannelId = sConfigMgr->GetIntDefault("WorldChannelId", 1000); // Configurable ID (optional use)
+    uint32 worldChannelId = sConfigMgr->GetIntDefault("WorldChannelId", 1000);
 
-    ChannelMgr* mgr = ChannelMgr::forTeam(0); // 0 = Horde side, or use forTeam(TEAM_NONE)
-    Channel* worldChannel = mgr->GetChannel("World", nullptr);
+    ChannelMgr* mgr = ChannelMgr::forTeam(0); // 0 = Alliance or Neutral
+    if (!mgr)
+        return;
 
-    if (!worldChannel)
-    {
-        worldChannel = mgr->JoinChannel("World", 0, nullptr); // This will create the channel if it doesn't exist
-        TC_LOG_INFO("misc", "World channel created at startup.");
-    }
+    Channel* worldChannel = new Channel(worldChannelId, 0, nullptr);
+    worldChannel->SetName("World");
+
+    mgr->AddCustomChannel("World", worldChannel);
+
+    TC_LOG_INFO("misc", "World channel created at startup.");
 }
 
 void World::DetectDBCLang()
