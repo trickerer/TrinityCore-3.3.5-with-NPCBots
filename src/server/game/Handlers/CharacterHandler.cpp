@@ -1040,17 +1040,23 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     uint32 channelId = 1000; // Custom channel ID
     std::string channelName = "world";
 
-    // Get the correct channel manager for the player's team (0 = Horde, 1 = Alliance)
+    // Get the channel manager based on the player's faction (0 = Horde, 1 = Alliance)
     ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
     if (!mgr)
         return;
 
-    // Get or create the channel
+    // Try to get the channel (it will return nullptr if it doesn't exist)
     Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
     if (!worldChannel)
     {
+        // Create the channel manually if it doesn't exist (3.3.5a doesn't have CreateChannel())
         worldChannel = new Channel(channelName, player, channelId);
+
+        // Add the newly created channel to the ChannelMgr
         mgr->AddChannel(worldChannel);
+
+        // Optionally, send a welcome message (Note: Say method signature is different)
+        worldChannel->Say(ObjectGuid(), "Welcome to MGAWoW!", 0);
     }
 
     // Join the player to the channel
