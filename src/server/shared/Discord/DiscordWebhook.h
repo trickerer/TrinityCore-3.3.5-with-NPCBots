@@ -2,7 +2,6 @@
 #define DISCORDWEBHOOK_H
 
 #include <string>
-#include <curl/curl.h>
 #include DiscordWebhookMgr.h
 
 class DiscordWebhook

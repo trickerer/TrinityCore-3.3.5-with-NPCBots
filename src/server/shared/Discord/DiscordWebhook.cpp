@@ -1,7 +1,6 @@
 #include "DiscordWebhook.h"
 #include <iostream>
 #include <sstream>
-#include <curl/curl.h>
 #include DiscordWebhookMgr.h
 
 DiscordWebhook::DiscordWebhook(const std::string& webhookUrl)
