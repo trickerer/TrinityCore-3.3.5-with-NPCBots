@@ -136,6 +136,14 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
     con->setCommandSuccess(success);
 }
 
+bool SOAPHandler::HandleSendWorldMessage(std::string& message)
+{
+    // Create an instance of the SendWorldMessageCommand and execute it
+    SendWorldMessageCommand cmd;
+    cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
+    return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 //  Namespace Definition Table

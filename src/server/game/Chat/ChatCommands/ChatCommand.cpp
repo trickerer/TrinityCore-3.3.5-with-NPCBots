@@ -477,6 +477,34 @@ bool Trinity::Impl::ChatCommands::ChatCommandNode::HasVisibleSubCommands(ChatHan
     return false;
 }
 
+// This is the new command class for "sendworld"
+class SendWorldMessageCommand : public Command
+{
+public:
+    SendWorldMessageCommand() : Command("sendworld") {}
+
+    bool HandleCommand(WorldSession* session, const std::string& args) override
+    {
+        // If the message is empty, notify the GM
+        if (args.empty())
+        {
+            session->SendSysMessage("You need to specify a message to send.");
+            return false;
+        }
+
+        // Create the message and send it to the world
+        WorldPacket data(SMSG_MESSAGECHAT, 0);
+        data << uint8(CHAT_MSG_SAY);  // You can choose other types like CHAT_MSG_WHISPER, etc.
+        data << uint64(0);            // This is the sender's GUID (0 for world)
+        data << uint32(0);            // Recipient (this could be modified for direct messages)
+        data << "[World] " + args;    // The message to send
+
+        World::SendWorldMessage(data);  // Broadcast the message to all players
+
+        return true;
+    }
+};
+
 void Trinity::ChatCommands::LoadCommandMap() { Trinity::Impl::ChatCommands::ChatCommandNode::LoadCommandMap(); }
 void Trinity::ChatCommands::InvalidateCommandMap() { Trinity::Impl::ChatCommands::ChatCommandNode::InvalidateCommandMap(); }
 bool Trinity::ChatCommands::TryExecuteCommand(ChatHandler& handler, std::string_view cmd) { return Trinity::Impl::ChatCommands::ChatCommandNode::TryExecuteCommand(handler, cmd); }
