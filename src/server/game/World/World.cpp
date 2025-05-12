@@ -2240,15 +2240,10 @@ void World::SetInitialWorldSettings()
             }
         });
     }
-    // Create "World" channel on startup
-    if (ChannelMgr* mgr = ChannelMgr::forTeam(0)) // 0 = team neutral (both factions see it)
+    void World::InitChannels()
     {
-        if (!mgr->GetCustomChannel("World"))
-        {
-            Channel* worldChannel = mgr->CreateCustomChannel("World");
-            mgr->AddCustomChannel("World", worldChannel);
-            LOG_INFO("server.world", "Created global World channel.");
-        }
+        // Initialize the world channel
+        ChannelMgr::GetWorldChannel();
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);

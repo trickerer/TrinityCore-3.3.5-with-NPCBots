@@ -40,7 +40,7 @@ class TC_GAME_API ChannelMgr
         static void LoadFromDB();
         static ChannelMgr* forTeam(uint32 team);
         static Channel* GetChannelForPlayerByNamePart(std::string const& namePart, Player* playerSearcher);
-        void MakeNotOnPacket(WorldPacket* data, std::string const& name);
+        static Channel* GetWorldChannel();
 
         void SaveToDB();
         Channel* GetSystemChannel(uint32 channelId, AreaTableEntry const* zoneEntry = nullptr);
@@ -65,7 +65,7 @@ class TC_GAME_API ChannelMgr
         std::map<std::string, Channel*> _channels;
         uint32 const _team;
 
-        std::map<std::string, Channel*> _customWorldChannels; //
+        static Channel* _worldChannel;
 };
 
 #endif
