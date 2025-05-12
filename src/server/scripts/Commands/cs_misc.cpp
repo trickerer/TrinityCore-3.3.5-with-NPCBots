@@ -68,6 +68,8 @@
 using namespace Trinity::ChatCommands;
 
 namespace {
+
+    // Command to send a message to all players
     class SendWorldMessageCommand
     {
     public:
@@ -100,13 +102,22 @@ namespace {
         }
     };
 
-    // Register the custom command table
-    void RegisterCustomCommand(ChatHandler* handler)
+    // Define a custom command table
+    ChatCommandTable GetCustomCommandTable()
     {
-        handler->AddCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, false, &SendWorldMessageCommand::HandleSendWorld);
+        static ChatCommandTable customCommandTable =
+        {
+            ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
+        };
+        return customCommandTable;
+    }
+
+    // Register the command using the script manager
+    void AddSC_misc_commandscript()
+    {
+        sScriptMgr->RegisterScript("misc_commandscript", &GetCustomCommandTable);
     }
 }
-
 // Register your command under the appropriate group
 ChatCommandTable GetMiscCommandTable()
 {
