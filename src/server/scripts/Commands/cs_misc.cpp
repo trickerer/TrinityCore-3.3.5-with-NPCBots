@@ -137,34 +137,18 @@ public:
     }
 
     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
-    {
-        if (!*args)
-            return false;
+	{
+		if (!*args)
+			return false;
 
-        std::string message = args;
+		std::string message = args;
 
-        for (const auto& pair : ObjectAccessor::GetPlayers())
-        {
-            if (Player* player = pair.second)
-            {
-                if (player->IsInWorld())
-                {
-                    WorldPacket data(SMSG_MESSAGECHAT, 200);
-                    data << uint8(CHAT_MSG_SYSTEM);
-                    data << uint32(LANG_UNIVERSAL);
-                    data << uint64(0); // sender GUID
-                    data << uint64(0); // receiver GUID
-                    data << message;
-                    data << uint8(0); // chat tag
+		// This simulates the .world command properly
+		sWorld->SendWorldText("[World] %s", message.c_str());
 
-                    player->GetSession()->SendPacket(&data);
-                }
-            }
-        }
-
-        handler->SendSysMessage("World message sent.");
-        return true;
-    }
+		handler->SendSysMessage("World message sent.");
+		return true;
+	}
 	
 	static bool HandlePvPstatsCommand(ChatHandler* handler)
     {
