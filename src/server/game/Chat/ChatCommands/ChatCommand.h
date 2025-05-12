@@ -49,23 +49,35 @@ namespace Trinity::ChatCommands
     struct ChatCommandBuilder;
     using ChatCommandTable = std::vector<ChatCommandBuilder>;
 	
-	class SendWorldMessageCommand
+class SendWorldMessageCommand
     {
     public:
         SendWorldMessageCommand() {}
 
         bool HandleCommand(WorldSession* session, const std::string& args)
         {
-            // Implement your logic to handle the world message command
-            // For example, sending a message to all players in the world:
+            // If no message is provided, return false
             if (args.empty())
             {
                 return false; // Error handling if no message is provided
             }
 
-            // Send the message to all players
-            World::SendWorldMessage(args);
-            return true;
+            // Loop through all online players and send them the message
+            for (auto& itr : ObjectAccessor::GetPlayers())
+            {
+                Player* player = itr.second;  // Get the Player* from the pair
+
+                if (player && player->IsInWorld())  // Ensure the player is valid and online
+                {
+                    WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
+                    data << uint8(CHAT_MSG_SAY);               // Set the chat type to SAY
+                    data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
+                    data << "[World] " + args;                 // Add the message
+                    player->GetSession()->SendPacket(&data);   // Send the message to each player
+                }
+            }
+
+            return true;  // Successfully sent the message to all players
         }
     };
 }
