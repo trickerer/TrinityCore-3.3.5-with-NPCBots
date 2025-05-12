@@ -567,7 +567,6 @@ struct CharacterInfo
 class TC_GAME_API World
 {
     public:
-        void CreateWorldChannel();
         static World* instance();
 
         static std::atomic<uint32> m_worldLoopCounter;

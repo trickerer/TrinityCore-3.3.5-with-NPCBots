@@ -35,10 +35,6 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-#include "WorldSession.h"   // Include WorldSession
-#include "ObjectAccessor.h"  // Include ObjectAccessor to access all players
-#include "Player.h"          // Include Player for using player-related methods
-#include "World.h"           // Include World for accessing world-related methods
 
 class ChatHandler;
 
@@ -52,35 +48,6 @@ namespace Trinity::ChatCommands
 
     struct ChatCommandBuilder;
     using ChatCommandTable = std::vector<ChatCommandBuilder>;
-	
-class SendWorldMessageCommand
-    {
-    public:
-        bool HandleCommand(WorldSession* session, const std::string& args)
-        {
-            if (args.empty())
-                return false;
-
-            for (auto const& pair : ObjectAccessor::GetPlayers())
-            {
-                Player* player = pair.second;
-                if (player && player->IsInWorld())
-                {
-                    WorldPacket data(SMSG_MESSAGECHAT, 500);
-                    data << uint8(CHAT_MSG_SAY);
-                    data << uint32(LANG_UNIVERSAL);
-                    data << ObjectGuid::Empty;
-                    data << uint64(0); // For whisper target if needed
-                    data << std::string("[World] ") + args;
-                    data << uint8(0);  // Chat tag
-
-                    player->GetSession()->SendPacket(&data);
-                }
-            }
-
-            return true;
-        }
-    };
 }
 
 namespace Trinity::Impl::ChatCommands

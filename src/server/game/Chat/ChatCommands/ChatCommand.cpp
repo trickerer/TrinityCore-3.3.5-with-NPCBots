@@ -27,56 +27,6 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
-// This is the new command class for "sendworld"
-#include "World.h"
-#include "ObjectAccessor.h"
-#include "Channel.h"
-#include "WorldPacket.h"
-
-// Command to send a world message
-class SendWorldMessageCommand
-{
-public:
-    SendWorldMessageCommand() {}
-
-    bool HandleCommand(WorldSession* session, const std::string& args)
-    {
-        if (args.empty())
-        {
-            // Send a message back to the GM if no message is specified
-            Player* player = session->GetPlayer();  // Get the player from the session
-            if (player)
-            {
-                WorldPacket data(SMSG_MESSAGECHAT, 500);  // Create a WorldPacket for the message
-                data << uint8(CHAT_MSG_SYSTEM);            // Set the chat type to SYSTEM
-                data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
-                data << "You must specify a message.";     // The message text
-                player->GetSession()->SendPacket(&data);   // Send the packet
-            }
-            return false;
-        }
-        // Loop through all online players and send them the message
-        for (auto& itr : ObjectAccessor::GetPlayers())
-        {
-            Player* player = itr.second; // Get the Player* from the pair
-
-            if (player && player->IsInWorld()) // Ensure the player is valid and online
-            {
-                WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
-                data << uint8(CHAT_MSG_SAY);               // Set the chat type to SAY
-                data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
-                data << "[World] " + args;                 // Add the message
-                player->GetSession()->SendPacket(&data);   // Send the message to each player
-            }
-        }
-
-        return true;
-    }
-};
-
-// Register the sendworld command in the correct location
-static SendWorldMessageCommand s_sendWorldMessageCommand;
-
 using ChatSubCommandMap = std::map<std::string_view, Trinity::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
 void Trinity::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuilder const& builder)
@@ -526,7 +476,6 @@ bool Trinity::Impl::ChatCommands::ChatCommandNode::HasVisibleSubCommands(ChatHan
             return true;
     return false;
 }
-
 
 void Trinity::ChatCommands::LoadCommandMap() { Trinity::Impl::ChatCommands::ChatCommandNode::LoadCommandMap(); }
 void Trinity::ChatCommands::InvalidateCommandMap() { Trinity::Impl::ChatCommands::ChatCommandNode::InvalidateCommandMap(); }

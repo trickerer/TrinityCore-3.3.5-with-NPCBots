@@ -1021,7 +1021,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    /*
     if (!pCurrChar->IsInChannel("world"))
 	{
 		std::string m_name = "world";  // in game channel name
@@ -1032,33 +1031,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 	}
 
     pCurrChar->GetSession()->SendPacket(&data);
-    */
-    Player* player = GetPlayer();
-    if (!player)
-        return;
+	
+	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
-    uint32 channelId = 1000; // Custom channel ID
-    std::string channelName = "world";
-
-    // Get the channel manager based on the player's faction (0 = Horde, 1 = Alliance)
-    ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
-    if (!mgr)
-        return;
-
-    // Try to get the channel (it will return nullptr if it doesn't exist)
-    Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
-    if (!worldChannel)
-    {
-        // Create the channel using the correct constructor for TC 3.3.5a
-        worldChannel = new Channel(channelId, player->GetTeamId());
-        
-        // No need to manually add the channel; it will be managed internally by the ChannelMgr.
-        worldChannel->Say(ObjectGuid(), "Welcome to MGAWoW!", 0);
-    }
-
-    // Join the player to the channel
-    worldChannel->JoinChannel(player, "");
 }
+
 void WorldSession::SendFeatureSystemStatus()
 {
     WorldPackets::System::FeatureSystemStatus features;

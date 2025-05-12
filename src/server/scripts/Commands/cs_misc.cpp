@@ -52,14 +52,6 @@
 #include "World.h"
 #include "WorldSession.h"
 
-#include "WorldPacket.h"
-
-#include "ChannelMgr.h"
-#include "Channel.h"
-#include "Player.h"
-
-
-
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
 #undef GetClassName
@@ -133,44 +125,11 @@ public:
             { "unstuck",          HandleUnstuckCommand,          rbac::RBAC_PERM_COMMAND_UNSTUCK,          Console::Yes },
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
-            { "sendworld", 		  HandleSendWorldCommand, 		 rbac::RBAC_PERM_COMMAND_SENDWORLD, 	   Console::Yes },
         };
-    
         return commandTable;
     }
 
-    bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
-
-        uint32 channelId = 1000; // Custom channel ID
-        std::string channelName = "world";
-
-        // Get the channel manager based on the player's faction (0 = Horde, 1 = Alliance)
-        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
-        if (!mgr)
-            return false;
-
-        // Create the key (if _channels is using a pair of (channelId, channelName))
-        auto key = std::make_pair(channelId, channelName);
-
-        // Try to get the channel (it will return nullptr if it doesn't exist)
-        Channel* worldChannel = mgr->GetChannel(key, player, true); // Adjusted the function call
-        if (!worldChannel)
-        {
-            // Create the channel using the correct constructor for TC 3.3.5a
-            worldChannel = new Channel(channelId, player->GetTeamId());
-            worldChannel->Say(ObjectGuid(), "Welcome to MGAWoW!", 0);
-        }
-
-        // Join the player to the channel
-        worldChannel->JoinChannel(player, "");
-        return true;
-    }
-	
-	static bool HandlePvPstatsCommand(ChatHandler* handler)
+    static bool HandlePvPstatsCommand(ChatHandler* handler)
     {
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
         {

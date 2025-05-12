@@ -24,34 +24,6 @@
 #include "World.h"
 #include "WorldSession.h"
 
-// Define the static world channel pointer
-Channel* ChannelMgr::_worldChannel = nullptr;
-
-Channel* ChannelMgr::GetWorldChannel()
-{
-    if (!_worldChannel)
-    {
-        // Create the world channel if it doesn't exist yet
-        _worldChannel = CreateCustomChannel("world");
-    }
-
-    return _worldChannel;
-}
-
-Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
-{
-    // Custom channel creation logic
-    Channel* newChannel = new Channel(name);
-    // Perform any additional setup needed for the channel (like permissions, etc.)
-
-    // Save the channel to the custom channels map
-    AddCustomChannel(name, newChannel);
-
-    return newChannel;
-}
-
-
-
 ChannelMgr::~ChannelMgr()
 {
     for (auto itr = _channels.begin(); itr != _channels.end(); ++itr)
@@ -60,8 +32,6 @@ ChannelMgr::~ChannelMgr()
     for (auto itr = _customChannels.begin(); itr != _customChannels.end(); ++itr)
         delete itr->second;
 }
-
-
 
 /*static*/ void ChannelMgr::LoadFromDB()
 {
@@ -189,35 +159,31 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
 
     std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
 
-    // Convert the pair of uint32 to a string key
-    std::ostringstream oss;
-    oss << key.first << "_" << key.second;
-    std::string mapKey = oss.str();
-
-    // Search for the channel using the string key
-    auto itr = _channels.find(mapKey);
+    auto itr = _channels.find(key);
     if (itr != _channels.end())
-        return itr->second;  // Return the existing channel if found
+        return itr->second;
 
-    // If not found, create a new channel
     Channel* newChannel = new Channel(channelId, _team, zoneEntry);
-    _channels[mapKey] = newChannel;  // Store the new channel in the map
-
+    _channels[key] = newChannel;
     return newChannel;
 }
 
-// Rename the second definition (line 209) to something else
-Channel* ChannelMgr::CreateCustomChannelWithId(const std::string& name)
+Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
 {
-    uint32 channelId = 1000; // or whatever ID you need
-    uint8 teamId = 0; // Adjust this as needed (0 = Horde, 1 = Alliance)
+    std::wstring channelName;
+    if (!Utf8toWStr(name, channelName))
+        return nullptr;
 
-    Channel* newChannel = new Channel(channelId, teamId);
-    newChannel->SetName(name);
+    wstrToLower(channelName);
 
-    // Add the channel to the manager (or wherever needed)
-    _channels[channelId] = newChannel;
+    Channel*& c = _customChannels[channelName];
+    if (c)
+        return nullptr;
 
+    Channel* newChannel = new Channel(name, _team);
+    newChannel->SetDirty();
+
+    c = newChannel;
     return newChannel;
 }
 

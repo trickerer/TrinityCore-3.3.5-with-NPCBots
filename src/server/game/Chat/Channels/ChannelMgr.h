@@ -32,42 +32,28 @@ class TC_GAME_API ChannelMgr
     typedef std::unordered_map<std::wstring, Channel*> CustomChannelContainer; // custom channels only differ in name
     typedef std::unordered_map<std::pair<uint32 /*channelId*/, uint32 /*zoneId*/>, Channel*> BuiltinChannelContainer; //identify builtin (DBC) channels by zoneId instead, since name changes by client locale
 
-protected:
-    explicit ChannelMgr(uint32 team) : _team(team) { }
-    ~ChannelMgr();
+    protected:
+        explicit ChannelMgr(uint32 team) : _team(team) { }
+        ~ChannelMgr();
 
-public:
-    static void LoadFromDB();
-    static ChannelMgr* forTeam(uint32 team);
-    static Channel* GetChannelForPlayerByNamePart(std::string const& namePart, Player* playerSearcher);
-    //static void MakeNotOnPacket(WorldPacket* data, std::string const& name);
+    public:
+        static void LoadFromDB();
+        static ChannelMgr* forTeam(uint32 team);
+        static Channel* GetChannelForPlayerByNamePart(std::string const& namePart, Player* playerSearcher);
 
-    void SaveToDB();
-    Channel* GetSystemChannel(uint32 channelId, AreaTableEntry const* zoneEntry = nullptr);
-    Channel* CreateCustomChannel(std::string const& name);
-    Channel* GetCustomChannel(std::string const& name) const;
-    Channel* GetChannel(uint32 channelId, std::string const& name, Player* player, bool pkt = true, AreaTableEntry const* zoneEntry = nullptr) const;
-    void LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry);
-
-    Channel* GetWorldChannel(); // Add the declaration here
-
-    void AddCustomChannel(std::string const& name, Channel* channel)
-    {
-        std::wstring wname;
-        if (!Utf8toWStr(name, wname))  // Converts name to wide string
-            return;
-
-        wstrToLower(wname);  // Converts to lowercase
-        _customChannels[wname] = channel;  // Adds the channel to the map
-    }
-
+        void SaveToDB();
+        Channel* GetSystemChannel(uint32 channelId, AreaTableEntry const* zoneEntry = nullptr);
+        Channel* CreateCustomChannel(std::string const& name);
+        Channel* GetCustomChannel(std::string const& name) const;
+        Channel* GetChannel(uint32 channelId, std::string const& name, Player* player, bool pkt = true, AreaTableEntry const* zoneEntry = nullptr) const;
+        void LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry);
 
     private:
         CustomChannelContainer _customChannels;
-        std::map<std::string, Channel*> _channels;
+        BuiltinChannelContainer _channels;
         uint32 const _team;
 
-        static Channel* _worldChannel;
+        static void MakeNotOnPacket(WorldPacket* data, std::string const& name);
 };
 
 #endif

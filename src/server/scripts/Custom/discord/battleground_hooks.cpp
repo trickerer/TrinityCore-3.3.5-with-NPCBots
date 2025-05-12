@@ -49,11 +49,9 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         if (path.empty()) path = "/";
 
         Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-		json->set("content", "⚔️ **" + battlegroundName + " Started!**\n"
-		);
-        /*json->set("content", "⚔️ **" + battlegroundName + " Started!**\n"
+        json->set("content", "⚔️ **" + battlegroundName + " Started!**\n"
                             + "**Players:** " + std::to_string(alliancePlayers) + " Alliance vs "
-                            + std::to_string(hordePlayers) + " Horde");*/
+                            + std::to_string(hordePlayers) + " Horde");
 
         std::stringstream payload;
         Poco::JSON::Stringifier::stringify(json, payload);

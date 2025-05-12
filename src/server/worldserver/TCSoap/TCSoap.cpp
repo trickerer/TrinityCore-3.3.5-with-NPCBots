@@ -6,7 +6,8 @@
  * Free Software Foundation; either version 2 of the License, or (at your
  * option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
@@ -22,25 +23,6 @@
 #include "AccountMgr.h"
 #include "Log.h"
 
-#include "ChatCommand.h"  // Include the header for SendWorldMessageCommand
-#include <string>
-
-// SOAP Handler Class
-class SOAPHandler {
-public:
-    bool HandleSendWorldMessage(const std::string& message)
-	{
-		// Create an instance of the fully qualified SendWorldMessageCommand
-		Trinity::ChatCommands::SendWorldMessageCommand cmd;
-
-		// Call the HandleCommand method and store the result in 'success'
-		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
-
-		return success;  // Return true for success, false for failure
-	}
-};
-
-// Main SOAP Thread
 void TCSoapThread(const std::string& host, uint16 port)
 {
     struct soap soap;
@@ -52,7 +34,7 @@ void TCSoapThread(const std::string& host, uint16 port)
     soap.bind_flags = SO_REUSEADDR;
 #endif
 
-    // Check every 3 seconds if world ended
+    // check every 3 seconds if world ended
     soap.accept_timeout = 3;
     soap.recv_timeout = 5;
     soap.send_timeout = 5;
@@ -67,10 +49,10 @@ void TCSoapThread(const std::string& host, uint16 port)
     while (!World::IsStopped())
     {
         if (!soap_valid_socket(soap_accept(&soap)))
-            continue;   // Ran into an accept timeout
+            continue;   // ran into an accept timeout
 
         TC_LOG_DEBUG("network.soap", "Accepted connection from IP={}.{}.{}.{}", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
-        struct soap* thread_soap = soap_copy(&soap);  // Make a safe copy
+        struct soap* thread_soap = soap_copy(&soap);// make a safe copy
         process_message(thread_soap);
     }
 
@@ -79,20 +61,23 @@ void TCSoapThread(const std::string& host, uint16 port)
     soap_done(&soap);
 }
 
-// Process SOAP Message
 void process_message(struct soap* soap_message)
 {
     TC_LOG_TRACE("network.soap", "SOAPWorkingThread::process_message");
 
     soap_serve(soap_message);
-    soap_destroy(soap_message); // Dealloc C++ data
-    soap_end(soap_message); // Dealloc data and clean up
-    soap_free(soap_message); // Detach soap struct and free up the memory
+    soap_destroy(soap_message); // dealloc C++ data
+    soap_end(soap_message); // dealloc data and clean up
+    soap_free(soap_message); // detach soap struct and free up the memory
 }
+/*
+Code used for generating stubs:
 
-// SOAP Command Execution
+int ns1__executeCommand(char* command, char** result);
+*/
 int ns1__executeCommand(soap* soap, char* command, char** result)
 {
+    // security check
     if (!soap->userid || !soap->passwd)
     {
         TC_LOG_INFO("network.soap", "Client didn't provide login information");
@@ -122,33 +107,46 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return soap_sender_fault(soap, "Command can not be empty", "The supplied command was an empty string");
 
     TC_LOG_INFO("network.soap", "Received command '{}'", command);
+    SOAPCommand connection;
 
-    // Convert char* to std::string before passing to HandleSendWorldMessage
-    std::string commandStr(command);
-
-    // Example of how you can call HandleSendWorldMessage
-    SOAPHandler handler;
-    bool success = handler.HandleSendWorldMessage(commandStr); // Convert to std::string
-
-    if (success)
+    // commands are executed in the world thread. We have to wait for them to be completed
     {
-        *result = "Message sent successfully"; // Correctly using 'result'
+        // CliCommandHolder will be deleted from world, accessing after queueing is NOT safe
+        CliCommandHolder* cmd = new CliCommandHolder(&connection, command, &SOAPCommand::print, &SOAPCommand::commandFinished);
+        sWorld->QueueCliCommand(cmd);
+    }
+
+    // Wait until the command has finished executing
+    connection.finishedPromise.get_future().wait();
+
+    // The command has finished executing already
+    char* printBuffer = soap_strdup(soap, connection.m_printBuffer.c_str());
+    if (connection.hasCommandSucceeded())
+    {
+        *result = printBuffer;
         return SOAP_OK;
     }
     else
-    {
-        *result = "Failed to send message"; // Correctly using 'result'
-        return SOAP_ERR;
-    }
+        return soap_sender_fault(soap, printBuffer, printBuffer);
 }
 
-// Namespace Definitions for SOAP
+void SOAPCommand::commandFinished(void* soapconnection, bool success)
+{
+    SOAPCommand* con = (SOAPCommand*)soapconnection;
+    con->setCommandSuccess(success);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Namespace Definition Table
+//
+////////////////////////////////////////////////////////////////////////////////
+
 struct Namespace namespaces[] =
-{   
-    { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", NULL, NULL }, // Must be first
-    { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", NULL, NULL }, // Must be second
+{   { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", NULL, NULL }, // must be first
+    { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", NULL, NULL }, // must be second
     { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL },
-    { "xsd", "http://www.w3.org/1999/XMLSchema", "http://www.w3.org/*/XMLSchema", NULL },
+    { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", NULL },
     { "ns1", "urn:TC", NULL, NULL },     // "ns1" namespace prefix
     { NULL, NULL, NULL, NULL }
 };

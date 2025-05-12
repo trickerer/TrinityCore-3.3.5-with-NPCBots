@@ -89,9 +89,6 @@
 #include "WhoListStorage.h"
 #include "WorldSession.h"
 
-#include "Channel.h"
-#include "WorldPacket.h"
-
 #include <boost/asio/ip/address.hpp>
 
 TC_GAME_API std::atomic<bool> World::m_stopEvent(false);
@@ -2240,33 +2237,12 @@ void World::SetInitialWorldSettings()
             }
         });
     }
-    void World::InitChannels()
-    {
-        // Initialize the world channel
-        ChannelMgr::GetWorldChannel();
-    }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
     TC_LOG_INFO("server.worldserver", "World initialized in {} minutes {} seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
 
     TC_METRIC_EVENT("events", "World initialized", "World initialized in " + std::to_string(startupDuration / 60000) + " minutes " + std::to_string((startupDuration % 60000) / 1000) + " seconds");
-}
-
-void World::CreateWorldChannel()
-{
-    uint32 worldChannelId = sConfigMgr->GetIntDefault("WorldChannelId", 1000);
-
-    ChannelMgr* mgr = ChannelMgr::forTeam(0); // 0 = Alliance or Neutral
-    if (!mgr)
-        return;
-
-    Channel* worldChannel = new Channel(worldChannelId, 0, nullptr);
-    worldChannel->SetName("World");
-
-    mgr->AddCustomChannel("World", worldChannel);
-
-    TC_LOG_INFO("misc", "World channel created at startup.");
 }
 
 void World::DetectDBCLang()
