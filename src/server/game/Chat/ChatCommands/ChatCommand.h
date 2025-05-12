@@ -35,7 +35,10 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
-#include "WorldSession.h"  // Include WorldSession header
+#include "WorldSession.h"   // Include WorldSession
+#include "ObjectAccessor.h"  // Include ObjectAccessor to access all players
+#include "Player.h"          // Include Player for using player-related methods
+#include "World.h"           // Include World for accessing world-related methods
 
 class ChatHandler;
 
