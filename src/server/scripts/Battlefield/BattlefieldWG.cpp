@@ -40,7 +40,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
-#include "DiscordWebhookMgr.h" 
+#include "DiscordWebhookMgr.h"
 
 struct BfWGCoordGY
 {
@@ -583,7 +583,7 @@ bool BattlefieldWG::Update(uint32 diff)
         SendDiscordMessage(timerMessage);
 
         // Notify about ownership
-        std::string owner = (IsHordeControlled()) ? "Horde" : "Alliance";
+        std::string owner = (this->IsHordeControlled()) ? "Horde" : "Alliance";
         std::string ownershipMessage = "Wintergrasp is currently controlled by: " + owner;
         SendDiscordMessage(ownershipMessage);
 
@@ -596,9 +596,9 @@ bool BattlefieldWG::Update(uint32 diff)
     }
 
     // Announce winner when event ends
-    if (IsEventEnded())
+    if (this->IsEventEnded())
     {
-        std::string winner = (GetWinner() == 0) ? "Alliance" : "Horde"; // Assuming 0 is Alliance and 1 is Horde
+        std::string winner = (this->GetWinner() == 0) ? "Alliance" : "Horde";
         std::string winnerMessage = "Wintergrasp has ended! The winner is: " + winner;
         SendDiscordMessage(winnerMessage);
     }
