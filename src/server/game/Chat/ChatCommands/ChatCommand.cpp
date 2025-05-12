@@ -46,7 +46,7 @@ public:
             // Send a message back to the GM if no message is specified
             Player* player = session->GetPlayer();  // Get the player from the session
             if (player)
-                player->SendMessageToSet("You must specify a message.", true); // Use SendMessageToSet for system messages
+                player->SendDirectMessage("You must specify a message."); // Use the player's SendSysMessage
             return false;
         }
 
