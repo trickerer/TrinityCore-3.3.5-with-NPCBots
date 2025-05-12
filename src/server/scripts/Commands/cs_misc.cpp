@@ -56,6 +56,8 @@
 
 
 
+
+
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
 #undef GetClassName
@@ -69,7 +71,6 @@ using namespace Trinity::ChatCommands;
 
 namespace {
 
-    // Command to send a message to all players
     class SendWorldMessageCommand
     {
     public:
@@ -102,36 +103,22 @@ namespace {
         }
     };
 
-    // Define custom command table using ChatCommandBuilder
-    ChatCommandTable GetCustomCommandTable()
+    // ChatCommandScript class for registering custom command
+    class misc_commandscript : public CommandScript
     {
-        static ChatCommandTable customCommandTable;
-        
-        // Register the 'sendworld' command
-        customCommandTable.push_back(ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes));
-        
-        return customCommandTable;
-    }
+    public:
+        misc_commandscript() : CommandScript("misc_commandscript") { }
 
-    // Register the custom commands
-    void AddSC_misc_commandscript()
-    {
-        // Use the correct global ChatHandler instance
-        ChatHandler* handler = sChatHandler;
-
-        // Register the custom command
-        handler->RegisterCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, &SendWorldMessageCommand::HandleSendWorld);
-    }
-
-    // Register the custom command table under "custom"
-    ChatCommandTable GetMiscCommandTable()
-    {
-        static ChatCommandTable miscCommandTable =
+        ChatCommand* GetCommands() const override
         {
-            { "custom", GetCustomCommandTable() }
-        };
-        return miscCommandTable;
-    }
+            static ChatCommand miscCommandTable[] =
+            {
+                { "sendworld", SEC_ADMINISTRATOR, false, &SendWorldMessageCommand::HandleSendWorld, NULL },
+                { NULL, 0, false, NULL, NULL }
+            };
+            return miscCommandTable;
+        }
+    };
 }
 
 
