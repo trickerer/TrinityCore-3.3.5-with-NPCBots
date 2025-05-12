@@ -103,9 +103,8 @@ namespace {
     // Register the custom command table
     ChatCommandTable GetCustomCommandTable()
     {
-        static ChatCommandTable customCommandTable =
-        {
-            ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
+        static ChatCommandTable customCommandTable = {
+            { "sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes }
         };
         return customCommandTable;
     }
