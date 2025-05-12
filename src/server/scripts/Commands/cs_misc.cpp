@@ -133,12 +133,12 @@ public:
             { "unstuck",          HandleUnstuckCommand,          rbac::RBAC_PERM_COMMAND_UNSTUCK,          Console::Yes },
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
-			{ "sendworld", 		  HandleSendWorldCommand, 		 rbac::RBAC_PERM_COMMAND_SENDWORLD, 	   Console::Yes },
+			{ "sendworld",        &misc_commandscript::HandleSendWorldCommand, rbac::RBAC_PERM_COMMAND_SENDWORLD, Trinity::ChatCommands::Console::Yes },
         };
         return commandTable;
     }
 
-    bool misc_commandscript::HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
