@@ -2,6 +2,8 @@
 #include "Config.h"
 #include "Log.h"
 
+#include <curl/curl.h>
+
 // Poco includes
 #define format __poco_format_workaround
 #include <Poco/Net/HTTPClientSession.h>
