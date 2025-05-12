@@ -29,33 +29,38 @@
 
 // This is the new command class for "sendworld"
 #include "World.h"
+#include "ObjectAccessor.h"
+#include "Channel.h"
 
-class SendWorldMessageCommand : public Command
+// Command to send a world message
+class SendWorldMessageCommand
 {
 public:
-    SendWorldMessageCommand() : Command("sendworld") {}
+    SendWorldMessageCommand() {}
 
     bool HandleCommand(WorldSession* session, const std::string& args)
     {
-        // If the message is empty, notify the GM
         if (args.empty())
         {
-            session->SendSysMessage("You need to specify a message to send.");
+            session->SendChatMessage(CHAT_MSG_SYSTEM, LANG_UNIVERSAL, "You must specify a message.");
             return false;
         }
 
-        // Create the message and send it to the world
-        WorldPacket data(SMSG_MESSAGECHAT, 0);
-        data << uint8(CHAT_MSG_SAY);  // You can choose other types like CHAT_MSG_WHISPER, etc.
-        data << uint64(0);            // This is the sender's GUID (0 for world)
-        data << uint32(0);            // Recipient (this could be modified for direct messages)
-        data << "[World] " + args;    // The message to send
-
-        World::SendWorldMessage(data);  // Broadcast the message to all players
+        // Loop through all online players and send them the message
+        for (Player* player : ObjectAccessor::GetPlayers())
+        {
+            if (player->IsInWorld()) // Check if the player is online
+            {
+                player->SendChatMessage(CHAT_MSG_SAY, LANG_UNIVERSAL, "[World] " + args);
+            }
+        }
 
         return true;
     }
 };
+
+// Register the sendworld command in the correct location
+static SendWorldMessageCommand s_sendWorldMessageCommand;
 
 using ChatSubCommandMap = std::map<std::string_view, Trinity::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
