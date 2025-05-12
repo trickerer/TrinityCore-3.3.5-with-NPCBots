@@ -45,7 +45,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 }
 
 
-void DiscordWebhookMgr::SendDiscordMessage(const std::string& message)
+static void SendDiscordMessage(const std::string& message)
 {
     // Example code to send a POST request to the Discord webhook (using libcurl)
     CURL* curl = curl_easy_init();
