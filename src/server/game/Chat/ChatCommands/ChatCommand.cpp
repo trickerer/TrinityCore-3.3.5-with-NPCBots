@@ -28,6 +28,8 @@
 #include "WorldSession.h"
 
 // This is the new command class for "sendworld"
+#include "World.h"
+
 class SendWorldMessageCommand : public Command
 {
 public:
