@@ -132,7 +132,12 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     std::string commandStr(command);
 
     SOAPHandler handler;
-    bool success = handler.HandleSendWorldMessage(commandStr);
+    bool SOAPHandler::HandleSendWorldMessage(const std::string& message)
+	{
+		SendWorldMessageCommand cmd;  // Create an instance of the SendWorldMessageCommand
+		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session since we don't have one in this context
+		return success;
+	}
 
     if (success)
     {
