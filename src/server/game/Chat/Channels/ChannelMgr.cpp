@@ -50,6 +50,8 @@ Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
     return newChannel;
 }
 
+
+
 ChannelMgr::~ChannelMgr()
 {
     for (auto itr = _channels.begin(); itr != _channels.end(); ++itr)
