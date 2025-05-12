@@ -136,20 +136,23 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
     // Convert char* to std::string before passing to HandleSendWorldMessage
     std::string commandStr(command);
 
-
-    // Example of how you can call HandleSendWorldMessage
     SOAPHandler handler;
-    bool success = handler.HandleSendWorldMessage(command);
+    bool SOAPHandler::HandleSendWorldMessage(const std::string& message)
+	{
+		SendWorldMessageCommand cmd;  // Create an instance of the SendWorldMessageCommand
+		bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session since we don't have one in this context
+		return success;
+	}
 
     if (success)
     {
-        *response = "Message sent successfully";
+        *result = soap_strdup(soap, "World message sent successfully");
         return SOAP_OK;
     }
     else
     {
-        *response = "Failed to send message";
-        return SOAP_ERR;
+        *result = soap_strdup(soap, "Failed to send world message");
+        return soap_sender_fault(soap, "Failed to send message", "An error occurred while sending the world message");
     }
 }
 
