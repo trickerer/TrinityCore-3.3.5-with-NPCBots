@@ -55,36 +55,30 @@ namespace Trinity::ChatCommands
 	
 class SendWorldMessageCommand
     {
-    
     public:
-        SendWorldMessageCommand() {}
-		
-		class SendWorldMessageCommand
-
         bool HandleCommand(WorldSession* session, const std::string& args)
         {
-            // If no message is provided, return false
             if (args.empty())
-            {
-                return false; // Error handling if no message is provided
-            }
+                return false;
 
-            // Loop through all online players and send them the message
-            for (auto& itr : ObjectAccessor::GetPlayers())
+            for (auto const& pair : ObjectAccessor::GetPlayers())
             {
-                Player* player = itr.second;  // Get the Player* from the pair
-
-                if (player && player->IsInWorld())  // Ensure the player is valid and online
+                Player* player = pair.second;
+                if (player && player->IsInWorld())
                 {
-                    WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
-                    data << uint8(CHAT_MSG_SAY);               // Set the chat type to SAY
-                    data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
-                    data << "[World] " + args;                 // Add the message
-                    player->GetSession()->SendPacket(&data);   // Send the message to each player
+                    WorldPacket data(SMSG_MESSAGECHAT, 500);
+                    data << uint8(CHAT_MSG_SAY);
+                    data << uint32(LANG_UNIVERSAL);
+                    data << ObjectGuid::Empty;
+                    data << uint64(0); // For whisper target if needed
+                    data << std::string("[World] ") + args;
+                    data << uint8(0);  // Chat tag
+
+                    player->GetSession()->SendPacket(&data);
                 }
             }
 
-            return true;  // Successfully sent the message to all players
+            return true;
         }
     };
 }
