@@ -58,17 +58,13 @@ class TC_GAME_API ChannelMgr
             _customChannels[wname] = channel;
         }
 
+
     private:
         CustomChannelContainer _customChannels;
-        BuiltinChannelContainer _channels; // Do not rename this
+        BuiltinChannelContainer _channels; // Keep this one!
         uint32 const _team;
 
-        std::map<std::string, Channel*> _customWorldChannels; // renamed from _channels
-
-        static void MakeNotOnPacket(WorldPacket* data, std::string const& name);
-        
-    // Add this public or protected accessor:
-    std::map<std::string, Channel*> _channels;
+        std::map<std::string, Channel*> _customWorldChannels; //
 };
 
 #endif
