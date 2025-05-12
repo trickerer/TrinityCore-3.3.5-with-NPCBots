@@ -69,59 +69,6 @@
 
 using namespace Trinity::ChatCommands;
 
-namespace {
-
-    class SendWorldMessageCommand
-    {
-    public:
-        bool HandleSendWorld(ChatHandler* handler, const std::string& message)
-        {
-            if (message.empty())
-                return false;
-
-            // Loop through all online players
-            for (auto const& pair : ObjectAccessor::GetPlayers())
-            {
-                Player* player = pair.second;
-                if (player && player->IsInWorld())
-                {
-                    // Create a world message packet
-                    WorldPacket data(SMSG_MESSAGECHAT, 500);
-                    data << uint8(CHAT_MSG_SAY);
-                    data << uint32(LANG_UNIVERSAL);
-                    data << ObjectGuid::Empty;
-                    data << uint64(0);  // For whisper target if needed
-                    data << std::string("[World] ") + message;
-                    data << uint8(0);  // Chat tag
-
-                    // Send the packet to the player
-                    player->GetSession()->SendPacket(&data);
-                }
-            }
-
-            return true;
-        }
-    };
-
-    // ChatCommandScript class for registering custom command
-    class misc_commandscript : public CommandScript
-    {
-    public:
-        misc_commandscript() : CommandScript("misc_commandscript") { }
-
-        ChatCommand* GetCommands() const override
-        {
-            static ChatCommand miscCommandTable[] =
-            {
-                { "sendworld", SEC_ADMINISTRATOR, false, &SendWorldMessageCommand::HandleSendWorld, NULL },
-                { NULL, 0, false, NULL, NULL }
-            };
-            return miscCommandTable;
-        }
-    };
-}
-
-
 class misc_commandscript : public CommandScript
 {
 public:
@@ -184,11 +131,42 @@ public:
             { "unstuck",          HandleUnstuckCommand,          rbac::RBAC_PERM_COMMAND_UNSTUCK,          Console::Yes },
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
+			{ "sendworld", 		  HandleSendWorldCommand, 		 rbac::RBAC_PERM_COMMAND_SENDWORLD, 	   Console::Yes },
         };
         return commandTable;
     }
 
-    static bool HandlePvPstatsCommand(ChatHandler* handler)
+    static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        std::string message = args;
+
+        for (const auto& pair : ObjectAccessor::GetPlayers())
+        {
+            if (Player* player = pair.second)
+            {
+                if (player->IsInWorld())
+                {
+                    WorldPacket data(SMSG_MESSAGECHAT, 200);
+                    data << uint8(CHAT_MSG_SYSTEM);
+                    data << uint32(LANG_UNIVERSAL);
+                    data << uint64(0); // sender GUID
+                    data << uint64(0); // receiver GUID
+                    data << message;
+                    data << uint8(0); // chat tag
+
+                    player->GetSession()->SendPacket(&data);
+                }
+            }
+        }
+
+        handler->SendSysMessage("World message sent.");
+        return true;
+    }
+	
+	static bool HandlePvPstatsCommand(ChatHandler* handler)
     {
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
         {
