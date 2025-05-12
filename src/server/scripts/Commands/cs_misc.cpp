@@ -81,7 +81,7 @@ ChatCommandTable GetCustomCommandTable()
 {
     static ChatCommandTable customCommandTable =
     {
-        ChatCommandBuilder("sendworld", HandleSendWorld, RBAC_PERM_COMMAND_DEBUG, Console::Yes)
+        ChatCommandBuilder("sendworld", HandleSendWorld, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes)
     };
     return customCommandTable;
 }
