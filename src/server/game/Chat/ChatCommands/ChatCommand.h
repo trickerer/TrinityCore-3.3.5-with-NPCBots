@@ -55,10 +55,11 @@ namespace Trinity::ChatCommands
 	
 class SendWorldMessageCommand
     {
-   
-    {
+    
     public:
         SendWorldMessageCommand() {}
+		
+		class SendWorldMessageCommand
 
         bool HandleCommand(WorldSession* session, const std::string& args)
         {
