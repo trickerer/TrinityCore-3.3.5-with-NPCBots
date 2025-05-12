@@ -137,7 +137,7 @@ public:
         };
     
     return commandTable;
-}
+    }
 
     bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
