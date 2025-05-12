@@ -27,21 +27,20 @@
 // SOAP Handler Class
 class SOAPHandler {
 public:
-    bool HandleSendWorldMessage(std::string& message)
+    bool HandleSendWorldMessage(const std::string& message) // Accept const reference
     {
         SendWorldMessageCommand cmd;
         bool success = cmd.HandleCommand(nullptr, message);  // Passing nullptr for session as we don’t have one
 
-        // Now, you can return success or failure
         if (success)
         {
             TC_LOG_INFO("network.soap", "World message successfully sent: {}", message);
-            return true;  // Success
+            return true;
         }
         else
         {
             TC_LOG_ERROR("network.soap", "Failed to send world message: {}", message);
-            return false;  // Failure
+            return false;
         }
     }
 };
@@ -99,7 +98,6 @@ void process_message(struct soap* soap_message)
 // SOAP Command Execution
 int ns1__executeCommand(soap* soap, char* command, char** result)
 {
-    // Security check
     if (!soap->userid || !soap->passwd)
     {
         TC_LOG_INFO("network.soap", "Client didn't provide login information");
@@ -130,8 +128,11 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
 
     TC_LOG_INFO("network.soap", "Received command '{}'", command);
 
+    // Convert char* to std::string before passing to HandleSendWorldMessage
+    std::string commandStr(command);
+
     SOAPHandler handler;
-    bool success = handler.HandleSendWorldMessage(command);
+    bool success = handler.HandleSendWorldMessage(commandStr);
 
     if (success)
     {
