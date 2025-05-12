@@ -2707,5 +2707,5 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
-    sScriptMgr->AddScriptCommandTable(GetCustomCommandTable());
+    sScriptMgr->RegisterCommandTable(GetCustomCommandTable());
 }
