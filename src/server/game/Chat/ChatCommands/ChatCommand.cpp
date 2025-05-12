@@ -44,13 +44,15 @@ public:
         if (args.empty())
         {
             // Send a message back to the GM if no message is specified
-            //session->SendSysMessage("You must specify a message.");
+            session->SendSysMessage("You must specify a message.");
             return false;
         }
 
         // Loop through all online players and send them the message
-        for (Player* player : ObjectAccessor::GetPlayers())
+        for (auto& itr : ObjectAccessor::GetPlayers())
         {
+            Player* player = itr.second; // Get the Player* from the pair
+
             if (player && player->IsInWorld()) // Ensure the player is valid and online
             {
                 WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
