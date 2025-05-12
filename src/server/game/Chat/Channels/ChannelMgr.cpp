@@ -210,8 +210,8 @@ Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
     if (c)
         return nullptr;
 
-    // Use the correct constructor for Channel
-    Channel* newChannel = new Channel(name, _team);  // This matches the constructor we added
+    // Assuming Channel constructor needs name and team
+    Channel* newChannel = new Channel(name, _team);  // Make sure this matches your Channel constructor
     newChannel->SetDirty();
 
     c = newChannel;
