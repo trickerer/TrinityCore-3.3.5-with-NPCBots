@@ -38,6 +38,20 @@ Channel* ChannelMgr::GetWorldChannel()
     return _worldChannel;
 }
 
+Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
+{
+    // Custom channel creation logic
+    Channel* newChannel = new Channel(name);
+    // Perform any additional setup needed for the channel (like permissions, etc.)
+
+    // Save the channel to the custom channels map
+    AddCustomChannel(name, newChannel);
+
+    return newChannel;
+}
+
+
+
 ChannelMgr::~ChannelMgr()
 {
     for (auto itr = _channels.begin(); itr != _channels.end(); ++itr)
@@ -192,20 +206,18 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
     return newChannel;
 }
 
-Channel* ChannelMgr::CreateCustomChannel(const std::string& name)
+// Rename the second definition (line 209) to something else
+Channel* ChannelMgr::CreateCustomChannelWithId(const std::string& name)
 {
-    uint32 channelId = 1000; // or any other unique channel ID
-    uint8 teamId = 0; // 0 for Horde, 1 for Alliance; adjust as needed
+    uint32 channelId = 1000; // or whatever ID you need
+    uint8 teamId = 0; // Adjust this as needed (0 = Horde, 1 = Alliance)
 
-    // Assuming Channel has a constructor like this: Channel(uint32 id, uint8 team)
     Channel* newChannel = new Channel(channelId, teamId);
-    
-    // Optionally, set the name after the channel is created if there’s no constructor for it
     newChannel->SetName(name);
 
-    // Add the channel to the manager (or wherever it needs to be)
+    // Add the channel to the manager (or wherever needed)
     _channels[channelId] = newChannel;
-    
+
     return newChannel;
 }
 
