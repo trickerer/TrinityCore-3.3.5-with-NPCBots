@@ -23,7 +23,7 @@
 #include "Log.h"
 
 #include "Chat/ChatCommands/ChatCommand.h"  // Include the header for SendWorldMessageCommand
-#include <string>
+
 
 // SOAP Handler Class
 class SOAPHandler {
