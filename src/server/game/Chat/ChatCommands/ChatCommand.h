@@ -58,6 +58,11 @@ class SendWorldMessageCommand
     public:
         SendWorldMessageCommand() {}
 
+        class SendWorldMessageCommand
+    {
+    public:
+        SendWorldMessageCommand() {}
+
         bool HandleCommand(WorldSession* session, const std::string& args)
         {
             // If no message is provided, return false
