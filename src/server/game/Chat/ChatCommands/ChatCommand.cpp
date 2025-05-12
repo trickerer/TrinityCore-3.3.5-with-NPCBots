@@ -42,16 +42,18 @@ public:
     {
         if (args.empty())
         {
-            session->SendChatMessage(CHAT_MSG_SYSTEM, LANG_UNIVERSAL, "You must specify a message.");
+            // Send a message back to the GM if no message is specified
+            session->SendDirectMessage("You must specify a message to send.");
             return false;
         }
 
         // Loop through all online players and send them the message
-        for (Player* player : ObjectAccessor::GetPlayers())
+        for (auto itr = ObjectAccessor::GetPlayersBegin(); itr != ObjectAccessor::GetPlayersEnd(); ++itr)
         {
-            if (player->IsInWorld()) // Check if the player is online
+            Player* player = itr->getSource();
+            if (player && player->IsInWorld()) // Ensure the player is valid and online
             {
-                player->SendChatMessage(CHAT_MSG_SAY, LANG_UNIVERSAL, "[World] " + args);
+                player->SendDirectMessage("[World] " + args); // Broadcast the message
             }
         }
 
