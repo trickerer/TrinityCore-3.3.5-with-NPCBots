@@ -136,7 +136,7 @@ public:
             { "sendworld", 		  HandleSendWorldCommand, 		 rbac::RBAC_PERM_COMMAND_SENDWORLD, 	   Console::Yes },
         };
     
-    return commandTable;
+        return commandTable;
     }
 
     bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
@@ -153,8 +153,11 @@ public:
         if (!mgr)
             return false;
 
+        // Create the key (if _channels is using a pair of (channelId, channelName))
+        auto key = std::make_pair(channelId, channelName);
+
         // Try to get the channel (it will return nullptr if it doesn't exist)
-        Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
+        Channel* worldChannel = mgr->GetChannel(key, player, true); // Adjusted the function call
         if (!worldChannel)
         {
             // Create the channel using the correct constructor for TC 3.3.5a
