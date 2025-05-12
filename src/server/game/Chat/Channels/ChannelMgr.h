@@ -44,12 +44,13 @@ public:
 
     void SaveToDB();
     Channel* GetSystemChannel(uint32 channelId, AreaTableEntry const* zoneEntry = nullptr);
-    Channel* CreateCustomChannel(std::string const& name); // Single declaration of CreateCustomChannel
+    Channel* CreateCustomChannel(std::string const& name);
     Channel* GetCustomChannel(std::string const& name) const;
     Channel* GetChannel(uint32 channelId, std::string const& name, Player* player, bool pkt = true, AreaTableEntry const* zoneEntry = nullptr) const;
     void LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry);
 
-    // Function to add custom channels to the map
+    Channel* GetWorldChannel(); // Add the declaration here
+
     void AddCustomChannel(std::string const& name, Channel* channel)
     {
         std::wstring wname;
