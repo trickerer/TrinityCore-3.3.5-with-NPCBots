@@ -101,13 +101,9 @@ namespace {
     };
 
     // Register the custom command table
-    ChatCommandTable GetCustomCommandTable()
+    void RegisterCustomCommand(ChatHandler* handler)
     {
-        static ChatCommandTable customCommandTable;
-
-        customCommandTable.push_back(ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes));
-
-        return customCommandTable;
+        handler->AddCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, false, &SendWorldMessageCommand::HandleSendWorld);
     }
 }
 
@@ -2708,10 +2704,5 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
-    // Register each command individually
-    ChatCommandTable commandTable = GetCustomCommandTable();
-    for (auto& command : commandTable)
-    {
-        sScriptMgr->RegisterCommand(command);
-    }
+    sScriptMgr->RegisterScript("misc_commandscript", &RegisterCustomCommand);
 }
