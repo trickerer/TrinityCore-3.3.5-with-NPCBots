@@ -592,8 +592,9 @@ bool BattlefieldWG::Update(uint32 diff)
 
     if (this->IsEventEnded())
     {
-        // Correct field for team control in 3.3.5a
-        std::string owner = (this->m_TeamControl == TEAM_HORDE) ? "Horde" : "Alliance";
+        // Use GetTeamControl() to determine the controlling team
+        TeamId controllingTeam = this->GetTeamControl();
+        std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";
         std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
         SendDiscordMessage(winnerMessage);
     }
