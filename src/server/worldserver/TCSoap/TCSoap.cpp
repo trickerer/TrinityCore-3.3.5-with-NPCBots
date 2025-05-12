@@ -23,6 +23,17 @@
 #include "AccountMgr.h"
 #include "Log.h"
 
+#include "Chat/ChatCommands/ChatCommand.h"  // Include the header for the SendWorldMessageCommand
+
+// Ensure SOAPHandler is properly declared as well
+class SOAPHandler {
+public:
+    bool HandleSendWorldMessage(std::string& message) {
+        SendWorldMessageCommand cmd;  // Create the command object
+        return cmd.HandleCommand(nullptr, message);  // Pass nullptr for session as we're not using one
+    }
+};
+
 void TCSoapThread(const std::string& host, uint16 port)
 {
     struct soap soap;
