@@ -67,36 +67,23 @@ namespace {
 
 bool HandleSendWorld(ChatHandler* handler, char const* message)
 {
-	if (message.empty())
-		return false;
+    if (!message || !*message)
+        return false;
 
-	for (auto const& pair : ObjectAccessor::GetPlayers())
-	{
-		Player* player = pair.second;
-		if (player && player->IsInWorld())
-		{
-			WorldPacket data(SMSG_MESSAGECHAT, 500);
-			data << uint8(CHAT_MSG_SAY);
-			data << uint32(LANG_UNIVERSAL);
-			data << ObjectGuid::Empty;
-			data << uint64(0); // Whisper target (not used here)
-			data << std::string("[World] ") + message;
-			data << uint8(0);  // Chat tag
+    std::string msg = "[World] ";
+    msg += message;
 
-			player->GetSession()->SendPacket(&data);
-		}
-	}
-
-	return true;
+    sWorld->SendServerMessage(SERVER_MSG_STRING, msg.c_str());
+    return true;
 }
 
 ChatCommandTable GetCustomCommandTable()
 {
-	static ChatCommandTable customCommandTable =
-	{
-		ChatCommandBuilder("sendworld", HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes)
-	};
-	return customCommandTable;
+    static ChatCommandTable customCommandTable =
+    {
+        ChatCommandBuilder("sendworld", HandleSendWorld, RBAC_PERM_COMMAND_DEBUG, Console::Yes)
+    };
+    return customCommandTable;
 }
 
 }
