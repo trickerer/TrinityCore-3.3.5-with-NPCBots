@@ -144,7 +144,7 @@ public:
 		std::string message = args;
 
 		// This simulates the .world command properly
-		sWorld->SendWorldText("[World] %s", message.c_str());
+		sWorld->SendGlobalText((std::string("|cff00ccff[World]|r ") + message).c_str(), NULL);
 
 		handler->SendSysMessage("World message sent.");
 		return true;
