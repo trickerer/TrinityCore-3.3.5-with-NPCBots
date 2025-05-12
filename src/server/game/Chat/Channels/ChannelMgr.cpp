@@ -38,20 +38,6 @@ Channel* ChannelMgr::GetWorldChannel()
     return _worldChannel;
 }
 
-Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
-{
-    // Custom channel creation logic
-    Channel* newChannel = new Channel(name);
-    // Perform any additional setup needed for the channel (like permissions, etc.)
-
-    // Save the channel to the custom channels map
-    AddCustomChannel(name, newChannel);
-
-    return newChannel;
-}
-
-
-
 ChannelMgr::~ChannelMgr()
 {
     for (auto itr = _channels.begin(); itr != _channels.end(); ++itr)
