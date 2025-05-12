@@ -189,12 +189,20 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
 
     std::pair<uint32, uint32> key = std::make_pair(channelId, zoneId);
 
-    auto itr = _channels.find(key);
-    if (itr != _channels.end())
-        return itr->second;
+    // Convert the pair of uint32 to a string key
+    std::ostringstream oss;
+    oss << key.first << "_" << key.second;
+    std::string mapKey = oss.str();
 
+    // Search for the channel using the string key
+    auto itr = _channels.find(mapKey);
+    if (itr != _channels.end())
+        return itr->second;  // Return the existing channel if found
+
+    // If not found, create a new channel
     Channel* newChannel = new Channel(channelId, _team, zoneEntry);
-    _channels[key] = newChannel;
+    _channels[mapKey] = newChannel;  // Store the new channel in the map
+
     return newChannel;
 }
 
