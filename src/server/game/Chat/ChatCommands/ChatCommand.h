@@ -35,6 +35,7 @@
 #include <type_traits>
 #include <variant>
 #include <vector>
+#include "WorldSession.h"  // Include WorldSession header
 
 class ChatHandler;
 
