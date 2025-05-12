@@ -89,7 +89,6 @@
 #include "WhoListStorage.h"
 #include "WorldSession.h"
 
-
 #include "Channel.h"
 #include "WorldPacket.h"
 
@@ -2252,17 +2251,16 @@ void World::SetInitialWorldSettings()
 
 void World::CreateWorldChannel()
 {
-    // Check if the world channel already exists (using a default ID like 1)
-    uint32 worldChannelId = 100;
-    Channel* worldChannel = sWorld->GetChannelMgr().GetChannel(worldChannelId);
+    uint32 worldChannelId = 1000;
 
-    // If the world channel does not exist, create it
+    Channel* worldChannel = channelMgr->GetChannel("World", nullptr, false);
+
     if (!worldChannel)
     {
-        worldChannel = sWorld->GetChannelMgr().CreateChannel("World", worldChannelId, false, true, "");
+        worldChannel = channelMgr->CreateChannel("World", nullptr, worldChannelId);
 
-        // Send a system message to all players about the creation of the World channel
-        sWorld->SendWorldText("[World Channel] The World channel has been created.");
+        // Broadcast to all players
+        sWorld->SendGlobalText("[World Channel] The World channel has been created.", nullptr);
     }
 }
 
