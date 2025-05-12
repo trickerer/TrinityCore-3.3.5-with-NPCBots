@@ -1061,7 +1061,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     // Join the player to the channel
     worldChannel->JoinChannel(player, "");
-
+}
 void WorldSession::SendFeatureSystemStatus()
 {
     WorldPackets::System::FeatureSystemStatus features;
