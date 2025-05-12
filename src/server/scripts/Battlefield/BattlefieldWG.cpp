@@ -579,8 +579,7 @@ bool BattlefieldWG::Update(uint32 diff)
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
 
         // Send Discord message for timer update
-        uint32 timeLeft = m_Timer / 1000;  // Convert milliseconds to seconds
-        std::string timerMessage = "Wintergrasp timer: " + std::to_string(timeLeft) + " seconds remaining.";
+        std::string timerMessage = "Wintergrasp timer: " + std::to_string(m_Timer / 1000) + " seconds remaining.";
         SendDiscordMessage(timerMessage);
 
         // Notify about ownership
