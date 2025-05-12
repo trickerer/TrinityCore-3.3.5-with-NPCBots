@@ -48,19 +48,16 @@ public:
             return false;
         }
 
-        // Create a WorldPacket to send the message to all players
-        WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
-        data << uint8(CHAT_MSG_SAY);               // Set the chat type to SAY
-        data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
-        data << "[World] " + args;                 // Add the message
-
         // Loop through all online players and send them the message
-        for (auto itr = ObjectAccessor::GetPlayers(); itr != ObjectAccessor::GetPlayersEnd(); ++itr)
+        for (Player* player : ObjectAccessor::GetPlayers())
         {
-            Player* player = itr->getSource();
             if (player && player->IsInWorld()) // Ensure the player is valid and online
             {
-                player->GetSession()->SendPacket(&data); // Send the message to each player
+                WorldPacket data(SMSG_MESSAGECHAT, 500);  // Adjust size if necessary
+                data << uint8(CHAT_MSG_SAY);               // Set the chat type to SAY
+                data << uint32(LANG_UNIVERSAL);            // Language ID (UNIVERSAL)
+                data << "[World] " + args;                 // Add the message
+                player->GetSession()->SendPacket(&data);   // Send the message to each player
             }
         }
 
