@@ -45,32 +45,30 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 }
 
 
-static void SendDiscordMessage(const std::string& message)
+void SendDiscordMessage(const std::string& message)
 {
-    // Example code to send a POST request to the Discord webhook (using libcurl)
-    CURL* curl = curl_easy_init();
-    if (curl)
-    {
-        curl_easy_setopt(curl, CURLOPT_URL, "YOUR_DISCORD_WEBHOOK_URL");
+    // Example implementation using CURL
+    CURL *curl;
+    CURLcode res;
 
-        // Create JSON body
-        std::string jsonBody = "{\"content\": \"" + message + "\"}";
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
 
-        // Set up the request
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonBody.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, "Content-Type: application/json");
+    if (curl) {
+        // Set your webhook URL and message payload here
+        std::string payload = "{\"content\": \"" + message + "\"}";
+        
+        curl_easy_setopt(curl, CURLOPT_URL, "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
 
-        // Perform the request
-        CURLcode res = curl_easy_perform(curl);
+        res = curl_easy_perform(curl);
         if (res != CURLE_OK)
-        {
-            // Handle error
-            std::cerr << "Error sending message to Discord: " << curl_easy_strerror(res) << std::endl;
-        }
+            fprintf(stderr, "CURL failed: %s\n", curl_easy_strerror(res));
 
-        // Clean up
         curl_easy_cleanup(curl);
     }
+
+    curl_global_cleanup();
 }
 
 
