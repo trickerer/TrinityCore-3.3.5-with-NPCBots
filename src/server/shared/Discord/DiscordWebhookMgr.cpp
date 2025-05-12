@@ -56,3 +56,14 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
     }
 }
+
+
+void SendDiscordMessage(const std::string& message)
+{
+    std::string url = sConfigMgr->GetStringDefault("Discord.WebhookURL", "");
+    if (!url.empty())
+    {
+        DiscordWebhook webhook(url);
+        webhook.SendMessage(message);
+    }
+}
