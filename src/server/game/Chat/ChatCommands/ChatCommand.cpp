@@ -31,6 +31,7 @@
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "Channel.h"
+#include "WorldPacket.h"
 
 // Command to send a world message
 class SendWorldMessageCommand
