@@ -103,9 +103,10 @@ namespace {
     // Register the custom command table
     ChatCommandTable GetCustomCommandTable()
     {
-        static ChatCommandTable customCommandTable = {
-            { "sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes }
-        };
+        static ChatCommandTable customCommandTable;
+
+        customCommandTable.push_back(ChatCommandBuilder("sendworld", &SendWorldMessageCommand::HandleSendWorld, SEC_ADMINISTRATOR, Console::Yes));
+
         return customCommandTable;
     }
 }
@@ -2707,5 +2708,10 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
-    sScriptMgr->RegisterCommandTable(GetCustomCommandTable());
+    // Register each command individually
+    ChatCommandTable commandTable = GetCustomCommandTable();
+    for (auto& command : commandTable)
+    {
+        sScriptMgr->RegisterCommand(command);
+    }
 }
