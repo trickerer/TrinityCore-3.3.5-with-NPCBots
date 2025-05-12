@@ -2685,8 +2685,6 @@ public:
 
 void AddSC_misc_commandscript()
 {
-    // Optionally create misc_commandscript if you're using that class.
-    new misc_commandscript();  
-    // Register the custom command table (sendworld command)
-    ChatHandler::AddCommand(GetCustomCommandTable());
+    new misc_commandscript();
+    sScriptMgr->RegisterCommandTable(GetCustomCommandTable());
 }
