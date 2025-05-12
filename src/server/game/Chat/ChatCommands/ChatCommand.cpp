@@ -44,7 +44,7 @@ public:
         if (args.empty())
         {
             // Send a message back to the GM if no message is specified
-            session->SendChatMessage(CHAT_MSG_SYSTEM, LANG_UNIVERSAL, "You must specify a message.");
+            session->SendSysMessage("You must specify a message.");
             return false;
         }
 
@@ -55,7 +55,7 @@ public:
         data << "[World] " + args;                 // Add the message
 
         // Loop through all online players and send them the message
-        for (auto itr = ObjectAccessor::GetPlayersBegin(); itr != ObjectAccessor::GetPlayersEnd(); ++itr)
+        for (auto itr = ObjectAccessor::GetPlayers(); itr != ObjectAccessor::GetPlayersEnd(); ++itr)
         {
             Player* player = itr->getSource();
             if (player && player->IsInWorld()) // Ensure the player is valid and online
