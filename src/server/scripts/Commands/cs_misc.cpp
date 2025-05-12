@@ -71,24 +71,27 @@ namespace {
     class SendWorldMessageCommand
     {
     public:
-        bool HandleSendWorld(ChatHandler* handler, std::string message)
+        bool HandleSendWorld(ChatHandler* handler, const std::string& message)
         {
             if (message.empty())
                 return false;
 
+            // Loop through all online players
             for (auto const& pair : ObjectAccessor::GetPlayers())
             {
                 Player* player = pair.second;
                 if (player && player->IsInWorld())
                 {
+                    // Create a world message packet
                     WorldPacket data(SMSG_MESSAGECHAT, 500);
                     data << uint8(CHAT_MSG_SAY);
                     data << uint32(LANG_UNIVERSAL);
                     data << ObjectGuid::Empty;
-                    data << uint64(0); // For whisper target if needed
+                    data << uint64(0);  // For whisper target if needed
                     data << std::string("[World] ") + message;
                     data << uint8(0);  // Chat tag
 
+                    // Send the packet to the player
                     player->GetSession()->SendPacket(&data);
                 }
             }
@@ -96,7 +99,8 @@ namespace {
             return true;
         }
     };
-	// Register the custom command table
+
+    // Register the custom command table
     ChatCommandTable GetCustomCommandTable()
     {
         static ChatCommandTable customCommandTable =
