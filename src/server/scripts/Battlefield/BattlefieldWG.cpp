@@ -592,12 +592,16 @@ bool BattlefieldWG::Update(uint32 diff)
 
     if (this->IsEventEnded())
     {
-        TeamId controllingTeam = this->m_ControlTeamId;  // Using m_ControlTeamId directly
+        // Get the team controlling the Wintergrasp area
+        TeamId controllingTeam = this->GetTeamControl();  // Get the controlling team directly
+
+        // Determine which faction controls the area (Horde or Alliance)
         std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";
+
+        // Prepare the message to send to Discord
         std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
         SendDiscordMessage(winnerMessage);
     }
-        return m_return;
 }
 
 void BattlefieldWG::OnBattleStart()
