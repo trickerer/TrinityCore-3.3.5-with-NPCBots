@@ -2685,4 +2685,5 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
+	ChatCommandScript::Register(GetCustomCommandTable());
 }
