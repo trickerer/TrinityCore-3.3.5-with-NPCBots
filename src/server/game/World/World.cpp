@@ -2237,12 +2237,29 @@ void World::SetInitialWorldSettings()
             }
         });
     }
+    CreateWorldChannel();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
 
     TC_LOG_INFO("server.worldserver", "World initialized in {} minutes {} seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
 
     TC_METRIC_EVENT("events", "World initialized", "World initialized in " + std::to_string(startupDuration / 60000) + " minutes " + std::to_string((startupDuration % 60000) / 1000) + " seconds");
+}
+
+void World::CreateWorldChannel()
+{
+    // Check if the world channel already exists (using a default ID like 1)
+    uint32 worldChannelId = 100;
+    Channel* worldChannel = sWorld->GetChannelMgr().GetChannel(worldChannelId);
+
+    // If the world channel does not exist, create it
+    if (!worldChannel)
+    {
+        worldChannel = sWorld->GetChannelMgr().CreateChannel("World", worldChannelId, false, true, "");
+
+        // Send a system message to all players about the creation of the World channel
+        sWorld->SendWorldText("[World Channel] The World channel has been created.");
+    }
 }
 
 void World::DetectDBCLang()
