@@ -44,7 +44,7 @@ public:
         if (args.empty())
         {
             // Send a message back to the GM if no message is specified
-            session->SendSysMessage("You must specify a message.");
+            //session->SendSysMessage("You must specify a message.");
             return false;
         }
 
