@@ -1049,13 +1049,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
     if (!worldChannel)
     {
-        // Create the channel manually if it doesn't exist (3.3.5a doesn't have CreateChannel())
-        worldChannel = new Channel(channelName, player, channelId);
-
-        // Add the newly created channel to the ChannelMgr
-        mgr->AddChannel(worldChannel);
-
-        // Optionally, send a welcome message (Note: Say method signature is different)
+        // Create the channel using the correct constructor for TC 3.3.5a
+        worldChannel = new Channel(channelId, player->GetTeamId());
+        
+        // No need to manually add the channel; it will be managed internally by the ChannelMgr.
         worldChannel->Say(ObjectGuid(), "Welcome to MGAWoW!", 0);
     }
 

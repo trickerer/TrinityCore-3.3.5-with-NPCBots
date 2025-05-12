@@ -138,43 +138,31 @@ public:
         return commandTable;
     }
 
-    static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    bool misc_commandscript::HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
-        if (!*args)
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
             return false;
 
-        std::string message = args;
+        uint32 channelId = 1000; // Custom channel ID
+        std::string channelName = "world";
 
-        // Find or create the "world" channel
-        uint32 channelId = 1; // Let's assume channel 1 is our world channel
-        ChannelMgr* mgr = ChannelMgr::forTeam(0); // 0 = HORDE, 1 = ALLIANCE
-        Channel* worldChannel = mgr->GetChannel(channelId, "world", player, true);
+        // Get the channel manager based on the player's faction (0 = Horde, 1 = Alliance)
+        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
+        if (!mgr)
+            return false;
 
-        // If the world channel does not exist, create it
+        // Try to get the channel (it will return nullptr if it doesn't exist)
+        Channel* worldChannel = mgr->GetChannel(channelId, channelName, player, true);
         if (!worldChannel)
         {
-            worldChannel = mgr->CreateChannel("world", player, channelId);
+            // Create the channel using the correct constructor for TC 3.3.5a
+            worldChannel = new Channel(channelId, player->GetTeamId());
+            worldChannel->Say(ObjectGuid(), "Welcome to MGAWoW!", 0);
         }
 
-        // Send the message to the "world" channel
-        WorldPacket data(SMSG_MESSAGECHAT, 500);
-        data << uint8(CHAT_MSG_CHANNEL);
-        data << uint32(LANG_UNIVERSAL);
-        data << ObjectGuid::Empty;
-        data << uint64(0);  // receiver GUID (0 means everyone in the channel)
-        data << message;
-        data << uint8(0);  // chat tag
-
-        for (const auto& pair : ObjectAccessor::GetPlayers())
-        {
-            Player* player = pair.second;
-            if (player && player->IsInWorld() && worldChannel->HasMember(player))
-            {
-                player->GetSession()->SendPacket(&data);
-            }
-        }
-
-        handler->SendSysMessage("World message sent.");
+        // Join the player to the channel
+        worldChannel->JoinChannel(player, "");
         return true;
     }
 	
