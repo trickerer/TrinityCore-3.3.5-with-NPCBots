@@ -564,8 +564,11 @@ bool BattlefieldWG::SetupBattlefield()
 bool BattlefieldWG::Update(uint32 diff)
 {
     bool m_return = Battlefield::Update(diff);
+
+    // Update the save timer every 60 seconds
     if (m_saveTimer <= diff)
     {
+        // Update world states as before
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDER, m_DefenderTeam);
         sWorld->setWorldState(ClockWorldState[0], m_Timer);
@@ -573,10 +576,32 @@ bool BattlefieldWG::Update(uint32 diff)
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, GetData(BATTLEFIELD_WG_DATA_DEF_A));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
+
+        // Send Discord message for timer update
+        uint32 timeLeft = m_Timer / 1000;  // Convert milliseconds to seconds
+        std::string timerMessage = "Wintergrasp timer: " + std::to_string(timeLeft) + " seconds remaining.";
+        SendDiscordMessage(timerMessage);
+
+        // Notify about ownership
+        std::string owner = (IsHordeControlled()) ? "Horde" : "Alliance";
+        std::string ownershipMessage = "Wintergrasp is currently controlled by: " + owner;
+        SendDiscordMessage(ownershipMessage);
+
+        // Reset the save timer for the next update (60 seconds)
         m_saveTimer = 60 * IN_MILLISECONDS;
     }
     else
+    {
         m_saveTimer -= diff;
+    }
+
+    // Announce winner when event ends
+    if (IsEventEnded())
+    {
+        std::string winner = (GetWinner() == 0) ? "Alliance" : "Horde"; // Assuming 0 is Alliance and 1 is Horde
+        std::string winnerMessage = "Wintergrasp has ended! The winner is: " + winner;
+        SendDiscordMessage(winnerMessage);
+    }
 
     return m_return;
 }
