@@ -116,8 +116,11 @@ namespace {
     // Register the command script
     void AddSC_misc_commandscript()
     {
+        // Access the global singleton for ChatHandler (assuming you have access to it)
+        ChatHandler* handler = new ChatHandler(); // Use the actual handler initialization if needed
+        
         // Register the custom command
-        sChatHandler->RegisterCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, &SendWorldMessageCommand::HandleSendWorld);
+        handler->RegisterCommand("sendworld", "SendWorldMessageCommand", SEC_ADMINISTRATOR, &SendWorldMessageCommand::HandleSendWorld);
     }
 
     // Register the custom command table under "custom"
