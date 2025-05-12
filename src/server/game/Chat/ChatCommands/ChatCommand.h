@@ -55,10 +55,7 @@ namespace Trinity::ChatCommands
 	
 class SendWorldMessageCommand
     {
-    public:
-        SendWorldMessageCommand() {}
-
-        class SendWorldMessageCommand
+   
     {
     public:
         SendWorldMessageCommand() {}
