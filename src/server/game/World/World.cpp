@@ -2253,7 +2253,8 @@ void World::CreateWorldChannel()
 {
     uint32 worldChannelId = 1000;
 
-    Channel* worldChannel = channelMgr->GetChannel("World", nullptr, false);
+    ChannelMgr* mgr = ChannelMgr::forTeam(0); // Assuming you are using a specific team (0 = Horde, 1 = Alliance)
+    Channel* worldChannel = mgr->GetChannel("World", nullptr, false);
 
     if (!worldChannel)
     {
