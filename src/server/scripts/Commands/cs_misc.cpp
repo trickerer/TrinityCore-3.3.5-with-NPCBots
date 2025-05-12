@@ -111,12 +111,6 @@ namespace {
         };
         return customCommandTable;
     }
-
-    // Register the command using the script manager
-    void AddSC_misc_commandscript()
-    {
-        sScriptMgr->RegisterScript("misc_commandscript", &GetCustomCommandTable);
-    }
 }
 // Register your command under the appropriate group
 ChatCommandTable GetMiscCommandTable()
@@ -2715,5 +2709,5 @@ public:
 void AddSC_misc_commandscript()
 {
     new misc_commandscript();
-    sScriptMgr->RegisterScript("misc_commandscript", &RegisterCustomCommand);
+    sScriptMgr->RegisterScript("misc_commandscript", &GetCustomCommandTable);
 }
