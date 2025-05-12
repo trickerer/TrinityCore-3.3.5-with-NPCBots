@@ -1037,7 +1037,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         if (ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeam()))
         {
-            if (Channel* worldChannel = mgr->GetChannel("World", player, true))
+            if (Channel* worldChannel = mgr->GetChannel(0, "World", player, true))
             {
                 worldChannel->JoinChannel(player, "");
             }
