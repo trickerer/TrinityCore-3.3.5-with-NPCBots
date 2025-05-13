@@ -22812,11 +22812,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     ResyncRunes();
 
     GetGameClient()->SetMovedUnit(this, true);
-    
-    if (Channel* chn = ChannelMgr::forTeam(GetTeam())->GetChannel("world", this))
-    {
-        chn->Join(this, "");
-    }
+   
 }
 
 void Player::SendInitialPacketsAfterAddToMap()
