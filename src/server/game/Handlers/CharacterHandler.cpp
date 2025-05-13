@@ -1023,16 +1023,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     
-    std::string channelName = "world";
-    ChannelMgr* cMgr = ChannelMgr::forTeam(pCurrChar->GetTeam());
-    if (Channel* channel = cMgr->GetChannel(0, channelName, pCurrChar, false)) // false = don't auto-create
-    {
-        if (channel->IsMember(pCurrChar->GetGUID()))
-        {
-            // Player is in the channel
-            pCurrChar->Say("Already in world channel.", LANG_UNIVERSAL);
-        }
-    }
+
 
     std::string m_name = "world";  // in-game channel name
     data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
