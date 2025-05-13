@@ -894,6 +894,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     std::string method = endByTimer ? "defended" : "captured";
     std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " has " + method + " the fortress!";
     SendDiscordMessage(winnerMessage);
+    SendDiscordMessage("✅ TrinityCore webhook test message");
 
 }
 
