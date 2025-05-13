@@ -893,8 +893,9 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     std::string owner = allianceWon ? "🔵 **Alliance**" : "🔴 **Horde**";
     std::string method = endByTimer ? "defended" : "captured";
     std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " has " + method + " the fortress!";
-    SendDiscordMessage(winnerMessage);
-    //SendDiscordMessage("✅ TrinityCore webhook test message");
+    std::string jsonMessage = "{\"content\": \"" + winnerMessage + "\"}";
+    SendDiscordMessage(jsonMessage);
+    //SendDiscordMessage("✅ MGAWoW webhook test message");
     TC_LOG_INFO("misc", "Sending winner message: %s", winnerMessage.c_str());
 
 }
