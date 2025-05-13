@@ -830,8 +830,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
     }
-    std::string owner = (GetDefenderTeam() == TEAM_ALLIANCE) ? "🔵 **Alliance**" : "🔴 **Horde**";
-    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
+    bool allianceWon = (GetDefenderTeam() == TEAM_ALLIANCE);
+    std::string owner = allianceWon ? "🔵 **Alliance**" : "🔴 **Horde**";
+    std::string method = endByTimer ? "defended" : "captured";
+    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " has " + method + " the fortress!";
     SendDiscordMessage(winnerMessage);
 
 
