@@ -1013,6 +1013,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
+    TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     // say something as player logs in
     //if (pCurrChar->IsAlive())
@@ -1029,6 +1030,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
         data << m_name.c_str();            // Channel name ("world")
         data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
+        pCurrChar->GetSession()->SendPacket(&data);
     }
     else
     {
@@ -1037,9 +1039,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         pCurrChar->GetSession()->SendNotification("You are already in the 'world' channel.");
     }
 
-    pCurrChar->GetSession()->SendPacket(&data);
 	
-	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
 }
 
