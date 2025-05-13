@@ -922,8 +922,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 else
                 {
                     // Teleport to homebind location (hearthstone bind point)
-                    WorldLocation home = player->GetHomebindLocation();
-                    player->TeleportTo(home);
+                    Player::HomebindLocation const& home = player->GetHomebind();
+                    player->TeleportTo(home.mapId, home.posX, home.posY, home.posZ, 0.0f);
                 }
             }
         }
