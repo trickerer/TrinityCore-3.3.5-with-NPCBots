@@ -898,13 +898,21 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     // Escape the message content to ensure valid JSON formatting
     std::string escapedMessage = winnerMessage;
-    std::replace(escapedMessage.begin(), escapedMessage.end(), '"', '\\\"'); // Escape double quotes
-    std::string jsonMessage = "{\"content\": \"" + escapedMessage + "\"}";
+    std::string escapedMessageWithQuotes = "";
+    for (char c : escapedMessage) {
+        if (c == '"') {
+            escapedMessageWithQuotes += "\\\"";  // Escape quotes
+        } else {
+            escapedMessageWithQuotes += c;  // Add other characters as is
+        }
+    }
+
+    // Create JSON message
+    std::string jsonMessage = "{\"content\": \"" + escapedMessageWithQuotes + "\"}";
 
     TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
     SendDiscordMessage(jsonMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
-    TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
 
 }
 
