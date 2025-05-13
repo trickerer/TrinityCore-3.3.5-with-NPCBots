@@ -905,6 +905,9 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
+                // Remove phase auras
+                player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
+                player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
                 // Determine if player is on the winning team
                 if (player->GetTeamId() == GetDefenderTeam())
                 {
