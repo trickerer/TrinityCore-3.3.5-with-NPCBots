@@ -625,7 +625,7 @@ void BattlefieldWG::OnBattleStart()
     for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
 
-        SendWarning (DOCAPUPDATETEXT);
+        //SendWarning (DOCAPUPDATETEXT);
         //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
 
     }
@@ -823,23 +823,31 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     }
 
     if (!endByTimer) // win alli/horde
+    {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_HORDE);
+        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+
+        // Determine the winner team and use their color/label
+        std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
+
+        // Prepare the Discord message
+        std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
+        SendDiscordMessage(winnerMessage);
+    }
     else // defend alli/horde
+    {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
+        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
-    // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
-    TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+        // Determine the winner team and use their color/label
+        std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
 
-    // Determine the winner team and use their color/label
-    std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
+        // Prepare the Discord message
+        std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
+        SendDiscordMessage(winnerMessage);
+    }
 
-    // Prepare the Discord message
-    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
 
-    // Send the message to Discord
-    SendDiscordMessage(winnerMessage);
-        
-        
     // UPDATE MAP TEXT
     //SendWarning(TEST);
 
