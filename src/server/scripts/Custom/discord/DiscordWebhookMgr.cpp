@@ -53,7 +53,7 @@ void SendDiscordMessage(const std::string& message)
 
     if (webhookUrl.empty())
     {
-        LOG_ERROR("module", "Webhook URL is empty. Check your config (Webhook.URL)");
+        TC_LOG_ERROR("module", "Webhook URL is empty. Check your config (Webhook.URL)");
         return;
     }
 
@@ -89,7 +89,7 @@ void SendDiscordMessage(const std::string& message)
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK)
-            LOG_ERROR("module", "CURL failed: {}", curl_easy_strerror(res));
+            TC_LOG_ERROR("module", "CURL failed: {}", curl_easy_strerror(res));
 
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
