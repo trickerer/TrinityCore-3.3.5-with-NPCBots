@@ -1016,46 +1016,23 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     // say something as player logs in
-    //if (pCurrChar->IsAlive())
-    //{
-    //    pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
-    //}
+    if (pCurrChar->IsAlive())
+    {
+        pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
+    }
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     
     if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
     {
-        // Check if player is already in the channel
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
-        {
-            /*std::string m_name = "world";  // in-game channel name
-            data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-            data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
-            data << m_name.c_str();
-            data << uint64(pCurrChar->GetGUID());
-
-            pCurrChar->GetSession()->SendPacket(&data);
-            */
             worldChannel->JoinChannel(pCurrChar, "");
-        }
     }
     else
     {
-        // Channel doesn't exist, this will create it and auto-add player if pkt = true
-        Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true);
-
-        // Optional: send invite packet manually if you want to control client popup
-        if (newWorldChannel)
-        {
-            /*std::string m_name = "world";
-            data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-            data << uint8(CHAT_INVITE_NOTICE);
-            data << m_name.c_str();
-            data << uint64(pCurrChar->GetGUID());
-
-            pCurrChar->GetSession()->SendPacket(&data);*/
-            worldChannel->JoinChannel(pCurrChar, "");
-        }
+        // Create and immediately join channel
+        if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true))
+            newWorldChannel->JoinChannel(pCurrChar, "");
     }
     /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
