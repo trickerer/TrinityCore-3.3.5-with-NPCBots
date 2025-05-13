@@ -17,7 +17,7 @@
 #include "Player.h"
 #include "Config.h"
 #include "Log.h"
-
+#include "DiscordWebhookMgr.h"
 
 // Declare the function before its use
 //void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers);
