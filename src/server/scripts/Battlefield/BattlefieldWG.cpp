@@ -895,31 +895,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     std::string owner = allianceWon ? "🔵 **Alliance**" : "🔴 **Horde**";
     std::string method = endByTimer ? "defended" : "captured";
     std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\\n" + owner + " has " + method + " the fortress!";
-
-    // Escape the message content to ensure valid JSON formatting
-    std::string escapedMessage = winnerMessage;
-    std::string escapedMessageWithQuotes = "";
-
-    // Manually escape characters
-    for (char c : escapedMessage) {
-        if (c == '"') {
-            escapedMessageWithQuotes += "\\\"";  // Escape quotes
-        } else if (c == '\n') {
-            escapedMessageWithQuotes += "\\n";  // Escape newlines
-        } else {
-            escapedMessageWithQuotes += c;  // Add other characters as is
-        }
-    }
-
-    // Log the escaped message before building JSON
-    TC_LOG_INFO("misc", "Escaped winner message: %s", escapedMessageWithQuotes.c_str());
-
-    // Create JSON message with properly escaped content
-    std::string jsonMessage = "{\"content\": \"" + winnerMessage + "\"}";
-
-    // Log the final JSON message before sending
-    TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
-
     // Send to Discord
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
