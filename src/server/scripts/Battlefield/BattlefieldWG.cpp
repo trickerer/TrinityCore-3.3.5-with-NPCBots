@@ -899,9 +899,13 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Escape the message content to ensure valid JSON formatting
     std::string escapedMessage = winnerMessage;
     std::string escapedMessageWithQuotes = "";
+
+    // Manually escape characters
     for (char c : escapedMessage) {
         if (c == '"') {
             escapedMessageWithQuotes += "\\\"";  // Escape quotes
+        } else if (c == '\n') {
+            escapedMessageWithQuotes += "\\n";  // Escape newlines
         } else {
             escapedMessageWithQuotes += c;  // Add other characters as is
         }
@@ -910,10 +914,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Log the escaped message before building JSON
     TC_LOG_INFO("misc", "Escaped winner message: %s", escapedMessageWithQuotes.c_str());
 
-    // Create JSON message
+    // Create JSON message with properly escaped content
     std::string jsonMessage = "{\"content\": \"" + escapedMessageWithQuotes + "\"}";
 
-    // Log the final message before sending
+    // Log the final JSON message before sending
     TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
 
     // Send to Discord
