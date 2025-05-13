@@ -582,21 +582,6 @@ bool BattlefieldWG::Update(uint32 diff)
     else
         m_saveTimer -= diff;
 
-    if (this->IsEventEnded()) 
-    {
-        // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
-        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
-
-        // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
-        std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
-
-        // Prepare the Discord message
-        std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
-        
-        // Send the message to Discord
-        SendDiscordMessage(winnerMessage);
-    }
-
     return m_return;
 }
 
@@ -825,7 +810,19 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     else // defend alli/horde
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
 
+    // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
+    TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
+    // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
+    std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
+
+    // Prepare the Discord message
+    std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
+    
+    // Send the message to Discord
+    SendDiscordMessage(winnerMessage);
+        
+        
     // UPDATE MAP TEXT
     //SendWarning(TEST);
 
