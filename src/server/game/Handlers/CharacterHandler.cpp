@@ -1016,23 +1016,28 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 
     // say something as player logs in
-    if (pCurrChar->IsAlive())
-    {
-        pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
-    }
+    //if (pCurrChar->IsAlive())
+    //{
+    //    pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
+    //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     
     if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
     {
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
+        {
             worldChannel->JoinChannel(pCurrChar, "");
+            std::cout << "Joined existing channel 'world' for player: " << pCurrChar->GetName() << std::endl;
+        }
     }
     else
     {
-        // Create and immediately join channel
         if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true))
+        {
             newWorldChannel->JoinChannel(pCurrChar, "");
+            std::cout << "Created and joined new channel 'world' for player: " << pCurrChar->GetName() << std::endl;
+        }
     }
     /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
