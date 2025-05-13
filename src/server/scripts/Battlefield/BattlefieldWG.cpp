@@ -899,27 +899,33 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
     
-    for (auto const& itr : m_PlayersInBattle)
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
-        if (!itr.second->IsInWorld() || !itr.second->IsAlive())
-            continue;
-
-        Player* player = itr.second;
-        TeamId playerTeam = player->GetTeamId();
-        TeamId winningTeam = GetDefenderTeam();
-
-        if (playerTeam == winningTeam)
+        for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
-            // Winning team → teleport to Wintergrasp Fortress (e.g., Fortress Keep)
-            float x = 5467.0f, y = 2840.0f, z = 420.0f; // Example coords inside the fortress
-            float o = 3.14f; // Orientation
-            player->TeleportTo(571, x, y, z, o); // Map 571 = Northrend
-        }
-        else
-        {
-            // Losing team → teleport to home bind location
-            WorldLocation const& homeBind = player->GetHomebindLocation();
-            player->TeleportTo(homeBind);
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+            {
+                // Reset phase auras (optional, for clarity)
+                player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
+                player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
+
+                // Determine if player is on the winning team
+                if (player->GetTeamId() == GetDefenderTeam())
+                {
+                    // Teleport to fortress — customize coords as needed
+                    float x = 5024.0f;
+                    float y = 2840.0f;
+                    float z = 408.0f;
+                    float o = 3.14f;
+                    player->TeleportTo(571, x, y, z, o); // 571 = Northrend
+                }
+                else
+                {
+                    // Teleport to homebind location (hearthstone bind point)
+                    WorldLocation home = player->GetHomebindLocation();
+                    player->TeleportTo(home);
+                }
+            }
         }
     }
 
