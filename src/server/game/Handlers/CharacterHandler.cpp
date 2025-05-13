@@ -1030,7 +1030,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
         data << m_name.c_str();            // Channel name ("world")
         data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
-        
+
         pCurrChar->GetSession()->SendPacket(&data);
     }
     else
