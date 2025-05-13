@@ -48,24 +48,50 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 
 void SendDiscordMessage(const std::string& message)
 {
-    // Example implementation using CURL
-    CURL *curl;
+    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+    std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
+
+    if (webhookUrl.empty())
+    {
+        LOG_ERROR("module", "Webhook URL is empty. Check your config (Webhook.URL)");
+        return;
+    }
+
+    CURL* curl;
     CURLcode res;
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
 
-    if (curl) {
-        // Set your webhook URL and message payload here
-        std::string payload = "{\"content\": \"" + message + "\"}";
-        
-        curl_easy_setopt(curl, CURLOPT_URL, "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL");
+    if (curl)
+    {
+        // Escape double quotes in message
+        std::string escapedMessage = message;
+        size_t pos = 0;
+        while ((pos = escapedMessage.find("\"", pos)) != std::string::npos)
+        {
+            escapedMessage.replace(pos, 1, "\\\"");
+            pos += 2;
+        }
+
+        // Construct JSON payload
+        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
+        if (!avatarUrl.empty())
+            payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
+        payload += "}";
+
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+
+        curl_easy_setopt(curl, CURLOPT_URL, webhookUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK)
-            fprintf(stderr, "CURL failed: %s\n", curl_easy_strerror(res));
+            LOG_ERROR("module", "CURL failed: {}", curl_easy_strerror(res));
 
+        curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
     }
 
