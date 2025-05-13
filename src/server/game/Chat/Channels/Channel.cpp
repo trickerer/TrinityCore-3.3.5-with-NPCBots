@@ -92,6 +92,7 @@ void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleC
     if (channelId == 9)  // For example, assuming channel 9 is "world"
     {
         channelName = "world";
+        return;
     }
     if (channelId)
     {
