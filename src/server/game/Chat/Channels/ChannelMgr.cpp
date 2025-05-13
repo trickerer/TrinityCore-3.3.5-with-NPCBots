@@ -168,6 +168,18 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
     return newChannel;
 }
 
+Channel* ChannelMgr::CreateCustomChannel(std::string const& name, uint32 predefinedID /*= 0*/)
+{
+    Channel* channel = new Channel(name, /* other necessary parameters for the constructor, like team, creator */);
+
+    if (predefinedID != 0)
+        channel->SetChannelID(predefinedID);  // Set the predefined ID if provided
+
+    // Add any additional logic for channel setup, such as adding to the channel map or any setup.
+
+    return channel;
+}
+
 Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
 {
     std::wstring channelName;

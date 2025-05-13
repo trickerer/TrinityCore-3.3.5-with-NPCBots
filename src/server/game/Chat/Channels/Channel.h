@@ -154,6 +154,9 @@ class TC_GAME_API Channel
     public:
         Channel(uint32 channelId, uint32 team = 0, AreaTableEntry const* zoneEntry = nullptr);  // built-in channel ctor
         Channel(std::string const& name, uint32 team, std::string const& banList = "");         // custom player channel ctor
+        
+        void SetChannelID(uint32 id) { _channelID = id; }  // Setter for the Channel ID
+        Channel* CreateCustomChannel(std::string const& name, uint32 predefinedID = 0);
 
         static void GetChannelName(std::string& channelName, uint32 channelId, LocaleConstant locale, AreaTableEntry const* zoneEntry);
         std::string GetName(LocaleConstant locale = DEFAULT_LOCALE) const;

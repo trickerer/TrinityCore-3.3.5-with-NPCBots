@@ -230,6 +230,11 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 	player->TrackJoinedChannel(GetName());
 }
 
+void Channel::SetChannelID(uint32 id)
+{
+    _channelID = id;
+}
+
 void Channel::LeaveChannel(Player* player, bool send)
 {
     if (_channelName == "world")
