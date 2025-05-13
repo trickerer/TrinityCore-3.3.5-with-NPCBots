@@ -1035,9 +1035,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 	*/
 	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     
-    uint32 predefinedWorldChannelID = 100;  // Example ID for world channel
-    Channel* chn = ChannelMgr::CreateCustomChannel("world", predefinedWorldChannelID);
-    chn->Join(_player, "");
+    if (Channel* chn = ChannelMgr::GetChannel("world"))
+    {
+        chn->Join(_player, "");
+    }
 
 }
 
