@@ -684,7 +684,7 @@ void BattlefieldWG::OnBattleStart()
     std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
 
     // Prepare the Discord message
-    std::string winnerMessage = "Wintergrasp has Started! Owned by " + owner + "";
+    std::string winnerMessage = "⚔️ ** Wintergrasp has Started! ** Owned by **" + owner + "**";
     
     // Send the message to Discord
     SendDiscordMessage(winnerMessage);
@@ -831,10 +831,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
     // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
-    std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
+    std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
 
     // Prepare the Discord message
-    std::string winnerMessage = "Wintergrasp has ended! " + owner + " is victorious!";
+    std::string winnerMessage = "⚔️ ** Wintergrasp has ended! **\n" + owner + " is victorious!";
     
     // Send the message to Discord
     SendDiscordMessage(winnerMessage);
