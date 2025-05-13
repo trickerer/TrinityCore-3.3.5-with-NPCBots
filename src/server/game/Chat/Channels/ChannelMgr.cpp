@@ -168,12 +168,6 @@ Channel* ChannelMgr::GetSystemChannel(uint32 channelId, AreaTableEntry const* zo
     return newChannel;
 }
 
-Channel* worldChannel = ChannelMgr::GetChannelByName("world");
-if (!worldChannel)
-{
-    worldChannel = ChannelMgr::CreateCustomChannel("world");
-}
-
 Channel* ChannelMgr::CreateCustomChannel(std::string const& name)
 {
     std::wstring channelName;
