@@ -48,7 +48,7 @@
 #include "botmgr.h"
 //end npcbot
 
-#include "DiscordWebhookMgr.h"
+#include "Custom/discord/DiscordWebhookMgr.h"
 #include "Config.h"
 
 void BattlegroundScore::AppendToPacket(WorldPacket& data)
