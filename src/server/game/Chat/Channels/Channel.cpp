@@ -235,8 +235,8 @@ void Channel::LeaveChannel(Player* player, bool send)
     if (_channelName == "world")
     {
         if (send)
-            player->GetSession()->SendNotification("You cannot leave the world channel.");
-        return;
+            p->GetSession()->SendNotification("You cannot leave the world channel.");
+        return true; // don't actually leave
     }
     ObjectGuid guid = player->GetGUID();
     if (!IsOn(guid))
