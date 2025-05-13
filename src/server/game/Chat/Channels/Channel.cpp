@@ -232,12 +232,6 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
 void Channel::LeaveChannel(Player* player, bool send)
 {
-    if (m_name == "world")
-    {
-        if (send)
-            p->GetSession()->SendNotification("You cannot leave the world channel.");
-        return true; // don't actually leave
-    }
     ObjectGuid guid = player->GetGUID();
     if (!IsOn(guid))
     {
