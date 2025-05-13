@@ -88,6 +88,11 @@ Channel::Channel(std::string const& name, uint32 team /*= 0*/, std::string const
 
 void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleConstant locale, AreaTableEntry const* zoneEntry)
 {
+    
+    if (channelId == 9)  // For example, assuming channel 9 is "world"
+    {
+        channelName = "world";
+    }
     if (channelId)
     {
         ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
