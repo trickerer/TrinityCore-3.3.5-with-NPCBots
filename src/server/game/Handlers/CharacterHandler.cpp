@@ -1022,23 +1022,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    uint32 channelId = 0;
-    if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(channelId, "world", pCurrChar, true)) // true to auto-create if not exist
-    {
-        if (!worldChannel->IsMember(pCurrChar->GetGUID()))
-        {
-            worldChannel->JoinChannel(pCurrChar, ""); // actually adds the player to the channel
-
-            // Let client know it joined successfully
-            WorldPacket data(SMSG_CHANNEL_NOTIFY, 100);
-            data << uint8(CHAT_JOINED_NOTICE);
-            data << std::string("world");
-            data << pCurrChar->GetGUID();
-            pCurrChar->GetSession()->SendPacket(&data);
-
-            pCurrChar->Say("JOINED WORLD CHANNEL", LANG_UNIVERSAL); 
-        }
-    }
+    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+    data << uint8(CHAT_JOINED_NOTICE);
+    data << std::string("world");
+    data << pCurrChar->GetGUID();
+    pCurrChar->GetSession()->SendPacket(&data);
     /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
     if (worldChannel)
