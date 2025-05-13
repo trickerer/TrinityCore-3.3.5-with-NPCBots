@@ -92,12 +92,12 @@ void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleC
     if (channelId == 9)
     {
         channelName = "world";
-        return; // prevent crash by exiting early
+        return; // ✅ Prevents crash by skipping DBC lookup
     }
 
     if (channelId)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId); // CRASHES IF 9 IS NOT IN DBC
+        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId); // ❗ Crashes if channelId is invalid
         if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))
         {
             if (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY)
