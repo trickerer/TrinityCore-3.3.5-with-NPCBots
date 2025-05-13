@@ -676,6 +676,18 @@ void BattlefieldWG::OnBattleStart()
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+    
+    // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
+    TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+
+    // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
+    std::string owner = (controllingTeam == TEAM_HORDE) ? "Horde" : "Alliance";  // Use TEAM_HORDE for 3.3.5a
+
+    // Prepare the Discord message
+    std::string winnerMessage = "Wintergrasp has Started! Owned by " + owner + "";
+    
+    // Send the message to Discord
+    SendDiscordMessage(winnerMessage);
 
 }
 
