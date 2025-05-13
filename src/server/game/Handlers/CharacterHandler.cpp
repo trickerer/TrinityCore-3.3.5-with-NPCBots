@@ -1035,7 +1035,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 	*/
 	TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     
-    if (Channel* chn = ChannelMgr::GetChannel("world"))
+    if (Channel* chn = ChannelMgr::forTeam(_player->GetTeam())->GetChannel("world", _player))
     {
         chn->Join(_player, "");
     }
