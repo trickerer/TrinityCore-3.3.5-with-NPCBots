@@ -921,7 +921,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
 
     // Send to Discord
-    SendDiscordMessage(jsonMessage);
+    SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
 
 }
