@@ -825,10 +825,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     if (!endByTimer) // win alli/horde
     {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_HORDE);
-        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+        //TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
         // Determine the winner team and use their color/label
-        std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
+        std::string owner = (GetDefenderTeam() == TEAM_ALLIANCE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
 
         // Prepare the Discord message
         std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
@@ -837,10 +837,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     else // defend alli/horde
     {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
-        TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+        //TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
         // Determine the winner team and use their color/label
-        std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
+        std::string owner = (GetDefenderTeam() == TEAM_ALLIANCE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
 
         // Prepare the Discord message
         std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
