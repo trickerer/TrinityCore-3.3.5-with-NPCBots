@@ -1022,7 +1022,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    uint32 channelId = 9;
+    uint32 channelId = 0;
     if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(channelId, "world", pCurrChar, false))
     {
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
