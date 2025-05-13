@@ -1025,21 +1025,18 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     
     if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
     {
-        if (worldChannel->IsMember(pCurrChar->GetGUID()))
+        if (!worldChannel->IsMember(pCurrChar->GetGUID()))
         {
-            pCurrChar->GetSession()->SendNotification("You are already in the 'world' channel.");
-        }
-        else
-        {
-            worldChannel->Join(pCurrChar, "");
+            worldChannel->AddPlayer(pCurrChar);
         }
     }
     else
     {
-        // Channel doesn't exist, create and join
-        Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true);
-        if (newWorldChannel)
-            newWorldChannel->Join(pCurrChar, "");
+        // Channel doesn't exist, create and add player
+        if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true))
+        {
+            newWorldChannel->AddPlayer(pCurrChar);
+        }
     }
     /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
