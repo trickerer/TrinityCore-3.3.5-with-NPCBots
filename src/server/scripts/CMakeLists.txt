@@ -229,7 +229,7 @@ if(USE_SCRIPTPCH)
   reuse_cxx_pch("${DYNAMIC_SCRIPT_MODULE_PROJECTS}" scripts)
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/src/server/scripts)
+
 
 # Remove all shared libraries in the installl directory which
 # are contained in the static library already.
