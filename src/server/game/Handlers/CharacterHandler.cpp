@@ -1035,6 +1035,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             data << uint64(pCurrChar->GetGUID());
 
             pCurrChar->GetSession()->SendPacket(&data);
+            worldChannel->Join(pCurrChar, "");
         }
     }
     else
