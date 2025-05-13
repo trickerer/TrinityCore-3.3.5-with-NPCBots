@@ -1022,21 +1022,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    
-    if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
+    uint32 channelId = 9;
+    if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(channelId, "world", pCurrChar, false))
     {
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
         {
             worldChannel->JoinChannel(pCurrChar, "");
-            std::cout << "Joined existing channel 'world' for player: " << pCurrChar->GetName() << std::endl;
+            pCurrChar->Say("JOINED!", LANG_UNIVERSAL); 
         }
     }
     else
     {
-        if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true))
+        if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(channelId, "world", pCurrChar, true))
         {
             newWorldChannel->JoinChannel(pCurrChar, "");
-            std::cout << "Created and joined new channel 'world' for player: " << pCurrChar->GetName() << std::endl;
+            pCurrChar->Say("CREATED AND JOINED!", LANG_UNIVERSAL); 
         }
     }
     /*
