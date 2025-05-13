@@ -1027,7 +1027,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
         {
-            worldChannel->AddPlayer(pCurrChar);
+            //worldChannel->Join(pCurrChar, "");  // Auto-join the player
+            // Send the invite
+            std::string m_name = "world";  // in-game channel name
+            data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+            data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
+            data << m_name.c_str();            // Channel name ("world")
+            data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
+
+            pCurrChar->GetSession()->SendPacket(&data);
         }
     }
     else
@@ -1035,7 +1043,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         // Channel doesn't exist, create and add player
         if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true))
         {
-            newWorldChannel->AddPlayer(pCurrChar);
+            //worldChannel->Join(pCurrChar, "");  // Auto-join the player
+            // Send the invite
+            std::string m_name = "world";  // in-game channel name
+            data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+            data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
+            data << m_name.c_str();            // Channel name ("world")
+            data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
+
+            pCurrChar->GetSession()->SendPacket(&data);
         }
     }
     /*
