@@ -909,10 +909,10 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 if (player->GetTeamId() == GetDefenderTeam())
                 {
                     // Teleport to fortress — customize coords as needed
-                    float x = 5024.0f;
-                    float y = 2840.0f;
-                    float z = 408.0f;
-                    float o = 3.14f;
+                    float x = 5311.055664f;
+                    float y = 2842.945068f;
+                    float z = 409.260651f;
+                    float o = 6.166933;
                     player->TeleportTo(571, x, y, z, o); // 571 = Northrend
                 }
                 else
