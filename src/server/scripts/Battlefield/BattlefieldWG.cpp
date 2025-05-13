@@ -894,7 +894,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     bool allianceWon = (GetDefenderTeam() == TEAM_ALLIANCE);
     std::string owner = allianceWon ? "🔵 **Alliance**" : "🔴 **Horde**";
     std::string method = endByTimer ? "defended" : "captured";
-    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " has " + method + " the fortress!";
+    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\\n" + owner + " has " + method + " the fortress!";
 
     // Escape the message content to ensure valid JSON formatting
     std::string escapedMessage = winnerMessage;
@@ -915,7 +915,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     TC_LOG_INFO("misc", "Escaped winner message: %s", escapedMessageWithQuotes.c_str());
 
     // Create JSON message with properly escaped content
-    std::string jsonMessage = "{\"content\": \"" + escapedMessageWithQuotes + "\"}";
+    std::string jsonMessage = "{\"content\": \"" + winnerMessage + "\"}";
 
     // Log the final JSON message before sending
     TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
