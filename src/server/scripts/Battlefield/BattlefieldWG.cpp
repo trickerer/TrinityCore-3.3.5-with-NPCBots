@@ -830,12 +830,12 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
     TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
-    // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
+    // Determine the winner team and use their color/label
     std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde**" : "🔵 **Alliance**";  // Use TEAM_HORDE for 3.3.5a
 
     // Prepare the Discord message
-    std::string winnerMessage = "⚔️ ** Wintergrasp has ended! **\n" + owner + " is victorious!";
-    
+    std::string winnerMessage = "⚔️ **Wintergrasp has ended!**\n" + owner + " is victorious!";
+
     // Send the message to Discord
     SendDiscordMessage(winnerMessage);
         
