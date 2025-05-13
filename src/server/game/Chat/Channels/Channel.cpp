@@ -230,6 +230,11 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 	player->TrackJoinedChannel(GetName());
 }
 
+bool Channel::IsMember(ObjectGuid guid) const
+{
+    return _playersStore.find(guid) != _playersStore.end();
+}
+
 void Channel::LeaveChannel(Player* player, bool send)
 {
     ObjectGuid guid = player->GetGUID();
