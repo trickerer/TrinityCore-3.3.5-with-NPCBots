@@ -42,6 +42,8 @@
 #include "WorldStatePackets.h"
 #include "Custom/discord/DiscordWebhookMgr.h"
 
+#include <nlohmann/json.hpp>
+
 struct BfWGCoordGY
 {
     Position Pos;
