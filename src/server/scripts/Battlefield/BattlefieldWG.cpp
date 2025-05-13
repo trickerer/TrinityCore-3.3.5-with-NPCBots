@@ -905,10 +905,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
-                // Reset phase auras (optional, for clarity)
-                player->RemoveAurasDueToSpell(SPELL_HORDE_CONTROL_PHASE_SHIFT);
-                player->RemoveAurasDueToSpell(SPELL_ALLIANCE_CONTROL_PHASE_SHIFT);
-
                 // Determine if player is on the winning team
                 if (player->GetTeamId() == GetDefenderTeam())
                 {
@@ -923,7 +919,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 {
                     // Teleport to homebind location (hearthstone bind point)
                     Player::HomebindLocation const& home = player->GetHomebind();
-                    player->TeleportTo(home.mapId, home.posX, home.posY, home.posZ, 0.0f);
+                    player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
                 }
             }
         }
