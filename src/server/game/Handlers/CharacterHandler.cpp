@@ -1028,14 +1028,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         // Check if player is already in the channel
         if (!worldChannel->IsMember(pCurrChar->GetGUID()))
         {
-            std::string m_name = "world";  // in-game channel name
+            /*std::string m_name = "world";  // in-game channel name
             data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
             data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
             data << m_name.c_str();
             data << uint64(pCurrChar->GetGUID());
 
             pCurrChar->GetSession()->SendPacket(&data);
-            worldChannel->Join(pCurrChar, "");
+            */
+            worldChannel->JoinChannel(pCurrChar, "");
         }
     }
     else
@@ -1046,13 +1047,14 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         // Optional: send invite packet manually if you want to control client popup
         if (newWorldChannel)
         {
-            std::string m_name = "world";
+            /*std::string m_name = "world";
             data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
             data << uint8(CHAT_INVITE_NOTICE);
             data << m_name.c_str();
             data << uint64(pCurrChar->GetGUID());
 
-            pCurrChar->GetSession()->SendPacket(&data);
+            pCurrChar->GetSession()->SendPacket(&data);*/
+            worldChannel->JoinChannel(pCurrChar, "");
         }
     }
     /*
