@@ -46,7 +46,7 @@ add_library(game
 
 target_include_directories(game
   PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR})
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/src/server/scripts)
 
 target_link_libraries(game
