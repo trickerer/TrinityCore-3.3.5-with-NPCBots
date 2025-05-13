@@ -1039,14 +1039,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             pCurrChar->Say("JOINED WORLD CHANNEL", LANG_UNIVERSAL); 
         }
     }
-    else
-    {
-        if (Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(channelId, "world", pCurrChar, true))
-        {
-            newWorldChannel->JoinChannel(pCurrChar, "");
-            pCurrChar->Say("CREATED AND JOINED!", LANG_UNIVERSAL); 
-        }
-    }
     /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
     if (worldChannel)
