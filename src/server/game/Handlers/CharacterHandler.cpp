@@ -1026,7 +1026,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
     {
         // Check if player is already in the channel
-        if (!worldChannel->HasPlayer(pCurrChar->GetGUID()))
+        if (!worldChannel->IsMember(pCurrChar->GetGUID()))
         {
             std::string m_name = "world";  // in-game channel name
             data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);

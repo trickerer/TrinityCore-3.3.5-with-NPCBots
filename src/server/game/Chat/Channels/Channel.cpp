@@ -235,10 +235,6 @@ bool Channel::IsMember(ObjectGuid guid) const
     return _playersStore.find(guid) != _playersStore.end();
 }
 
-bool Channel::HasPlayer(uint64 guid) const
-{
-    return _playersStore.find(guid) != _playersStore.end();
-}
 
 void Channel::LeaveChannel(Player* player, bool send)
 {
