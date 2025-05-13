@@ -88,15 +88,16 @@ Channel::Channel(std::string const& name, uint32 team /*= 0*/, std::string const
 
 void Channel::GetChannelName(std::string& channelName, uint32 channelId, LocaleConstant locale, AreaTableEntry const* zoneEntry)
 {
-    
-    if (channelId == 9)  // For example, assuming channel 9 is "world"
+    // Hardcode "world" for channel ID 9
+    if (channelId == 9)
     {
         channelName = "world";
-        return;
+        return; // prevent crash by exiting early
     }
+
     if (channelId)
     {
-        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId);
+        ChatChannelsEntry const* channelEntry = sChatChannelsStore.AssertEntry(channelId); // CRASHES IF 9 IS NOT IN DBC
         if (!(channelEntry->Flags & CHANNEL_DBC_FLAG_GLOBAL))
         {
             if (channelEntry->Flags & CHANNEL_DBC_FLAG_CITY_ONLY)
