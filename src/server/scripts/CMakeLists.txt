@@ -21,7 +21,6 @@ GetInstallOffset(INSTALL_OFFSET)
 # like dynamic, static, minimal-static...
 # Sets SCRIPTS_DEFAULT_LINKAGE
 
-include_directories(${CMAKE_SOURCE_DIR}/src/server/scripts)
 
 
 if(SCRIPTS MATCHES "dynamic")
