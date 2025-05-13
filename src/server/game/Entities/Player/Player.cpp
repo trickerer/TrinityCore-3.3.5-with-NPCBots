@@ -181,10 +181,8 @@ uint32 const MAX_MONEY_AMOUNT = static_cast<uint32>(std::numeric_limits<int32>::
 
 bool Player::IsInWorldChannel() const
 {
-    if (Channel* chn = ChannelMgr::forTeam(GetTeam())->GetChannel("world", const_cast<Player*>(this)))
-    {
+    if (Channel* chn = ChannelMgr::forTeam(GetTeam())->GetChannel("world", GetZoneId()))
         return chn->IsMember(GetGUID());
-    }
 
     return false;
 }
