@@ -898,6 +898,30 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Send to Discord
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
+    
+    for (auto const& itr : m_PlayersInBattle)
+    {
+        if (!itr.second->IsInWorld() || !itr.second->IsAlive())
+            continue;
+
+        Player* player = itr.second;
+        TeamId playerTeam = player->GetTeamId();
+        TeamId winningTeam = GetDefenderTeam();
+
+        if (playerTeam == winningTeam)
+        {
+            // Winning team → teleport to Wintergrasp Fortress (e.g., Fortress Keep)
+            float x = 5467.0f, y = 2840.0f, z = 420.0f; // Example coords inside the fortress
+            float o = 3.14f; // Orientation
+            player->TeleportTo(571, x, y, z, o); // Map 571 = Northrend
+        }
+        else
+        {
+            // Losing team → teleport to home bind location
+            WorldLocation const& homeBind = player->GetHomebindLocation();
+            player->TeleportTo(homeBind);
+        }
+    }
 
 }
 
