@@ -896,7 +896,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     std::string jsonMessage = "{\"content\": \"" + winnerMessage + "\"}";
     SendDiscordMessage(jsonMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
-    TC_LOG_INFO("misc", "Sending winner message: %s", winnerMessage.c_str());
+    TC_LOG_INFO("misc", "Sending winner message: %s", jsonMessage.c_str());
 
 }
 
