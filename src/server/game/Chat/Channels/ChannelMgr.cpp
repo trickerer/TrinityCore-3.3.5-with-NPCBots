@@ -269,6 +269,8 @@ void ChannelMgr::LeftChannel(uint32 channelId, AreaTableEntry const* zoneEntry)
     }
 }
 
+ChannelMgr::forTeam(GetTeam())->GetChannel("world", this)
+
 void ChannelMgr::MakeNotOnPacket(WorldPacket* data, std::string const& name)
 {
     data->Initialize(SMSG_CHANNEL_NOTIFY, 1 + name.size());
