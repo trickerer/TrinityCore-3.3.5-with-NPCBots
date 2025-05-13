@@ -1022,6 +1022,26 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
+    
+    if (Channel* worldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, false))
+    {
+        if (worldChannel->IsMember(pCurrChar->GetGUID()))
+        {
+            pCurrChar->GetSession()->SendNotification("You are already in the 'world' channel.");
+        }
+        else
+        {
+            worldChannel->Join(pCurrChar, "");
+        }
+    }
+    else
+    {
+        // Channel doesn't exist, create and join
+        Channel* newWorldChannel = ChannelMgr::forTeam(pCurrChar->GetTeam())->GetChannel(0, "world", pCurrChar, true);
+        if (newWorldChannel)
+            newWorldChannel->Join(pCurrChar, "");
+    }
+    /*
     Channel* worldChannel = ChannelMgr::GetChannel(0, "world", pCurrChar);
     if (worldChannel)
     {
@@ -1045,6 +1065,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             pCurrChar->GetSession()->SendPacket(&data);
         }
     }
+    */
 
 	
 
