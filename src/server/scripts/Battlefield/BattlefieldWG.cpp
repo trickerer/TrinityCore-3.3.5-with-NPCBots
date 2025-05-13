@@ -40,7 +40,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
-#include "DiscordWebhookMgr.h"
+#include "src/server/scripts/Custom/discord/DiscordWebhookMgr.h"
 
 struct BfWGCoordGY
 {
