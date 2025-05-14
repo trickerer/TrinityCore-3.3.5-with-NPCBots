@@ -123,12 +123,17 @@ public:
         GameObject* mailbox = new GameObject();
         if (mailbox->Create(ObjectGuid::LowType(0), mailboxId, player->GetMap(), phaseMask, pos, rotation, animProgress, goState))
         {
-            mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            mailbox->AddToWorld();  // Add the mailbox to the world
+            mailbox->AddToWorld();
             player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
-            
-            // Set respawn time (effectively despawn time) for the mailbox (5 minutes)
-            mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
+
+            sEventMgr.ScheduleEvent([mailbox]()
+            {
+                if (mailbox->IsInWorld())
+                    mailbox->RemoveFromWorld();
+
+                delete mailbox;
+
+            }, 5 * MINUTE * IN_MILLISECONDS);
         }
 
         return true;  // Item use was successful
