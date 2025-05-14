@@ -114,7 +114,7 @@ public:
         {
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
             mailbox->SetSpawnedByDefault(true);  // Make sure the object is spawned
-            player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
+            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
             
             // Set the despawn time for the mailbox (5 minutes)
             mailbox->SetDespawnTime(5 * MINUTE * IN_MILLISECONDS);
