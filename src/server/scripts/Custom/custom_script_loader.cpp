@@ -37,30 +37,23 @@ void AddSC_DiscordWebhookPlayerActivity();
 void AddBattlegroundDiscordHookScripts();
 void AddSC_item_aaron_summon();
 void AddSC_item_temp_mailbox();
-void AddSC_custom_items();
-
-
-void AddSC_custom_items()
-{
-    AddSC_item_aaron_summon();
-    AddSC_item_temp_mailbox();
-}
-
+ 
 void AddCustomScripts()
 {
-    AddSC_npc_voters_zone();
-    AddSC_npc_renamer();
-    AddSC_npc_vote_teleport();
+	AddSC_npc_voters_zone();
+	AddSC_npc_renamer();
+	AddSC_npc_vote_teleport();
     AddSC_NPC_TransmogDisplayVendor();
-    AddSC_npc_token_shop();
-    AddSC_npc_token_exchange();
-    AddSC_npc_faction_class_edit();
-    AddSC_npc_proff_master();
-    AddSC_npc_xp_mod();
-    AddSC_npc_insta_80();
-    AddSC_npc_dungeon_master();
-    AddDiscordWebhookServerHookScripts();
-    AddSC_DiscordWebhookPlayerActivity();
-    AddBattlegroundDiscordHookScripts();
-    AddSC_custom_items();
+	AddSC_npc_token_shop();
+	AddSC_npc_token_exchange();
+	AddSC_npc_faction_class_edit();
+	AddSC_npc_proff_master();
+	AddSC_npc_xp_mod();
+	AddSC_npc_insta_80();
+	AddSC_npc_dungeon_master();
+	AddDiscordWebhookServerHookScripts();
+	AddSC_DiscordWebhookPlayerActivity();
+	AddBattlegroundDiscordHookScripts();
+    AddSC_item_aaron_summon();
+    AddSC_item_temp_mailbox();
 }
