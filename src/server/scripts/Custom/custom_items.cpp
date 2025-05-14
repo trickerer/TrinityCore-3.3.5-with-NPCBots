@@ -17,7 +17,7 @@ public:
         uint64 guid = player->GetGUID();
         uint32 now = time(nullptr);
         
-        sLog->outInfo(LOG_FILTER_GENERAL, "item_aaron_summon used by player GUID: %llu", guid);
+        TC_LOG_INFO("player.hooks", "item_aaron_summon used by player GUID: %llu", guid);
 
         // 1800 = 30 minutes
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
