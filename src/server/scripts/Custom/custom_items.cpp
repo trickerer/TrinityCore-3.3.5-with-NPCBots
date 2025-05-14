@@ -3,7 +3,7 @@
 #include "Creature.h"
 #include "WorldSession.h"
 #include "Map.h"
-#include "Object.h"
+
 
 class item_roboticon_summon : public ItemScript
 {
@@ -35,13 +35,14 @@ public:
         Position pos(x + 2, y + 2, z, player->GetOrientation());
 
         Creature* summon = player->GetMap()->SummonCreature(
-            creatureId,        // Creature ID
-            pos,               // Position object
-            TEMPSUMMON_MANUAL_DESPAWN, // Despawn type (manual)
-            2 * MINUTE * IN_MILLISECONDS, // Despawn time in milliseconds
-            0,                 // Vehicle ID (if applicable, 0 if not)
-            0,                 // Spell ID (if not used, 0)
-            ObjectGuid::Empty  // Private object owner (use default if not required)
+            creatureId,           // Creature ID
+            pos,                  // Position object
+            nullptr,              // No SummonPropertiesEntry
+            2 * MINUTE * IN_MILLISECONDS,  // Timed despawn duration in milliseconds
+            player,               // Player as the summoner (WorldObject pointer)
+            0,                    // No spell ID
+            0,                    // No vehicle ID
+            ObjectGuid::Empty     // Default empty ObjectGuid for privateObjectOwner
         );
         
         if (summon)
