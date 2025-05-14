@@ -79,7 +79,7 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP12, GOSSIP_SENDER_MAIN, 1012);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP14, GOSSIP_SENDER_MAIN, 1013);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP13, GOSSIP_SENDER_MAIN, 1013);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             
 			
