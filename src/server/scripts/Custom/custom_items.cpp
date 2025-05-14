@@ -110,15 +110,19 @@ public:
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        // Spawn the game object (mailbox)
+        // Create the game object (mailbox)
         uint32 mailboxId = 144112; // Replace with the mailbox game object ID (ensure this ID is valid)
-        GameObject* mailbox = player->GetMap()->SummonGameObject(mailboxId, pos); // Spawn mailbox game object at the position
+        GameObject* mailbox = GameObject::CreateGameObject(mailboxId);
 
         if (mailbox)
         {
+            mailbox->SetPosition(pos);  // Set the position
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            //player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
-            
+            mailbox->AddToWorld();  // Add the mailbox to the world
+
+            // Send message to player (Yell)
+            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
+
             // Set respawn time (effectively despawn time) for the mailbox (5 minutes)
             mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
         }
