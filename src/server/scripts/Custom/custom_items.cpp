@@ -39,7 +39,7 @@ public:
         player->GetPosition(x, y, z); // Get player's current position
 
         // Define position offset for summoned creature (2 yards away from the player)
-        Position pos(x + 2, y + 2, z, player->GetOrientation());
+        Position pos(x + 2, y + 2, z, player->GetOrientation() + M_PI);
         
         // Summon the creature
         Creature* summon = player->GetMap()->SummonCreature(
@@ -56,7 +56,6 @@ public:
         if (summon)
         {
             // If the creature is successfully summoned, announce it
-            summon->SetOrientation(player->GetOrientation());  // Set creature to face the player
             player->Yell("Aaron has been summoned! You have 2 minutes!", LANG_UNIVERSAL);
         }
 
