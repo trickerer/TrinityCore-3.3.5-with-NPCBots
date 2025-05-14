@@ -58,7 +58,7 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
             
-             if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
+            if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 2x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
@@ -132,7 +132,7 @@ public:
                 InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                 if (msg == EQUIP_ERR_OK)
                 {
-                    Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                    Item* item = player->StoreNewItem(dest, itemId4, 1, true);
                     player->SendNewItem(item, 1, true, false);
                     me->Say("Here you go, carry this item and XP is boosted to 2x. Bank the item then you're done.", LANG_UNIVERSAL);
                 }
