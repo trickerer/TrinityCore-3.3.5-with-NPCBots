@@ -3,6 +3,7 @@
 #include "Creature.h"
 #include "WorldSession.h"
 #include "Map.h"
+#include "Object.h"
 
 class item_roboticon_summon : public ItemScript
 {
