@@ -79,11 +79,11 @@ public:
         }
 
         std::string name = player->GetName();
-        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "";
-        std::string status = loggingIn ? "🟢 **Logged In**" : "🔴 **Logged Out**";
+        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";  //🛡️=GM / 👤=Player 
+        std::string status = loggingIn ? "🟢 **Logged In" : "🛑 **Logged Out";
 
         std::ostringstream messageStream;
-        messageStream << gmTag << "**Player " << status << "**\nName: `" << name << "`";
+        messageStream << gmTag << "" << status << " `" << name << "`";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
         TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
