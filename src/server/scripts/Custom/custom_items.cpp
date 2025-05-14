@@ -33,7 +33,6 @@ public:
         // Position object
         Position pos(x + 2, y + 2, z, player->GetOrientation());
 
-        // Correct SummonCreature call (8 arguments)
         Creature* summon = player->GetMap()->SummonCreature(
             creatureId,       // Creature ID
             pos,              // Position object
@@ -42,7 +41,8 @@ public:
             2 * MINUTE * IN_MILLISECONDS, // Timed despawn duration
             player,           // Player is passed as summoner (WorldObject pointer)
             0,                // No spell ID (0 by default)
-            0                 // No vehicle ID (0 by default)
+            0,                // No vehicle ID (0 by default)
+            ObjectGuid::Empty // Correct use of ObjectGuid for privateObjectOwner
         );
         
         if (summon)
