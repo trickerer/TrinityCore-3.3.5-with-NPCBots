@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Creature.h"
 #include "WorldSession.h"
+#include "Map.h"
 
 class item_roboticon_summon : public ItemScript
 {
@@ -29,13 +30,13 @@ public:
         float x, y, z;
         player->GetPosition(x, y, z);
 
-        TempSummon* summon = player->SummonCreature(
-            creatureId,
-            x + 2, y + 2, z,
-            player->GetOrientation(),
-            TEMPSUMMON_TIMED_DESPAWN,
-            2 * MINUTE * IN_MILLISECONDS,
-            nullptr
+        Creature* summon = player->GetMap()->SummonCreature(
+        creatureId,
+        x + 2, y + 2, z,
+        player->GetOrientation(),
+        TEMPSUMMON_TIMED_DESPAWN,
+        2 * MINUTE * IN_MILLISECONDS,
+        player
         );
 
         if (summon)
