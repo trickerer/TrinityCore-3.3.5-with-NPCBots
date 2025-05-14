@@ -50,7 +50,7 @@ public:
 	{
 		if (serverShuttingDown)
 		{
-			std::string message = "All online players have been logged out..";
+			std::string message = "👢 All online players have been logged out..";
 			std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
 			if (!webhookUrl.empty())
 			{
