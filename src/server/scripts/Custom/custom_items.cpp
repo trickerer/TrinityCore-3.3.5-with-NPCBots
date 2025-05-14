@@ -7,6 +7,7 @@
 #include "Item.h"
 #include "ItemTemplate.h"
 #include "ObjectAccessor.h"
+#include "GameObject.h"
 
 class item_aaron_summon : public ItemScript
 {
