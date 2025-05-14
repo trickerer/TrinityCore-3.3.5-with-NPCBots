@@ -58,7 +58,8 @@ public:
         if (summon)
         {
             // If the creature is successfully summoned, announce it
-            player->Say("Aaron has been summoned!", LANG_UNIVERSAL);
+            summon->SetOrientation(player->GetOrientation());  // Set creature to face the player
+            player->Yell("Aaron has been summoned! You have 2 minutes!", LANG_UNIVERSAL);
         }
 
         return true;  // Item use was successful
