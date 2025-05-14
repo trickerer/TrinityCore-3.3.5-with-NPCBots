@@ -13,8 +13,6 @@ public:
         TC_LOG_INFO("player.hooks", "Loaded item_aaron_summon script.");
     }
 
-    std::unordered_map<uint64, uint32> lastUsedTime;
-
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         TC_LOG_INFO("player.hooks", "item_aaron_summon OnUse triggered!");
