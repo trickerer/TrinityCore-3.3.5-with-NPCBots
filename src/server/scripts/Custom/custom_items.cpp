@@ -84,6 +84,7 @@ public:
     {
         uint64 guid = player->GetGUID();
         player->Yell("ITEM USED!", LANG_UNIVERSAL);
+
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
@@ -115,11 +116,9 @@ public:
         uint32 phaseMask = 1;  // Ensure proper visibility phase (1 is default, adjust if needed)
         QuaternionData rotation; // Adjust rotation as necessary
 
-        // The spawn ID could be set to 0 or another unique value if needed
         uint32 animProgress = 0; // Adjust animation progress if needed
         GOState goState = GOState::GO_STATE_READY;  // Set GameObject state to active
 
-        // Create the mailbox GameObject
         GameObject* mailbox = new GameObject();
         if (mailbox->Create(ObjectGuid::LowType(0), mailboxId, player->GetMap(), phaseMask, pos, rotation, animProgress, goState))
         {
@@ -127,14 +126,15 @@ public:
             player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
 
             player->m_Events.AddEvent(
-            [mailbox]()
-            {
-                if (mailbox->IsInWorld())
-                    mailbox->RemoveFromWorld();
-                delete mailbox;
-            },
-            5 * MINUTE * IN_MILLISECONDS);
-        }  // <-- close the if block here
+                [mailbox]()
+                {
+                    if (mailbox->IsInWorld())
+                        mailbox->RemoveFromWorld();
+                    delete mailbox;
+                },
+                std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS)
+            );
+        }
 
         return true;  // Item use was successful
     }
