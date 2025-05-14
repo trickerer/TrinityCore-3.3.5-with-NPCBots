@@ -5,7 +5,7 @@
 #include "Map.h"
 
 
-class item_roboticon_summon : public ItemScript
+class item_aaron_summon : public ItemScript
 {
 public:
     item_roboticon_summon() : ItemScript("item_roboticon_summon") { }
@@ -52,7 +52,7 @@ public:
     }
 };
 
-void AddSC_item_roboticon_summon()
+void AddSC_item_aaron_summon()
 {
-    new item_roboticon_summon();
+    new item_aaron_summon();
 }

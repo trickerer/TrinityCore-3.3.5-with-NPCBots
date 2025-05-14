@@ -35,7 +35,7 @@ void AddSC_npc_dungeon_master();
 void AddDiscordWebhookServerHookScripts();
 void AddSC_DiscordWebhookPlayerActivity();
 void AddBattlegroundDiscordHookScripts();
-void AddSC_item_roboticon_summon();
+void AddSC_item_aaron_summon();
  
 void AddCustomScripts()
 {
@@ -53,5 +53,5 @@ void AddCustomScripts()
 	AddDiscordWebhookServerHookScripts();
 	AddSC_DiscordWebhookPlayerActivity();
 	AddBattlegroundDiscordHookScripts();
-    AddSC_item_roboticon_summon();
+    AddSC_item_aaron_summon();
 }
