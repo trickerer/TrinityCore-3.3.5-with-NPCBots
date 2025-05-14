@@ -33,15 +33,19 @@ public:
         // Create Position object
         Position pos(x + 2, y + 2, z, player->GetOrientation());
 
-        // Summon creature with correct SummonPropertiesEntry
+        // Correct usage of SummonCreature with adjusted parameters
         Creature* summon = player->GetMap()->SummonCreature(
             creatureId,
             pos, // Position object
-            0,   // Optional: specify the face (0 = face toward the summoner)
-            TEMPSUMMON_TIMED_DESPAWN,
+            nullptr, // No SummonPropertiesEntry needed here
+            0,   // No specific flag (0 for default behavior)
             2 * MINUTE * IN_MILLISECONDS, // Timed despawn duration
-            player
+            player, // Pass player as the summoner (WorldObject pointer)
+            0,   // No spell ID (0 by default)
+            0,   // No vehicle ID (0 by default)
+            ObjectGuid::Empty // Default empty ObjectGuid
         );
+        
         if (summon)
             player->Say("Aaron has been summoned!", LANG_UNIVERSAL);
 
