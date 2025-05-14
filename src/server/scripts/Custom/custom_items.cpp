@@ -8,7 +8,10 @@
 class item_aaron_summon : public ItemScript
 {
 public:
-    item_aaron_summon() : ItemScript("item_aaron_summon") { }
+    item_aaron_summon() : ItemScript("item_aaron_summon") 
+    {
+        TC_LOG_INFO("player.hooks", "Loaded item_aaron_summon script.");
+    }
 
     std::unordered_map<uint64, uint32> lastUsedTime;
 
