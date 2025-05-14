@@ -51,6 +51,8 @@ public:
         bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select Your XP Boost Option!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             
             {
