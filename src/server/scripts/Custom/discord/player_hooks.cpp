@@ -82,7 +82,7 @@ private:
         std::string status = loggingIn ? "🟢 **Logged In" : "🛑 **Logged Out";
 
         std::ostringstream messageStream;
-        messageStream << gmTag << "" << status << "**\nName: `" << name << "`";
+        messageStream << gmTag << "" << status << " `" << name << "`";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
         TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
