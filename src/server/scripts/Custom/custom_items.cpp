@@ -30,13 +30,14 @@ public:
         float x, y, z;
         player->GetPosition(x, y, z);
 
+        Position pos(x + 2, y + 2, z, player->GetOrientation());
+
         Creature* summon = player->GetMap()->SummonCreature(
-        creatureId,
-        x + 2, y + 2, z,
-        player->GetOrientation(),
-        TEMPSUMMON_TIMED_DESPAWN,
-        2 * MINUTE * IN_MILLISECONDS,
-        player
+            creatureId,
+            pos, // Pass Position object
+            TEMPSUMMON_TIMED_DESPAWN,
+            2 * MINUTE * IN_MILLISECONDS,
+            player
         );
 
         if (summon)
