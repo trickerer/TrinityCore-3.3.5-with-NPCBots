@@ -30,16 +30,18 @@ public:
         float x, y, z;
         player->GetPosition(x, y, z);
 
+        // Create Position object
         Position pos(x + 2, y + 2, z, player->GetOrientation());
 
+        // Summon creature with correct SummonPropertiesEntry
         Creature* summon = player->GetMap()->SummonCreature(
             creatureId,
-            pos, // Pass Position object
-            TEMPSUMMON_TIMED_DESPAWN,
+            pos, // Position object
+            0,   // Optional: specify the face (0 = face toward the summoner)
+            SUMMON_TIMED_DESPAWN,   // Correct flag: use SUMMON_TIMED_DESPAWN (instead of TempSummonType)
             2 * MINUTE * IN_MILLISECONDS,
             player
         );
-
         if (summon)
             player->Say("Aaron has been summoned!", LANG_UNIVERSAL);
 
