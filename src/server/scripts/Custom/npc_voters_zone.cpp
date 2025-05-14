@@ -96,7 +96,8 @@ public:
             else
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TPNO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
-				me->Yell("For me to talk to you, you must complete a simple task for me.  Go to the website and vote, do this and I will happy to talk to you more.", LANG_UNIVERSAL);
+				player->Whisper("For me to talk to you, you must complete a simple task for me. Go to the website and vote (mgawow.online/vote), do this and I will be happy to talk to you more.", LANG_UNIVERSAL, player);
+                player->GetSession()->SendNotification("Vote on the website first, then I will talk to you. mgawow.online/vote");
             }
 			
 
