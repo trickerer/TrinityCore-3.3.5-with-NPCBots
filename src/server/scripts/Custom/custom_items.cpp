@@ -110,19 +110,23 @@ public:
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        // Create the game object (mailbox)
-        uint32 mailboxId = 144112; // Replace with the mailbox game object ID (ensure this ID is valid)
-        GameObject* mailbox = GameObject::CreateGameObject(mailboxId);
+        // Create the GameObject (mailbox)
+        uint32 mailboxId = 144112; // Replace with the correct GameObject ID for the mailbox
+        uint32 phaseMask = 1;  // Ensure proper visibility phase (1 is default, adjust if needed)
+        QuaternionData rotation; // Adjust rotation as necessary
 
-        if (mailbox)
+        // The spawn ID could be set to 0 or another unique value if needed
+        uint32 animProgress = 0; // Adjust animation progress if needed
+        GOState goState = GOState::GO_STATE_READY;  // Set GameObject state to active
+
+        // Create the mailbox GameObject
+        GameObject* mailbox = new GameObject();
+        if (mailbox->Create(ObjectGuid::LowType(0), mailboxId, player->GetMap(), phaseMask, pos, rotation, animProgress, goState))
         {
-            mailbox->SetPosition(pos);  // Set the position
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
             mailbox->AddToWorld();  // Add the mailbox to the world
-
-            // Send message to player (Yell)
             player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
-
+            
             // Set respawn time (effectively despawn time) for the mailbox (5 minutes)
             mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
         }
