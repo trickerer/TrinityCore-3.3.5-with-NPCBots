@@ -78,7 +78,7 @@ class item_temp_mailbox : public ItemScript
 public:
     item_temp_mailbox() : ItemScript("item_temp_mailbox") { }
 
-    std::unordered_map<uint64, uint32> lastUsedTime2;
+    std::unordered_map<uint64, uint32> lastUsedTime;
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
@@ -86,9 +86,9 @@ public:
         player->Yell("ITEM USED!", LANG_UNIVERSAL);
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800) // 1800 seconds = 30 minutes
+        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
         {
-            uint32 remaining = 1800 - (now - lastUsedTime2[guid]);
+            uint32 remaining = 1800 - (now - lastUsedTime[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
             
