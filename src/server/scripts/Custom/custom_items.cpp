@@ -5,26 +5,26 @@
 #include "Map.h"
 #include "Log.h"
 
-
 class item_aaron_summon : public ItemScript
 {
 public:
     item_aaron_summon() : ItemScript("item_aaron_summon") { }
 
-    
     std::unordered_map<uint64, uint32> lastUsedTime;
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
         uint32 now = time(nullptr);
-        
-        TC_LOG_INFO("player.hooks", "ITEM CLICKED");
+
+        TC_LOG_INFO("player.hooks", "item_aaron_summon OnUse triggered by player GUID: %llu", guid);
+
         // 1800 = 30 minutes
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
         {
             uint32 remaining = 1800 - (now - lastUsedTime[guid]);
             player->GetSession()->SendNotification("You must wait %u more seconds to use this item again.", remaining);
+            TC_LOG_INFO("player.hooks", "item_aaron_summon blocked use due to cooldown. Remaining: %u", remaining);
             return false;
         }
 
@@ -49,8 +49,15 @@ public:
         );
         
         if (summon)
+        {
             player->Say("Aaron has been summoned!", LANG_UNIVERSAL);
-
+            TC_LOG_INFO("player.hooks", "Creature summoned: %u", creatureId);
+        }
+        else
+        {
+            TC_LOG_INFO("player.hooks", "Creature summon failed for player GUID: %llu", guid);
+        }
+        TC_LOG_INFO("player.hooks", "ITEM CLICKED");
         return true;
     }
 };
