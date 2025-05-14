@@ -52,7 +52,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         std::stringstream content;
         content << "⚔️ **" << battlegroundName << " Started!**\n"
                 << "📊 **Bracket:** " << bracket << "\n"
-                << "👥 **Players:** " << alliancePlayers+5 << " Alliance vs " << hordePlayers+5 << " Horde";
+                << "👥 **Players:** " << alliancePlayers+8 << " Alliance vs " << hordePlayers+8 << " Horde";
 
         json->set("content", content.str());
 
