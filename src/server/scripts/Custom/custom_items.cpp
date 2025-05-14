@@ -78,7 +78,7 @@ class item_temp_mailbox : public ItemScript
 public:
     item_temp_mailbox() : ItemScript("item_temp_mailbox") { }
 
-    std::unordered_map<uint64, uint32> lastUsedTime;
+    std::unordered_map<uint64, uint32> lastUsedTime2;
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
@@ -87,9 +87,9 @@ public:
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
+        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800) // 1800 seconds = 30 minutes
         {
-            uint32 remaining = 1800 - (now - lastUsedTime[guid]);
+            uint32 remaining = 1800 - (now - lastUsedTime2[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
             
@@ -97,7 +97,7 @@ public:
             return false;  // Do not continue if item is on cooldown
         }
 
-        lastUsedTime[guid] = now; // Update last used time
+        lastUsedTime2[guid] = now; // Update last used time
 
         // Spawn the temporary mailbox
         float x, y, z;
