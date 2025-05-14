@@ -39,7 +39,7 @@ public:
             pos, // Position object
             0,   // Optional: specify the face (0 = face toward the summoner)
             TEMPSUMMON_TIMED_DESPAWN,
-            2 * MINUTE * IN_MILLISECONDS,
+            2 * MINUTE * IN_MILLISECONDS, // Timed despawn duration
             player
         );
         if (summon)
