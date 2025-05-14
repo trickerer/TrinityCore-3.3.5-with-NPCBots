@@ -113,7 +113,7 @@ public:
 
         // Create the GameObject (mailbox)
         uint32 mailboxId = 144112; // Replace with the correct GameObject ID for the mailbox
-        uint32 phaseMask = 1;  // Ensure proper visibility phase (1 is default, adjust if needed)
+        uint32 phaseMask = player->GetPhaseMask();
         QuaternionData rotation; // Adjust rotation as necessary
 
         uint32 animProgress = 0; // Adjust animation progress if needed
