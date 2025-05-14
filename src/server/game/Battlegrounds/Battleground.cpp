@@ -1182,7 +1182,9 @@ void Battleground::StartBattleground()
         uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
         uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
 
-        std::string bracket = Trinity::StringFormat("Level %u-%u", GetMinLevel(), GetMaxLevel());
+        std::ostringstream bracketStream;
+        bracketStream << "Level " << GetMinLevel() << "-" << GetMaxLevel();
+        std::string bracket = bracketStream.str();
 
         SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers, bracket);
     }
