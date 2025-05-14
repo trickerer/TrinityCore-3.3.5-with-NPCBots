@@ -16,7 +16,7 @@ public:
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
-        TC_LOG_INFO("player.hooks", "Item used by player GUID: %llu", guid);
+        //TC_LOG_INFO("player.hooks", "Item used by player GUID: %llu", guid);
 
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
@@ -39,7 +39,13 @@ public:
         player->GetPosition(x, y, z); // Get player's current position
 
         // Define position offset for summoned creature (2 yards away from the player)
-        Position pos(x + 2, y + 2, z, player->GetOrientation() + M_PI);
+        float orientation = player->GetOrientation() + M_PI;
+        float distance = 2.0f; // 2 yards in front
+
+        float spawnX = x + distance * std::cos(orientation);
+        float spawnY = y + distance * std::sin(orientation);
+
+Position pos(spawnX, spawnY, z, orientation);
         
         // Summon the creature
         Creature* summon = player->GetMap()->SummonCreature(
