@@ -19,7 +19,7 @@ public:
         uint32 now = time(nullptr);
         
         TC_LOG_INFO("player.hooks", "item_aaron_summon used by player GUID: %llu", guid);
-
+        TC_LOG_INFO("player.hooks", "Test log message!");
         // 1800 = 30 minutes
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
         {
