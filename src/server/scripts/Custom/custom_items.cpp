@@ -1,6 +1,7 @@
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "Creature.h"
+#include "WorldSession.h"
 
 class item_roboticon_summon : public ItemScript
 {
@@ -18,7 +19,7 @@ public:
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
         {
             uint32 remaining = 1800 - (now - lastUsedTime[guid]);
-            player->SendNotification("You must wait %u more seconds to use this item again.", remaining);
+            player->GetSession()->SendNotification("You must wait %u more seconds to use this item again.", remaining);
             return false;
         }
 
@@ -33,7 +34,8 @@ public:
             x + 2, y + 2, z,
             player->GetOrientation(),
             TEMPSUMMON_TIMED_DESPAWN,
-            2 * MINUTE * IN_MILLISECONDS
+            2 * MINUTE * IN_MILLISECONDS,
+            nullptr
         );
 
         if (summon)
