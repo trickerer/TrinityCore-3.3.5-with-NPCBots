@@ -11,7 +11,7 @@ class item_aaron_summon : public ItemScript
 public:
     item_aaron_summon() : ItemScript("item_aaron_summon") { }
 
-    TC_LOG_INFO("player.hooks", "ITEM CLICKED by player GUID: %llu", guid);
+    
     std::unordered_map<uint64, uint32> lastUsedTime;
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
@@ -19,7 +19,7 @@ public:
         uint64 guid = player->GetGUID();
         uint32 now = time(nullptr);
         
-        TC_LOG_INFO("player.hooks", "Test message: item_aaron_summon used by player GUID: %llu", guid);
+        TC_LOG_INFO("player.hooks", "ITEM CLICKED");
         // 1800 = 30 minutes
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
         {
