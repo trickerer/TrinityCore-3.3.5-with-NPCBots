@@ -40,7 +40,7 @@ public:
 
         // Define position offset for summoned creature (2 yards away from the player)
         float orientation = player->GetOrientation() + M_PI;
-        float distance = 2.0f; // 2 yards in front
+        float distance = -2.0f; // 2 yards in front
 
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
