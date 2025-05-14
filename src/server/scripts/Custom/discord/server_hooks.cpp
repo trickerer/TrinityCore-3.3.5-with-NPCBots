@@ -38,7 +38,7 @@ public:
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
         std::stringstream messageStream;
-        messageStream << "✅ **Server is online** - Realm: " << realmName << ""; // use /n for new line
+        messageStream << "✅ **Server is online** - Realm: " << realmName << ""; // use \n for new line
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
