@@ -8,7 +8,7 @@
 class item_aaron_summon : public ItemScript
 {
 public:
-    item_roboticon_summon() : ItemScript("item_roboticon_summon") { }
+    item_aaron_summon() : ItemScript("item_roboticon_summon") { }
 
     std::unordered_map<uint64, uint32> lastUsedTime;
 
