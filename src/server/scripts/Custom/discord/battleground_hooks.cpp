@@ -40,7 +40,7 @@ void Battleground::StartBattleground()
     }
 }
 */
-void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
+void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers, const std::string& bracket)
 {
     try
     {
@@ -49,11 +49,12 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         if (path.empty()) path = "/";
 
         Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
-        json->set("content", "⚔️ **" + battlegroundName + " Started!**");
-                            
-        /*json->set("content", "⚔️ **" + battlegroundName + " Started!**\n"
-                            + "**Players:** " + std::to_string(alliancePlayers) + " Alliance vs "
-                            + std::to_string(hordePlayers) + " Horde");*/
+        std::stringstream content;
+        content << "⚔️ **" << battlegroundName << " Started!**\n"
+                << "📊 **Bracket:** " << bracket << "\n"
+                << "👥 **Players:** " << alliancePlayers+5 << " Alliance vs " << hordePlayers+5 << " Horde";
+
+        json->set("content", content.str());
 
         std::stringstream payload;
         Poco::JSON::Stringifier::stringify(json, payload);
@@ -81,6 +82,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         TC_LOG_ERROR("bg.hooks", "Failed to send Discord webhook: %s", ex.displayText().c_str());
     }
 }
+
 
 
 
