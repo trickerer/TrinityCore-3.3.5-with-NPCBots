@@ -69,7 +69,6 @@ public:
     }
 };
 
-// Temporary Mailbox item (30-minute cooldown)
 class item_temp_mailbox : public ItemScript
 {
 public:
@@ -107,14 +106,18 @@ public:
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        // Summon the mailbox creature
-        uint32 mailboxId = 190000; // Replace with the mailbox creature ID (ensure this ID is valid)
-        Creature* mailbox = player->GetMap()->SummonCreature(mailboxId, pos, nullptr, 5 * MINUTE * IN_MILLISECONDS, player); // Mailbox will disappear after 5 minutes
+        // Spawn the game object (mailbox)
+        uint32 mailboxId = 144112; // Replace with the mailbox game object ID (ensure this ID is valid)
+        GameObject* mailbox = player->GetMap()->SummonGameObject(mailboxId, pos); // GameObject will be placed at the position
 
         if (mailbox)
         {
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
+            mailbox->SetSpawnedByDefault(true);  // Make sure the object is spawned
+            player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
+            
+            // Set the despawn time for the mailbox (5 minutes)
+            mailbox->SetDespawnTime(5 * MINUTE * IN_MILLISECONDS);
         }
 
         return true;  // Item use was successful
