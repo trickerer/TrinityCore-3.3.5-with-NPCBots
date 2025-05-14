@@ -50,6 +50,7 @@
 
 #include "Custom/discord/DiscordWebhookMgr.h"
 #include "Config.h"
+#include "Common.h"
 
 void BattlegroundScore::AppendToPacket(WorldPacket& data)
 {
