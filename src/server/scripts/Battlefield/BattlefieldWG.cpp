@@ -686,7 +686,7 @@ void BattlefieldWG::OnBattleStart()
     std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde" : "🔵 **Alliance";  // Use TEAM_HORDE for 3.3.5a
 
     // Prepare the Discord message
-    std::string winnerMessage = "⚔️ ** Wintergrasp has Started! ** Owned by " + owner + "";
+    std::string winnerMessage = "⚔️ ** Wintergrasp has Started! Defenders " + owner + "";
  
     // Send the message to Discord
     SendDiscordMessage(winnerMessage);
