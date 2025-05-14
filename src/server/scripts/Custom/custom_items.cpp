@@ -12,53 +12,33 @@ public:
 
     std::unordered_map<uint64, uint32> lastUsedTime;
 
-    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
+    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
-        uint32 now = time(nullptr);
+        TC_LOG_INFO("player.hooks", "Item used by player GUID: %llu", guid);
 
-        TC_LOG_INFO("player.hooks", "item_aaron_summon OnUse triggered by player GUID: %llu", guid);
-
-        // 1800 = 30 minutes
-        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
+        // Implement item-specific logic here
+        // Example: Check if the player can use the item
+        if (player->GetLevel() < 10)
         {
-            uint32 remaining = 1800 - (now - lastUsedTime[guid]);
-            player->GetSession()->SendNotification("You must wait %u more seconds to use this item again.", remaining);
-            TC_LOG_INFO("player.hooks", "item_aaron_summon blocked use due to cooldown. Remaining: %u", remaining);
+            player->GetSession()->SendNotification("You must be level 10 to use this item.");
             return false;
         }
 
-        lastUsedTime[guid] = now;
-
-        uint32 creatureId = 500612; // Replace with your custom creature
+        // If the item can be used, do something (e.g., summon a creature)
+        uint32 creatureId = 500612; // Replace with your custom creature ID
         float x, y, z;
         player->GetPosition(x, y, z);
 
-        // Position object
         Position pos(x + 2, y + 2, z, player->GetOrientation());
+        Creature* summon = player->GetMap()->SummonCreature(creatureId, pos, nullptr, 2 * MINUTE * IN_MILLISECONDS, player);
 
-        Creature* summon = player->GetMap()->SummonCreature(
-            creatureId,           // Creature ID
-            pos,                  // Position object
-            nullptr,              // No SummonPropertiesEntry
-            2 * MINUTE * IN_MILLISECONDS,  // Timed despawn duration in milliseconds
-            player,               // Player as the summoner (WorldObject pointer)
-            0,                    // No spell ID
-            0,                    // No vehicle ID
-            ObjectGuid::Empty     // Default empty ObjectGuid for privateObjectOwner
-        );
-        
         if (summon)
         {
             player->Say("Aaron has been summoned!", LANG_UNIVERSAL);
-            TC_LOG_INFO("player.hooks", "Creature summoned: %u", creatureId);
         }
-        else
-        {
-            TC_LOG_INFO("player.hooks", "Creature summon failed for player GUID: %llu", guid);
-        }
-        TC_LOG_INFO("player.hooks", "ITEM CLICKED");
-        return true;
+
+        return true;  // Item use was successful
     }
 };
 
