@@ -28,7 +28,6 @@ public:
             uint32 remainingSeconds = remaining % 60;
             
             player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
-            item->SetSpellId(0);
             return false;
         }
 
