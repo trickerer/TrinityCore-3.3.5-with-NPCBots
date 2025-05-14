@@ -17,19 +17,17 @@ public:
         uint64 guid = player->GetGUID();
         TC_LOG_INFO("player.hooks", "Item used by player GUID: %llu", guid);
 
-        // Check if the player is level 10 or higher before allowing item use
-        if (player->GetLevel() < 10)
-        {
-            player->GetSession()->SendNotification("You must be level 10 to use this item.");
-            return false;
-        }
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
         {
             uint32 remaining = 1800 - (now - lastUsedTime[guid]);
-            player->GetSession()->SendNotification("You must wait %u more seconds to use this item again.", remaining);
+            uint32 remainingMinutes = remaining / 60;
+            uint32 remainingSeconds = remaining % 60;
+            
+            player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
+            item->SetSpellId(0);
             return false;
         }
 
