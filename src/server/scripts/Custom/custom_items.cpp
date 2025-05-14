@@ -114,7 +114,7 @@ public:
         if (mailbox)
         {
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
+            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
         }
 
         return true;  // Item use was successful
