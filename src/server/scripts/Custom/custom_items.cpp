@@ -112,19 +112,14 @@ public:
 
         // Spawn the game object (mailbox)
         uint32 mailboxId = 144112; // Replace with the mailbox game object ID (ensure this ID is valid)
-        GameObject* mailbox = player->GetMap()->CreateGameObject(mailboxId); // Create the game object
+        GameObject* mailbox = player->GetMap()->SummonGameObject(mailboxId, pos); // Spawn mailbox game object at the position
 
         if (mailbox)
         {
-            mailbox->SetPosition(pos); // Set the position
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            mailbox->SetSpawnedByDefault(true);  // Make sure the object is spawned
-            player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
+            //player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
             
-            // Add the mailbox to the world
-            mailbox->AddToWorld();
-
-            // Manually remove the mailbox after 5 minutes (in milliseconds)
+            // Set respawn time (effectively despawn time) for the mailbox (5 minutes)
             mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
         }
 
