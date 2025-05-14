@@ -33,14 +33,14 @@ public:
         // Create Position object
         Position pos(x + 2, y + 2, z, player->GetOrientation());
 
-        // Corrected SummonCreature call (8 arguments, not 9)
+        WorldObject* worldObj = player;
         Creature* summon = player->GetMap()->SummonCreature(
             creatureId,       // Creature ID
             pos,              // Position object
             nullptr,          // No SummonPropertiesEntry
             0,                // No specific flag (0 for default behavior)
             2 * MINUTE * IN_MILLISECONDS, // Timed despawn duration
-            player,           // Pass player as the summoner (WorldObject pointer)
+            worldObj,         // Pass player as WorldObject pointer
             0,                // No spell ID (0 by default)
             0,                // No vehicle ID (0 by default)
             ObjectGuid::Empty // Default empty ObjectGuid
