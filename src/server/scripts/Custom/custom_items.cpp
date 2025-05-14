@@ -5,7 +5,6 @@
 #include "Log.h"
 #include "SpellMgr.h"
 #include "Item.h"
-#include "ItemTemplate.h"
 
 class item_aaron_summon : public ItemScript
 {
@@ -29,7 +28,7 @@ public:
             uint32 remainingSeconds = remaining % 60;
             
             player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
-            Item->SetSpellId(0);
+            item->SetSpellId(0);
             return false;
         }
 
