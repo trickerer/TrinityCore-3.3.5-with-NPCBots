@@ -9,6 +9,8 @@
 #include "ObjectAccessor.h"
 #include "GameObject.h"
 
+
+// AARON
 class item_aaron_summon : public ItemScript
 {
 public:
@@ -70,6 +72,7 @@ public:
     }
 };
 
+// MAILBOX
 class item_temp_mailbox : public ItemScript
 {
 public:
@@ -109,16 +112,20 @@ public:
 
         // Spawn the game object (mailbox)
         uint32 mailboxId = 144112; // Replace with the mailbox game object ID (ensure this ID is valid)
-        GameObject* mailbox = player->GetMap()->SummonGameObject(mailboxId, pos); // GameObject will be placed at the position
+        GameObject* mailbox = player->GetMap()->CreateGameObject(mailboxId); // Create the game object
 
         if (mailbox)
         {
+            mailbox->SetPosition(pos); // Set the position
             mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
             mailbox->SetSpawnedByDefault(true);  // Make sure the object is spawned
-            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
+            player->SendBroadcastMessage("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.");
             
-            // Set the despawn time for the mailbox (5 minutes)
-            mailbox->SetDespawnTime(5 * MINUTE * IN_MILLISECONDS);
+            // Add the mailbox to the world
+            mailbox->AddToWorld();
+
+            // Manually remove the mailbox after 5 minutes (in milliseconds)
+            mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
         }
 
         return true;  // Item use was successful
