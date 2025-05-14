@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "SpellMgr.h"
 #include "Item.h"
+#include "ItemTemplate.h"
 
 class item_aaron_summon : public ItemScript
 {
