@@ -16,6 +16,7 @@ enum ItemIds
     itemId = 461141,  // 3x Rates
     itemId2 = 461142, // 10x Rates
     itemId3 = 21140, // MGA TOKEN
+    itemId4 = 461144, // 2x Rates
 };
 
 /*
@@ -50,20 +51,26 @@ public:
         bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
-            if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1))
+            if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             
             {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Set XP To Normal - Deletes Item!! * WARNING *  BANK IT????", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
+            
+             if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 2x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            }
 
-            if (!player->HasItemCount(itemId, 1) && !player->HasItemCount(itemId2, 1))
+            if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 3x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
 
-            if (!player->HasItemCount(itemId2, 1) && !player->HasItemCount(itemId, 1))
+            if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 10x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
@@ -84,10 +91,11 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 1000)
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1))
+                if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1 || player->HasItemCount(itemId4, 1)))
                 {
                     player->DestroyItemCount(itemId, 1, true);
                     player->DestroyItemCount(itemId2, 1, true);
+                    player->DestroyItemCount(itemId4, 1, true);
                     me->Say("XP Modification Item Removed! XP Rates Server Normal!", LANG_UNIVERSAL);
                     return true;
                 }
@@ -98,7 +106,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(itemId, 1))
                 {
-                    me->Say("You have the XP deduction item", LANG_UNIVERSAL);
+                    me->Say("You have the XP Booster item 3x Rates!", LANG_UNIVERSAL);
                     return true;
                 }
                 ItemPosCountVec dest;
@@ -111,13 +119,32 @@ public:
                 }
 
 			}
+            
+            if (action == GOSSIP_ACTION_INFO_DEF + 1004)
+			{
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(itemId, 1))
+                {
+                    me->Say("You have the XP Booster item 2x Rates!", LANG_UNIVERSAL);
+                    return true;
+                }
+                ItemPosCountVec dest;
+                InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                    player->SendNewItem(item, 1, true, false);
+                    me->Say("Here you go, carry this item and XP is boosted to 2x. Bank the item then you're done.", LANG_UNIVERSAL);
+                }
+
+			}
 
             if (action == GOSSIP_ACTION_INFO_DEF + 1002)
             {
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(itemId2, 1))
                 {
-                    me->Say("You have the XP Booster item", LANG_UNIVERSAL);
+                    me->Say("You have the XP Booster item 10x Rates!", LANG_UNIVERSAL);
                     return true;
                 }
 
