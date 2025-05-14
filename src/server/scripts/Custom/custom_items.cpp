@@ -3,6 +3,7 @@
 #include "Creature.h"
 #include "WorldSession.h"
 #include "Map.h"
+#include "Log.h"
 
 
 class item_aaron_summon : public ItemScript
