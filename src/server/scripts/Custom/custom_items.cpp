@@ -38,7 +38,7 @@ public:
             creatureId,
             pos, // Position object
             0,   // Optional: specify the face (0 = face toward the summoner)
-            SUMMON_TIMED_DESPAWN,
+            TEMPSUMMON_TIMED_DESPAWN,
             2 * MINUTE * IN_MILLISECONDS,
             player
         );
