@@ -78,60 +78,54 @@ class item_temp_mailbox : public ItemScript
 public:
     item_temp_mailbox() : ItemScript("item_temp_mailbox") { }
 
-    std::unordered_map<uint64, uint32> lastUsedTime;
+    std::unordered_map<uint64, uint32> lastUsedTime2;
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
 
-        // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
+        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800)
         {
             uint32 remaining = 1800 - (now - lastUsedTime[guid]);
-            uint32 remainingMinutes = remaining / 60;
-            uint32 remainingSeconds = remaining % 60;
-            
-            player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
-            return false;  // Do not continue if item is on cooldown
+            player->GetSession()->SendNotification("You must wait %u seconds to use this item again.", remaining);
+            return false;
         }
 
-        lastUsedTime[guid] = now; // Update last used time
+        lastUsedTime[guid] = now;
 
-        // Spawn the temporary mailbox
         float x, y, z;
-        player->GetPosition(x, y, z); // Get player's current position
-
-        // Position mailbox in front of the player (2 yards)
+        player->GetPosition(x, y, z);
         float orientation = player->GetOrientation();
-        float distance = 2.0f; // 2 yards in front
+        float distance = 2.0f;
 
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        // Create the GameObject (mailbox)
-        uint32 mailboxId = 144112; // Replace with the correct GameObject ID for the mailbox
-        uint32 phaseMask = 1;  // Ensure proper visibility phase (1 is default, adjust if needed)
-        QuaternionData rotation; // Adjust rotation as necessary
+        uint32 mailboxId = 144112; // Replace with your actual mailbox GO entry
+        GameObject* mailbox = player->GetMap()->CreateGameObject(mailboxId);
 
-        // The spawn ID could be set to 0 or another unique value if needed
-        uint32 animProgress = 0; // Adjust animation progress if needed
-        GOState goState = GOState::GO_STATE_READY;  // Set GameObject state to active
-
-        // Create the mailbox GameObject
-        GameObject* mailbox = new GameObject();
-        if (mailbox->Create(ObjectGuid::LowType(0), mailboxId, player->GetMap(), phaseMask, pos, rotation, animProgress, goState))
+        if (!mailbox)
         {
-            mailbox->SetOrientation(player->GetOrientation());  // Set mailbox to face the player
-            mailbox->AddToWorld();  // Add the mailbox to the world
-            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
-            
-            // Set respawn time (effectively despawn time) for the mailbox (5 minutes)
-            mailbox->SetRespawnTime(5 * MINUTE * IN_MILLISECONDS); // Set respawn time as the despawn time
+            player->GetSession()->SendNotification("Failed to create mailbox game object!");
+            return false;
         }
 
-        return true;  // Item use was successful
+        mailbox->SetPosition(pos);
+        mailbox->SetOrientation(orientation);
+        mailbox->SetPhaseMask(1, true);
+        mailbox->AddToWorld();
+
+        player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
+
+        // Schedule removal after 5 minutes (300000 ms)
+        sEventMgr.ScheduleEvent([mailbox]() {
+            if (mailbox && mailbox->IsInWorld())
+                mailbox->RemoveFromWorld();
+        }, 300000);
+
+        return true;
     }
 };
 
