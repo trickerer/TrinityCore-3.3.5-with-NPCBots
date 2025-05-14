@@ -4,6 +4,7 @@
 #include "WorldSession.h"
 #include "Log.h"
 #include "SpellMgr.h"
+#include "Item.h"
 
 class item_aaron_summon : public ItemScript
 {
