@@ -63,7 +63,7 @@ public:
 		uint64 guid = player->GetGUID();
 		LoggedInGuids.erase(guid);
 
-		TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
+		//TC_LOG_INFO("player.hooks", "Player logged out: {}", player->GetName());
 		Notify(player, false);  
 	}
 
