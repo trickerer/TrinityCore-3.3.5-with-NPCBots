@@ -141,8 +141,12 @@ public:
 };
 
 // Register scripts
-void AddSC_custom_items()
+void AddSC_item_aaron_summon()
 {
-    AddSC_item_aaron_summon();
-    AddSC_item_temp_mailbox();
+    new item_aaron_summon(); // Register the Aaron summon item script
+}
+
+void AddSC_item_temp_mailbox()
+{
+    new item_temp_mailbox(); // Register the temporary mailbox item script
 }
