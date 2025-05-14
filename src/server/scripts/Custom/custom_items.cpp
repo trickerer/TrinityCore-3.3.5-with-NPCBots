@@ -8,7 +8,6 @@
 #include "ItemTemplate.h"
 #include "ObjectAccessor.h"
 #include "GameObject.h"
-#include "EventMgr.h"
 
 
 // AARON
@@ -127,15 +126,15 @@ public:
             mailbox->AddToWorld();
             player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
 
-            sEventMgr.ScheduleEvent([mailbox]()
+            player->m_Events.AddEvent(
+            [mailbox]()
             {
                 if (mailbox->IsInWorld())
                     mailbox->RemoveFromWorld();
-
                 delete mailbox;
-
-            }, 5 * MINUTE * IN_MILLISECONDS);
-        }
+            },
+            5 * MINUTE * IN_MILLISECONDS);
+        }  // <-- close the if block here
 
         return true;  // Item use was successful
     }
