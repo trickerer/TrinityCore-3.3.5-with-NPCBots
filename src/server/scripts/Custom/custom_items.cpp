@@ -10,6 +10,10 @@
 #include "GameObject.h"
 #include "ObjectGuid.h"
 
+#ifndef HIGHGUID_GAMEOBJECT
+#define HIGHGUID_GAMEOBJECT 0xF11
+#endif
+
 
 // AARON
 class item_aaron_summon : public ItemScript
