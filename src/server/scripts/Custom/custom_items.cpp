@@ -92,7 +92,14 @@ public:
 
         uint32 mailboxId = 144113;
 
-        if (GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z + 0.5f, orientation, 0, 0, 0, 0, 5 * MINUTE))
+        QuaternionData rotation; // default zero rotation
+
+        Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
+
+        // Summon the mailbox using correct parameters
+        GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+
+        if (go)
         {
             player->Yell("Mailbox summoned!", LANG_UNIVERSAL);
         }
