@@ -921,8 +921,15 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 }
                 else
                 {
-                    // Teleport to homebind location (hearthstone bind point)
-                    player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
+                    if (player->m_homebindMapId && !(player->m_homebindX == 0.0f && player->m_homebindY == 0.0f))
+                    {
+                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
+                    }
+                    else
+                    {
+                        // Fallback safe location (DALA)
+                        player->TeleportTo(571, 5808.55f, 647.83f, 647.42f, 2.0f);
+                    }
                 }
             }
         }
