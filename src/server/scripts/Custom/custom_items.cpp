@@ -83,6 +83,7 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
+        uint64 guid = player->GetGUID();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800) // 1800 seconds = 30 minutes
