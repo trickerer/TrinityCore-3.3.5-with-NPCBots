@@ -95,6 +95,8 @@ public:
             return false;  // Do not continue if item is on cooldown
         }
         
+        lastUsedTime2[guid] = now; // Update last used time
+        
         float x, y, z;
         player->GetPosition(x, y, z);
 
