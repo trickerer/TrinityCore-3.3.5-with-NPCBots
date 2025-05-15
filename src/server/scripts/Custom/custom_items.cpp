@@ -95,7 +95,7 @@ public:
         float spawnY = y + distance * std::sin(orientation);
 
         uint32 mailboxId = 144113;
-        uint32 phaseMask = player->GetPhaseMask();
+        uint32 phaseMask = PHASEMASK_NORMAL;
         QuaternionData rotation;
         uint32 lowGuid = player->GetMap()->GenerateLowGuid<HighGuid::GameObject>();
 
