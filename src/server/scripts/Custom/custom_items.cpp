@@ -56,7 +56,7 @@ public:
             creatureId,              // Creature ID
             pos,                     // Position to spawn at
             nullptr,                 // No custom summon properties
-            2 * MINUTE * IN_MILLISECONDS, // Creature will despawn in 2 minutes
+            5 * MINUTE * IN_MILLISECONDS, // Creature will despawn in 2 minutes
             player,                  // Player who summoned it
             0,                       // No spell ID for summoning
             0,                       // No vehicle ID
@@ -66,7 +66,7 @@ public:
         if (summon)
         {
             // If the creature is successfully summoned, announce it
-            player->Yell("Aaron has been summoned! You have 2 minutes!", LANG_UNIVERSAL);
+            player->Yell("Aaron has been summoned! You have 5 minutes!", LANG_UNIVERSAL);
         }
 
         return true;  // Item use was successful
