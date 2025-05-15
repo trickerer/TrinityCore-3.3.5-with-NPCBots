@@ -314,8 +314,13 @@ public:
                 }
             case 1014:
                 CloseGossipMenuFor(player);
-                if ((player->HasItemCount(18154, 10)) && !player->HasItemCount(90002, 1))
+                if (player->HasItemCount(18154, 10))
                 {
+                    if (player->HasItemCount(90001, 1))
+                    {
+                        me->Yell(tokentext9, LANG_UNIVERSAL);
+                        break;
+                    }
                     uint32 itemId = 90002;
                     ItemPosCountVec dest;
 
