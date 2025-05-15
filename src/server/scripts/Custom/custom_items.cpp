@@ -83,7 +83,7 @@ public:
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
-        player->Yell("ITEM USED!", LANG_UNIVERSAL);
+        //player->Yell("ITEM USED!", LANG_UNIVERSAL);
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
@@ -128,9 +128,9 @@ public:
             player->m_Events.AddEvent(
                 [mailbox]()
                 {
-                    if (mailbox->IsInWorld())
-                        mailbox->RemoveFromWorld();
-                    delete mailbox;
+                    //if (mailbox->IsInWorld())
+                    //    mailbox->RemoveFromWorld();
+                    // delete mailbox;  // REMOVE this line to avoid crash
                 },
                 std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS)
             );
