@@ -132,6 +132,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1002: // close and cast spell on player and insuly
@@ -144,6 +145,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1003:
@@ -156,6 +158,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1004:
@@ -180,6 +183,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1005:
@@ -209,6 +213,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1007:
@@ -221,6 +226,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1008:
@@ -233,6 +239,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1009:
@@ -268,6 +275,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1012:
@@ -281,6 +289,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1013:
@@ -290,6 +299,7 @@ public:
                     if (player->HasItemCount(90001, 1))
                     {
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                     }
                     else
                     {
@@ -313,6 +323,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
                 break;
             case 1014:
@@ -322,6 +333,7 @@ public:
                     if (player->HasItemCount(90002, 1))
                     {
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                     }
                     else
                     {
@@ -345,6 +357,7 @@ public:
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                 }
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 9999)
