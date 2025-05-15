@@ -97,12 +97,12 @@ public:
 
         uint32 mailboxId = 144113;
         uint32 phaseMask = player->GetPhaseMask();
-        QuaternionData rotation; // default is fine
-
-        // Generate low GUID for GameObject
+        QuaternionData rotation;
         uint32 lowGuid = player->GetMap()->GenerateLowGuid<HighGuid::GameObject>();
 
+        Position pos(spawnX, spawnY, z + 0.5f, orientation); // raise a little just in case
         GameObject* mailbox = new GameObject();
+
         if (!mailbox->Create(ObjectGuid(HighGuid::GameObject, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
         {
             player->Yell("NO MAILBOX MADE!", LANG_UNIVERSAL);
@@ -112,8 +112,17 @@ public:
         }
 
         mailbox->AddToWorld();
-        player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
 
+        if (!mailbox->IsInWorld())
+        {
+            player->Yell("MAILBOX NOT IN WORLD!", LANG_UNIVERSAL);
+            TC_LOG_INFO("player.hooks", "Mailbox created but not added to world!");
+        }
+        else
+        {
+            player->Yell("MAILBOX CREATED!", LANG_UNIVERSAL);
+            TC_LOG_INFO("player.hooks", "Mailbox successfully spawned with GUID %s", mailbox->GetGUID().ToString().c_str());
+        }
         player->m_Events.AddEvent([mailbox]()
         {
             if (mailbox->IsInWorld())
