@@ -8,6 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+find_package(Poco REQUIRED COMPONENTS Foundation JSON Net NetSSL Util Crypto XML)
+
 CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE_SOURCES
@@ -52,7 +54,8 @@ target_link_libraries(worldserver
     scripts
     game
     gsoap
-    readline)
+    readline
+    ${Poco_LIBRARIES})
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
