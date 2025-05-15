@@ -95,7 +95,7 @@ public:
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        uint32 mailboxId = 180000;
+        uint32 mailboxId = 144113;
         uint32 phaseMask = player->GetPhaseMask();
         QuaternionData rotation; // default is fine
 
