@@ -10,6 +10,10 @@
 #include "GameObject.h"
 #include "ObjectGuid.h"
 
+#ifndef HIGHGUID_GAMEOBJECT
+#define HIGHGUID_GAMEOBJECT 0xF11
+#endif
+
 // AARON
 class item_aaron_summon : public ItemScript
 {
@@ -115,7 +119,7 @@ public:
         GameObject* mailbox = new GameObject();
 
         // Generate a unique low GUID for this GO on the map
-        uint32 lowGuid = player->GetMap()->GenerateLowGuid(TYPEID_GAMEOBJECT);
+        uint32 lowGuid = player->GetMap()->GenerateLowGuid<HIGHGUID_GAMEOBJECT>();
 
         if (!mailbox->Create(ObjectGuid(HIGHGUID_GAMEOBJECT, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
         {
