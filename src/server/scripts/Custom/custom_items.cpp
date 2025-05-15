@@ -8,6 +8,7 @@
 #include "ItemTemplate.h"
 #include "ObjectAccessor.h"
 #include "GameObject.h"
+#include "ObjectGuid.h"
 
 
 // AARON
