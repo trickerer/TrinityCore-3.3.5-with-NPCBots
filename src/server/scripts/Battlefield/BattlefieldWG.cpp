@@ -892,9 +892,9 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // NEED TO RESET THE CAP BAR
     
     bool allianceWon = (GetDefenderTeam() == TEAM_ALLIANCE);
-    std::string owner = allianceWon ? "🔵 Alliance" : "🔴 Horde";
+    std::string owner = allianceWon ? "🔵 ** Alliance" : "🔴 ** Horde";
     std::string method = endByTimer ? "defended" : "captured";
-    std::string winnerMessage = "⚔️ **Wintergrasp has ended!\\n" + owner + " has " + method + " the fortress!";
+    std::string winnerMessage = "⚔️ ** Wintergrasp has ended!\\n" + owner + " has " + method + " the fortress!";
     // Send to Discord
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
