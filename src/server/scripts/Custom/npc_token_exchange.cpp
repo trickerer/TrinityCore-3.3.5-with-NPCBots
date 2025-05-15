@@ -299,7 +299,7 @@ public:
                         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                         if (msg == EQUIP_ERR_OK)
                         {
-                            Item* item = player->StoreNewItem(dest, itemId, false, Item::GenerateItemRandomPropertyId(itemId));
+                            InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                             player->SendNewItem(item, 1, true, false);
                             player->DestroyItemCount(18154, 10, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
@@ -330,7 +330,7 @@ public:
                         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                         if (msg == EQUIP_ERR_OK)
                         {
-                            Item* item = player->StoreNewItem(dest, itemId, false, Item::GenerateItemRandomPropertyId(itemId));
+                            InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                             player->SendNewItem(item, 1, true, false);
                             player->DestroyItemCount(18154, 10, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
