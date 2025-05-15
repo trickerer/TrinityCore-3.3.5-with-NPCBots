@@ -93,7 +93,6 @@ public:
 
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
-        Position pos(spawnX, spawnY, z, orientation);
 
         uint32 mailboxId = 144113;
         uint32 phaseMask = player->GetPhaseMask();
