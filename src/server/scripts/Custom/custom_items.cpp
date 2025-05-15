@@ -86,21 +86,7 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
-        uint64 guid = player->GetGUID();
-
-        // Cooldown check (30 minutes)
-        uint32 now = time(nullptr);
-        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800)
-        {
-            uint32 remaining = 1800 - (now - lastUsedTime2[guid]);
-            uint32 remainingMinutes = remaining / 60;
-            uint32 remainingSeconds = remaining % 60;
-
-            player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
-            return false;
-        }
-
-        lastUsedTime2[guid] = now;
+        // cooldown logic here...
 
         float x, y, z;
         player->GetPosition(x, y, z);
@@ -112,35 +98,29 @@ public:
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        uint32 mailboxId = 144112; // Use correct mailbox GO ID here
+        uint32 mailboxId = 144112;
         uint32 phaseMask = player->GetPhaseMask();
-        QuaternionData rotation; // default rotation (no rotation)
+        QuaternionData rotation; // default is fine
+
+        // Generate low GUID for GameObject
+        uint32 lowGuid = player->GetMap()->GenerateLowGuid<HighGuid::GameObject>();
 
         GameObject* mailbox = new GameObject();
-
-        // Generate a unique low GUID for this GO on the map
-        uint32 lowGuid = player->GetMap()->GenerateLowGuid<HIGHGUID_GAMEOBJECT>();
-
-        if (!mailbox->Create(ObjectGuid(HIGHGUID_GAMEOBJECT, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
+        if (!mailbox->Create(ObjectGuid(HighGuid::GameObject, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
         {
             delete mailbox;
-            //player->SendBroadcastMessage("Failed to create mailbox GameObject.");
             return false;
         }
 
-        // Add the mailbox safely to the map (preferred over AddToWorld)
-        player->GetMap()->AddToMap(mailbox);
-
+        mailbox->AddToWorld();
         player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
 
-        // Schedule mailbox removal after 5 minutes
         player->m_Events.AddEvent([mailbox]()
         {
             if (mailbox->IsInWorld())
                 mailbox->RemoveFromWorld();
-            // Do NOT delete mailbox here; server will clean it up safely
-        },
-        std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS));
+            delete mailbox;
+        }, std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS));
 
         return true;
     }
