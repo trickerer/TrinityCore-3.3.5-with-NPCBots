@@ -17,6 +17,7 @@
 #define tokentext5 "Mini Tokens can be earned a few ways, you willf ind clues in the game......" // How to Get tokens..
 #define tokentext6 "UNKNOWN!" //??
 #define tokentext7 "Farewell! " // Bye
+#define tokentext8 "Exchange Complete." //??
 
 #define GOSSIP_HELLO_TSWAP1  "Create 1 MGA Token (Requies 50 Mini Tokens)"
 #define GOSSIP_HELLO_TSWAP2  "Exchange 3 WSG Marks for 50 Honor"
@@ -283,7 +284,7 @@ public:
                 break;
             case 1013:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if ((player->HasItemCount(18154, 10)) && !player->HasItemCount(90001, 1))
                 {
                     uint32 itemId = 90001;
                     ItemPosCountVec dest;
@@ -291,10 +292,10 @@ public:
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                     if (msg == EQUIP_ERR_OK)
                     {
-                        Item* item = player->StoreNewItem(dest, itemId, false, 10);
+                        Item* item = player->StoreNewItem(dest, itemId, false, 1);
                         player->SendNewItem(item, 10, true, false);
                         player->DestroyItemCount(18154, 10, true);
-                        me->Say(tokentext6, LANG_UNIVERSAL);
+                        me->Say(tokentext8, LANG_UNIVERSAL);
                     }
                     else
                     {
@@ -307,7 +308,7 @@ public:
                 }
             case 1014:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if ((player->HasItemCount(18154, 10)) && !player->HasItemCount(90002, 1))
                 {
                     uint32 itemId = 90002;
                     ItemPosCountVec dest;
@@ -315,10 +316,10 @@ public:
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                     if (msg == EQUIP_ERR_OK)
                     {
-                        Item* item = player->StoreNewItem(dest, itemId, false, 10);
+                        Item* item = player->StoreNewItem(dest, itemId, false, 1);
                         player->SendNewItem(item, 10, true, false);
                         player->DestroyItemCount(18154, 10, true);
-                        me->Say(tokentext6, LANG_UNIVERSAL);
+                        me->Say(tokentext8, LANG_UNIVERSAL);
                     }
                     else
                     {
