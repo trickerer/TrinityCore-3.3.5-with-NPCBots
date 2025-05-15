@@ -927,8 +927,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                     }
                     else
                     {
-                        // Fallback safe location (DALA)
-                        player->TeleportTo(571, 5808.55f, 647.83f, 647.42f, 2.0f);
+                        // Fallback safe location (DALA INN)
+                        player->TeleportTo(571, 5769.09f, 729.62f, 641.01f, 3.1f);
                     }
                 }
             }
