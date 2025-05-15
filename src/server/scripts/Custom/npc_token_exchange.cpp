@@ -30,7 +30,7 @@
 #define GOSSIP_HELLO_TSWAP10  "Exchange 5K honor for 1 Mini Token"
 #define GOSSIP_HELLO_TSWAP12  "Exchange 75K honor for 100 Arena Points."
 #define GOSSIP_HELLO_TSWAP13  "Exchange 10 MGA Mini Tokens for summon Aaron item."
-#define GOSSIP_HELLO_TSWAP13  "Exchange 10 MGA Mini Tokens for summon Mailbox item."
+#define GOSSIP_HELLO_TSWAP14  "Exchange 10 MGA Mini Tokens for summon Mailbox item."
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
