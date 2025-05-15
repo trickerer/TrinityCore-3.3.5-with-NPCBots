@@ -126,7 +126,7 @@ public:
                     }
                     else
                     {
-                        player->SendEquipError(msg, NULL, NULL);
+                        player->SendEquipError(msg, nullptr, nullptr);
                     }
                 }
                 else
@@ -174,7 +174,7 @@ public:
                     }
                     else
                     {
-                        player->SendEquipError(msg, NULL, NULL);
+                        player->SendEquipError(msg, nullptr, nullptr);
                     }
                 }
                 else
@@ -203,7 +203,7 @@ public:
                     }
                     else
                     {
-                        player->SendEquipError(msg, NULL, NULL);
+                        player->SendEquipError(msg, nullptr, nullptr);
                     }
                 }
                 else
@@ -314,6 +314,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
                 }
+                break;
             case 1014:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(18154, 10))
