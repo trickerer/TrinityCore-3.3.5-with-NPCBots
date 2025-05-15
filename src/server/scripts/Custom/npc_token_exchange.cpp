@@ -289,28 +289,30 @@ public:
                 {
                     if (player->HasItemCount(90001, 1))
                     {
-                        me->Yell(tokentext9, LANG_UNIVERSAL);
-                        return;
-                    }
-                    uint32 itemId = 90001;
-                    ItemPosCountVec dest;
-
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
-                    if (msg == EQUIP_ERR_OK)
-                    {
-                        Item* item = player->StoreNewItem(dest, itemId, false, 1);
-                        player->SendNewItem(item, 1, true, false);
-                        player->DestroyItemCount(18154, 10, true);
-                        me->Say(tokentext8, LANG_UNIVERSAL);
+                        me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                     }
                     else
                     {
-                        player->SendEquipError(msg, NULL, NULL);
+                        uint32 itemId = 90001;
+                        ItemPosCountVec dest;
+
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            Item* item = player->StoreNewItem(dest, itemId, false, Item::GenerateItemRandomPropertyId(itemId));
+                            player->SendNewItem(item, 1, true, false);
+                            player->DestroyItemCount(18154, 10, true);
+                            me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                        }
+                        else
+                        {
+                            player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
+                        }
                     }
                 }
                 else
                 {
-                    me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
                 }
             case 1014:
                 CloseGossipMenuFor(player);
@@ -318,28 +320,30 @@ public:
                 {
                     if (player->HasItemCount(90002, 1))
                     {
-                        me->Yell(tokentext9, LANG_UNIVERSAL);
-                        return;
-                    }
-                    uint32 itemId = 90002;
-                    ItemPosCountVec dest;
-
-                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
-                    if (msg == EQUIP_ERR_OK)
-                    {
-                        Item* item = player->StoreNewItem(dest, itemId, false, 1);
-                        player->SendNewItem(item, 1, true, false);
-                        player->DestroyItemCount(18154, 10, true);
-                        me->Say(tokentext8, LANG_UNIVERSAL);
+                        me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                     }
                     else
                     {
-                        player->SendEquipError(msg, NULL, NULL);
+                        uint32 itemId = 90002;
+                        ItemPosCountVec dest;
+
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            Item* item = player->StoreNewItem(dest, itemId, false, Item::GenerateItemRandomPropertyId(itemId));
+                            player->SendNewItem(item, 1, true, false);
+                            player->DestroyItemCount(18154, 10, true);
+                            me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                        }
+                        else
+                        {
+                            player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
+                        }
                     }
                 }
                 else
                 {
-                    me->Yell(tokentext2, LANG_UNIVERSAL);
+                    me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
                 }
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 9999)
