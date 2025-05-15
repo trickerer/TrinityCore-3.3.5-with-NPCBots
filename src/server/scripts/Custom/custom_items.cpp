@@ -105,6 +105,7 @@ public:
         GameObject* mailbox = new GameObject();
         if (!mailbox->Create(ObjectGuid(HighGuid::GameObject, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
         {
+            player->Yell("NO MAILBOX MADE!", LANG_UNIVERSAL);
             TC_LOG_INFO("player.hooks", "Failed to create mailbox GO with entry %u", mailboxId);
             delete mailbox;
             return false;
