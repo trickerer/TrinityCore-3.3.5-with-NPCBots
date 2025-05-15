@@ -290,7 +290,7 @@ public:
                     if (player->HasItemCount(90001, 1))
                     {
                         me->Yell(tokentext9, LANG_UNIVERSAL);
-                        break;
+                        return;
                     }
                     uint32 itemId = 90001;
                     ItemPosCountVec dest;
@@ -319,7 +319,7 @@ public:
                     if (player->HasItemCount(90002, 1))
                     {
                         me->Yell(tokentext9, LANG_UNIVERSAL);
-                        break;
+                        return;
                     }
                     uint32 itemId = 90002;
                     ItemPosCountVec dest;
