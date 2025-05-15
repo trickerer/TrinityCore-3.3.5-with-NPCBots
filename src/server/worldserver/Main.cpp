@@ -62,6 +62,7 @@
 #include <boost/program_options.hpp>
 #include <csignal>
 #include <iostream>
+#include <Poco/Net/SSLManager.h>
 
 using namespace boost::program_options;
 namespace fs = boost::filesystem;
