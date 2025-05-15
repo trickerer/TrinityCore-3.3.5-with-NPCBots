@@ -30,6 +30,7 @@
 #define GOSSIP_HELLO_TSWAP10  "Exchange 5K honor for 1 Mini Token"
 #define GOSSIP_HELLO_TSWAP12  "Exchange 75K honor for 100 Arena Points."
 #define GOSSIP_HELLO_TSWAP13  "Exchange 10 MGA Mini Tokens for summon Aaron item."
+#define GOSSIP_HELLO_TSWAP13  "Exchange 10 MGA Mini Tokens for summon Mailbox item."
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
@@ -80,6 +81,8 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP12, GOSSIP_SENDER_MAIN, 1012);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP13, GOSSIP_SENDER_MAIN, 1013);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP14, GOSSIP_SENDER_MAIN, 1014);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             
 			
@@ -283,6 +286,30 @@ public:
                 if (player->HasItemCount(18154, 10))
                 {
                     uint32 itemId = 90001;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, false, 10);
+                        player->SendNewItem(item, 10, true, false);
+                        player->DestroyItemCount(18154, 10, true);
+                        me->Say(tokentext6, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext2, LANG_UNIVERSAL);
+                }
+            case 1014:
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(18154, 10))
+                {
+                    uint32 itemId = 90002;
                     ItemPosCountVec dest;
 
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
