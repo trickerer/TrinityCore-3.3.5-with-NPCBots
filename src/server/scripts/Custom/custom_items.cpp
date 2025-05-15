@@ -120,7 +120,7 @@ public:
         if (!mailbox->Create(ObjectGuid(HIGHGUID_GAMEOBJECT, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
         {
             delete mailbox;
-            player->SendBroadcastMessage("Failed to create mailbox GameObject.");
+            //player->SendBroadcastMessage("Failed to create mailbox GameObject.");
             return false;
         }
 
