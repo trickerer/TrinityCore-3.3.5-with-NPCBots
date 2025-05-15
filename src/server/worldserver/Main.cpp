@@ -128,6 +128,7 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, f
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
+    Poco::Net::initializeSSL();
     Trinity::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
     signal(SIGABRT, &Trinity::AbortHandler);
 
@@ -429,6 +430,8 @@ extern int main(int argc, char** argv)
     // 0 - normal shutdown
     // 1 - shutdown at error
     // 2 - restart command used, this code can be used by restarter for restart Trinityd
+    
+    Poco::Net::uninitializeSSL();
 
     return World::GetExitCode();
 }
