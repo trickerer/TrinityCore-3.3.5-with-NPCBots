@@ -83,60 +83,62 @@ public:
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
         uint64 guid = player->GetGUID();
-        //player->Yell("ITEM USED!", LANG_UNIVERSAL);
 
-        // Implement cooldown logic to prevent abuse (30 minutes cooldown)
+        // Cooldown check (30 minutes)
         uint32 now = time(nullptr);
-        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800) // 1800 seconds = 30 minutes
+        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800)
         {
             uint32 remaining = 1800 - (now - lastUsedTime2[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
-            
+
             player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
-            return false;  // Do not continue if item is on cooldown
+            return false;
         }
 
-        lastUsedTime2[guid] = now; // Update last used time
+        lastUsedTime2[guid] = now;
 
-        // Spawn the temporary mailbox
         float x, y, z;
-        player->GetPosition(x, y, z); // Get player's current position
+        player->GetPosition(x, y, z);
 
-        // Position mailbox in front of the player (2 yards)
         float orientation = player->GetOrientation();
-        float distance = 2.0f; // 2 yards in front
+        float distance = 2.0f;
 
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
         Position pos(spawnX, spawnY, z, orientation);
 
-        // Create the GameObject (mailbox)
-        uint32 mailboxId = 144112; // Replace with the correct GameObject ID for the mailbox
+        uint32 mailboxId = 144112; // Use correct mailbox GO ID here
         uint32 phaseMask = player->GetPhaseMask();
-        QuaternionData rotation; // Adjust rotation as necessary
-
-        uint32 animProgress = 0; // Adjust animation progress if needed
-        GOState goState = GOState::GO_STATE_READY;  // Set GameObject state to active
+        QuaternionData rotation; // default rotation (no rotation)
 
         GameObject* mailbox = new GameObject();
-        if (mailbox->Create(ObjectGuid::LowType(0), mailboxId, player->GetMap(), phaseMask, pos, rotation, animProgress, goState))
-        {
-            mailbox->AddToWorld();
-            player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
 
-            player->m_Events.AddEvent(
-                [mailbox]()
-                {
-                    //if (mailbox->IsInWorld())
-                    //    mailbox->RemoveFromWorld();
-                    // delete mailbox;  // REMOVE this line to avoid crash
-                },
-                std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS)
-            );
+        // Generate a unique low GUID for this GO on the map
+        uint32 lowGuid = player->GetMap()->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
+
+        if (!mailbox->Create(ObjectGuid(HIGHGUID_GAMEOBJECT, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
+        {
+            delete mailbox;
+            player->SendBroadcastMessage("Failed to create mailbox GameObject.");
+            return false;
         }
 
-        return true;  // Item use was successful
+        // Add the mailbox safely to the map (preferred over AddToWorld)
+        player->GetMap()->AddToMap(mailbox);
+
+        player->Yell("A temporary mailbox has been summoned for you. It will disappear in 5 minutes.", LANG_UNIVERSAL);
+
+        // Schedule mailbox removal after 5 minutes
+        player->m_Events.AddEvent([mailbox]()
+        {
+            if (mailbox->IsInWorld())
+                mailbox->RemoveFromWorld();
+            // Do NOT delete mailbox here; server will clean it up safely
+        },
+        std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS));
+
+        return true;
     }
 };
 
