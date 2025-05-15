@@ -133,6 +133,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1002: // close and cast spell on player and insuly
@@ -146,6 +147,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1003:
@@ -159,6 +161,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1004:
@@ -184,6 +187,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1005:
@@ -214,6 +218,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1007:
@@ -227,6 +232,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1008:
@@ -240,6 +246,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1009:
@@ -276,6 +283,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1012:
@@ -290,6 +298,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1013:
@@ -325,6 +334,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
                 break;
             case 1014:
@@ -360,6 +370,7 @@ public:
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
                 }
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 9999)
