@@ -79,12 +79,8 @@ class item_temp_mailbox : public ItemScript
 public:
     item_temp_mailbox() : ItemScript("item_temp_mailbox") { }
 
-    std::unordered_map<uint64, uint32> lastUsedTime2;
-
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
-        // cooldown logic here...
-
         float x, y, z;
         player->GetPosition(x, y, z);
 
@@ -95,39 +91,15 @@ public:
         float spawnY = y + distance * std::sin(orientation);
 
         uint32 mailboxId = 144113;
-        uint32 phaseMask = PHASEMASK_NORMAL;
-        QuaternionData rotation;
-        uint32 lowGuid = player->GetMap()->GenerateLowGuid<HighGuid::GameObject>();
 
-        Position pos(spawnX, spawnY, z + 0.5f, orientation); // raise a little just in case
-        GameObject* mailbox = new GameObject();
-
-        if (!mailbox->Create(ObjectGuid(HighGuid::GameObject, lowGuid), mailboxId, player->GetMap(), phaseMask, pos, rotation, 0, GOState::GO_STATE_READY))
+        if (GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z + 0.5f, orientation, 0, 0, 0, 0, 5 * MINUTE))
         {
-            player->Yell("NO MAILBOX MADE!", LANG_UNIVERSAL);
-            TC_LOG_INFO("player.hooks", "Failed to create mailbox GO with entry %u", mailboxId);
-            delete mailbox;
-            return false;
-        }
-
-        mailbox->AddToWorld();
-
-        if (!mailbox->IsInWorld())
-        {
-            player->Yell("MAILBOX NOT IN WORLD!", LANG_UNIVERSAL);
-            TC_LOG_INFO("player.hooks", "Mailbox created but not added to world!");
+            player->Yell("Mailbox summoned!", LANG_UNIVERSAL);
         }
         else
         {
-            player->Yell("MAILBOX CREATED!", LANG_UNIVERSAL);
-            TC_LOG_INFO("player.hooks", "Mailbox successfully spawned with GUID %s", mailbox->GetGUID().ToString().c_str());
+            player->Yell("Failed to summon mailbox!", LANG_UNIVERSAL);
         }
-        player->m_Events.AddEvent([mailbox]()
-        {
-            if (mailbox->IsInWorld())
-                mailbox->RemoveFromWorld();
-            delete mailbox;
-        }, std::chrono::milliseconds(5 * MINUTE * IN_MILLISECONDS));
 
         return true;
     }
