@@ -316,7 +316,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(18154, 10))
                 {
-                    if (player->HasItemCount(90001, 1))
+                    if (player->HasItemCount(90002, 1))
                     {
                         me->Yell(tokentext9, LANG_UNIVERSAL);
                         break;
