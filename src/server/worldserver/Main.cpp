@@ -433,7 +433,7 @@ extern int main(int argc, char** argv)
     // 2 - restart command used, this code can be used by restarter for restart Trinityd
     
     Poco::Net::uninitializeSSL();
-    Poco::Net::SSLManager::shutdown();
+    Poco::Net::SSLManager::instance().shutdown();
     return World::GetExitCode();
 }
 
