@@ -20,7 +20,7 @@
 #define tokentext8 "Exchange Complete." //??
 #define tokentext9 "You own this, dont be silly.." //??
 
-#define GOSSIP_HELLO_TSWAP1  "Create 1 MGA Token (Requies 50 Mini Tokens)"
+#define GOSSIP_HELLO_TSWAP1  "Create 1 MGA Token (Cost 50 Mini Tokens)"
 #define GOSSIP_HELLO_TSWAP2  "Exchange 3 WSG Marks for 50 Honor"
 #define GOSSIP_HELLO_TSWAP3  "Exchange 2 AB Marks for 50 Honor"
 #define GOSSIP_HELLO_TSWAP4  "Exchange 1 AV Mark for 50 Honor" 
@@ -31,9 +31,9 @@
 #define GOSSIP_HELLO_TSWAP8  "How do I earn Mini Tokens?"
 #define GOSSIP_HELLO_TSWAP10  "Exchange 5K honor for 1 Mini Token"
 #define GOSSIP_HELLO_TSWAP12  "Exchange 75K honor for 100 Arena Points."
-#define GOSSIP_HELLO_TSWAP13  "Exchange 10 MGA Mini Tokens for summon Aaron item."
-#define GOSSIP_HELLO_TSWAP14  "Exchange 10 MGA Mini Tokens for summon Mailbox item."
-#define GOSSIP_HELLO_TSWAP15  "Exchange 10 MGA Mini Tokens for summon Guild Vault item."
+#define GOSSIP_HELLO_TSWAP13  "Summon Aaron item. (cost 10 mini tokens)"
+#define GOSSIP_HELLO_TSWAP14  "Summon Mailbox item. (cost 10 mini tokens)"
+#define GOSSIP_HELLO_TSWAP15  "Summon Guild Vault item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
