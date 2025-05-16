@@ -62,7 +62,7 @@ public:
             InitGossipMenuFor(player, NPC_GOSSIP_MENU);
 			
 			QueryResult result;
-            result = WorldDatabase.PQuery("SELECT * FROM `guild_transfer` WHERE `name1` = '%s' AND `duplicate` = '0' AND `status` = '0'", std::string(player->GetName()).c_str());
+            result = WorldDatabase.PQuery("SELECT * FROM `guild_transfer` WHERE `name1` = '{}' AND `duplicate` = '0' AND `status` = '0'", std::string(player->GetName()).c_str());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -87,9 +87,9 @@ public:
             if (result2)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-				AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 //if (player->GetGuild())
                 //{
                 //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
@@ -98,9 +98,9 @@ public:
             else if (player->IsGameMaster())
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-                AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 //if (player->GetGuild())
                 //{
                 //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
