@@ -161,14 +161,14 @@ public:
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
 
-        uint32 Guild VaultId = 187299;
+        uint32 GuildVaultId = 187299;
 
         QuaternionData rotation; // default zero rotation
 
         Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
 
         // Summon the Guild Vault using correct parameters
-        GameObject* go = player->SummonGameObject(Guild VaultId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+        GameObject* go = player->SummonGameObject(GuildVaultId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
 
         if (go)
         {
