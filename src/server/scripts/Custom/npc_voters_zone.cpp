@@ -6,7 +6,6 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
-#include "Creature.h"
 
 #define GOSSIP_HELLO_TP1  "Send me to the MGA Voters Area!"
 #define GOSSIP_HELLO_TP3  "Nevermind - Bye!"
@@ -57,7 +56,7 @@ public:
             me->Whisper(message, LANG_UNIVERSAL, player);
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) //override
+        bool OnGossipHello(Player* player) override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             InitGossipMenuFor(player, NPC_GOSSIP_MENU);
@@ -89,15 +88,17 @@ public:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                
             }
             else if (player->IsGameMaster())
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                
             }
             else
             {
@@ -124,7 +125,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) //override
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
@@ -194,7 +195,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 1005) // "Open Bank"
             {
                 CloseGossipMenuFor(player);
-                player->GetSession()->SendShowBank(creature->GetGUID()); // 
+                player->GetSession()->SendShowBank(me->GetGUID()); // 
                 return true;
             }
 
