@@ -198,18 +198,18 @@ public:
 				player->SetPvP(false);
 				return true;
 			}
-            if (action == GOSSIP_ACTION_INFO_DEF + 1004)
-			{
-				CloseGossipMenuFor(player);
-                player->GetSession()->SendShowGuildBank(creature->GetGUID());
-				return true;
-			}
-             if (action == GOSSIP_ACTION_INFO_DEF + 1005)
-			{
-				CloseGossipMenuFor(player);
-                player->GetSession()->SendShowBank(creature->GetGUID());
-				return true;
-			}
+            if (action == GOSSIP_ACTION_INFO_DEF + 1004) // "Open Bank"
+            {
+                CloseGossipMenuFor(player);
+                player->GetSession()->SendShowBank(creature->GetGUID()); // ✔ normal bank
+                return true;
+            }
+            if (action == GOSSIP_ACTION_INFO_DEF + 1005) // "Open Guild Bank"
+            {
+                CloseGossipMenuFor(player);
+                player->GetSession()->SendShowGuildBank(creature->GetGUID()); // ✔ guild bank
+                return true;
+            }
 
             CloseGossipMenuFor(player);
 
