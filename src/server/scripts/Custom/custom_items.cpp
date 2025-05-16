@@ -161,22 +161,22 @@ public:
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
 
-        uint32 GuildVaultId = 187299;
+        uint32 mailboxId = 144113;
 
         QuaternionData rotation; // default zero rotation
 
         Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
 
-        // Summon the Guild Vault using correct parameters
-        GameObject* go = player->SummonGameObject(GuildVaultId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+        // Summon the mailbox using correct parameters
+        GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
 
         if (go)
         {
-            player->Yell("Guild Vault summoned!", LANG_UNIVERSAL);
+            player->Yell("Mailbox summoned!", LANG_UNIVERSAL);
         }
         else
         {
-            player->Yell("Failed to summon Guild Vault!", LANG_UNIVERSAL);
+            player->Yell("Failed to summon mailbox!", LANG_UNIVERSAL);
         }
 
         return true;
