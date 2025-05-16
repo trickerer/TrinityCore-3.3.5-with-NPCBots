@@ -56,7 +56,7 @@ public:
             me->Whisper(message, LANG_UNIVERSAL, player);
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
+        bool OnGossipHello(Player* player, Creature* creature) //override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             InitGossipMenuFor(player, NPC_GOSSIP_MENU);
@@ -131,7 +131,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) override
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) //override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
