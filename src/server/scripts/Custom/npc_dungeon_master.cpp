@@ -50,7 +50,7 @@ public:
         bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Coming Soon!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Stormwind Vault 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
             
             
 
@@ -68,9 +68,10 @@ public:
            
             if (action == GOSSIP_ACTION_INFO_DEF + 1000)
             {
-                me->Say(player->GetName() + "Coming Soon!", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
-                return true;
+                player->TeleportTo(0, -8633.600586f, 594.303101f, 95.690689f, 1.487484f);
+                player->SetPvP(false);
+                return false;
             }
 
             if (action == GOSSIP_ACTION_INFO_DEF + 2000)
