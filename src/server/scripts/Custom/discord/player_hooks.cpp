@@ -78,6 +78,7 @@ private:
         }
 
         std::string name = player->GetName();
+        uint8 level = player->getLevel(); 
         std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";  //🛡️=GM / 👤=Player 
         std::string status = loggingIn ? "🟢 Logged In" : "🛑 Logged Out";
 
