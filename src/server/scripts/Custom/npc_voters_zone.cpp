@@ -89,6 +89,7 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 
             }
@@ -97,6 +98,7 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 
             }
@@ -196,6 +198,12 @@ public:
             {
                 CloseGossipMenuFor(player);
                 player->GetSession()->SendShowBank(me->GetGUID()); // 
+                return true;
+            }
+            
+            if (action == GOSSIP_ACTION_INFO_DEF + 9999)
+            {
+                CloseGossipMenuFor(player);
                 return true;
             }
 
