@@ -59,7 +59,7 @@ public:
         bool OnGossipHello(Player* player, Creature* creature) //override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
-            InitGossipMenuFor(player, NPC_GOSSIP_MENU);
+            InitGossipMenuFor(player, 0);
 			
 			QueryResult result;
             result = WorldDatabase.PQuery("SELECT * FROM `guild_transfer` WHERE `name1` = '{}' AND `duplicate` = '0' AND `status` = '0'", std::string(player->GetName()).c_str());
