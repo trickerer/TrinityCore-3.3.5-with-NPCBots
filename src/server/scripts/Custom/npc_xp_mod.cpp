@@ -52,30 +52,30 @@ public:
         {
             WorldSession* session = player->GetSession();
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Select Your XP Boost Option!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             
             {
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Set XP To Normal - Deletes Item!! * WARNING *  BANK IT????", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
             
             if (!player->HasItemCount(itemId, 1) && !player->HasItemCount(itemId2, 1) && !player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 2x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
 
             if (!player->HasItemCount(itemId, 1) && !player->HasItemCount(itemId2, 1) & !player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 3x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
 
             if (!player->HasItemCount(itemId, 1) && !player->HasItemCount(itemId2, 1) && !player->HasItemCount(itemId4, 1))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "BOOST XP TO 10x", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
