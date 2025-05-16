@@ -79,7 +79,7 @@ public:
             }
             else
             {
-                result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` > '{}' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
+                result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`={} AND `time` > {} LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
             }
             
             //result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
