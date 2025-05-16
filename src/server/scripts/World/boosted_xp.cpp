@@ -19,6 +19,7 @@
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
+#include "Item.h"
 
 namespace
 {
@@ -73,12 +74,12 @@ public:
         return CanCarryOnlyOneXPItem(player, newItem->GetEntry());
     }
 
-    bool CanTakeItem(Player* player, Item* item) override
+    bool CanTakeItem(Player* player, Item* item) //override
     {
         return CanCarryOnlyOneXPItem(player, item->GetEntry());
     }
 
-    void OnLogin(Player* player) override
+    void OnLogin(Player* player) //override
     {
         RemoveExtraXPItems(player);
     }
