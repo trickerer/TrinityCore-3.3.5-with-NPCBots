@@ -20,6 +20,7 @@
 #include "Util.h"
 #include "World.h"
 #include "Item.h"
+#include "ChatHandler.h"
 
 namespace
 {
@@ -39,7 +40,7 @@ class xp_boost_PlayerScript : public PlayerScript
 public:
     xp_boost_PlayerScript() : PlayerScript("xp_boost_PlayerScript") { }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* /*unit*/) override
+    void OnGiveXP(Player* player, uint32& amount, Unit* /*unit*/) //override
     {
         if (IsXPBoostActive())
         {
