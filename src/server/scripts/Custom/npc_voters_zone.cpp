@@ -6,6 +6,7 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
+#include "Creature.h"
 
 #define GOSSIP_HELLO_TP1  "Send me to the MGA Voters Area!"
 #define GOSSIP_HELLO_TP3  "Nevermind - Bye!"
@@ -56,7 +57,7 @@ public:
             me->Whisper(message, LANG_UNIVERSAL, player);
         }
 
-        bool OnGossipHello(Player* player) override
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             InitGossipMenuFor(player, NPC_GOSSIP_MENU);
@@ -123,7 +124,7 @@ public:
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) //override
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*menuId*/, uint32 gossipListId) override
         {
             uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
             ClearGossipMenuFor(player);
