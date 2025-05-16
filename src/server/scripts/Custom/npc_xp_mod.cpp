@@ -56,7 +56,7 @@ public:
             if (player->HasItemCount(itemId, 1) || player->HasItemCount(itemId2, 1) || player->HasItemCount(itemId4, 1))
             
             {
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Set XP To Normal - Deletes Item!! * WARNING *  BANK IT????", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "To Change XP Rates, Bank current item and talk to me again!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             }
             
