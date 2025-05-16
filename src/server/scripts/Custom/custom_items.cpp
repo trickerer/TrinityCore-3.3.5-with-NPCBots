@@ -137,6 +137,13 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
+        if (player->GetGuild())
+        {
+            player->Yell("LOL IM NOT IN A GUILD", LANG_UNIVERSAL);
+            return false;
+        }
+            
+        
         uint64 guid = player->GetGUID();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
