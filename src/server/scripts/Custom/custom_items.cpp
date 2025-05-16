@@ -10,7 +10,6 @@
 #include "GameObject.h"
 #include "ObjectGuid.h"
 
-
 // AARON
 class item_aaron_summon : public ItemScript
 {
@@ -129,6 +128,61 @@ public:
     }
 };
 
+class item_temp_gvault : public ItemScript
+{
+public:
+    item_temp_gvault() : ItemScript("item_temp_gvault") { }
+    
+    std::unordered_map<uint64, uint32> lastUsedTime3;
+
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
+    {
+        uint64 guid = player->GetGUID();
+        // Implement cooldown logic to prevent abuse (30 minutes cooldown)
+        uint32 now = time(nullptr);
+        if (lastUsedTime3.count(guid) && now - lastUsedTime3[guid] < 1800) // 1800 seconds = 30 minutes
+        {
+            uint32 remaining = 1800 - (now - lastUsedTime3[guid]);
+            uint32 remainingMinutes = remaining / 60;
+            uint32 remainingSeconds = remaining % 60;
+            
+            player->GetSession()->SendNotification("You must wait %u minute(s) and %u second(s) to use this item again.", remainingMinutes, remainingSeconds);
+            return false;  // Do not continue if item is on cooldown
+        }
+        
+        lastUsedTime3[guid] = now; // Update last used time
+        
+        float x, y, z;
+        player->GetPosition(x, y, z);
+
+        float orientation = player->GetOrientation();
+        float distance = 2.0f;
+
+        float spawnX = x + distance * std::cos(orientation);
+        float spawnY = y + distance * std::sin(orientation);
+
+        uint32 Guild VaultId = 187299;
+
+        QuaternionData rotation; // default zero rotation
+
+        Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
+
+        // Summon the Guild Vault using correct parameters
+        GameObject* go = player->SummonGameObject(Guild VaultId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+
+        if (go)
+        {
+            player->Yell("Guild Vault summoned!", LANG_UNIVERSAL);
+        }
+        else
+        {
+            player->Yell("Failed to summon Guild Vault!", LANG_UNIVERSAL);
+        }
+
+        return true;
+    }
+};
+
 // Register scripts
 void AddSC_item_aaron_summon()
 {
@@ -138,4 +192,9 @@ void AddSC_item_aaron_summon()
 void AddSC_item_temp_mailbox()
 {
     new item_temp_mailbox(); // Register the temporary mailbox item script
+}
+
+void AddSC_item_temp_gvault()
+{
+    new item_temp_gvault(); // Register the temporary gvault item script
 }
