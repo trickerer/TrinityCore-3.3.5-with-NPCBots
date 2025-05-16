@@ -71,12 +71,12 @@ public:
         {
             //me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Level Rewards", GOSSIP_SENDER_MAIN, 1000);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Gold Rewards", GOSSIP_SENDER_MAIN, 1300);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             //AddGossipItemFor(player,  GOSSIP_ICON_INTERACT_1, "Armor Rewards"    , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1400);
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Reputation Rewards", GOSSIP_SENDER_MAIN, 1500);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
 			
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye", GOSSIP_SENDER_MAIN, 2);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -98,12 +98,12 @@ public:
             {
                 //me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                 AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Level Rewards", GOSSIP_SENDER_MAIN, 1000);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Gold Rewards", GOSSIP_SENDER_MAIN, 1300);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 //AddGossipItemFor(player,  GOSSIP_ICON_INTERACT_1, "Armor Rewards"    , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1400);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Reputation Rewards", GOSSIP_SENDER_MAIN, 1500);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
 				
 				AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye", GOSSIP_SENDER_MAIN, 2);
 
@@ -133,7 +133,7 @@ public:
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "You are too high level to boost yourself max is level 77", GOSSIP_SENDER_MAIN, 1);
                 }
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "[Back]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
 				SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
@@ -197,9 +197,9 @@ public:
             case 1300: // Gief Gawld Menu
             {
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "5000 Gold at the cost of 1 MGA Token", GOSSIP_SENDER_MAIN, 1301);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "12500 Gold at the cost of 2 MGA Tokens", GOSSIP_SENDER_MAIN, 1302);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 //AddGossipItemFor(player,  GOSSIP_ICON_VENDOR, "2500 Gold at the cost of 4 MGA Tokens"    , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1303);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "[Back]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -260,13 +260,13 @@ public:
             case 1500:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Aldor Reputation Tokens", GOSSIP_SENDER_MAIN, 1501);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Scryers Reputation Tokens", GOSSIP_SENDER_MAIN, 1502);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Honor Hold Reputation Tokens", GOSSIP_SENDER_MAIN, 1550);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Thrallmar Reputation Tokens", GOSSIP_SENDER_MAIN, 1551);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "[Back]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
 				SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
@@ -276,13 +276,13 @@ public:
             case 1501: // aldor
             {
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "1 Mark of Sargeras at the cost of 1 Mini Token", GOSSIP_SENDER_MAIN, 1510);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "10 Marks of Sargeras at the cost of 10 Mini Tokens", GOSSIP_SENDER_MAIN, 1511);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "1 Fel Armament at the cost of 4 Mini Tokens", GOSSIP_SENDER_MAIN, 1512);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "10 Fel Armament at the cost of 40 Mini Tokens", GOSSIP_SENDER_MAIN, 1513);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Back]", GOSSIP_SENDER_MAIN, 1500);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Main Menu]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -293,13 +293,13 @@ public:
             case 1502: // scryers
             {
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "1 Sunfury Signet at the cost of 1 Mini Token", GOSSIP_SENDER_MAIN, 1514);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "10 Sunfury Signets at the cost of 10 Mini Tokens", GOSSIP_SENDER_MAIN, 1515);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "1 Arcane Tome at the cost of 4 Mini Tokens", GOSSIP_SENDER_MAIN, 1516);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "10 Arcane Tomes at the cost of 40 Mini Tokens", GOSSIP_SENDER_MAIN, 1517);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Back]", GOSSIP_SENDER_MAIN, 1500);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Main Menu]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -509,7 +509,7 @@ public:
             case 1550:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "5 Marks of Honor Hold at the cost of 1 MGA Token", GOSSIP_SENDER_MAIN, 1552);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Back]", GOSSIP_SENDER_MAIN, 1500);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Main Menu]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -520,7 +520,7 @@ public:
             case 1551:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "5 Marks of Thrallmar at the cost of 1 MGA Token", GOSSIP_SENDER_MAIN, 1553);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "---------------------------------------------", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Back]", GOSSIP_SENDER_MAIN, 1500);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "[Main Menu]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
