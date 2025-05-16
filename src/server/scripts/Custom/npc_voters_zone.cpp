@@ -180,7 +180,8 @@ public:
 			if (action == GOSSIP_ACTION_INFO_DEF + 1003)
 			{
 				CloseGossipMenuFor(player);
-				player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
+				//player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
 				player->SetPvP(false);
 				return true;
 			}
