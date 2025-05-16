@@ -43,15 +43,15 @@ public:
         if (IsXPBoostActive())
         {
             
-            if ((player->HasItemCount(461144, 1)) && (!player->HasItemCount(461141, 1) && (!player->HasItemCount(461142, 1))
+            if ((player->HasItemCount(461144, 1)) && (!player->HasItemCount(461141, 1)) && (!player->HasItemCount(461142, 1)))
             {
                 amount *= 2;
             }
-            if ((player->HasItemCount(461141, 1)) && (!player->HasItemCount(461142, 1) && (!player->HasItemCount(461144, 1))  
+            if ((player->HasItemCount(461141, 1)) && (!player->HasItemCount(461142, 1)) && (!player->HasItemCount(461144, 1)))  
             {
                 amount *= 3;
             }
-            if ((player->HasItemCount(461142, 1)) && (!player->HasItemCount(461144, 1) && (!player->HasItemCount(461141, 1)) 
+            if ((player->HasItemCount(461142, 1)) && (!player->HasItemCount(461144, 1)) && (!player->HasItemCount(461141, 1))) 
             {
                 amount *= 10;
             }
