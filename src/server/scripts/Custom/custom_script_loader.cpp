@@ -37,6 +37,7 @@ void AddSC_DiscordWebhookPlayerActivity();
 void AddBattlegroundDiscordHookScripts();
 void AddSC_item_aaron_summon();
 void AddSC_item_temp_mailbox();
+void AddSC_item_temp_gvault();
  
 void AddCustomScripts()
 {
@@ -56,4 +57,5 @@ void AddCustomScripts()
 	AddBattlegroundDiscordHookScripts();
     AddSC_item_aaron_summon();
     AddSC_item_temp_mailbox();
+    AddSC_item_temp_gvault();
 }
