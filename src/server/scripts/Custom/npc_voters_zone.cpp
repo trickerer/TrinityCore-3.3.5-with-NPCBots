@@ -12,6 +12,9 @@
 #define GOSSIP_HELLO_TP2  "IMPORT DETECTED!!! - Teleport me to the voters area."
 #define GOSSIP_HELLO_TP4  "Send Me Home!"
 
+#define GOSSIP_OPTION_OPEN_BANK "Open Bank"
+#define GOSSIP_OPTION_OPEN_GBANK "Open Guild Bank"
+
 #define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours on this account, if you wish to use me please go and vote and I will send you to a Very Very nice location."
 
 /*
@@ -86,12 +89,22 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                if (player->GetGuild())
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                }
             }
             else if (player->IsGameMaster())
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                if (player->GetGuild())
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                }
             }
             else
             {
@@ -183,6 +196,18 @@ public:
                 player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
 				//player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
 				player->SetPvP(false);
+				return true;
+			}
+            if (action == GOSSIP_ACTION_INFO_DEF + 1004)
+			{
+				CloseGossipMenuFor(player);
+                player->GetSession()->SendShowGuildBank(creature->GetGUID());
+				return true;
+			}
+             if (action == GOSSIP_ACTION_INFO_DEF + 1005)
+			{
+				CloseGossipMenuFor(player);
+                player->GetSession()->SendShowBank(creature->GetGUID());
 				return true;
 			}
 
