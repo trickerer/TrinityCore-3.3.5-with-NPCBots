@@ -89,10 +89,10 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
                 //if (player->GetGuild())
                 //{
-                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 //}
             }
             else if (player->IsGameMaster())
@@ -100,10 +100,10 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
                 //if (player->GetGuild())
                 //{
-                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 //}
             }
             else
