@@ -56,7 +56,7 @@ public:
             me->Whisper(message, LANG_UNIVERSAL, player);
         }
 
-        bool OnGossipHello(Player* player, Creature* creature) //override
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             InitGossipMenuFor(player, NPC_GOSSIP_MENU);
