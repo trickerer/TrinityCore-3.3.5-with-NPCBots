@@ -40,7 +40,7 @@ class xp_boost_PlayerScript : public PlayerScript
 public:
     xp_boost_PlayerScript() : PlayerScript("xp_boost_PlayerScript") { }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* /*unit*/) //override
+    void OnGiveXP(Player* player, uint32& amount, Unit* /*unit*/) override
     {
         if (IsXPBoostActive())
         {
@@ -70,7 +70,7 @@ class xp_boost_ItemRestrict : public PlayerScript
 public:
     xp_boost_ItemRestrict() : PlayerScript("xp_boost_ItemRestrict") { }
 
-    bool CanEquipItem(Player* player, uint8 /*slot*/, uint16 /*entry*/, Item* newItem, bool /*swap*/, Item* /*oldItem*/) override
+    bool CanEquipItem(Player* player, uint8 /*slot*/, uint16 /*entry*/, Item* newItem, bool /*swap*/, Item* /*oldItem*/) //override
     {
         return CanCarryOnlyOneXPItem(player, newItem->GetEntry());
     }
