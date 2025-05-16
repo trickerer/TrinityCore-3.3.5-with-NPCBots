@@ -90,10 +90,10 @@ public:
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
-                if (player->GetGuild())
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
-                }
+                //if (player->GetGuild())
+                //{
+                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                //}
             }
             else if (player->IsGameMaster())
             {
@@ -101,10 +101,10 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_GBANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
-                if (player->GetGuild())
-                {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
-                }
+                //if (player->GetGuild())
+                //{
+                //    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1004);
+                //}
             }
             else
             {
@@ -204,12 +204,12 @@ public:
                 player->GetSession()->SendShowBank(creature->GetGUID()); // ✔ normal bank
                 return true;
             }
-            if (action == GOSSIP_ACTION_INFO_DEF + 1005) // "Open Guild Bank"
-            {
-                CloseGossipMenuFor(player);
-                player->GetSession()->SendShowGuildBank(creature->GetGUID()); // ✔ guild bank
-                return true;
-            }
+            //if (action == GOSSIP_ACTION_INFO_DEF + 1005) // "Open Guild Bank"
+            //{
+            //    CloseGossipMenuFor(player);
+            //    player->GetSession()->SendShowGuildBank(creature->GetGUID()); // ✔ guild bank
+            //    return true;
+            //}
 
             CloseGossipMenuFor(player);
 
