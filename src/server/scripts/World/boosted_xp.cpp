@@ -20,7 +20,7 @@
 #include "Util.h"
 #include "World.h"
 #include "Item.h"
-#include "ChatHandler.h"
+#include "Chat.h"
 
 namespace
 {
