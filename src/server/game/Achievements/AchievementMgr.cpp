@@ -1603,22 +1603,25 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         draft.SendMailTo(trans, GetPlayer(), MailSender(MAIL_CREATURE, reward->SenderCreatureId));
         CharacterDatabase.CommitTransaction(trans);
     }
+    sScriptMgr->OnAchievementEarned(m_player, achievement);
+    /*
     if (m_player)
     {
         //TC_LOG_INFO("achievement", "Calling OnAchievementEarned for player: {}", m_player->GetName());
         sScriptMgr->OnAchievementEarned(m_player, achievement);
 
-        // Add Discord webhook message here:
-        //std::string name = m_player->GetName();
-        //std::string achievementName = GetLocalizedAchievementName(achievement->ID);
+        //Add Discord webhook message here:
+        std::string name = m_player->GetName();
+        std::string achievementName = GetLocalizedAchievementName(achievement->ID);
 
-        //std::ostringstream messageStream;
+        std::ostringstream messageStream;
 
-        //std::string gmTag = m_player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
-        //messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
+        std::string gmTag = m_player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+        messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
-        //SendDiscordMessage(messageStream.str());
+        SendDiscordMessage(messageStream.str());
     }
+    */
 }
 
 
