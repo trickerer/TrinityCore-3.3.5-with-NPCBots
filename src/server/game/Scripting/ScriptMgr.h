@@ -1039,6 +1039,7 @@ class TC_GAME_API ScriptMgr
         void OnQuestStatusChange(Player* player, uint32 questId);
         void OnMovieComplete(Player* player, uint32 movieId);
         void OnPlayerRepop(Player* player);
+        void OnAchievementEarned(Player* player, AchievementEntry const* achievement);
 
     public: /* AccountScript */
 
