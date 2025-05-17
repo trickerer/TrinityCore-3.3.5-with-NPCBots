@@ -50,7 +50,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         std::string path = uri.getPathAndQuery();
         if (path.empty()) path = "/";
         
-        uint32 fakeplayers 1;
+        uint32 fakeplayers = 1;
         if (battlegroundName == "Warsong Gulch")
         {
             uint32 fakeplayers = 8;
