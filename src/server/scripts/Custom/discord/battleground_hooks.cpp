@@ -44,17 +44,53 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 {
     try
     {
+        std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
+        
         Poco::URI uri(webhookUrl);
         std::string path = uri.getPathAndQuery();
         if (path.empty()) path = "/";
+        
+        uint32 fakeplayers 1;
+        if (battlegroundName == "Warsong Gulch")
+        {
+            uint32 fakeplayers = 8;
+        }
+        
+        if (battlegroundName == "Arathi Basin")
+        {
+            uint32 fakeplayers = 10;
+        }
+        
+        if (battlegroundName == "Alterac Valley")
+        {
+            uint32 fakeplayers = 35;
+        }
+        
+        if (battlegroundName == "Eye of the Storm")
+        {
+            uint32 fakeplayers = 12;
+        }
+        
+        if (battlegroundName == "Strand of the Ancients")
+        {
+            uint32 fakeplayers = 12;
+        }
+        
+        if (battlegroundName == "Isle of Conquest")
+        {
+            uint32 fakeplayers = 35;
+        }
 
         Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
         std::stringstream content;
         content << "⚔️ **" << battlegroundName << " Started!**\n"
                 << "📊 **Bracket:** " << bracket << "\n"
-                << "👥 **Players:** " << alliancePlayers+8 << " Alliance vs " << hordePlayers+8 << " Horde";
+                << "👥 **Players:** " << alliancePlayers+fakeplayers << " Alliance vs " << hordePlayers+fakeplayers << " Horde";
 
         json->set("content", content.str());
+        
+        if (!avatarUrl.empty())
+            json->set("avatar_url", avatarUrl);
 
         std::stringstream payload;
         Poco::JSON::Stringifier::stringify(json, payload);
