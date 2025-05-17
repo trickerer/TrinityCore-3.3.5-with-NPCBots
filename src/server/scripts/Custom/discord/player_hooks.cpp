@@ -121,7 +121,14 @@ private:
         if (!achievement)
             return "Unknown Achievement";
 
-        return achievement->Title ? std::string(achievement->Title) : "Unnamed Achievement";
+        uint8 locale = sWorld->GetDefaultDbcLocale(); // e.g., 0 for enUS
+
+        if (achievement->Title[locale] && achievement->Title[locale][0] != '\0')
+            return std::string(achievement->Title[locale]);
+        else if (achievement->Title[0])
+            return std::string(achievement->Title[0]); // fallback to default locale
+
+        return "Unnamed Achievement";
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
