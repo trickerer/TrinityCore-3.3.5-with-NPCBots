@@ -36,15 +36,6 @@ public:
     void OnAchievementEarned(Player* player, AchievementEntry const* achievement) //override
     {
         
-        static std::string GetLocalizedAchievementName(uint32 id)
-        {
-            const AchievementEntry* achievement = sAchievementStore.LookupEntry(id);
-            if (!achievement)
-                return "Unknown Achievement";
-
-            return achievement->name[sWorld->GetDefaultDbcLocale()];
-        }
-        
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -120,6 +111,15 @@ private:
         TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
 
         SendDiscordWebhook(webhookUrl, messageStream.str());
+    }
+    
+    static std::string GetLocalizedAchievementName(uint32 id)
+    {
+        const AchievementEntry* achievement = sAchievementStore.LookupEntry(id);
+        if (!achievement)
+            return "Unknown Achievement";
+
+        return achievement->name[sWorld->GetDefaultDbcLocale()];
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
