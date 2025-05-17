@@ -116,22 +116,14 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
-        if (AchievementLocaleEntry const* loc = sAchievementLocaleStore.LookupEntry(id))
-        {
-            uint8 locale = sWorld->GetDefaultDbcLocale();
-            if (!loc->Name[locale].empty())
-                return loc->Name[locale];
-            else if (!loc->Name[0].empty())
-                return loc->Name[0];
-        }
-        
-        if (AchievementEntry const* achievement = sAchievementStore.LookupEntry(id))
-        {
-            // In 3.3.5a AchievementEntry name is a const char* (non-localized)
-            if (achievement->name && achievement->name[0])
-                return std::string(achievement->name);
-        }
-        
+        AchievementEntry const* achievement = sAchievementStore.LookupEntry(id);
+        if (!achievement)
+            return "Unknown Achievement";
+
+        // In 3.3.5a, AchievementEntry::name is a const char*
+        if (achievement->name && achievement->name[0])
+            return std::string(achievement->name);
+
         return "Unknown Achievement";
     }
 
