@@ -50,35 +50,21 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         std::string path = uri.getPathAndQuery();
         if (path.empty()) path = "/";
         
+        
+        std::map<std::string, uint32> bgPlayers = {
+            {"Warsong Gulch", 8},
+            {"Arathi Basin", 10},
+            {"Alterac Valley", 35},
+            {"Eye of the Storm", 12},
+            {"Strand of the Ancients", 12},
+            {"Isle of Conquest", 35}
+        };
+        
         uint32 fakeplayers = 1;
-        if (battlegroundName == "Warsong Gulch")
+        auto it = bgPlayers.find(battlegroundName);
+        if (it != bgPlayers.end())
         {
-            uint32 fakeplayers = 8;
-        }
-        
-        if (battlegroundName == "Arathi Basin")
-        {
-            uint32 fakeplayers = 10;
-        }
-        
-        if (battlegroundName == "Alterac Valley")
-        {
-            uint32 fakeplayers = 35;
-        }
-        
-        if (battlegroundName == "Eye of the Storm")
-        {
-            uint32 fakeplayers = 12;
-        }
-        
-        if (battlegroundName == "Strand of the Ancients")
-        {
-            uint32 fakeplayers = 12;
-        }
-        
-        if (battlegroundName == "Isle of Conquest")
-        {
-            uint32 fakeplayers = 35;
+            fakeplayers = it->second;
         }
 
         Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
