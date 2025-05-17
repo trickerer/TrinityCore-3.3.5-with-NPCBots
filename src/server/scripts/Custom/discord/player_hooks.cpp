@@ -35,6 +35,16 @@ public:
 	}
     void OnAchievementEarned(Player* player, AchievementEntry const* achievement) //override
     {
+        
+        static std::string GetLocalizedAchievementName(uint32 id)
+        {
+            const AchievementEntry* achievement = sAchievementStore.LookupEntry(id);
+            if (!achievement)
+                return "Unknown Achievement";
+
+            return achievement->name[sWorld->GetDefaultDbcLocale()];
+        }
+        
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
