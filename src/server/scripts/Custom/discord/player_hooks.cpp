@@ -115,11 +115,10 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
-        const AchievementEntry* achievement = sAchievementStore.LookupEntry(id);
-        if (!achievement)
-            return "Unknown Achievement";
-
-        return achievement->name[sWorld->GetDefaultDbcLocale()];
+        if (AchievementLocale const* loc = sAchievementLocaleStore.LookupEntry(id))
+            return loc->Name[sWorld->GetDefaultDbcLocale()];
+        
+        return "Unknown Achievement";
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
