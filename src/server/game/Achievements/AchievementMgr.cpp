@@ -1592,12 +1592,12 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         //sScriptMgr->OnAchievementEarned(m_player, achievement);
 
         // Add Discord webhook message here:
-        std::string name = player->GetName();
-        std::string achievementName = achievement->Name->Get(player->GetSession()->GetSessionDbcLocale());
+        std::string name = m_player->GetName();
+        std::string achievementName = achievement->Name->Get(m_player->GetSession()->GetSessionDbcLocale());
 
         std::ostringstream messageStream;
 
-        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+        std::string gmTag = m_player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
         SendDiscordMessage(messageStream.str());
