@@ -1602,7 +1602,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         SendDiscordMessage(messageStream.str());
     }
-)
+}
 
 void AchievementMgr::SendAllAchievementData() const
 {
