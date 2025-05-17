@@ -116,7 +116,7 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
-        if (AchievementLocale const* loc = sAchievementLocaleStore.LookupEntry(id))
+        if (AchievementLocaleEntry const* loc = sAchievementLocaleStore.LookupEntry(id))
         {
             // Use the server's default locale or 0 for English fallback
             uint8 locale = sWorld->GetDefaultDbcLocale();
