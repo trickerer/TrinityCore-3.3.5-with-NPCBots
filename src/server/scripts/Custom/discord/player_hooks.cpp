@@ -115,9 +115,14 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
-        if (AchievementLocale const* loc = sAchievementLocaleStore.LookupEntry(id))
-            return loc->Name[sWorld->GetDefaultDbcLocale()];
-        
+        if (AchievementReward const* reward = sAchievementRewardStore.LookupEntry(id))
+        {
+            LocaleConstant locale = sWorld->GetDefaultDbcLocale();
+            std::string const& name = reward->subject[locale];
+            if (!name.empty())
+                return name;
+        }
+
         return "Unknown Achievement";
     }
 
