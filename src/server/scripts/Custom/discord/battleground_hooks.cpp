@@ -61,7 +61,8 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         };
         
         uint32 fakeplayers = 1;
-        auto it = bgPlayers.find(battlegroundName);
+        std::string bgNameStr(battlegroundName);
+        auto it = bgPlayers.find(bgNameStr);
         if (it != bgPlayers.end())
         {
             fakeplayers = it->second;
