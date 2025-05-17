@@ -1585,6 +1585,10 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         draft.SendMailTo(trans, GetPlayer(), MailSender(MAIL_CREATURE, reward->SenderCreatureId));
         CharacterDatabase.CommitTransaction(trans);
     }
+    if (m_player)
+    {
+        sScriptMgr->OnAchievementEarned(m_player, achievement);
+    }
 }
 
 void AchievementMgr::SendAllAchievementData() const
