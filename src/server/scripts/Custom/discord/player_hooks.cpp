@@ -38,6 +38,7 @@ public:
     void OnAchievementEarned(Player* player, AchievementEntry const* achievement) override
     {
         
+        TC_LOG_INFO("player.hooks", "Achievement earned hook called for player: {}", player->GetName());
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
