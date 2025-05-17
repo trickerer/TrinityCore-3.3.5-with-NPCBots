@@ -1593,7 +1593,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         // Add Discord webhook message here:
         std::string name = m_player->GetName();
-        std::string achievementName = achievement->Name->Get(m_player->GetSession()->GetSessionDbcLocale());
+        std::string achievementName = GetLocalizedAchievementName(achievement->ID);
 
         std::ostringstream messageStream;
 
