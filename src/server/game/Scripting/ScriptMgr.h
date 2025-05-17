@@ -723,6 +723,8 @@ class TC_GAME_API PlayerScript : public ScriptObject
 
         // Called when a player completes a movie
         virtual void OnMovieComplete(Player* player, uint32 movieId);
+        
+        virtual void OnAchievementEarned(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
 
 };
 
