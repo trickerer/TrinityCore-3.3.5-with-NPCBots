@@ -53,7 +53,14 @@ public:
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for achievement: {}", achievementName);
-        SendDiscordWebhook(webhookUrl, messageStream.str());
+        try
+        {
+            SendDiscordWebhook(webhookUrl, messageStream.str());
+        }
+        catch (const std::exception& e)
+        {
+            TC_LOG_ERROR("player.hooks", "Exception sending achievement webhook: {}", e.what());
+        }
     }
 
     void OnLogin(Player* player, bool /*firstLogin*/)
