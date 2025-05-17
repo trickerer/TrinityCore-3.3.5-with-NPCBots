@@ -1594,7 +1594,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         // Add Discord webhook message here:
         std::ostringstream msg;
         msg << "**" << m_player->GetName() << "** earned achievement: **" << achievement->name[0] << "** 🏆";
-        SendDiscordWebhook(msg.str());
+        SendDiscordMessage(msg.str());
     }
 
 void AchievementMgr::SendAllAchievementData() const
