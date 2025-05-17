@@ -32,6 +32,25 @@ public:
 	{
 		TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
 	}
+    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) override
+    {
+        std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+        if (webhookUrl.empty())
+        {
+            TC_LOG_ERROR("player.hooks", "No webhook URL configured!");
+            return;
+        }
+
+        std::string name = player->GetName();
+        std::string achievementName = achievement->name[sWorld->GetDefaultDbcLocale()];
+        std::ostringstream messageStream;
+
+        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";  //🛡️=GM / 👤=Player
+        messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
+
+        TC_LOG_INFO("player.hooks", "Sending webhook for achievement: {}", achievementName);
+        SendDiscordWebhook(webhookUrl, messageStream.str());
+    }
 
     void OnLogin(Player* player, bool /*firstLogin*/)
 	{
