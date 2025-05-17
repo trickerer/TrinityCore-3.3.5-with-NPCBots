@@ -25,6 +25,8 @@
 #include <memory>
 #include <vector>
 
+#include "DBCStructure.h"
+
 class AccountMgr;
 class AuctionHouseObject;
 class Aura;
