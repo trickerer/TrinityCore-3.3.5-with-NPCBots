@@ -23,6 +23,7 @@ static std::unordered_set<uint64> LoggedInGuids;
 #include "World.h"
 #include "WorldSession.h"
 #include "server_shutdown.h"
+#include "DBCStores.h"
 
 
 class DiscordWebhookPlayerActivity : public PlayerScript
@@ -42,10 +43,10 @@ public:
         }
 
         std::string name = player->GetName();
-        std::string achievementName = achievement->name[sWorld->GetDefaultDbcLocale()];
+        std::string achievementName = GetLocalizedAchievementName(achievement->ID);
         std::ostringstream messageStream;
 
-        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";  //🛡️=GM / 👤=Player
+        std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
         TC_LOG_INFO("player.hooks", "Sending webhook for achievement: {}", achievementName);
