@@ -1529,9 +1529,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
     if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
-    //if (m_player->IsGameMaster())
-    //    return;
-
+    
     //Add Discord webhook message here:
     std::string name = GetPlayer()->GetName();
     std::string achievementName = GetLocalizedAchievementName(achievement->ID);
