@@ -45,6 +45,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WowTime.h"
+#include "DiscordWebhookMgr.h"
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
