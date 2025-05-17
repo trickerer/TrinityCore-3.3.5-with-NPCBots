@@ -118,13 +118,12 @@ private:
     {
         if (AchievementLocaleEntry const* loc = sAchievementLocaleStore.LookupEntry(id))
         {
-            // Use the server's default locale or 0 for English fallback
             uint8 locale = sWorld->GetDefaultDbcLocale();
 
             if (!loc->Name[locale].empty())
                 return loc->Name[locale];
             else
-                return loc->Name[0]; // fallback to English
+                return loc->Name[0];
         }
         return "Unknown Achievement";
     }
