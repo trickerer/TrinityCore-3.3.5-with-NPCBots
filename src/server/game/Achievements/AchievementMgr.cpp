@@ -1587,10 +1587,14 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     }
     if (m_player)
     {
-        TC_LOG_INFO("achievement", "Calling OnAchievementEarned for player: {}", m_player->GetName());
-        sScriptMgr->OnAchievementEarned(m_player, achievement);
+        //TC_LOG_INFO("achievement", "Calling OnAchievementEarned for player: {}", m_player->GetName());
+        //sScriptMgr->OnAchievementEarned(m_player, achievement);
+
+        // Add Discord webhook message here:
+        std::ostringstream msg;
+        msg << "**" << m_player->GetName() << "** earned achievement: **" << achievement->name[0] << "** 🏆";
+        SendDiscordWebhook(msg.str());
     }
-}
 
 void AchievementMgr::SendAllAchievementData() const
 {
