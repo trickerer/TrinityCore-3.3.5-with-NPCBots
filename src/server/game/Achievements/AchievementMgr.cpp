@@ -1593,7 +1593,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         // Add Discord webhook message here:
         std::string name = player->GetName();
-        std::string achievementName = GetLocalizedAchievementName(achievement->ID);  // your custom function
+        std::string achievementName = achievement->Name->Get(player->GetSession()->GetSessionDbcLocale());
 
         std::ostringstream messageStream;
 
@@ -1602,6 +1602,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         SendDiscordMessage(messageStream.str());
     }
+);
 
 void AchievementMgr::SendAllAchievementData() const
 {
