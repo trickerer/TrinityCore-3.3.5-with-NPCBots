@@ -121,10 +121,7 @@ private:
         if (!achievement)
             return "Unknown Achievement";
 
-        if (achievement->Title && achievement->Title[0])
-            return std::string(achievement->Title);
-        
-        return "Unnamed Achievement";
+        return achievement->Title ? std::string(achievement->Title) : "Unnamed Achievement";
     }
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
