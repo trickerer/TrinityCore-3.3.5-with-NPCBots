@@ -117,7 +117,7 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
-        AchievementLocale const* loc = sAchievementLocaleStore.LookupEntry(id);
+        AchievementLocaleEntry const* loc = sAchievementLocaleStore.LookupEntry(id);
         if (!loc)
             return "Unknown Achievement";
 
