@@ -1610,8 +1610,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     std::ostringstream messageStream;
 
-    std::string gmTag = GetPlayer()->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
-    messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
+    //std::string gmTag = GetPlayer()->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+    messageStream "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
     SendDiscordMessage(messageStream.str());
     /*
