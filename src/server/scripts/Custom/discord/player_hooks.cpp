@@ -24,6 +24,7 @@ static std::unordered_set<uint64> LoggedInGuids;
 #include "WorldSession.h"
 #include "server_shutdown.h"
 #include "DBCStores.h"
+#include "AchievementMgr.h"
 
 
 class DiscordWebhookPlayerActivity : public PlayerScript
