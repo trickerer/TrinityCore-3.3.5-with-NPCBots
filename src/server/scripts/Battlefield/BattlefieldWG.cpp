@@ -699,7 +699,7 @@ void BattlefieldWG::OnBattleStart()
 void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
     m_team = team; // or call SetTeam(team) if you prefer encapsulation
-    BfCapturePoint::SetCapturePointData(go, TeamId team);
+    BfCapturePoint::SetCapturePointData(go);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
@@ -1130,7 +1130,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
         {
             WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
 
-            capturePoint->SetCapturePointData(go, TeamId team);
+            capturePoint->SetCapturePointData(go);
             capturePoint->LinkToWorkshop(workshop);
             AddCapturePoint(capturePoint);
             break;
