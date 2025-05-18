@@ -1951,9 +1951,13 @@ void BattlefieldWG::AddPlayer(Player* player)
         if (!point)
             continue;
 
-        uint32 factionValue = point->GetTeamId() == TEAM_ALLIANCE ? 1 : 2;
-        player->SendUpdateWorldState(point->m_capturePointWorldState, factionValue);
-        player->SendUpdateWorldState(point->m_captureProgressWorldState, point->GetProgress());
+        WintergraspCapturePoint* wgPoint = dynamic_cast<WintergraspCapturePoint*>(point);
+        if (!wgPoint)
+            continue;
+
+        uint32 factionValue = wgPoint->GetTeamId() == TEAM_ALLIANCE ? 1 : 2;
+        player->SendUpdateWorldState(wgPoint->GetCapturePointWorldState(), factionValue);
+        player->SendUpdateWorldState(wgPoint->GetCaptureProgressWorldState(), wgPoint->GetProgress());
     }
 }
 
