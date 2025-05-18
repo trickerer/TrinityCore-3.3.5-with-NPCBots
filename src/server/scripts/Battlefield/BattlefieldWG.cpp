@@ -623,7 +623,7 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Set Sliders capture points data to his owners when battle start
+    // Set Sliders capture points data to their owners when battle starts
     for (auto const& pair : m_capturePoints)
     {
         BfCapturePoint* capturePoint = pair.second;
@@ -634,12 +634,19 @@ void BattlefieldWG::OnBattleStart()
         if (!wgCapturePoint)
             continue;
 
-        uint32 goEntry = wgCapturePoint->GetCapturePointGo()->GetEntry();
+        GameObject* cpGo = wgCapturePoint->GetCapturePointGo();
+        if (!cpGo)
+        {
+            TC_LOG_ERROR("bg.battlefield", "WG: Capture point has no GameObject linked!");
+            continue;
+        }
+
+        uint32 goEntry = cpGo->GetEntry();
 
         TeamId ownerTeam = (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
                            ? GetAttackerTeam() : GetDefenderTeam();
 
-        wgCapturePoint->SetCapturePointData(wgCapturePoint->GetCapturePointGo(), ownerTeam);
+        wgCapturePoint->SetCapturePointData(cpGo, ownerTeam);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -696,16 +703,6 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
-{
-    // Call base class method if needed or implement logic here
-    // For example, assuming BfCapturePoint has a non-virtual method SetCapturePointData:
-    // return BfCapturePoint::SetCapturePointData(go);
-
-    // Your implementation here
-    // Return true/false accordingly
-    return true;
-}
 
 bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {

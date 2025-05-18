@@ -214,6 +214,10 @@ class WintergraspCapturePoint : public BfCapturePoint
 
     protected:
         WintergraspWorkshop* m_Workshop;
+        
+    private:
+        GameObject* m_capturePoint = nullptr;
+
 };
 
 /* ######################### *
