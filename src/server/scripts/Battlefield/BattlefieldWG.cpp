@@ -587,6 +587,11 @@ bool BattlefieldWG::Update(uint32 diff)
     return m_return;
 }
 
+uint32 WintergraspWorkshop::GetWorldStateId() const
+{
+    return _staticInfo->WorldStateId;
+}
+
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
