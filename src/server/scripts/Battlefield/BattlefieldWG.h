@@ -209,16 +209,16 @@ public:
     void ChangeTeam(TeamId oldteam) override;
     TeamId GetTeam() const { return m_team; }
 
-    // Add these:
     uint32 GetCapturePointWorldState() const { return m_capturePointWorldState; }
     uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
-    uint32 GetProgress() const;  // Implement this in cpp
+    uint32 GetProgress() const;
 
 protected:
     WintergraspWorkshop* m_Workshop;
 
-    // Add this if not existing:
-    uint32 m_progress = 0;
+    uint32 m_capturePointWorldState;
+    uint32 m_captureProgressWorldState;
+    uint32 m_progress = 0;  // for GetProgress()
 };
 
 /* ######################### *

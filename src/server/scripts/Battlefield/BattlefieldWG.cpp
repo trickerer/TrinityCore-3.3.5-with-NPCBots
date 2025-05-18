@@ -78,6 +78,16 @@ uint8 const WG_MAX_TELEPORTER = 12;
 uint8 const WG_MAX_WORKSHOP = 6;
 uint8 const WG_MAX_TOWER = 7;
 
+uint32 WintergraspCapturePoint::GetCapturePointWorldState() const
+{
+    return m_capturePointWorldState;
+}
+
+uint32 WintergraspCapturePoint::GetCaptureProgressWorldState() const
+{
+    return m_captureProgressWorldState;
+}
+
 // *****************************************************
 // ************ Destructible (Wall, Tower..) ***********
 // *****************************************************
