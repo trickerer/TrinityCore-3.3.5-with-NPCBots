@@ -863,24 +863,11 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
+        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
-
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
-    }
-
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
-    {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetDefenderTeam(), true);
-        else
+        else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
 
-        // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
     }
 
@@ -899,6 +886,11 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
     
+    
+    SendInitWorldStatesToAll();
+    
+    // TELEPORT PLAYERS ON END????
+    /*
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -933,7 +925,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 }
             }
         }
-    }
+    }*/
 
 }
 
