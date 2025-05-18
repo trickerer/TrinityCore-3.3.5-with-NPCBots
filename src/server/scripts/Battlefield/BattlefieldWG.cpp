@@ -624,12 +624,22 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
     // Set Sliders capture points data to his owners when battle start
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (auto const& capturePoint : m_capturePoints)
     {
+        if (!capturePoint)
+            continue;
 
-        //SendWarning (DOCAPUPDATETEXT);
-        //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
+        // Determine controlling team for the capture point based on its gameobject entry
+        TeamId ownerTeam = TeamId::TEAM_NEUTRAL;
 
+        uint32 goEntry = capturePoint->GetCapturePointGo()->GetEntry();
+
+        if (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
+            ownerTeam = GetAttackerTeam();
+        else
+            ownerTeam = GetDefenderTeam();
+
+        capturePoint->SetCapturePointData(capturePoint->GetCapturePointGo(), ownerTeam);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -651,19 +661,12 @@ void BattlefieldWG::OnBattleStart()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+
         if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
-        // Note: Capture point is added once the gameobject is created.
-        Workshops[i] = workshop;
-    }
-
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
-    {
-        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+        else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
 
-        // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
     }
 
