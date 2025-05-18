@@ -220,6 +220,7 @@ protected:
     uint32 m_capturePointWorldState;
     uint32 m_captureProgressWorldState;
     uint32 m_progress = 0;  // for GetProgress()
+    ObjectGuid m_capturePointSpawn;
 };
 
 /* ######################### *
