@@ -78,7 +78,6 @@ uint8 const WG_MAX_TELEPORTER = 12;
 uint8 const WG_MAX_WORKSHOP = 6;
 uint8 const WG_MAX_TOWER = 7;
 
-
 // *****************************************************
 // ************ Destructible (Wall, Tower..) ***********
 // *****************************************************
@@ -902,8 +901,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
-        //TELEPORT PLAYERS AT END OF BATTLE
-        /*
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
@@ -936,7 +933,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 }
             }
         }
-        */
     }
 
 }
@@ -1559,12 +1555,11 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-
-//void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
-//{
-//    ASSERT(m_Workshop);
-//    m_Workshop->GiveControlTo(m_team);
-//}
+void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
+{
+    ASSERT(m_Workshop);
+    m_Workshop->GiveControlTo(m_team);
+}
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
 {
@@ -1933,98 +1928,6 @@ void BfWGGameObjectBuilding::UpdateTurretAttack(bool disable)
     }
 }
 
-void BattlefieldWG::AddPlayer(Player* player)
-{
-    // No call to Battlefield::AddPlayer(player); - base method doesn't exist
-
-    // Send main battlefield state
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDER, m_DefenderTeam);
-    player->SendUpdateWorldState(ClockWorldState[0], m_Timer);
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, GetData(BATTLEFIELD_WG_DATA_DEF_A));
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
-    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
-
-    // Loop over all capture points and send their state
-    for (auto& pair : m_capturePoints)
-    {
-        BfCapturePoint* point = pair.second;
-        if (!point)
-            continue;
-
-        WintergraspCapturePoint* wgPoint = dynamic_cast<WintergraspCapturePoint*>(point);
-        if (!wgPoint)
-            continue;
-
-        uint32 factionValue = wgPoint->GetTeamId() == TEAM_ALLIANCE ? 1 : 2;
-        player->SendUpdateWorldState(wgPoint->GetCapturePointWorldState(), factionValue);
-        player->SendUpdateWorldState(wgPoint->GetCaptureProgressWorldState(), wgPoint->GetProgress());
-    }
-}
-
-void BattlefieldWG::SendUpdateWorldStateToZone(uint32 worldState, uint32 value)
-{
-    for (GuidSet::const_iterator itr = m_playersInBattle.begin(); itr != m_playersInBattle.end(); ++itr)
-    {
-        ObjectGuid guid = ObjectGuid(*itr);  // convert uint64 to ObjectGuid
-        if (Player* player = ObjectAccessor::FindPlayer(guid))
-        {
-            player->SendUpdateWorldState(worldState, value);
-        }
-    }
-}
-
-// GetProgress() implementation
-float WintergraspCapturePoint::GetProgress() const
-{
-    return m_value; // or whatever variable tracks progress
-}
-
-// SetCapturePointData() implementation
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
-{
-    m_capturePointSpawn = go->GetGUID(); // or however you store GO data
-}
-
-void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
-{
-    if (m_team == oldTeam)
-        return;
-
-    BfCapturePoint::ChangeTeam(oldTeam); // Maintain base behavior
-
-    // Update faction ownership world state
-    if (m_Workshop)
-    {
-        uint32 worldState = m_capturePointWorldState;
-        uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2; // 1 = Alliance, 2 = Horde (match DBC client logic)
-
-        m_Bf->SendUpdateWorldState(worldState, factionValue);
-    }
-
-    ASSERT(m_Workshop);
-    m_Workshop->GiveControlTo(m_team);
-}
-
-void WintergraspCapturePoint::AddPlayer(Player* player)
-{
-    m_playersInside.insert(player->GetGUID());
-
-    uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2;
-    player->SendUpdateWorldState(m_capturePointWorldState, factionValue);
-
-    uint32 scaledProgress = (uint32)(GetProgress() * 100);
-    player->SendUpdateWorldState(m_captureProgressWorldState, scaledProgress);
-}
-
-void WintergraspCapturePoint::RemovePlayer(Player* player)
-{
-    m_playersInside.erase(player->GetGUID());
-    
-    // Optionally send 0 progress or remove worldstate if needed
-}
-
 void BfWGGameObjectBuilding::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.emplace_back(_worldState, _state);
@@ -2078,6 +1981,7 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         _wg->UpdateCounterVehicle(false);
         _wg->CapturePointTaken(_staticInfo->WorkshopId);
     }
+    player->SendUpdateWorldState(wgPoint->GetCapturePointWorldState(), factionValue);
 }
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()

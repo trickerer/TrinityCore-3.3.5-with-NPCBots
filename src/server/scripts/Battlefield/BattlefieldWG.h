@@ -19,7 +19,6 @@
 #define BATTLEFIELD_WG_
 
 #include "Battlefield.h"
-#include <set>
 
 namespace WorldPackets
 {
@@ -195,35 +194,21 @@ enum WintergraspNpcs
 
 class WintergraspCapturePoint : public BfCapturePoint
 {
-public:
-    WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
+    public:
+        WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-    void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
+        void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
-    void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
-    void SetTeam(TeamId team) { m_team = team; }
+        //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
+        //void SetTeam(TeamId team) { m_team = team; }
 
-    void SetCapturePointData(GameObject* go);  // declaration only
-    void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
+        //void SetCapturePointData(GameObject*);  // or just declared, not implemented
 
-    void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
+        void ChangeTeam(TeamId oldteam) override;
+        TeamId GetTeam() const { return m_team; }
 
-    uint32 GetCapturePointWorldState() const { return m_capturePointWorldState; }
-    uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
-    float GetProgress() const;  // correct declaration
-
-    void AddPlayer(Player* player); // override;
-    void RemovePlayer(Player* player);
-
-protected:
-    WintergraspWorkshop* m_Workshop;
-
-    uint32 m_capturePointWorldState;
-    uint32 m_captureProgressWorldState;
-    uint32 m_progress = 0;  // for GetProgress()
-    ObjectGuid m_capturePointSpawn;
-    std::set<ObjectGuid> m_playersInside;
+    protected:
+        WintergraspWorkshop* m_Workshop;
 };
 
 /* ######################### *
@@ -384,10 +369,6 @@ class BattlefieldWG : public Battlefield
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
-        
-        void AddPlayer(Player* player);// override
-        
-        void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
     protected:
         bool m_isRelicInteractible;
@@ -405,9 +386,6 @@ class BattlefieldWG : public Battlefield
         uint32 m_saveTimer;
 
         ObjectGuid m_titansRelicGUID;
-        
-        typedef std::set<uint64> GuidSet;
-        GuidSet m_playersInBattle; 
 };
 
 enum WintergraspGameObjectBuildingType
