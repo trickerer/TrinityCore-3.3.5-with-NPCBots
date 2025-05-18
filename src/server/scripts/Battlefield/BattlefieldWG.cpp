@@ -2009,33 +2009,20 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 
 void WintergraspCapturePoint::AddPlayer(Player* player)
 {
-    if (!player)
-        return;
-
     m_playersInside.insert(player->GetGUID());
 
-    if (m_Workshop)
-    {
-        uint32 worldState = GetCapturePointWorldState();
-        uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2;
+    uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2;
+    player->SendUpdateWorldState(m_capturePointWorldState, factionValue);
 
-        player->SendUpdateWorldState(worldState, factionValue);
-
-        uint32 progressWorldState = GetCaptureProgressWorldState();
-        if (progressWorldState)
-        {
-            uint32 scaledProgress = m_progress; // make sure m_progress is updated elsewhere
-            player->SendUpdateWorldState(progressWorldState, scaledProgress);
-        }
-    }
+    uint32 scaledProgress = (uint32)(GetProgress() * 100);
+    player->SendUpdateWorldState(m_captureProgressWorldState, scaledProgress);
 }
 
 void WintergraspCapturePoint::RemovePlayer(Player* player)
 {
-    if (!player)
-        return;
-
     m_playersInside.erase(player->GetGUID());
+    
+    // Optionally send 0 progress or remove worldstate if needed
 }
 
 void BfWGGameObjectBuilding::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
