@@ -1975,6 +1975,17 @@ void BattlefieldWG::SendUpdateWorldStateToZone(uint32 worldState, uint32 value)
     }
 }
 
+// GetProgress() implementation
+float WintergraspCapturePoint::GetProgress() const
+{
+    return m_value; // or whatever variable tracks progress
+}
+
+// SetCapturePointData() implementation
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
+{
+    m_capturePointSpawn = go->GetGUID(); // or however you store GO data
+}
 
 void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 {
