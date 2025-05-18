@@ -718,6 +718,17 @@ BattlefieldWG::BattlefieldWG()
 {
     // You can leave this empty or initialize variables as needed
 }
+void BattlefieldWG::ClearCaptureBars()
+{
+    // For example, zero out the capture progress and ownership states
+    uint32 capturePointWorldState = /* your capture point worldstate ID */;
+    uint32 captureProgressWorldState = /* your capture progress worldstate ID */;
+
+    // Send zero or neutral values to all players
+    SendUpdateWorldStateToZone(capturePointWorldState, 0);
+    SendUpdateWorldStateToZone(captureProgressWorldState, 0);
+}
+
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
@@ -899,7 +910,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
     
-    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+    /*for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
@@ -932,8 +943,11 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                     }
                 }
             }
+            
+            
         }
-    }
+    }*/
+    ClearCaptureBars();
 
 }
 
@@ -1957,29 +1971,36 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 {
     if (teamId == TEAM_NEUTRAL)
     {
-        // Send warning message to all player for inform a faction attack a workshop
-        // alliance / horde attacking workshop
+        // Send warning message to all players for faction attacking workshop
         _wg->SendWarning(_teamControl == TEAM_ALLIANCE ? _staticInfo->TextIds.HordeAttack : _staticInfo->TextIds.AllianceAttack);
     }
-    else {
+    else 
+    {
         // Update worldstate
         _state = teamId == TEAM_HORDE ? BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
         _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
 
-        // Warning message
+        // Warning message if not initialization
         if (!init)
-            _wg->SendWarning(teamId == TEAM_HORDE ? _staticInfo->TextIds.HordeCapture : _staticInfo->TextIds.AllianceCapture); // workshop taken - horde
+            _wg->SendWarning(teamId == TEAM_HORDE ? _staticInfo->TextIds.HordeCapture : _staticInfo->TextIds.AllianceCapture);
 
-        // Update graveyard control
+        // Update graveyard control if applicable
         if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
             if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
                 gy->GiveControlTo(teamId);
 
         _teamControl = teamId;
     }
-    if (!init) {
+
+    if (!init) 
+    {
         _wg->UpdateCounterVehicle(false);
         _wg->CapturePointTaken(_staticInfo->WorkshopId);
+
+        // Broadcast capture point ownership to all players in zone
+        //uint32 worldState = _wg->GetCapturePointWorldState();
+        uint32 factionValue = (teamId == TEAM_ALLIANCE) ? 1 : 2;
+        _wg->SendUpdateWorldState(_staticInfo->WorldStateId, factionValue);
     }
 }
 
