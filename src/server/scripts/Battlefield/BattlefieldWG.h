@@ -369,6 +369,8 @@ class BattlefieldWG : public Battlefield
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
+        
+        void ClearCaptureBars();
 
     protected:
         bool m_isRelicInteractible;
