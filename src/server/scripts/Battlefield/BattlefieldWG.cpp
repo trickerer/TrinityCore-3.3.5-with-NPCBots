@@ -698,7 +698,22 @@ void BattlefieldWG::OnBattleStart()
 
 bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
-    return BfCapturePoint::SetCapturePointData(go);
+    // Call base class method if needed or implement logic here
+    // For example, assuming BfCapturePoint has a non-virtual method SetCapturePointData:
+    // return BfCapturePoint::SetCapturePointData(go);
+
+    // Your implementation here
+    // Return true/false accordingly
+    return true;
+}
+
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
+{
+    // Call your one-argument version to preserve existing behavior
+    SetCapturePointData(go);
+
+    // Now add your team logic
+    m_team = team;
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
