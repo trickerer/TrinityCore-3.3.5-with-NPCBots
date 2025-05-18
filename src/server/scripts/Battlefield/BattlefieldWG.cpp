@@ -589,19 +589,21 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void BattlefieldWG::OnBattleStart()
 {
-    // Spawn titan relic
+    // Spawn Titan's relic at defined position and rotation
     if (GameObject* relic = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, WintergraspRelicPos, WintergraspRelicRot))
     {
-        // Update faction of relic, only attacker can click on
+        // Set faction to attacker team so only they can interact
         relic->SetFaction(WintergraspFaction[GetAttackerTeam()]);
-        // Set in use (not allow to click on before last door is broken)
+        // Set flags to prevent usage until conditions met
         relic->SetFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
         m_titansRelicGUID = relic->GetGUID();
     }
     else
+    {
         TC_LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
+    }
 
-    // Update tower visibility and update faction
+    // Show all canon NPCs and set their faction to the defender team
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Creature* creature = GetCreature(*itr))
@@ -611,43 +613,44 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
-    // Rebuild all wall
+    // Rebuild all walls and disable turret attacks initially
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
     {
         building->Rebuild();
         building->UpdateTurretAttack(false);
     }
 
+    // Reset tower damage counters at battle start
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Set Sliders capture points data to his owners when battle start
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-    {
+    // TODO: Initialize capture points sliders if needed
+    // for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    // {
+    //     // Example: itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
+    // }
 
-        //SendWarning (DOCAPUPDATETEXT);
-        //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
-
-    }
-
+    // Teleport players out of orb room and send initial world states
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
-            // Kick player in orb room, TODO: offline player ?
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
                 float x, y, z;
                 player->GetPosition(x, y, z);
-                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
+                // If player is inside orb room coordinates, teleport them out
+                if (x > 5392 && x < 5500 && y > 2800 && y < 2880 && z < 480)
                     player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
+
                 SendInitWorldStatesTo(player);
             }
         }
     }
 
+    // Initialize workshops and assign control based on position
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
@@ -657,35 +660,33 @@ void BattlefieldWG::OnBattleStart()
         else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
         else
-            workshop->GiveControlTo(GetDefenderTeam(), true); // or default faction
+            workshop->GiveControlTo(GetDefenderTeam(), true); // default faction
 
         Workshops[i] = workshop;
     }
 
-    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
+    // Update graveyards and workshops after initialization
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->Save();
 
-    // Initialize vehicle counter
+    // Initialize vehicle counter at battle start
     UpdateCounterVehicle(true);
-    // Send start warning to all players
+
+    // Broadcast start battle message to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
-    
-    // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
-    TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
 
-    // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
-    std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde" : "🔵 **Alliance";  // Use TEAM_HORDE for 3.3.5a
+    // Determine controlling team (defender) and prepare Discord message
+    TeamId controllingTeam = GetDefenderTeam();  // Correct for 3.3.5a
 
-    // Prepare the Discord message
-    std::string winnerMessage = "⚔️ ** Wintergrasp has Started! Defenders " + owner + "";
- 
-    // Send the message to Discord
-    SendDiscordMessage(winnerMessage);
+    std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde" : "🔵 **Alliance";
 
+    std::string startMessage = "⚔️ ** Wintergrasp has Started! Defenders " + owner;
+
+    // Send message to Discord channel
+    SendDiscordMessage(startMessage);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
@@ -718,24 +719,23 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
     // Remove relic
     if (m_titansRelicGUID)
+    {
         if (GameObject* relic = GetGameObject(m_titansRelicGUID))
             relic->RemoveFromWorld();
-    m_titansRelicGUID.Clear();
-
-    // change collision wall state closed
-    for (BfWGGameObjectBuilding* building : BuildingsInZone)
-    {
-        building->RebuildGate();
+        m_titansRelicGUID.Clear();
     }
 
-    // successful defense
+    // Rebuild gates (close collision walls)
+    for (BfWGGameObjectBuilding* building : BuildingsInZone)
+        building->RebuildGate();
+
+    // Update battlefield data for defense or victory
     if (endByTimer)
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? BATTLEFIELD_WG_DATA_DEF_H : BATTLEFIELD_WG_DATA_DEF_A, 1);
-    // successful attack (note that teams have already been swapped, so defender team is the one who won)
     else
         UpdateData(GetDefenderTeam() == TEAM_HORDE ? BATTLEFIELD_WG_DATA_WON_H : BATTLEFIELD_WG_DATA_WON_A, 1);
 
-    // Remove turret
+    // Remove turrets and set faction if battle ended by capture
     for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Creature* creature = GetCreature(*itr))
@@ -746,64 +746,71 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         }
     }
 
-    // Update all graveyard, control is to defender when no wartime
-    for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
+    // Update graveyard control to defender (no wartime)
+    for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; ++i)
+    {
         if (BfGraveyard* graveyard = GetGraveyardById(i))
             graveyard->GiveControlTo(GetDefenderTeam());
+    }
 
-    // Update portals
-    for (auto itr = DefenderPortalList[GetDefenderTeam()].begin(); itr != DefenderPortalList[GetDefenderTeam()].end(); ++itr)
-        if (GameObject* portal = GetGameObject(*itr))
+    // Update portals respawn times
+    for (auto itr : DefenderPortalList[GetDefenderTeam()])
+        if (GameObject* portal = GetGameObject(itr))
             portal->SetRespawnTime(RESPAWN_IMMEDIATELY);
 
-    for (auto itr = DefenderPortalList[GetAttackerTeam()].begin(); itr != DefenderPortalList[GetAttackerTeam()].end(); ++itr)
-        if (GameObject* portal = GetGameObject(*itr))
+    for (auto itr : DefenderPortalList[GetAttackerTeam()])
+        if (GameObject* portal = GetGameObject(itr))
             portal->SetRespawnTime(RESPAWN_ONE_DAY);
 
-    // Saving data
+    // Save buildings and workshops state
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
         building->Save();
 
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->Save();
 
+    // Reward defenders and attackers
     for (auto itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
         {
             player->CastSpell(player, SPELL_ESSENCE_OF_WINTERGRASP, true);
             player->CastSpell(player, SPELL_VICTORY_REWARD, true);
-            // Complete victory quests
             player->AreaExploredOrEventHappens(QUEST_VICTORY_WINTERGRASP_A);
             player->AreaExploredOrEventHappens(QUEST_VICTORY_WINTERGRASP_H);
-            // Send Wintergrasp victory achievement
             DoCompleteOrIncrementAchievement(ACHIEVEMENTS_WIN_WG, player);
-            // Award achievement for succeeding in Wintergrasp in 10 minutes or less
+
             if (!endByTimer && GetTimer() <= 10000)
                 DoCompleteOrIncrementAchievement(ACHIEVEMENTS_WIN_WG_TIMER_10, player);
         }
     }
 
     for (auto itr = m_PlayersInWar[GetAttackerTeam()].begin(); itr != m_PlayersInWar[GetAttackerTeam()].end(); ++itr)
+    {
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
             player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
+    }
 
+    // Remove auras and despawn vehicles, clear war data
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 RemoveAurasFromPlayer(player);
-
+        }
         m_PlayersInWar[team].clear();
 
         for (auto itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
+        {
             if (Creature* creature = GetCreature(*itr))
                 if (creature->IsVehicle())
                     creature->DespawnOrUnsummon();
-
+        }
         m_vehicles[team].clear();
     }
 
+    // Update player phasing auras if battle ended by capture
     if (!endByTimer)
     {
         for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -812,53 +819,42 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
             {
                 if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 {
+                    // Remove old faction phase aura
                     player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
+                    // Add new faction phase aura
                     player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
                 }
             }
         }
     }
 
-    if (!endByTimer) // win alli/horde
-    {
+    // Send victory/defense message
+    if (!endByTimer)
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_HORDE);
-    }
-    else // defend alli/horde
-    {
+    else
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
-    }
 
-
-
-    // UPDATE MAP TEXT
-    //SendWarning(TEST);
-
+    // Update buildings (rebuild & disable turret attacks)
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
     {
         building->Rebuild();
         building->UpdateTurretAttack(false);
     }
 
+    // Reset tower damage counters
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Remove turret
-    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
-    {
-        if (Creature* creature = GetCreature(*itr))
-        {
-            if (!endByTimer)
-                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
-            HideNpc(creature);
-        }
-    }
-
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    // Re-initialize workshops safely (delete old instances)
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; ++i)
     {
         if (Workshops[i])
-            delete Workshops[i];  // Free previous memory first
+        {
+            delete Workshops[i];
+            Workshops[i] = nullptr;
+        }
 
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
 
@@ -872,57 +868,47 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         Workshops[i] = workshop;
     }
 
-
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->UpdateGraveyardAndWorkshop();
 
-    // SEMD WORLD UPDATE??
-    // NEED TO RESET THE CAP BAR
-    
+    // Send Discord notification about battle result
     bool allianceWon = (GetDefenderTeam() == TEAM_ALLIANCE);
     std::string owner = allianceWon ? "🔵 ** Alliance" : "🔴 ** Horde";
     std::string method = endByTimer ? "defended" : "captured";
     std::string winnerMessage = "⚔️ ** Wintergrasp has ended!\\n" + owner + " has " + method + " the fortress!";
-    // Send to Discord
     SendDiscordMessage(winnerMessage);
-    //SendDiscordMessage("✅ MGAWoW webhook test message");
-    
+
+    // Remove/add phase auras and teleport players accordingly
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
-                // Remove phase auras
+                // Remove old faction phase aura
                 player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
+                // Add new faction phase aura
                 player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
 
-                // Determine if player is on the winning team
+                // Teleport winners to fortress, losers to homebind or fallback
                 if (player->GetTeamId() == GetDefenderTeam())
                 {
-                    // Teleport to fortress — customize coords as needed
-                    float x = 5311.055664f;
-                    float y = 2842.945068f;
-                    float z = 409.260651f;
-                    float o = 6.166933;
-                    player->TeleportTo(571, x, y, z, o); // 571 = Northrend
+                    constexpr float x = 5311.055664f;
+                    constexpr float y = 2842.945068f;
+                    constexpr float z = 409.260651f;
+                    constexpr float o = 6.166933f;
+                    player->TeleportTo(571, x, y, z, o);
                 }
                 else
                 {
                     if (player->m_homebindMapId && !(player->m_homebindX == 0.0f && player->m_homebindY == 0.0f))
-                    {
                         player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
-                    }
                     else
-                    {
-                        // Fallback safe location (DALA INN)
-                        player->TeleportTo(571, 5769.09f, 729.62f, 643.01f, 3.1f);
-                    }
+                        player->TeleportTo(571, 5769.09f, 729.62f, 643.01f, 3.1f); // Dalaran fallback
                 }
             }
         }
     }
-
 }
 
 // *******************************************************
