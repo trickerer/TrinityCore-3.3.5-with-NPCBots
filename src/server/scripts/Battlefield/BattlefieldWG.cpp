@@ -636,7 +636,7 @@ void BattlefieldWG::OnBattleStart()
     {
         if (WintergraspCapturePoint* cp = dynamic_cast<WintergraspCapturePoint*>(pair.second))
         {
-            if (WintergraspWorkshop* wk = cp->GetWorkshop())
+            if (WintergraspWorkshop* wk = cp->m_Workshop())
             {
                 TeamId controllingTeam = wk->GetTeamControl();
                 cp->ChangeTeam(controllingTeam); // ✅ pass the actual owner
