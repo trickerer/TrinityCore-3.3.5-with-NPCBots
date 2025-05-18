@@ -721,8 +721,8 @@ BattlefieldWG::BattlefieldWG()
 void BattlefieldWG::ClearCaptureBars()
 {
     // For example, zero out the capture progress and ownership states
-    uint32 capturePointWorldState = /* your capture point worldstate ID */;
-    uint32 captureProgressWorldState = /* your capture progress worldstate ID */;
+    uint32 capturePointWorldState = 0/* your capture point worldstate ID */;
+    uint32 captureProgressWorldState = 0/* your capture progress worldstate ID */;
 
     // Send zero or neutral values to all players
     SendUpdateWorldState(capturePointWorldState, 0);
