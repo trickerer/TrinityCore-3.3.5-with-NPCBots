@@ -707,13 +707,12 @@ bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
     return true;
 }
 
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
+bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
-    // Call your one-argument version to preserve existing behavior
-    SetCapturePointData(go);
+    bool result = BfCapturePoint::SetCapturePointData(go); // call base method
+    m_team = team; // store the team
 
-    // Now add your team logic
-    m_team = team;
+    return result;
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
