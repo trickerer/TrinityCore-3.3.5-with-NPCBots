@@ -206,9 +206,12 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
+        
+        uint32 GetWorldStateID() const { return m_worldStateID; }
 
     protected:
         WintergraspWorkshop* m_Workshop;
+        uint32 m_worldStateID; 
 };
 
 /* ######################### *
