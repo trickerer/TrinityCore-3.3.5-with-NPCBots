@@ -623,30 +623,13 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Set Sliders capture points data to their owners when battle starts
-    for (auto const& pair : m_capturePoints)
+    // Set Sliders capture points data to his owners when battle start
+    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
-        BfCapturePoint* capturePoint = pair.second;
-        if (!capturePoint)
-            continue;
 
-        auto* wgCapturePoint = dynamic_cast<WintergraspCapturePoint*>(capturePoint);
-        if (!wgCapturePoint)
-            continue;
+        //SendWarning (DOCAPUPDATETEXT);
+        //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
 
-        GameObject* cpGo = wgCapturePoint->GetCapturePointGo();
-        if (!cpGo)
-        {
-            TC_LOG_ERROR("bg.battlefield", "WG: Capture point has no GameObject linked!");
-            continue;
-        }
-
-        uint32 goEntry = cpGo->GetEntry();
-
-        TeamId ownerTeam = (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
-                           ? GetAttackerTeam() : GetDefenderTeam();
-
-        wgCapturePoint->SetCapturePointData(cpGo, ownerTeam);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -668,12 +651,19 @@ void BattlefieldWG::OnBattleStart()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-
         if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
-        else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
             workshop->GiveControlTo(GetAttackerTeam(), true);
 
+        // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
     }
 
@@ -701,15 +691,6 @@ void BattlefieldWG::OnBattleStart()
     // Send the message to Discord
     SendDiscordMessage(winnerMessage);
 
-}
-WintergraspCapturePoint::~WintergraspCapturePoint() = default;
-
-bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
-{
-    bool result = BfCapturePoint::SetCapturePointData(go); // call base method
-    m_team = team; // store the team
-
-    return result;
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
@@ -882,11 +863,24 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
             workshop->GiveControlTo(GetDefenderTeam(), true);
-        else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+        else
             workshop->GiveControlTo(GetAttackerTeam(), true);
 
+        // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
     }
 
@@ -905,11 +899,6 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     SendDiscordMessage(winnerMessage);
     //SendDiscordMessage("✅ MGAWoW webhook test message");
     
-    
-    SendInitWorldStatesToAll();
-    
-    // TELEPORT PLAYERS ON END????
-    /*
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -944,7 +933,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 }
             }
         }
-    }*/
+    }
 
 }
 
@@ -1559,7 +1548,7 @@ void BattlefieldWG::UpdateTenacity()
         m_tenacityTeam = TEAM_NEUTRAL;
 }
 
-WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield), m_team(teamInControl), m_Workshop(nullptr), m_capturePoint(nullptr)
+WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield)
 {
     m_Bf = battlefield;
     m_team = teamInControl;

@@ -199,28 +199,16 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
-        void SetTeamControl(TeamId team) { m_team = team; }
         //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
         //void SetTeam(TeamId team) { m_team = team; }
-        
-        // Override of base class method
-        bool SetCapturePointData(GameObject* go) override;              // 1-arg override
-        bool SetCapturePointData(GameObject* go, TeamId team);  
-        
-        
+
+        //void SetCapturePointData(GameObject*);  // or just declared, not implemented
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
-        
-        GameObject* m_capturePoint = nullptr;
-        TeamId m_team;
-        
-        virtual ~WintergraspCapturePoint() override; //
 
     protected:
         WintergraspWorkshop* m_Workshop;
-         
-
 };
 
 /* ######################### *
@@ -232,7 +220,6 @@ class BattlefieldWG : public Battlefield
     private:
         bool m_EventEnded;       // To track if the event is finished
         int m_WinnerTeam;        // To store the winning team (0 - Alliance, 1 - Horde)
-        
 
     public:
         BattlefieldWG();          // Constructor to initialize variables
@@ -382,8 +369,6 @@ class BattlefieldWG : public Battlefield
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
-        
-        TeamId m_team;
 
     protected:
         bool m_isRelicInteractible;
