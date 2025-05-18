@@ -1529,6 +1529,9 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
     if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
+ 
+    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
+        return;
     
     //Add Discord webhook message here:
     std::string name = GetPlayer()->GetName();
@@ -1539,9 +1542,6 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     messageStream << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
     SendDiscordMessage(messageStream.str());
-
-    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
-        return;
 
     TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}",
         achievement->ID, m_player->GetName(), m_player->GetGUID().ToString());
