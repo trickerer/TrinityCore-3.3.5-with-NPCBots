@@ -725,8 +725,8 @@ void BattlefieldWG::ClearCaptureBars()
     uint32 captureProgressWorldState = /* your capture progress worldstate ID */;
 
     // Send zero or neutral values to all players
-    SendUpdateWorldStateToZone(capturePointWorldState, 0);
-    SendUpdateWorldStateToZone(captureProgressWorldState, 0);
+    SendUpdateWorldState(capturePointWorldState, 0);
+    SendUpdateWorldState(captureProgressWorldState, 0);
 }
 
 
