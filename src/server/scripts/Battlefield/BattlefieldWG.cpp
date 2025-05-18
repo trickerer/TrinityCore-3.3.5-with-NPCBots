@@ -656,7 +656,6 @@ void BattlefieldWG::OnBattleStart()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-
         if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
         else if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
@@ -689,11 +688,13 @@ void BattlefieldWG::OnBattleStart()
 
         SendUpdateWorldState(worldState, factionValue);
     }
-
+   
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+    
+    SendInitWorldStatesToAll();
     
     // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
     TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
