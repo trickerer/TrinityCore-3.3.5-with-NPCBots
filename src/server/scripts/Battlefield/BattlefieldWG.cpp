@@ -2009,7 +2009,7 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 
 void WintergraspCapturePoint::AddPlayer(Player* player)
 {
-    //BfCapturePoint::AddPlayer(player); // base logic to track presence
+    BfCapturePoint::AddPlayer(player); // base logic to track presence
 
     if (m_Workshop)
     {
@@ -2022,7 +2022,7 @@ void WintergraspCapturePoint::AddPlayer(Player* player)
         uint32 progressWorldState = GetCaptureProgressWorldState();
         if (progressWorldState)
         {
-            uint32 scaledProgress = (uint32)(m_value * 100.0f); // assuming m_value is 0.0 to 1.0
+            uint32 scaledProgress = m_progress;
             player->SendUpdateWorldState(progressWorldState, scaledProgress);
         }
     }
