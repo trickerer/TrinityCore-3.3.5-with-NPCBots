@@ -208,6 +208,7 @@ class WintergraspCapturePoint : public BfCapturePoint
         TeamId GetTeam() const { return m_team; }
         
         uint32 GetWorldStateID() const { return m_worldStateID; }
+        
 
     protected:
         WintergraspWorkshop* m_Workshop;

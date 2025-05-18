@@ -1541,23 +1541,16 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
+void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
 {
     ASSERT(m_Workshop);
-
-    // Set internal team reference first
-    m_team = newTeam;
-
-    // Update worldstate to reflect new control
-    if (BattlefieldWG* wg = dynamic_cast<BattlefieldWG*>(m_Bf))
-    {
-        uint32 worldStateID = GetWorldStateID(); // <- Make sure this is implemented
-        uint32 worldStateValue = (m_team == TEAM_ALLIANCE) ? 1 : 2;
-        wg->SendUpdateWorldState(worldStateID, worldStateValue);
-    }
-
-    // Apply control to the workshop
     m_Workshop->GiveControlTo(m_team);
+
+    // Update the worldstate so the correct faction bar shows
+    if (m_worldStateID)
+    {
+        m_Bf->SendUpdateWorldState(m_worldStateID, m_team == TEAM_ALLIANCE ? 1 : 2);  // 1 for Ally, 2 for Horde
+    }
 }
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
