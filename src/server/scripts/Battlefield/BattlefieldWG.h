@@ -199,10 +199,12 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
+        void SetTeamControl(TeamId team) { m_team = team; }
         //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
         //void SetTeam(TeamId team) { m_team = team; }
 
         //void SetCapturePointData(GameObject*);  // or just declared, not implemented
+        
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
