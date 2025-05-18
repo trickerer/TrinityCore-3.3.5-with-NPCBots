@@ -696,10 +696,15 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
+bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
-    BfCapturePoint::SetCapturePointData(go);  // Call base class method
-    m_team = team;
+    // Call base class and get its return value
+    bool result = BfCapturePoint::SetCapturePointData(go);
+
+    // Here you cannot assign m_team because no team argument
+    // If you want, set a default or leave it untouched
+
+    return result;
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
