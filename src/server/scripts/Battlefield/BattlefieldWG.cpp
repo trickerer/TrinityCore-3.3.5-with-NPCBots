@@ -673,6 +673,24 @@ void BattlefieldWG::OnBattleStart()
 
     for (WintergraspWorkshop* workshop : Workshops)
         workshop->Save();
+    
+    
+    for (WintergraspWorkshop* workshop : m_Workshops)
+    {
+        if (!workshop)
+            continue;
+
+        uint32 worldState = workshop->GetWorldStateId(); // or similar accessor
+        TeamId controllingTeam = workshop->GetTeamControl(); // get faction controlling workshop
+
+        uint32 factionValue = 0;
+        if (controllingTeam == TEAM_ALLIANCE)
+            factionValue = 1;
+        else if (controllingTeam == TEAM_HORDE)
+            factionValue = 2;
+
+        SendUpdateWorldState(worldState, factionValue);
+    }
 
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
