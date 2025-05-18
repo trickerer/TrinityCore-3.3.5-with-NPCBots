@@ -703,6 +703,11 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
+WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl)
+    : BfCapturePoint(battlefield), m_team(teamInControl), m_Workshop(nullptr), m_capturePoint(nullptr)
+{
+    // Constructor body (can be empty if no logic is needed)
+}
 
 bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
