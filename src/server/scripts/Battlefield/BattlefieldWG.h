@@ -213,6 +213,7 @@ public:
     float GetProgress() const;  // correct declaration
 
     void AddPlayer(Player* player); // override;
+    void RemovePlayer(Player* player);
 
 protected:
     WintergraspWorkshop* m_Workshop;
