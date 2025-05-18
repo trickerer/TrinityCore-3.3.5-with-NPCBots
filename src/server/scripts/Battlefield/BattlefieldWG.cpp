@@ -634,14 +634,14 @@ void BattlefieldWG::OnBattleStart()
     
     for (auto& pair : m_capturePoints)
     {
-        WintergraspCapturePoint* capturePoint = static_cast<WintergraspCapturePoint*>(pair.second);
-        TeamId team = capturePoint->GetTeam(); // This returns the team controlling the workshop
-        uint32 worldStateID = capturePoint->GetWorldStateID();
-
-        // 1 for Alliance, 2 for Horde
-        uint32 worldStateValue = (team == TEAM_ALLIANCE) ? 1 : 2;
-
-        SendUpdateWorldState(worldStateID, worldStateValue);
+        if (WintergraspCapturePoint* cp = dynamic_cast<WintergraspCapturePoint*>(pair.second))
+        {
+            if (WintergraspWorkshop* wk = cp->GetWorkshop())
+            {
+                TeamId controllingTeam = wk->GetTeamControl();
+                cp->ChangeTeam(controllingTeam); // ✅ pass the actual owner
+            }
+        }
     }
 
     // Teleport players out of orb room and send initial world states
@@ -1541,21 +1541,22 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
+void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
 {
     ASSERT(m_Workshop);
 
-    // IMPORTANT: update the team
-    m_team = m_Workshop->GetTeamControl();
+    // Set internal team reference first
+    m_team = newTeam;
 
-    // Send worldstate update
+    // Update worldstate to reflect new control
     if (BattlefieldWG* wg = dynamic_cast<BattlefieldWG*>(m_Bf))
     {
-        uint32 worldStateID = GetWorldStateID();
+        uint32 worldStateID = GetWorldStateID(); // <- Make sure this is implemented
         uint32 worldStateValue = (m_team == TEAM_ALLIANCE) ? 1 : 2;
         wg->SendUpdateWorldState(worldStateID, worldStateValue);
     }
 
+    // Apply control to the workshop
     m_Workshop->GiveControlTo(m_team);
 }
 
