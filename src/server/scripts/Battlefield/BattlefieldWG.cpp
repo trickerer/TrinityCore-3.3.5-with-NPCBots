@@ -1984,7 +1984,7 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         _wg->CapturePointTaken(_staticInfo->WorkshopId);
 
         // Broadcast capture point ownership to all players in zone
-        uint32 worldState = _wg->GetCapturePointWorldState();
+        //uint32 worldState = _wg->GetCapturePointWorldState();
         uint32 factionValue = (teamId == TEAM_ALLIANCE) ? 1 : 2;
         _wg->SendUpdateWorldStateToZone(worldState, factionValue);
     }
