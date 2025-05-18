@@ -214,6 +214,8 @@ class WintergraspCapturePoint : public BfCapturePoint
         
         GameObject* m_capturePoint = nullptr;
         TeamId m_team;
+        
+        virtual ~WintergraspCapturePoint() override; //
 
     protected:
         WintergraspWorkshop* m_Workshop;
