@@ -696,10 +696,10 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
+bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
 {
-    m_team = team; // or call SetTeam(team) if you prefer encapsulation
-    BfCapturePoint::SetCapturePointData(go);
+    // Just call the base version
+    return BfCapturePoint::SetCapturePointData(go);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
