@@ -2002,13 +2002,13 @@ void WintergraspCapturePoint::AddPlayer(Player* player)
 
     if (m_Workshop)
     {
-        uint32 worldState = m_Workshop->GetCapturePointWorldState();
+        uint32 worldState = GetCapturePointWorldState();
         uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2;
 
         player->SendUpdateWorldState(worldState, factionValue);
 
         // Optionally send progress bar (if used)
-        uint32 progressWorldState = m_Workshop->GetProgressWorldState();
+        uint32 progressWorldState = GetCaptureProgressWorldState();
         if (progressWorldState)
         {
             uint32 scaledProgress = (uint32)(m_value * 100.0f); // assuming m_value is 0.0 to 1.0
