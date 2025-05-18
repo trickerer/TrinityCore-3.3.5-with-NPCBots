@@ -624,20 +624,16 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
     // Set Sliders capture points data to his owners when battle start
-    for (auto const& capturePoint : m_capturePoints)
+    for (auto const& pair : m_capturePoints)
     {
+        BfCapturePoint* capturePoint = pair.second;
         if (!capturePoint)
             continue;
 
-        // Determine controlling team for the capture point based on its gameobject entry
-        TeamId ownerTeam = TeamId::TEAM_NEUTRAL;
-
         uint32 goEntry = capturePoint->GetCapturePointGo()->GetEntry();
 
-        if (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
-            ownerTeam = GetAttackerTeam();
-        else
-            ownerTeam = GetDefenderTeam();
+        TeamId ownerTeam = (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
+                           ? GetAttackerTeam() : GetDefenderTeam();
 
         capturePoint->SetCapturePointData(capturePoint->GetCapturePointGo(), ownerTeam);
     }
