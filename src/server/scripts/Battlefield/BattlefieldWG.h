@@ -213,7 +213,7 @@ public:
     uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
     uint32 GetProgress() const;
     
-    void AddPlayer(Player* player);
+    void AddPlayer(Player* player) override;
 
 protected:
     WintergraspWorkshop* m_Workshop;
@@ -382,7 +382,7 @@ class BattlefieldWG : public Battlefield
 
         uint32 GetData(uint32 data) const override;
         
-        void AddPlayer(Player* player);
+        void AddPlayer(Player* player) override;
         
         void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
