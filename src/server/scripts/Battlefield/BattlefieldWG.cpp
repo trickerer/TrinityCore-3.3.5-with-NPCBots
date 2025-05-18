@@ -631,6 +631,16 @@ void BattlefieldWG::OnBattleStart()
     // {
     //     // Example: itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
     // }
+    
+    for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    {
+        BfCapturePoint* point = itr->second;
+        point->ResetProgress();                // Reset capture progress to zero or initial state
+        point->SetOwner(GetDefenderTeam());   // Or whoever owns it at battle start
+
+        // Send updated world state for this capture point to all players
+        SendUpdateWorldState(point->GetWorldStateID(), point->GetOwnerFactionWorldStateValue());
+    }
 
     // Teleport players out of orb room and send initial world states
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
