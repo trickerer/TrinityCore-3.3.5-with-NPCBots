@@ -194,23 +194,31 @@ enum WintergraspNpcs
 
 class WintergraspCapturePoint : public BfCapturePoint
 {
-    public:
-        WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
+public:
+    WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-        void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
+    void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
-        void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
-        void SetTeam(TeamId team) { m_team = team; }
+    void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
+    void SetTeam(TeamId team) { m_team = team; }
 
-        void SetCapturePointData(GameObject*);  // or just declared, not implemented
-        
-        void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
+    void SetCapturePointData(GameObject*);  // declared only
 
-        void ChangeTeam(TeamId oldteam) override;
-        TeamId GetTeam() const { return m_team; }
+    void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
-    protected:
-        WintergraspWorkshop* m_Workshop;
+    void ChangeTeam(TeamId oldteam) override;
+    TeamId GetTeam() const { return m_team; }
+
+    // Add these:
+    uint32 GetCapturePointWorldState() const { return m_capturePointWorldState; }
+    uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
+    uint32 GetProgress() const;  // Implement this in cpp
+
+protected:
+    WintergraspWorkshop* m_Workshop;
+
+    // Add this if not existing:
+    uint32 m_progress = 0;
 };
 
 /* ######################### *
