@@ -632,25 +632,14 @@ void BattlefieldWG::OnBattleStart()
     //     // Example: itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
     // }
     
-    for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (auto& pair : m_capturePoints)
     {
-        WintergraspCapturePoint* capturePoint = dynamic_cast<WintergraspCapturePoint*>(itr->second);
-        if (!capturePoint)
-            continue;
+        WintergraspCapturePoint* capturePoint = static_cast<WintergraspCapturePoint*>(pair.second);
+        TeamId team = capturePoint->GetTeam(); // This returns the team controlling the workshop
+        uint32 worldStateID = capturePoint->GetWorldStateID();
 
-        // Reset capture progress if you have a method, else implement one
-        // e.g. capturePoint->ResetProgress();  // If exists
-
-        // Set controlling team at battle start — usually the defender team owns them at the start
-        capturePoint->ChangeTeam(GetDefenderTeam());
-
-        // Send the capture point's world state to all players to update UI
-        // Usually worldstate IDs are defined in your constants, like:
-        // BATTLEFIELD_WG_WORLDSTATE_CAPTURE_POINT_0, etc.
-        // This depends on your implementation.
-
-        uint32 worldStateID = capturePoint->GetWorldStateID();  // You may need to implement this getter
-        uint32 worldStateValue = capturePoint->GetTeam();       // Team controlling it, encoded appropriately
+        // 1 for Alliance, 2 for Horde
+        uint32 worldStateValue = (team == TEAM_ALLIANCE) ? 1 : 2;
 
         SendUpdateWorldState(worldStateID, worldStateValue);
     }
