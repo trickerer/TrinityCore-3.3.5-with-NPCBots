@@ -202,8 +202,8 @@ class WintergraspCapturePoint : public BfCapturePoint
         void SetTeamControl(TeamId team) { m_team = team; }
         //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
         //void SetTeam(TeamId team) { m_team = team; }
-
-        void SetCapturePointData(GameObject*);  // or just declared, not implemented
+        
+        void SetCapturePointData(GameObject* go, TeamId team);
         
 
         void ChangeTeam(TeamId oldteam) override;

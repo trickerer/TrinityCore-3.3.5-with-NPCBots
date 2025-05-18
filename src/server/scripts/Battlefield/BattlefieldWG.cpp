@@ -630,12 +630,16 @@ void BattlefieldWG::OnBattleStart()
         if (!capturePoint)
             continue;
 
-        uint32 goEntry = capturePoint->GetCapturePointGo()->GetEntry();
+        auto* wgCapturePoint = dynamic_cast<WintergraspCapturePoint*>(capturePoint);
+        if (!wgCapturePoint)
+            continue;
+
+        uint32 goEntry = wgCapturePoint->GetCapturePointGo()->GetEntry();
 
         TeamId ownerTeam = (goEntry == GO_WINTERGRASP_FACTORY_BANNER_SE || goEntry == GO_WINTERGRASP_FACTORY_BANNER_SW)
                            ? GetAttackerTeam() : GetDefenderTeam();
 
-        capturePoint->SetCapturePointData(capturePoint->GetCapturePointGo(), ownerTeam);
+        wgCapturePoint->SetCapturePointData(wgCapturePoint->GetCapturePointGo(), ownerTeam);
     }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -692,10 +696,10 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
-    BfCapturePoint::SetCapturePointData(go); // call base version
-    // additional custom logic here if needed
+    m_team = team; // or call SetTeam(team) if you prefer encapsulation
+    BfCapturePoint::SetCapturePointData(go);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
