@@ -19,6 +19,7 @@
 #define BATTLEFIELD_WG_
 
 #include "Battlefield.h"
+#include <set>
 
 namespace WorldPackets
 {
@@ -222,6 +223,7 @@ protected:
     uint32 m_captureProgressWorldState;
     uint32 m_progress = 0;  // for GetProgress()
     ObjectGuid m_capturePointSpawn;
+    std::set<ObjectGuid> m_playersInside;
 };
 
 /* ######################### *
