@@ -204,7 +204,6 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void SetCapturePointData(GameObject*);  // or just declared, not implemented
         
-        void AddPlayer(Player* player); //override;
         void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
         void ChangeTeam(TeamId oldteam) override;
@@ -372,6 +371,8 @@ class BattlefieldWG : public Battlefield
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
+        
+        void AddPlayer(Player* player); //override;
 
     protected:
         bool m_isRelicInteractible;
