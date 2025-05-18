@@ -371,8 +371,6 @@ class BattlefieldWG : public Battlefield
         uint32 GetData(uint32 data) const override;
         
         void ClearCaptureBars();
-        uint32 GetWorldStateId() const { return _staticInfo->WorldStateId; }
-        TeamId GetTeamControl() const { return _teamControl; }
 
     protected:
         bool m_isRelicInteractible;
@@ -390,8 +388,6 @@ class BattlefieldWG : public Battlefield
         uint32 m_saveTimer;
 
         ObjectGuid m_titansRelicGUID;
-        WorkshopStaticInfo* _staticInfo;
-        TeamId _teamControl;
 };
 
 enum WintergraspGameObjectBuildingType
@@ -597,6 +593,8 @@ public:
     void UpdateGraveyardAndWorkshop();
 
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
+    
+    uint32 GetWorldStateId() const { return _staticInfo->WorldStateId; }
 
     void Save();
 };
