@@ -211,12 +211,12 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
+        
+        GameObject* m_capturePoint = nullptr;
 
     protected:
         WintergraspWorkshop* m_Workshop;
-        
-    private:
-        GameObject* m_capturePoint = nullptr;
+         
 
 };
 
