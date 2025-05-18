@@ -1945,8 +1945,9 @@ void BattlefieldWG::AddPlayer(Player* player)
     player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
 
     // Loop over all capture points and send their state
-    for (auto& point : m_capturePoints)
+    for (auto& pair : m_capturePoints)
     {
+        BfCapturePoint* point = pair.second;
         if (!point)
             continue;
 
