@@ -1933,8 +1933,7 @@ void BfWGGameObjectBuilding::UpdateTurretAttack(bool disable)
 
 void BattlefieldWG::AddPlayer(Player* player)
 {
-    // Call base logic
-    Battlefield::AddPlayer(player);
+    // No call to Battlefield::AddPlayer(player); - base method doesn't exist
 
     // Send main battlefield state
     player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
@@ -1951,10 +1950,9 @@ void BattlefieldWG::AddPlayer(Player* player)
         if (!point)
             continue;
 
-        // Replace with your actual worldstate IDs and logic
         uint32 factionValue = point->GetTeam() == TEAM_ALLIANCE ? 1 : 2;
         player->SendUpdateWorldState(point->m_capturePointWorldState, factionValue);
-        player->SendUpdateWorldState(point->m_captureProgressWorldState, point->GetProgress()); // if using progress bar
+        player->SendUpdateWorldState(point->m_captureProgressWorldState, point->GetProgress());
     }
 }
 
