@@ -692,6 +692,12 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go)
+{
+    BfCapturePoint::SetCapturePointData(go); // call base version
+    // additional custom logic here if needed
+}
+
 void BattlefieldWG::UpdateCounterVehicle(bool init)
 {
     if (init)
