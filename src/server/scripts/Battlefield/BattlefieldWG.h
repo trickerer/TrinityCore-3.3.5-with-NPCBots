@@ -232,7 +232,7 @@ class BattlefieldWG : public Battlefield
     private:
         bool m_EventEnded;       // To track if the event is finished
         int m_WinnerTeam;        // To store the winning team (0 - Alliance, 1 - Horde)
-        
+        TeamId m_team;
 
     public:
         BattlefieldWG();          // Constructor to initialize variables
@@ -382,8 +382,6 @@ class BattlefieldWG : public Battlefield
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
 
         uint32 GetData(uint32 data) const override;
-        
-        TeamId m_team;
 
     protected:
         bool m_isRelicInteractible;

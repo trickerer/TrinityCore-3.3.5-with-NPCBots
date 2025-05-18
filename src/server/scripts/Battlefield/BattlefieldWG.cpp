@@ -702,6 +702,7 @@ void BattlefieldWG::OnBattleStart()
     SendDiscordMessage(winnerMessage);
 
 }
+WintergraspCapturePoint::~WintergraspCapturePoint() = default;
 
 bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
