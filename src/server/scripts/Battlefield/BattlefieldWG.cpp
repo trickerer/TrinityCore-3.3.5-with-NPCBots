@@ -696,10 +696,10 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-bool WintergraspCapturePoint::SetCapturePointData(GameObject* go)
+void WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
-    // Just call the base version
-    return BfCapturePoint::SetCapturePointData(go);
+    SetCapturePointData(go);  // Call the 1-arg method to preserve base behavior
+    m_team = team;            // Your added logic for tracking team
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
