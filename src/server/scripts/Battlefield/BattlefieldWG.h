@@ -198,21 +198,16 @@ class WintergraspCapturePoint : public BfCapturePoint
         WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
         void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
-
-        //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
-        //void SetTeam(TeamId team) { m_team = team; }
-
-        //void SetCapturePointData(GameObject*);  // or just declared, not implemented
+        WintergraspWorkshop* GetWorkshop() const { return m_Workshop; }
 
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
-        
+
         uint32 GetWorldStateID() const { return m_worldStateID; }
-        WintergraspWorkshop* m_Workshop;
 
     protected:
-        
-        uint32 m_worldStateID; 
+        WintergraspWorkshop* m_Workshop = nullptr;
+        uint32 m_worldStateID = 0;
 };
 
 /* ######################### *
