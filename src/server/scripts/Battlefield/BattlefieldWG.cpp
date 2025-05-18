@@ -901,6 +901,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
+        //TELEPORT PLAYERS AT END OF BATTLE
+        /*
         for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
@@ -933,6 +935,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
                 }
             }
         }
+        */
     }
 
 }
