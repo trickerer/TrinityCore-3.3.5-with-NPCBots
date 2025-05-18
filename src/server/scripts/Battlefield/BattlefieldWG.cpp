@@ -1989,7 +1989,7 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
         uint32 worldState = m_capturePointWorldState;
         uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2; // 1 = Alliance, 2 = Horde (match DBC client logic)
 
-        m_Bf->SendUpdateWorldStateToZone(worldState, factionValue); // You'll define this helper if not already
+        m_Bf->SendUpdateWorldState(worldState, factionValue);
     }
 
     ASSERT(m_Workshop);
