@@ -204,7 +204,7 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void SetCapturePointData(GameObject*);  // or just declared, not implemented
         
-        void AddPlayer(Player* player) //override;
+        void AddPlayer(Player* player); //override;
         void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
         void ChangeTeam(TeamId oldteam) override;
