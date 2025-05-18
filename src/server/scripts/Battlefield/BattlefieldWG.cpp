@@ -668,7 +668,7 @@ void BattlefieldWG::OnBattleStart()
         workshop->Save();
     
     
-    for (WintergraspWorkshop* workshop : m_Workshops)
+    for (WintergraspWorkshop* workshop : Workshops)
     {
         if (!workshop)
             continue;
