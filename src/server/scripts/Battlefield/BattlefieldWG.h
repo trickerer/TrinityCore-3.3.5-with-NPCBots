@@ -403,7 +403,7 @@ class BattlefieldWG : public Battlefield
 
         ObjectGuid m_titansRelicGUID;
         
-        typedef std::set<uint64> GuidSet
+        typedef std::set<uint64> GuidSet;
         GuidSet m_playersInBattle; 
 };
 
