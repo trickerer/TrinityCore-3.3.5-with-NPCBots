@@ -1130,7 +1130,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
         {
             WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, GetAttackerTeam());
 
-            capturePoint->SetCapturePointData(go);
+            capturePoint->SetCapturePointData(go, TeamId team);
             capturePoint->LinkToWorkshop(workshop);
             AddCapturePoint(capturePoint);
             break;
