@@ -703,12 +703,6 @@ void BattlefieldWG::OnBattleStart()
 
 }
 
-WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl)
-    : BfCapturePoint(battlefield), m_team(teamInControl), m_Workshop(nullptr), m_capturePoint(nullptr)
-{
-    // Constructor body (can be empty if no logic is needed)
-}
-
 bool WintergraspCapturePoint::SetCapturePointData(GameObject* go, TeamId team)
 {
     bool result = BfCapturePoint::SetCapturePointData(go); // call base method
@@ -1564,7 +1558,7 @@ void BattlefieldWG::UpdateTenacity()
         m_tenacityTeam = TEAM_NEUTRAL;
 }
 
-WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield)
+WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield), m_team(teamInControl), m_Workshop(nullptr), m_capturePoint(nullptr)
 {
     m_Bf = battlefield;
     m_team = teamInControl;

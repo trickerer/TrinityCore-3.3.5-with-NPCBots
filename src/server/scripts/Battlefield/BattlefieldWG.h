@@ -213,6 +213,7 @@ class WintergraspCapturePoint : public BfCapturePoint
         TeamId GetTeam() const { return m_team; }
         
         GameObject* m_capturePoint = nullptr;
+        TeamId m_team;
 
     protected:
         WintergraspWorkshop* m_Workshop;
