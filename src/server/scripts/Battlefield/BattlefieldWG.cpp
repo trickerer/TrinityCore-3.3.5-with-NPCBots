@@ -1541,11 +1541,22 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
+void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 {
     ASSERT(m_Workshop);
-    m_team = newTeam;
-    m_Workshop->GiveControlTo(newTeam);
+
+    // IMPORTANT: update the team
+    m_team = m_Workshop->GetTeamControl();
+
+    // Send worldstate update
+    if (BattlefieldWG* wg = dynamic_cast<BattlefieldWG*>(m_Bf))
+    {
+        uint32 worldStateID = GetWorldStateID();
+        uint32 worldStateValue = (m_team == TEAM_ALLIANCE) ? 1 : 2;
+        wg->SendUpdateWorldState(worldStateID, worldStateValue);
+    }
+
+    m_Workshop->GiveControlTo(m_team);
 }
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
