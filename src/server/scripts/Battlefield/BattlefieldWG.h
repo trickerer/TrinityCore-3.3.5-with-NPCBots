@@ -402,6 +402,9 @@ class BattlefieldWG : public Battlefield
         uint32 m_saveTimer;
 
         ObjectGuid m_titansRelicGUID;
+        
+        typedef std::set<uint64> GuidSet
+        GuidSet m_playersInBattle; 
 };
 
 enum WintergraspGameObjectBuildingType
