@@ -1981,7 +1981,7 @@ void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
         _wg->UpdateCounterVehicle(false);
         _wg->CapturePointTaken(_staticInfo->WorkshopId);
     }
-    player->SendUpdateWorldState(wgPoint->GetCapturePointWorldState(), factionValue);
+    Player->SendUpdateWorldState(wgPoint->GetCapturePointWorldState(), factionValue);
 }
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()
