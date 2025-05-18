@@ -152,6 +152,9 @@ class TC_GAME_API BfCapturePoint
 
         // Gameobject related to that capture point
         ObjectGuid m_capturePointGUID;
+        
+        uint32 m_capturePointEntry;
+        TeamId m_team;
 };
 
 class TC_GAME_API BfGraveyard
