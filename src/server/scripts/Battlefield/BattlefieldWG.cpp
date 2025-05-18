@@ -1998,7 +1998,7 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 
 void WintergraspCapturePoint::AddPlayer(Player* player)
 {
-    BfCapturePoint::AddPlayer(player); // base logic to track presence
+    //BfCapturePoint::AddPlayer(player); // base logic to track presence
 
     if (m_Workshop)
     {
