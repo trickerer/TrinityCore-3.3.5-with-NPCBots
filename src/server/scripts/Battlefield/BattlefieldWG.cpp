@@ -634,12 +634,25 @@ void BattlefieldWG::OnBattleStart()
     
     for (auto itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
     {
-        BfCapturePoint* point = itr->second;
-        point->ResetProgress();                // Reset capture progress to zero or initial state
-        point->SetOwner(GetDefenderTeam());   // Or whoever owns it at battle start
+        WintergraspCapturePoint* capturePoint = dynamic_cast<WintergraspCapturePoint*>(itr->second);
+        if (!capturePoint)
+            continue;
 
-        // Send updated world state for this capture point to all players
-        SendUpdateWorldState(point->GetWorldStateID(), point->GetOwnerFactionWorldStateValue());
+        // Reset capture progress if you have a method, else implement one
+        // e.g. capturePoint->ResetProgress();  // If exists
+
+        // Set controlling team at battle start — usually the defender team owns them at the start
+        capturePoint->ChangeTeam(GetDefenderTeam());
+
+        // Send the capture point's world state to all players to update UI
+        // Usually worldstate IDs are defined in your constants, like:
+        // BATTLEFIELD_WG_WORLDSTATE_CAPTURE_POINT_0, etc.
+        // This depends on your implementation.
+
+        uint32 worldStateID = capturePoint->GetWorldStateID();  // You may need to implement this getter
+        uint32 worldStateValue = capturePoint->GetTeam();       // Team controlling it, encoded appropriately
+
+        SendUpdateWorldState(worldStateID, worldStateValue);
     }
 
     // Teleport players out of orb room and send initial world states
@@ -1539,10 +1552,11 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
+void WintergraspCapturePoint::ChangeTeam(TeamId newTeam)
 {
     ASSERT(m_Workshop);
-    m_Workshop->GiveControlTo(m_team);
+    m_team = newTeam;
+    m_Workshop->GiveControlTo(newTeam);
 }
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
