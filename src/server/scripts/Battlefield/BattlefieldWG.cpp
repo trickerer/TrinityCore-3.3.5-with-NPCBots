@@ -1951,7 +1951,7 @@ void BattlefieldWG::AddPlayer(Player* player)
         if (!point)
             continue;
 
-        uint32 factionValue = point->GetTeam() == TEAM_ALLIANCE ? 1 : 2;
+        uint32 factionValue = point->GetTeamId() == TEAM_ALLIANCE ? 1 : 2;
         player->SendUpdateWorldState(point->m_capturePointWorldState, factionValue);
         player->SendUpdateWorldState(point->m_captureProgressWorldState, point->GetProgress());
     }
