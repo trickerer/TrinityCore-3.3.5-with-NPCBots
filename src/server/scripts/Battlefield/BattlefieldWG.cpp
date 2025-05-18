@@ -1928,6 +1928,81 @@ void BfWGGameObjectBuilding::UpdateTurretAttack(bool disable)
     }
 }
 
+void BattlefieldWG::AddPlayer(Player* player)
+{
+    // Call base logic
+    Battlefield::AddPlayer(player);
+
+    // Send main battlefield state
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDER, m_DefenderTeam);
+    player->SendUpdateWorldState(ClockWorldState[0], m_Timer);
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ATTACKED_A, GetData(BATTLEFIELD_WG_DATA_WON_A));
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, GetData(BATTLEFIELD_WG_DATA_DEF_A));
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
+    player->SendUpdateWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
+
+    // Loop over all capture points and send their state
+    for (auto& point : m_capturePoints)
+    {
+        if (!point)
+            continue;
+
+        // Replace with your actual worldstate IDs and logic
+        uint32 factionValue = point->GetTeam() == TEAM_ALLIANCE ? 1 : 2;
+        player->SendUpdateWorldState(point->m_capturePointWorldState, factionValue);
+        player->SendUpdateWorldState(point->m_captureProgressWorldState, point->GetProgress()); // if using progress bar
+    }
+}
+
+void BattlefieldWG::SendUpdateWorldStateToZone(uint32 worldState, uint32 value)
+{
+    for (GuidSet::const_iterator itr = m_playersInBattle.begin(); itr != m_playersInBattle.end(); ++itr)
+    {
+        if (Player* player = ObjectAccessor::FindPlayer(*itr))
+            player->SendUpdateWorldState(worldState, value);
+    }
+}
+
+
+void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
+{
+    if (m_team == oldTeam)
+        return;
+
+    BfCapturePoint::ChangeTeam(oldTeam); // Maintain base behavior
+
+    // Update faction ownership world state
+    if (m_Workshop)
+    {
+        uint32 worldState = m_Workshop->GetCapturePointWorldState();
+        uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2; // 1 = Alliance, 2 = Horde (match DBC client logic)
+
+        m_Bf->SendUpdateWorldStateToZone(worldState, factionValue); // You'll define this helper if not already
+    }
+}
+
+void WintergraspCapturePoint::AddPlayer(Player* player)
+{
+    BfCapturePoint::AddPlayer(player); // base logic to track presence
+
+    if (m_Workshop)
+    {
+        uint32 worldState = m_Workshop->GetCapturePointWorldState();
+        uint32 factionValue = m_team == TEAM_ALLIANCE ? 1 : 2;
+
+        player->SendUpdateWorldState(worldState, factionValue);
+
+        // Optionally send progress bar (if used)
+        uint32 progressWorldState = m_Workshop->GetProgressWorldState();
+        if (progressWorldState)
+        {
+            uint32 scaledProgress = (uint32)(m_value * 100.0f); // assuming m_value is 0.0 to 1.0
+            player->SendUpdateWorldState(progressWorldState, scaledProgress);
+        }
+    }
+}
+
 void BfWGGameObjectBuilding::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.emplace_back(_worldState, _state);
