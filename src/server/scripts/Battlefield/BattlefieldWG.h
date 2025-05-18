@@ -372,7 +372,7 @@ class BattlefieldWG : public Battlefield
 
         uint32 GetData(uint32 data) const override;
         
-        void AddPlayer(Player* player); //override;
+        void AddPlayer(Player* player) override;
 
     protected:
         bool m_isRelicInteractible;
