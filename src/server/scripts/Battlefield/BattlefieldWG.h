@@ -204,10 +204,8 @@ class WintergraspCapturePoint : public BfCapturePoint
         //void SetTeam(TeamId team) { m_team = team; }
         
         // Override of base class method
-        bool SetCapturePointData(GameObject* go) override;
-
-        // Custom overload with team info
-        void SetCapturePointData(GameObject* go, TeamId team);
+        bool SetCapturePointData(GameObject* go) override;              // 1-arg override
+        bool SetCapturePointData(GameObject* go, TeamId team);  
         
         
 
@@ -227,6 +225,7 @@ class BattlefieldWG : public Battlefield
     private:
         bool m_EventEnded;       // To track if the event is finished
         int m_WinnerTeam;        // To store the winning team (0 - Alliance, 1 - Horde)
+        TeamId m_team;
 
     public:
         BattlefieldWG();          // Constructor to initialize variables
