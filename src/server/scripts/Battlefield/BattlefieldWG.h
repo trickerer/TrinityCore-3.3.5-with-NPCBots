@@ -202,8 +202,7 @@ public:
     void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
     void SetTeam(TeamId team) { m_team = team; }
 
-    void SetCapturePointData(GameObject*);  // declared only
-
+    void SetCapturePointData(GameObject* go);  // declaration only
     void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
     void ChangeTeam(TeamId oldteam) override;
@@ -211,9 +210,9 @@ public:
 
     uint32 GetCapturePointWorldState() const { return m_capturePointWorldState; }
     uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
-    uint32 GetProgress() const;
-    
-    void AddPlayer(Player* player); //override;
+    float GetProgress() const;  // correct declaration
+
+    void AddPlayer(Player* player); // override;
 
 protected:
     WintergraspWorkshop* m_Workshop;
