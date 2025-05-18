@@ -1559,11 +1559,12 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     m_Workshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
-{
-    ASSERT(m_Workshop);
-    m_Workshop->GiveControlTo(m_team);
-}
+
+//void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
+//{
+//    ASSERT(m_Workshop);
+//    m_Workshop->GiveControlTo(m_team);
+//}
 
 BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefield)
 {
@@ -1987,6 +1988,8 @@ void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 
         m_Bf->SendUpdateWorldStateToZone(worldState, factionValue); // You'll define this helper if not already
     }
+    ASSERT(m_Workshop);
+    m_Workshop->GiveControlTo(m_team);
 }
 
 void WintergraspCapturePoint::AddPlayer(Player* player)
