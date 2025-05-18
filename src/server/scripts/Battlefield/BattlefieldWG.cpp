@@ -1967,8 +1967,11 @@ void BattlefieldWG::SendUpdateWorldStateToZone(uint32 worldState, uint32 value)
 {
     for (GuidSet::const_iterator itr = m_playersInBattle.begin(); itr != m_playersInBattle.end(); ++itr)
     {
-        if (Player* player = ObjectAccessor::FindPlayer(*itr))
+        ObjectGuid guid = ObjectGuid(*itr);  // convert uint64 to ObjectGuid
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+        {
             player->SendUpdateWorldState(worldState, value);
+        }
     }
 }
 
