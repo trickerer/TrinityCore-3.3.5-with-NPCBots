@@ -212,6 +212,8 @@ public:
     uint32 GetCapturePointWorldState() const { return m_capturePointWorldState; }
     uint32 GetCaptureProgressWorldState() const { return m_captureProgressWorldState; }
     uint32 GetProgress() const;
+    
+    void AddPlayer(Player* player);
 
 protected:
     WintergraspWorkshop* m_Workshop;
@@ -381,6 +383,8 @@ class BattlefieldWG : public Battlefield
         uint32 GetData(uint32 data) const override;
         
         void AddPlayer(Player* player);
+        
+        void SendUpdateWorldStateToZone(uint32 worldState, uint32 value);
 
     protected:
         bool m_isRelicInteractible;
