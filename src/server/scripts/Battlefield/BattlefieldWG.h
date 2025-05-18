@@ -594,7 +594,7 @@ public:
 
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet);
     
-    uint32 GetWorldStateId() const { return _staticInfo->WorldStateId; }
+    uint32 GetWorldStateId() const;
 
     void Save();
 };
