@@ -1548,6 +1548,9 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}",
         achievement->ID, m_player->GetName(), m_player->GetGUID().ToString());
+        
+    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER)
+        return;
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
