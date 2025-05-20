@@ -113,7 +113,7 @@ public:
         Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
 
         // Summon the mailbox using correct parameters
-        GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+        GameObject* go = player->SummonGameObject(mailboxId, spawnX, spawnY, z, orientation, rotation, respawnTime);
 
         if (go)
         {
@@ -175,7 +175,7 @@ public:
         Seconds respawnTime(5 * MINUTE); // 5 minutes lifetime
 
         // Summon the Guild Vault using correct parameters
-        GameObject* go = player->SummonGameObject(GuildVaultId, spawnX, spawnY, z + 0.5f, orientation, rotation, respawnTime);
+        GameObject* go = player->SummonGameObject(GuildVaultId, spawnX, spawnY, z, orientation, rotation, respawnTime);
 
         if (go)
         {
