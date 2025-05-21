@@ -275,7 +275,7 @@ void AddSC_item_temp_gvault()
     new item_temp_gvault(); // Register the temporary gvault item script
 }
 
-void AddSC_ItemAuraVisualScript()
+void ItemAuraVisualScript()
 {
     new ItemAuraVisualScript();
 }
