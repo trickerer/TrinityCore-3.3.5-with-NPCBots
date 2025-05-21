@@ -59,6 +59,5 @@ void AddCustomScripts()
     AddSC_item_aaron_summon();
     AddSC_item_temp_mailbox();
     AddSC_item_temp_gvault();
-    AddCustomScripts();
-    ItemAuraVisualScript();
+    AddSC_ItemAuraVisualScript();
 }
