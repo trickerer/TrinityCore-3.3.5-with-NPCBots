@@ -9,6 +9,7 @@
 #include "ObjectAccessor.h"
 #include "GameObject.h"
 #include "ObjectGuid.h"
+#include "SpellAuraEffects.h"
 
 // AARON
 class item_aaron_summon : public ItemScript
@@ -199,6 +200,45 @@ public:
     }
 };
 
+class ItemAuraVisualScript : public PlayerScript
+{
+public:
+    ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
+
+    void OnLogin(Player* player) override
+    {
+        CheckAura(player);
+    }
+
+    void OnItemAdded(Player* player, Item* /*item*/) override
+    {
+        CheckAura(player);
+    }
+
+    void OnItemRemoved(Player* player, Item* /*item*/) override
+    {
+        CheckAura(player);
+    }
+
+private:
+    void CheckAura(Player* player)
+    {
+        uint32 itemId = 461145;        // ✅ Replace with your item's entry ID
+        uint32 auraSpellId = 65633;   // ✅ Replace with your chosen aura (e.g., Wings of the Protector)
+
+        if (player->HasItemCount(itemId, 1, true)) // true = only inventory/bags, no bank
+        {
+            if (!player->HasAura(auraSpellId))
+                player->CastSpell(player, auraSpellId, true); // Triggered cast, no cast bar
+        }
+        else
+        {
+            if (player->HasAura(auraSpellId))
+                player->RemoveAura(auraSpellId);
+        }
+    }
+};
+
 // Register scripts
 void AddSC_item_aaron_summon()
 {
@@ -213,4 +253,9 @@ void AddSC_item_temp_mailbox()
 void AddSC_item_temp_gvault()
 {
     new item_temp_gvault(); // Register the temporary gvault item script
+}
+
+void AddCustomScripts()
+{
+    new ItemAuraVisualScript();
 }
