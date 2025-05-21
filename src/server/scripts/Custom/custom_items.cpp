@@ -25,6 +25,8 @@ public:
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         uint32 delaytime = 1800;
+        if (player->HasItemCount(461145, 1))
+            uint32 delaytime = 300;
         if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < delaytime) // 1800 seconds = 30 minutes
         {
             uint32 remaining = delaytime - (now - lastUsedTime[guid]);
@@ -87,6 +89,8 @@ public:
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         uint32 delaytime = 1800;
+        if (player->HasItemCount(461145, 1))
+            uint32 delaytime = 300;
         if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < delaytime) // 1800 seconds = 30 minutes
         {
             uint32 remaining = delaytime - (now - lastUsedTime2[guid]);
@@ -150,6 +154,8 @@ public:
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         uint32 delaytime = 1800;
+        if (player->HasItemCount(461145, 1))
+            uint32 delaytime = 300;
         if (lastUsedTime3.count(guid) && now - lastUsedTime3[guid] < delaytime) // 1800 seconds = 30 minutes
         {
             uint32 remaining = delaytime - (now - lastUsedTime3[guid]);
