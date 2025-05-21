@@ -205,17 +205,17 @@ class ItemAuraVisualScript : public PlayerScript
 public:
     ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
 
-    void OnLogin(Player* player) override
+    void OnLogin(Player* player) //override
     {
         CheckAura(player);
     }
 
-    void OnItemAdded(Player* player, Item* /*item*/) override
+    void OnItemAdded(Player* player, Item* /*item*/) //override
     {
         CheckAura(player);
     }
 
-    void OnItemRemoved(Player* player, Item* /*item*/) override
+    void OnItemRemoved(Player* player, Item* /*item*/) //override
     {
         CheckAura(player);
     }
