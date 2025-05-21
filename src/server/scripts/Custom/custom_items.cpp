@@ -224,7 +224,7 @@ private:
     void CheckAura(Player* player)
     {
         uint32 itemId = 461145;        // ✅ Replace with your item's entry ID
-        uint32 auraSpellId = 65633;   // ✅ Replace with your chosen aura (e.g., Wings of the Protector)
+        uint32 auraSpellId = 50247;   // ✅ Replace with your chosen aura (e.g., Wings of the Protector)
 
         if (player->HasItemCount(itemId, 1, true)) // true = only inventory/bags, no bank
         {
