@@ -43,7 +43,7 @@ target_link_libraries(game-interface
 
 add_library(game
   ${PRIVATE_SOURCES}
-  ${CMAKE_CURRENT_SOURCE_DIR}/Discord/DiscordWebhookMgr.cpp
+  ${CMAKE_SOURCE_DIR}/server/scripts/Custom/discord/DiscordWebhookMgr.cpp
   )
 
 target_include_directories(game
