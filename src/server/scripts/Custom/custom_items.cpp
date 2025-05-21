@@ -11,6 +11,8 @@
 #include "ObjectGuid.h"
 #include "SpellAuraEffects.h"
 #include "Custom/discord/DiscordWebhookMgr.h"
+#include <unordered_map>
+#include <ctime> 
 
 // AARON
 class item_aaron_summon : public ItemScript
@@ -201,37 +203,39 @@ public:
     }
 };
 
+// Static map to track per-player aura check timing
+static std::unordered_map<uint64, uint32> lastAuraCheckTime;
+
 class ItemAuraVisualScript : public PlayerScript
 {
 public:
     ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
 
-    void OnLogin(Player* player) //override
+    void OnLogin(Player* player) override
     {
-        player->SetCustomValue<uint32>("ItemAuraCheckTime", sWorld->GetGameTime());
+        lastAuraCheckTime[player->GetGUID()] = time(nullptr);
         CheckAura(player);
     }
 
-    void OnUpdate(Player* player, uint32 /*diff*/) //override
+    void OnUpdate(Player* player, uint32 /*diff*/) override
     {
-        uint32 interval = 301; // seconds
-        uint32 now = sWorld->GetGameTime();
+        uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
+        uint64 guid = player->GetGUID();
 
-        uint32 lastChecked = player->GetCustomValue<uint32>("ItemAuraCheckTime", 0);
+        if (lastAuraCheckTime.count(guid) && now - lastAuraCheckTime[guid] < 2)
+            return;
 
-        if (now - lastChecked >= interval)
-        {
-            player->SetCustomValue<uint32>("ItemAuraCheckTime", now);
-            CheckAura(player);
-        }
+        lastAuraCheckTime[guid] = now;
+
+        CheckAura(player); // ✅ Call the check logic every ~2s
     }
 
-    void OnItemAdded(Player* player, Item* /*item*/) //override
+    void OnItemAdded(Player* player, Item* /*item*/) override
     {
         CheckAura(player);
     }
 
-    void OnItemRemoved(Player* player, Item* /*item*/) //override
+    void OnItemRemoved(Player* player, Item* /*item*/) override
     {
         CheckAura(player);
     }
@@ -239,13 +243,14 @@ public:
 private:
     void CheckAura(Player* player)
     {
-        uint32 itemId = 461145;     
-        uint32 auraSpellId = 50247;  
+        uint32 itemId = 461145;     // ✅ Your custom item ID
+        uint32 auraSpellId = 50247; // ✅ Spell visual-only aura
 
-        if (player->HasItemCount(itemId, 1, true)) // true = only in bags
+        // true = only in bags (not equipped, not bank)
+        if (player->HasItemCount(itemId, 1, true))
         {
             if (!player->HasAura(auraSpellId))
-                player->CastSpell(player, auraSpellId, true); // Triggered (no cast bar)
+                player->CastSpell(player, auraSpellId, true); // Triggered, no cast bar
         }
         else
         {
