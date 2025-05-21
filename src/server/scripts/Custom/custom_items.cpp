@@ -24,9 +24,10 @@ public:
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < 1800) // 1800 seconds = 30 minutes
+        uint32 delaytime = 1800;
+        if (lastUsedTime.count(guid) && now - lastUsedTime[guid] < uint32) // 1800 seconds = 30 minutes
         {
-            uint32 remaining = 1800 - (now - lastUsedTime[guid]);
+            uint32 remaining = uint32 - (now - lastUsedTime[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
             
@@ -85,9 +86,10 @@ public:
         uint64 guid = player->GetGUID();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < 1800) // 1800 seconds = 30 minutes
+        uint32 delaytime = 1800;
+        if (lastUsedTime2.count(guid) && now - lastUsedTime2[guid] < delaytime) // 1800 seconds = 30 minutes
         {
-            uint32 remaining = 1800 - (now - lastUsedTime2[guid]);
+            uint32 remaining = delaytime - (now - lastUsedTime2[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
             
@@ -147,9 +149,10 @@ public:
         uint64 guid = player->GetGUID();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
-        if (lastUsedTime3.count(guid) && now - lastUsedTime3[guid] < 1800) // 1800 seconds = 30 minutes
+        uint32 delaytime = 1800;
+        if (lastUsedTime3.count(guid) && now - lastUsedTime3[guid] < delaytime) // 1800 seconds = 30 minutes
         {
-            uint32 remaining = 1800 - (now - lastUsedTime3[guid]);
+            uint32 remaining = delaytime - (now - lastUsedTime3[guid]);
             uint32 remainingMinutes = remaining / 60;
             uint32 remainingSeconds = remaining % 60;
             
