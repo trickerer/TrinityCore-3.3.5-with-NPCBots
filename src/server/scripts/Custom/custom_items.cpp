@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "ObjectGuid.h"
 #include "SpellAuraEffects.h"
+#include "Custom/discord/DiscordWebhookMgr.h"
 
 // AARON
 class item_aaron_summon : public ItemScript
