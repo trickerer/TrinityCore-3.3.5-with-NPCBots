@@ -207,7 +207,22 @@ public:
 
     void OnLogin(Player* player) //override
     {
+        player->SetCustomValue<uint32>("ItemAuraCheckTime", sWorld->GetGameTime());
         CheckAura(player);
+    }
+
+    void OnUpdate(Player* player, uint32 /*diff*/) //override
+    {
+        uint32 interval = 301; // seconds
+        uint32 now = sWorld->GetGameTime();
+
+        uint32 lastChecked = player->GetCustomValue<uint32>("ItemAuraCheckTime", 0);
+
+        if (now - lastChecked >= interval)
+        {
+            player->SetCustomValue<uint32>("ItemAuraCheckTime", now);
+            CheckAura(player);
+        }
     }
 
     void OnItemAdded(Player* player, Item* /*item*/) //override
@@ -223,13 +238,13 @@ public:
 private:
     void CheckAura(Player* player)
     {
-        uint32 itemId = 461145;        // ✅ Replace with your item's entry ID
-        uint32 auraSpellId = 50247;   // ✅ Replace with your chosen aura (e.g., Wings of the Protector)
+        uint32 itemId = 461145;     
+        uint32 auraSpellId = 50247;  
 
-        if (player->HasItemCount(itemId, 1, true)) // true = only inventory/bags, no bank
+        if (player->HasItemCount(itemId, 1, true)) // true = only in bags
         {
             if (!player->HasAura(auraSpellId))
-                player->CastSpell(player, auraSpellId, true); // Triggered cast, no cast bar
+                player->CastSpell(player, auraSpellId, true); // Triggered (no cast bar)
         }
         else
         {
@@ -238,7 +253,6 @@ private:
         }
     }
 };
-
 // Register scripts
 void AddSC_item_aaron_summon()
 {
