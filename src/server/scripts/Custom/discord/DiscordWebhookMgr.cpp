@@ -17,7 +17,7 @@
 #include <Poco/JSON/Stringifier.h>
 #undef format
 
-/*
+
 void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
 {
     CURL* curl = curl_easy_init();
@@ -44,7 +44,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
         curl_easy_cleanup(curl);
     }
 }
-*/
+
 
 void SendDiscordMessage(const std::string& message)
 {
