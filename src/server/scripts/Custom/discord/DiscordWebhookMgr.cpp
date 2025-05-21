@@ -18,7 +18,7 @@
 #undef format
 
 
-void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::string& battlegroundName, uint32 alliancePlayers, uint32 hordePlayers)
+void SendBattlegroundDiscordWebhook(const std::string& battlegroundName, const std::string& teamAName, unsigned int teamAPlayers, unsigned int teamBPlayers, const std::string& teamBName)
 {
     CURL* curl = curl_easy_init();
     if (curl)
