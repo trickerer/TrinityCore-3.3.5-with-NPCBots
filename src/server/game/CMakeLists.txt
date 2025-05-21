@@ -42,7 +42,9 @@ target_link_libraries(game-interface
     Detour)
 
 add_library(game
-  ${PRIVATE_SOURCES})
+  ${PRIVATE_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Discord/DiscordWebhookMgr.cpp
+  )
 
 target_include_directories(game
   PRIVATE
