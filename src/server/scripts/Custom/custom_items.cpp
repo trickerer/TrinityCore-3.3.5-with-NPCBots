@@ -11,6 +11,7 @@
 #include "ObjectGuid.h"
 #include "SpellAuraEffects.h"
 #include "Unit.h"
+#include "Chat.h"
 #include "Custom/discord/DiscordWebhookMgr.h"
 #include <unordered_map>
 #include <ctime> 
@@ -214,7 +215,7 @@ public:
 
     void OnLogin(Player* player) //override
     {
-        player->Say("LOGGED IN", LANG_UNIVERSAL);
+        ChatHandler(player->GetSession()).PSendSysMessage(">> TEST: Login hook works.");
         lastAuraCheckTime[player->GetGUID()] = time(nullptr);
         CheckAura(player);
     }
