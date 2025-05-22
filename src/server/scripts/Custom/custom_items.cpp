@@ -234,19 +234,6 @@ public:
         CheckAura(player);
     }
 
-    void OnItemAdded(Player* player, Item* item) //override
-    {
-        player->Say("ITEM ADDED", LANG_UNIVERSAL);
-        CheckAura(player);
-    }
-
-    bool OnRemove(Player* player, Item* /*item*/) //override
-    {
-        player->Say("ITEM REMOVED", LANG_UNIVERSAL);
-        CheckAura(player);
-        return true; 
-    }
-
 private:
     void CheckAura(Player* player)
     {
