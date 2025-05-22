@@ -39,6 +39,7 @@ void AddSC_item_aaron_summon();
 void AddSC_item_temp_mailbox();
 void AddSC_item_temp_gvault();
 void AddSC_ItemAuraVisualScript();
+void AddSC_TestLoginHook();
  
 void AddCustomScripts()
 {
@@ -60,4 +61,5 @@ void AddCustomScripts()
     AddSC_item_temp_mailbox();
     AddSC_item_temp_gvault();
     AddSC_ItemAuraVisualScript();
+    AddSC_TestLoginHook();
 }
