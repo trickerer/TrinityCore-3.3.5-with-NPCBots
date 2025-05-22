@@ -10,6 +10,7 @@
 #include "GameObject.h"
 #include "ObjectGuid.h"
 #include "SpellAuraEffects.h"
+#include "Unit.h"
 #include "Custom/discord/DiscordWebhookMgr.h"
 #include <unordered_map>
 #include <ctime> 
