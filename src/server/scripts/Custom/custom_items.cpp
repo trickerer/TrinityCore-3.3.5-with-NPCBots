@@ -221,17 +221,24 @@ public:
         CheckAura(player);
     }
 
-       void OnUpdate(Player* player, uint32 /*diff*/) //override
+    void OnUpdate(uint32 diff) //override
     {
-        player->Say("UPDATE", LANG_UNIVERSAL);
-        uint32 now = time(nullptr);
-        uint64 guid = player->GetGUID();
+        static uint32 timer = 0;
+        timer += diff;
 
-        if (lastAuraCheckTime.count(guid) && now - lastAuraCheckTime[guid] < 2)
+        if (timer < 2000) // 2 seconds interval
             return;
 
-        lastAuraCheckTime[guid] = now;
-        CheckAura(player);
+        timer = 0;
+
+        for (auto player : sObjectAccessor->GetPlayers())
+        {
+            if (!player || !player->IsInWorld())
+                continue;
+        
+            CheckAura(player);
+            player->Say("UPDATE", LANG_UNIVERSAL);
+        }
     }
 
 private:
