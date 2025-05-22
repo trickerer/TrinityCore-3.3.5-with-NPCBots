@@ -208,7 +208,7 @@ public:
 // Static map to track per-player aura check timing
 static std::unordered_map<uint64, uint32> lastAuraCheckTime;
 
-class ItemAuraVisualScript : public PlayerScript
+class ItemAuraVisualScript : public ItemScript
 {
 public:
     ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
