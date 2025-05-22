@@ -216,7 +216,7 @@ public:
     //void OnLogin(Player* player) //override
     void OnLogin(Player* player, bool /*firstLogin*/)
     {
-        //ChatHandler(player->GetSession()).PSendSysMessage(">> TEST: Login hook works.");
+        player->Say("LOGGED IN", LANG_UNIVERSAL);
         lastAuraCheckTime[player->GetGUID()] = time(nullptr);
         CheckAura(player);
     }
