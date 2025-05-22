@@ -14,7 +14,7 @@ public:
         TC_LOG_INFO("custom", "TestLoginHook: OnLogin triggered for player: %s", player->GetName().c_str());
     }
 };
-
+broken_code_here;
 void AddSC_TestLoginHook()
 {
     new TestLoginHook();
