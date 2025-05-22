@@ -235,15 +235,13 @@ public:
         CheckAura(player); // ✅ Call the check logic every ~2s
     }
 
-    //void OnItemAdded(Player* player, Item* item) //override
-    void OnCreate(Player* player, Item* item, uint32 /*count*/)
+    void OnItemAdded(Player* player, Item* item) //override
     {
         player->Say("ITEM ADDED", LANG_UNIVERSAL);
         CheckAura(player);
     }
 
-    //void OnItemRemoved(Player* player, Item* item) //override
-    bool OnRemove(Player* player, Item* item, uint32 /*count*/)
+    virtual bool OnItemRemove(Player* player, Item* item) //override
     {
         player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
@@ -285,5 +283,6 @@ void AddSC_item_temp_gvault()
 
 void AddSC_ItemAuraVisualScript()
 {
-    new ItemAuraVisualScript();
+    auto listener = new ItemAuraVisualScript();
+    sScriptMgr->RegisterPlayerScript(listener);
 }
