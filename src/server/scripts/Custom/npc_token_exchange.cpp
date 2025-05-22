@@ -14,7 +14,7 @@
 #define tokentext2 "You can't afford that!!" // Cant afford
 #define tokentext3 -1700002
 #define tokentext4 -1700003
-#define tokentext5 "Mini Tokens can be earned a few ways, you willf ind clues in the game......" // How to Get tokens..
+#define tokentext5 "Mini Tokens can be earned a few ways, you will find clues in the game or ask in world channel in game or Discord...." // How to Get tokens..
 #define tokentext6 "UNKNOWN!" //??
 #define tokentext7 "Farewell! " // Bye
 #define tokentext8 "Exchange Complete." //??
@@ -34,6 +34,8 @@
 #define GOSSIP_HELLO_TSWAP13  "Summon Aaron item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP14  "Summon Mailbox item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP15  "Summon Guild Vault item. (cost 10 mini tokens)"
+#define GOSSIP_HELLO_TSWAP16  "Exchange 1 MGA Token For VIP Item"
+#define GOSSIP_HELLO_TSWAP17  "Exchange 50K gold For VIP Item"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
@@ -88,6 +90,10 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP14, GOSSIP_SENDER_MAIN, 1014);
             //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP15, GOSSIP_SENDER_MAIN, 1015);
+            
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP16, GOSSIP_SENDER_MAIN, 1016);
+            
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP17, GOSSIP_SENDER_MAIN, 1017);
             
 			
 			//AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP5, GOSSIP_SENDER_MAIN, 1005);
@@ -389,6 +395,64 @@ public:
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
                             player->DestroyItemCount(18154, 10, true);
+                            me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                        }
+                        else
+                        {
+                            player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
+                        }
+                    }
+                }
+                case 1016:
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 1))
+                {
+                    if (player->HasItemCount(461145, 1))
+                    {
+                        me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                        me->PlayDirectSound(11466);
+                    }
+                    else
+                    {
+                        uint32 itemId = 461145;
+                        ItemPosCountVec dest;
+
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                            player->SendNewItem(item, 1, true, false);
+                            player->DestroyItemCount(21140, 1, true);
+                            me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                        }
+                        else
+                        {
+                            player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
+                        }
+                    }
+                }
+                case 1017:
+                CloseGossipMenuFor(player);
+                if (player->GetMoney() >= 500000000)
+                {
+                    if (player->HasItemCount(461145, 1))
+                    {
+                        me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                        me->PlayDirectSound(11466);
+                    }
+                    else
+                    {
+                        uint32 itemId = 461145;
+                        ItemPosCountVec dest;
+
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                            player->SendNewItem(item, 1, true, false);
+                            player->ModifyMoney(-500000000);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
