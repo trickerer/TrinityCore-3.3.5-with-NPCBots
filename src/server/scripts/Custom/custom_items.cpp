@@ -227,20 +227,24 @@ public:
 private:
     void CheckAura(Player* player)
     {
-        uint32 itemId = 461145;     // ✅ Your custom item ID
-        uint32 auraSpellId = 50247; // ✅ Spell visual-only aura
+        uint32 itemId = 461145;
+        std::vector<uint32> auraSpellIds = {28126, 36945};
 
         if (player->HasItemCount(itemId, 1))
         {
-            //player->Say("HAS ITEM", LANG_UNIVERSAL);
-            if (!player->HasAura(auraSpellId))
-                player->CastSpell(player, auraSpellId, true); // Triggered, no cast bar
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (!player->HasAura(spellId))
+                    player->CastSpell(player, spellId, true);
+            }
         }
         else
         {
-            //player->Say("DOES NOT HAVE ITEM", LANG_UNIVERSAL);
-            if (player->HasAura(auraSpellId))
-                player->RemoveAura(auraSpellId);
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (player->HasAura(spellId))
+                    player->RemoveAura(spellId);
+            }
         }
     }
 };
@@ -276,17 +280,23 @@ private:
     void CheckAura(Player* player)
     {
         uint32 itemId = 461145;
-        uint32 auraSpellId = 50247;
+        std::vector<uint32> auraSpellIds = {28126, 36945};
 
         if (player->HasItemCount(itemId, 1))
         {
-            if (!player->HasAura(auraSpellId))
-                player->CastSpell(player, auraSpellId, true);
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (!player->HasAura(spellId))
+                    player->CastSpell(player, spellId, true);
+            }
         }
         else
         {
-            if (player->HasAura(auraSpellId))
-                player->RemoveAura(auraSpellId);
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (player->HasAura(spellId))
+                    player->RemoveAura(spellId);
+            }
         }
     }
 };
