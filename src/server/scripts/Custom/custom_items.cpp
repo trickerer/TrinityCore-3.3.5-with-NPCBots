@@ -223,7 +223,7 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(uint32 diff) //override
+    void OnUpdate(Player* player, uint32 diff) //override
     {
         static uint32 timer = 0;
         timer += diff;
