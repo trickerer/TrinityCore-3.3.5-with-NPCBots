@@ -233,7 +233,7 @@ public:
 
         timer = 0;
 
-        SessionMap const& sessions = sWorld->GetAllSessions();
+        std::unordered_map<uint32, WorldSession*> const& sessions = sWorld->GetAllSessions();
         for (auto const& pair : sessions)
         {
             if (Player* player = pair.second->GetPlayer())
