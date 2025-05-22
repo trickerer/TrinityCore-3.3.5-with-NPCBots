@@ -375,7 +375,9 @@ public:
                             player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
                         }
                     }
+                    
                 }
+                break;
                 case 1015:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(18154, 10))
@@ -405,8 +407,9 @@ public:
                             player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
                         }
                     }
-                    return true;
+                    
                 }
+                break;
                 case 1016:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(21140, 1))
@@ -437,8 +440,8 @@ public:
                             player->SendEquipError(msg, nullptr, nullptr);
                         }
                     }
-                    return true;
                 }
+                break;
                 case 1017:
                 CloseGossipMenuFor(player);
                 if (player->GetMoney() >= 500000000)
@@ -468,7 +471,6 @@ public:
                             player->SendEquipError(msg, nullptr, nullptr); // Better to use nullptr
                         }
                     }
-                    return true;
                 }
                 else
                 {
