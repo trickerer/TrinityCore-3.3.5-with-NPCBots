@@ -213,14 +213,14 @@ public:
 
     void OnLogin(Player* player) //override
     {
-        me->Say("LOGGED IN", LANG_UNIVERSAL);
+        WhisperTo(player, "LOGGED IN");
         lastAuraCheckTime[player->GetGUID()] = time(nullptr);
         CheckAura(player);
     }
 
     void OnUpdate(Player* player, uint32 /*diff*/) //override
     {
-        me->Say("UPDATE", LANG_UNIVERSAL);
+        WhisperTo(player, "UPDATE");
         uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
         uint64 guid = player->GetGUID();
 
@@ -234,13 +234,13 @@ public:
 
     void OnItemAdded(Player* player, Item* /*item*/) override
     {
-        me->Say("ITEM ADDED", LANG_UNIVERSAL);
+        WhisperTo(player, "ITEM ADDED");
         CheckAura(player);
     }
 
     void OnItemRemoved(Player* player, Item* /*item*/) override
     {
-        me->Say("ITEM REMOVED", LANG_UNIVERSAL);
+        WhisperTo(player, "ITEM REMOVED);
         CheckAura(player);
     }
 
