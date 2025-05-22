@@ -12,6 +12,7 @@
 #include "SpellAuraEffects.h"
 #include "Unit.h"
 #include "Chat.h"
+#include "ObjectAccessor.h"
 #include "Custom/discord/DiscordWebhookMgr.h"
 #include <unordered_map>
 #include <ctime> 
