@@ -224,29 +224,24 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(uint32 diff) //override
+    void OnUpdate(Player* player, uint32 diff)
+{
+    static std::unordered_map<uint64, uint32> playerTimers;
+    uint64 guid = player->GetGUID();
+
+    playerTimers[guid] += diff;
+
+    if (playerTimers[guid] < 2000)
+        return;
+
+    playerTimers[guid] = 0;
+
+    if (player->IsInWorld())
     {
-        static uint32 timer = 0;
-        timer += diff;
-
-        if (timer < 2000)
-            return;
-
-        timer = 0;
-
-        std::unordered_map<uint32, WorldSession*> const& sessions = sWorld->GetAllSessions();
-        for (auto const& pair : sessions)
-        {
-            if (Player* player = pair.second->GetPlayer())
-            {
-                if (player->IsInWorld())
-                {
-                    CheckAura(player);
-                    player->Say("UPDATE!", LANG_UNIVERSAL);
-                }
-            }
-        }
+        CheckAura(player);
+        player->Say("UPDATE!", LANG_UNIVERSAL);
     }
+}
 
 
 private:
