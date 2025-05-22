@@ -221,9 +221,9 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(uint32 diff) //override
+    void OnUpdate(Player* player, uint32 diff) //override
     {
-        //player->Say("UPDATE", LANG_UNIVERSAL);
+        player->Say("UPDATE", LANG_UNIVERSAL);
         uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
         uint64 guid = player->GetGUID();
 
@@ -237,13 +237,13 @@ public:
 
     void OnItemAdded(Player* player, Item* /*item*/) //override
     {
-        //player->Say("ITEM ADDED", LANG_UNIVERSAL);
+        player->Say("ITEM ADDED", LANG_UNIVERSAL);
         CheckAura(player);
     }
 
     void OnItemRemoved(Player* player, Item* /*item*/) //override
     {
-        //player->Say("ITEM REMOVED", LANG_UNIVERSAL);
+        player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
     }
 
