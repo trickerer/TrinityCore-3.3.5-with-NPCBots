@@ -221,18 +221,17 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(Player* player, uint32 diff) //override
+       void OnUpdate(Player* player, uint32 /*diff*/) //override
     {
         player->Say("UPDATE", LANG_UNIVERSAL);
-        uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
+        uint32 now = time(nullptr);
         uint64 guid = player->GetGUID();
 
         if (lastAuraCheckTime.count(guid) && now - lastAuraCheckTime[guid] < 2)
             return;
 
         lastAuraCheckTime[guid] = now;
-
-        CheckAura(player); // ✅ Call the check logic every ~2s
+        CheckAura(player);
     }
 
     void OnItemAdded(Player* player, Item* item) //override
