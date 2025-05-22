@@ -253,8 +253,7 @@ private:
         uint32 itemId = 461145;     // ✅ Your custom item ID
         uint32 auraSpellId = 50247; // ✅ Spell visual-only aura
 
-        // true = only in bags (not equipped, not bank)
-        if (player->HasItemCount(itemId, 1, true))
+        if (player->HasItemCount(itemId, 1))
         {
             if (!player->HasAura(auraSpellId))
                 player->CastSpell(player, auraSpellId, true); // Triggered, no cast bar
