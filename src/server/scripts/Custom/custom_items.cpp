@@ -245,6 +245,7 @@ public:
     {
         player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
+        return true; 
     }
 
 private:
