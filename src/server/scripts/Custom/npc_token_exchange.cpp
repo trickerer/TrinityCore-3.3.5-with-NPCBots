@@ -420,12 +420,6 @@ public:
                     }
                     else
                     {
-                        // Check if player has at least 50,000 gold
-                        if (player->GetMoney() < 500000000)
-                        {
-                            me->Say("You need at least 50,000 gold!", LANG_UNIVERSAL);
-                            return true;
-                        }
 
                         uint32 itemId = 461145;
                         ItemPosCountVec dest;
@@ -436,7 +430,6 @@ public:
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
                             player->DestroyItemCount(21140, 1, true);
-                            player->ModifyMoney(-500000000); // Remove 50k gold
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
