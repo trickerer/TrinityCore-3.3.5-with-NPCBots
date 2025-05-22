@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Creature.h"
 #include "WorldSession.h"
+#include "World.h"
 #include "Log.h"
 #include "SpellMgr.h"
 #include "Item.h"
