@@ -241,7 +241,7 @@ public:
         CheckAura(player);
     }
 
-    bool OnItemRemove(Player* player, Item* item) //override
+    bool OnRemove(Player* player, Item* /*item*/) //override
     {
         player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
