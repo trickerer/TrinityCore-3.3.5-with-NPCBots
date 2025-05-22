@@ -221,7 +221,7 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(uint32 diff) override
+    void OnUpdate(uint32 diff) //override
     {
         player->Say("UPDATE", LANG_UNIVERSAL);
         uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
