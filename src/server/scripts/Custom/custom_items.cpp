@@ -213,7 +213,8 @@ class ItemAuraVisualScript : public PlayerScript
 public:
     ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
 
-    void OnLogin(Player* player) //override
+    //void OnLogin(Player* player) //override
+    void OnLogin(Player* player, bool /*firstLogin*/)
     {
         ChatHandler(player->GetSession()).PSendSysMessage(">> TEST: Login hook works.");
         lastAuraCheckTime[player->GetGUID()] = time(nullptr);
