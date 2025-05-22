@@ -241,7 +241,7 @@ public:
         CheckAura(player);
     }
 
-    virtual bool OnItemRemove(Player* player, Item* item) //override
+    bool OnItemRemove(Player* player, Item* item) override
     {
         player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
@@ -283,6 +283,5 @@ void AddSC_item_temp_gvault()
 
 void AddSC_ItemAuraVisualScript()
 {
-    auto listener = new ItemAuraVisualScript();
-    sScriptMgr->RegisterPlayerScript(listener);
+    new ItemAuraVisualScript();
 }
