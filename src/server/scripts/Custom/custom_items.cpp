@@ -17,7 +17,6 @@
 #include <unordered_map>
 #include <ctime> 
 
-extern ObjectAccessor* sObjectAccessor;
 
 // AARON
 class item_aaron_summon : public ItemScript
@@ -234,14 +233,11 @@ public:
 
         timer = 0;
 
-        for (auto player : sObjectAccessor->GetPlayers())
-        {
-            if (!player || !player->IsInWorld())
-                continue;
-        
-            CheckAura(player);
-            player->Say("UPDATE", LANG_UNIVERSAL);
-        }
+        if (!player || !player->IsInWorld())
+            continue;
+    
+        CheckAura(player);
+        player->Say("UPDATE", LANG_UNIVERSAL);
     }
 
 private:
