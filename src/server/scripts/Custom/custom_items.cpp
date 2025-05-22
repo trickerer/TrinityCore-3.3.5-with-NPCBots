@@ -216,12 +216,12 @@ public:
     //void OnLogin(Player* player) //override
     void OnLogin(Player* player, bool /*firstLogin*/)
     {
-        ChatHandler(player->GetSession()).PSendSysMessage(">> TEST: Login hook works.");
+        //ChatHandler(player->GetSession()).PSendSysMessage(">> TEST: Login hook works.");
         lastAuraCheckTime[player->GetGUID()] = time(nullptr);
         CheckAura(player);
     }
 
-    void OnUpdate(Player* player, uint32 /*diff*/) //override
+    void OnUpdate(uint32 diff) override
     {
         player->Say("UPDATE", LANG_UNIVERSAL);
         uint32 now = time(nullptr); // ✅ Corrected: Only use time() for current time
