@@ -223,22 +223,30 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(Player* player, uint32 diff) //override
+    void OnUpdate(uint32 diff) //override
     {
         static uint32 timer = 0;
         timer += diff;
 
-        if (timer < 2000) // 2 seconds interval
+        if (timer < 2000)
             return;
 
         timer = 0;
 
-        if (!player || !player->IsInWorld())
-            return;
-    
-        CheckAura(player);
-        player->Say("UPDATE", LANG_UNIVERSAL);
+        SessionMap const& sessions = sWorld->GetAllSessions();
+        for (auto const& pair : sessions)
+        {
+            if (Player* player = pair.second->GetPlayer())
+            {
+                if (player->IsInWorld())
+                {
+                    CheckAura(player);
+                    player->Say("UPDATE!", LANG_UNIVERSAL);
+                }
+            }
+        }
     }
+
 
 private:
     void CheckAura(Player* player)
