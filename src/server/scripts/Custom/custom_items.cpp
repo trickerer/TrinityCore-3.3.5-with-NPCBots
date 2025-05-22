@@ -224,26 +224,6 @@ public:
         CheckAura(player);
     }
 
-    void OnUpdate(Player* player, uint32 diff)
-{
-    static std::unordered_map<uint64, uint32> playerTimers;
-    uint64 guid = player->GetGUID();
-
-    playerTimers[guid] += diff;
-
-    if (playerTimers[guid] < 2000)
-        return;
-
-    playerTimers[guid] = 0;
-
-    if (player->IsInWorld())
-    {
-        CheckAura(player);
-        player->Say("UPDATE!", LANG_UNIVERSAL);
-    }
-}
-
-
 private:
     void CheckAura(Player* player)
     {
@@ -259,6 +239,52 @@ private:
         else
         {
             player->Say("DOES NOT HAVE ITEM", LANG_UNIVERSAL);
+            if (player->HasAura(auraSpellId))
+                player->RemoveAura(auraSpellId);
+        }
+    }
+};
+
+class ItemAuraVisualWorldScript : public WorldScript
+{
+public:
+    ItemAuraVisualWorldScript() : WorldScript("ItemAuraVisualWorldScript") { }
+
+    void OnUpdate(uint32 diff) override
+    {
+        static uint32 timer = 0;
+        timer += diff;
+
+        if (timer < 2000)
+            return;
+
+        timer = 0;
+
+        for (auto const& pair : sWorld->GetAllSessions())
+        {
+            if (Player* player = pair.second->GetPlayer())
+            {
+                if (player->IsInWorld())
+                {
+                    CheckAura(player);
+                }
+            }
+        }
+    }
+
+private:
+    void CheckAura(Player* player)
+    {
+        uint32 itemId = 461145;
+        uint32 auraSpellId = 50247;
+
+        if (player->HasItemCount(itemId, 1))
+        {
+            if (!player->HasAura(auraSpellId))
+                player->CastSpell(player, auraSpellId, true);
+        }
+        else
+        {
             if (player->HasAura(auraSpellId))
                 player->RemoveAura(auraSpellId);
         }
@@ -283,4 +309,5 @@ void AddSC_item_temp_gvault()
 void AddSC_ItemAuraVisualScript()
 {
     new ItemAuraVisualScript();
+    new ItemAuraVisualWorldScript();
 }
