@@ -235,13 +235,15 @@ public:
         CheckAura(player); // ✅ Call the check logic every ~2s
     }
 
-    void OnItemAdded(Player* player, Item* item) //override
+    //void OnItemAdded(Player* player, Item* item) //override
+    void OnCreate(Player* player, Item* item, uint32 /*count*/)
     {
         player->Say("ITEM ADDED", LANG_UNIVERSAL);
         CheckAura(player);
     }
 
-    void OnItemRemoved(Player* player, Item* item) //override
+    //void OnItemRemoved(Player* player, Item* item) //override
+    bool OnRemove(Player* player, Item* item, uint32 /*count*/)
     {
         player->Say("ITEM REMOVED", LANG_UNIVERSAL);
         CheckAura(player);
