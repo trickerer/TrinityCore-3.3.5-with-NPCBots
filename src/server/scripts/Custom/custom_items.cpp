@@ -17,6 +17,8 @@
 #include <unordered_map>
 #include <ctime> 
 
+extern ObjectAccessor* sObjectAccessor;
+
 // AARON
 class item_aaron_summon : public ItemScript
 {
