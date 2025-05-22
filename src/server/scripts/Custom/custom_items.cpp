@@ -211,7 +211,7 @@ static std::unordered_map<uint64, uint32> lastAuraCheckTime;
 class ItemAuraVisualScript : public ItemScript
 {
 public:
-    ItemAuraVisualScript() : PlayerScript("ItemAuraVisualScript") {}
+    ItemAuraVisualScript() : ItemScript("ItemAuraVisualScript") {}
 
     //void OnLogin(Player* player) //override
     void OnLogin(Player* player, bool /*firstLogin*/)
