@@ -242,11 +242,13 @@ private:
 
         if (player->HasItemCount(itemId, 1))
         {
+            player->Say("HAS ITEM", LANG_UNIVERSAL);
             if (!player->HasAura(auraSpellId))
                 player->CastSpell(player, auraSpellId, true); // Triggered, no cast bar
         }
         else
         {
+            player->Say("DOES NOT HAVE ITEM", LANG_UNIVERSAL);
             if (player->HasAura(auraSpellId))
                 player->RemoveAura(auraSpellId);
         }
