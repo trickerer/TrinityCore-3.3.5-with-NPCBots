@@ -234,7 +234,7 @@ public:
         timer = 0;
 
         if (!player || !player->IsInWorld())
-            continue;
+            return false;
     
         CheckAura(player);
         player->Say("UPDATE", LANG_UNIVERSAL);
