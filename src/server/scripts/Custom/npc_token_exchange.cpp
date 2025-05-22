@@ -318,6 +318,7 @@ public:
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         me->PlayDirectSound(11466);
+                        return true;
                     }
                     else
                     {
@@ -354,6 +355,7 @@ public:
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         me->PlayDirectSound(11466);
+                        return true;
                     }
                     else
                     {
@@ -383,6 +385,7 @@ public:
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         me->PlayDirectSound(11466);
+                        return true;
                     }
                     else
                     {
@@ -412,6 +415,7 @@ public:
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         me->PlayDirectSound(11466);
+                        return true;
                     }
                     else
                     {
@@ -441,6 +445,7 @@ public:
                         me->Yell(tokentext9, LANG_UNIVERSAL); // Already has reward
                         me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
                         me->PlayDirectSound(11466);
+                        return true;
                     }
                     else
                     {
