@@ -32,12 +32,14 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
-    ChatCommandTable GetCommands() const override
+    Trinity::ChatCommands::ChatCommandTable GetCommands() const override
     {
+        using namespace Trinity::ChatCommands;
+
         static ChatCommandTable discordVerifyCommandTable =
         {
-            ChatCommandBuilder("getdiscordcode")
-                .SetHandler(&discord_verify_commandscript::HandleGetDiscordCode)
+            // { commandName, handlerFunction, securityLevel, logging enum }
+            ChatCommandBuilder("getdiscordcode", &discord_verify_commandscript::HandleGetDiscordCode)
                 .SetSecurity(SEC_PLAYER)
         };
 
@@ -49,7 +51,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleGetDiscordCode(ChatHandler* handler)
+    static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
@@ -67,10 +69,8 @@ public:
         static const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         std::string result;
         result.reserve(length);
-
         for (size_t i = 0; i < length; ++i)
             result += charset[rand() % (sizeof(charset) - 1)];
-
         return result;
     }
 };
