@@ -1,29 +1,10 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
-#include "CreatureAI.h"
-#include "CreatureGroups.h"
-#include "DatabaseEnv.h"
-#include "FollowMovementGenerator.h"
-#include "GameTime.h"
-#include "Language.h"
-#include "Log.h"
-#include "Map.h"
-#include "MotionMaster.h"
-#include "MovementDefines.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
-#include "Pet.h"
 #include "Player.h"
-#include "RBAC.h"
-#include "SmartEnum.h"
-#include "Transport.h"
-#include "World.h"
 #include "WorldSession.h"
 #include <unordered_map>
-#include <ctime>
 #include <cstdlib>
-
-using namespace Trinity::ChatCommands;
+#include <ctime>
 
 std::unordered_map<uint64, std::string> g_DiscordCodes;
 
