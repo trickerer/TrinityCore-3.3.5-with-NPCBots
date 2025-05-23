@@ -1,7 +1,6 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "WorldSession.h"
 #include <unordered_map>
 #include <ctime>
 
@@ -12,23 +11,25 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    ChatCommandTable GetCommands() const //override
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommandTable commands =
+        static std::vector<ChatCommand> commands =
         {
-            { "getdiscordcode", SEC_PLAYER, false, [](ChatHandler* handler, std::string_view /*args*/) -> bool
-                {
-                    Player* player = handler->GetSession()->GetPlayer();
-                    uint64 guid = player->GetGUID();
-                    std::string code = GenerateCode(6);
-                    g_DiscordCodes[guid] = code;
-
-                    handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cffffcc00%s|r", code.c_str());
-                    return true;
-                }, "" },
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" }
         };
-
         return commands;
+    }
+
+    static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        uint64 guid = player->GetGUID();
+
+        std::string code = GenerateCode(6);
+        g_DiscordCodes[guid] = code;
+
+        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cffffcc00%s|r", code.c_str());
+        return true;
     }
 
     static std::string GenerateCode(size_t length)
@@ -37,9 +38,10 @@ public:
         std::string result;
         result.reserve(length);
 
-        std::srand(std::time(nullptr)); // seed once per call
+        std::srand(std::time(nullptr));
         for (size_t i = 0; i < length; ++i)
             result += charset[rand() % (sizeof(charset) - 1)];
+
         return result;
     }
 };
