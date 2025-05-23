@@ -1,7 +1,6 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "WorldSession.h"
 #include <unordered_map>
 #include <cstdlib>
 #include <ctime>
@@ -17,16 +16,11 @@ public:
     {
         using namespace Trinity::ChatCommands;
 
-        static ChatCommandTable discordVerifyCommandTable =
+        static ChatCommandTable commandTable =
         {
             ChatCommandBuilder("getdiscordcode")
                 .SetHandler(&discord_verify_commandscript::HandleGetDiscordCode)
                 .SetSecurity(SEC_PLAYER)
-        };
-
-        static ChatCommandTable commandTable =
-        {
-            ChatCommandBuilder("discordverify", discordVerifyCommandTable)
         };
 
         return commandTable;
