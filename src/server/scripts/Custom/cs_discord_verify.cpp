@@ -6,8 +6,6 @@
 #include <ctime>
 #include <cstdlib>
 
-using namespace Trinity::ChatCommands;
-
 std::unordered_map<uint64, std::string> g_DiscordCodes;
 
 class discord_verify_commandscript : public CommandScript
@@ -15,21 +13,13 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    std::vector<ChatCommandBuilder> GetCommands() const override
+    std::vector<Trinity::ChatCommands::ChatCommandBuilder> GetCommands() const override
     {
-        static ChatCommand getDiscordCodeCommand = 
-        {
-            "getdiscordcode",        // Command name
-            SEC_PLAYER,             // Security level
-            false,                  // Not disabled
-            &HandleGetDiscordCode,  // Command handler function
-            "",                     // Help text (empty)
-            nullptr                 // No child commands
-        };
+        using namespace Trinity::ChatCommands;
 
         return
         {
-            ChatCommandBuilder(getDiscordCodeCommand)
+            ChatCommandBuilder("getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode),
         };
     }
 
