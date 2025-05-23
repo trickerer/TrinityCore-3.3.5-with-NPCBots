@@ -1,7 +1,7 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "WorldSession.h" // <-- This was missing!
+#include "WorldSession.h"
 #include <unordered_map>
 #include <ctime>
 
@@ -12,15 +12,14 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommand* GetCommands() const override
     {
-        static ChatCommand commands[] =
+        static ChatCommand commandTable[] =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" },
-            { nullptr, 0, false, nullptr, "", "" }
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", nullptr },
+            { nullptr, 0, false, nullptr, "", nullptr }
         };
-
-        return std::vector<ChatCommand>(commands, commands + (sizeof(commands)/sizeof(ChatCommand) - 1));
+        return commandTable;
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
