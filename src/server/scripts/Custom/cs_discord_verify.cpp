@@ -17,9 +17,19 @@ public:
 
     std::vector<ChatCommandBuilder> GetCommands() const override
     {
+        static ChatCommand getDiscordCodeCommand = 
+        {
+            "getdiscordcode",        // Command name
+            SEC_PLAYER,             // Security level
+            false,                  // Not disabled
+            &HandleGetDiscordCode,  // Command handler function
+            "",                     // Help text (empty)
+            nullptr                 // No child commands
+        };
+
         return
         {
-            ChatCommand("getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode)
+            ChatCommandBuilder(getDiscordCodeCommand)
         };
     }
 
