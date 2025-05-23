@@ -36,7 +36,9 @@ public:
     {
         static ChatCommandTable discordVerifyCommandTable =
         {
-            ChatCommandBuilder("getdiscordcode", &discord_verify_commandscript::HandleGetDiscordCode, SEC_PLAYER, Console::No)
+            ChatCommandBuilder("getdiscordcode")
+                .SetHandler(&discord_verify_commandscript::HandleGetDiscordCode)
+                .SetSecurity(SEC_PLAYER)
         };
 
         static ChatCommandTable commandTable =
