@@ -12,7 +12,7 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    ChatCommandTable GetCommands() const override
+    ChatCommandTable GetCommands() const //override
     {
         static ChatCommandTable commands =
         {
