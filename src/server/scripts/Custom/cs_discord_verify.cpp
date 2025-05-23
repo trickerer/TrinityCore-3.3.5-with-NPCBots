@@ -1,6 +1,7 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
+#include "WorldSession.h"
 #include <unordered_map>
 #include <ctime>
 #include <cstdlib>
