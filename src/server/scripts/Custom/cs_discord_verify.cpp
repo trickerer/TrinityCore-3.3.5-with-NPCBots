@@ -15,11 +15,12 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-        static std::vector<ChatCommand> commands =
+        static ChatCommand commandTable[] =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" }
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", nullptr },
+            { nullptr,          0,           false, nullptr,              "", nullptr }
         };
-        return commands;
+        return std::vector<ChatCommand>(commandTable, commandTable + sizeof(commandTable)/sizeof(ChatCommand) - 1);
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
