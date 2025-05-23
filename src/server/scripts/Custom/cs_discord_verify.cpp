@@ -32,16 +32,16 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
         static ChatCommandTable discordVerifyCommandTable =
         {
-            { "getdiscordcode", HandleGetDiscordCode, SEC_PLAYER, Console::No }
+            ChatCommandBuilder("getdiscordcode", &discord_verify_commandscript::HandleGetDiscordCode, SEC_PLAYER, Console::No)
         };
 
         static ChatCommandTable commandTable =
         {
-            { "discordverify", discordVerifyCommandTable }
+            ChatCommandBuilder("discordverify", discordVerifyCommandTable)
         };
 
         return commandTable;
