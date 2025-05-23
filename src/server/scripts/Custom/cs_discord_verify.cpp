@@ -1,7 +1,7 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "WorldSession.h" // required for GetSession()
+#include "WorldSession.h" // <-- This was missing!
 #include <unordered_map>
 #include <ctime>
 
@@ -19,18 +19,20 @@ public:
             { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" },
             { nullptr, 0, false, nullptr, "", "" }
         };
-        return std::vector<ChatCommand>(commands, commands + sizeof(commands)/sizeof(ChatCommand) - 1);
+
+        return std::vector<ChatCommand>(commands, commands + (sizeof(commands)/sizeof(ChatCommand) - 1));
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
-        uint64 guid = player->GetGUID();
+        if (!player)
+            return false;
 
         std::string code = GenerateCode(6);
-        g_DiscordCodes[guid] = code;
+        g_DiscordCodes[player->GetGUID()] = code;
 
-        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cffffcc00%s|r", code.c_str());
+        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cff00ff00%s|r", code.c_str());
         return true;
     }
 
