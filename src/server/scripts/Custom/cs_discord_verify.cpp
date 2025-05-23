@@ -11,7 +11,7 @@ std::unordered_map<uint64, std::string> g_DiscordCodes;
 class discord_verify_commandscript : public CommandScript
 {
 public:
-    discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
+    discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
     std::vector<Trinity::ChatCommands::ChatCommandBuilder> GetCommands() const override
     {
@@ -19,7 +19,10 @@ public:
 
         return
         {
-            ChatCommandBuilder("getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode),
+            ChatCommandBuilder("getdiscordcode")
+                .SetSecurity(SEC_PLAYER)
+                .SetHandler(&HandleGetDiscordCode)
+                .SetNoLogged(false),
         };
     }
 
