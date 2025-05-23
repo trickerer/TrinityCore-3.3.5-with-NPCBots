@@ -154,7 +154,7 @@ public:
 
         // Check if a code already exists in DB for this player
         QueryResult result = WorldDatabase.PQuery(
-            "SELECT code FROM discord_verification WHERE player_guid = {} AND verified != 1", guid);
+            "SELECT code FROM discord_verification WHERE player_guid = {}", guid);
 
         if (result)
         {
