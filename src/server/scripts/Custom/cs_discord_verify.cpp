@@ -54,5 +54,6 @@ public:
 
 void AddSC_discord_verify_commandscript()
 {
+    std::srand(std::time(nullptr));  // Seed here once
     new discord_verify_commandscript();
 }
