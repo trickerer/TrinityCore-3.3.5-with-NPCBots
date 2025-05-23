@@ -4,6 +4,7 @@
 #include "WorldSession.h"
 #include <unordered_map>
 #include <ctime>
+#include <cstdlib>
 
 std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -12,16 +13,16 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    std::vector<ChatCommand> GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static std::vector<ChatCommand> commands =
+        static ChatCommandTable commandTable =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" }
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "" }
         };
-        return commands;
+        return commandTable;
     }
 
-    static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
+    static bool HandleGetDiscordCode(ChatHandler* handler, std::string /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
