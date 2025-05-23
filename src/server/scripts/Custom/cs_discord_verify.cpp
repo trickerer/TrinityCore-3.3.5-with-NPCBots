@@ -23,6 +23,8 @@
 #include <ctime>
 #include <cstdlib>
 
+using namespace Trinity::ChatCommands;
+
 std::unordered_map<uint64, std::string> g_DiscordCodes;
 
 class discord_verify_commandscript : public CommandScript
@@ -30,7 +32,7 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
-    ChatCommandTable GetCommands() const override
+    std::vector<ChatCommand> GetCommands() const override
     {
         static ChatCommandTable discordVerifyCommandTable =
         {
