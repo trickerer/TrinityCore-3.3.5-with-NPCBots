@@ -12,14 +12,13 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") { }
 
-    ChatCommand* GetCommands() const override
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commands =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", nullptr },
-            { nullptr, 0, false, nullptr, "", nullptr }
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" }
         };
-        return commandTable;
+        return commands;
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
