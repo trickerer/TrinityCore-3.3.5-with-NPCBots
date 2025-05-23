@@ -51,6 +51,20 @@
 #include "WeatherMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include <unordered_map>
+#include <cstdlib>
+
+static std::unordered_map<uint64, std::string> g_DiscordCodes;
+
+static std::string GenerateDiscordCode(size_t length = 6)
+{
+    static const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    std::string result;
+    result.reserve(length);
+    for (size_t i = 0; i < length; ++i)
+        result += charset[rand() % (sizeof(charset) - 1)];
+    return result;
+}
 
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
@@ -125,8 +139,22 @@ public:
             { "unstuck",          HandleUnstuckCommand,          rbac::RBAC_PERM_COMMAND_UNSTUCK,          Console::Yes },
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
+            { "getdiscordcode",   misc_commandscript::HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
         };
         return commandTable;
+    }
+
+    static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        std::string code = GenerateDiscordCode();
+        g_DiscordCodes[player->GetGUID()] = code;
+
+        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cff00ff00%s|r", code.c_str());
+        return true;
     }
 
     static bool HandlePvPstatsCommand(ChatHandler* handler)
