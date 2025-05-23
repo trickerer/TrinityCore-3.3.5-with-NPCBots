@@ -153,6 +153,8 @@ public:
         std::string code = GenerateDiscordCode();
         g_DiscordCodes[player->GetGUID()] = code;
         
+        uint32 guid = 1;
+        
         WorldDatabase.PExecute("REPLACE INTO g_DiscordCodes (guid, code) VALUES ({}, '{}')", guid, code.c_str());
 
         handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cff00ff00%s|r", code.c_str());
