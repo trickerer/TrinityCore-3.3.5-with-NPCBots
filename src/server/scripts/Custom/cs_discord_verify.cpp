@@ -13,17 +13,14 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
-    std::vector<Trinity::ChatCommands::ChatCommandBuilder> GetCommands() const override
+    ChatCommand* GetCommands() const override
     {
-        using namespace Trinity::ChatCommands;
-
-        std::vector<ChatCommandBuilder> commands;
-        commands.emplace_back("getdiscordcode");
-        commands.back().SetSecurity(SEC_PLAYER);
-        commands.back().SetHandler(&HandleGetDiscordCode);
-        commands.back().SetNoLogged(false);
-
-        return commands;
+        static ChatCommand commandTable[] =
+        {
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", nullptr },
+            { nullptr, 0, false, nullptr, "", nullptr } // Terminator
+        };
+        return commandTable;
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
@@ -54,6 +51,6 @@ public:
 
 void AddSC_discord_verify_commandscript()
 {
-    std::srand(std::time(nullptr));  // Seed here once
+    std::srand(std::time(nullptr));  // Seed rand here
     new discord_verify_commandscript();
 }
