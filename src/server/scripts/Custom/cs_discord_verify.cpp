@@ -1,6 +1,7 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
+#include "WorldSession.h" // required for GetSession()
 #include <unordered_map>
 #include <ctime>
 
@@ -13,11 +14,12 @@ public:
 
     std::vector<ChatCommand> GetCommands() const override
     {
-        static std::vector<ChatCommand> commands =
+        static ChatCommand commands[] =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" }
+            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", "" },
+            { nullptr, 0, false, nullptr, "", "" }
         };
-        return commands;
+        return std::vector<ChatCommand>(commands, commands + sizeof(commands)/sizeof(ChatCommand) - 1);
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
