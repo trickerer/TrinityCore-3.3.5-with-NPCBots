@@ -17,13 +17,13 @@ public:
     {
         using namespace Trinity::ChatCommands;
 
-        return
-        {
-            ChatCommandBuilder("getdiscordcode")
-                .SetSecurity(SEC_PLAYER)
-                .SetHandler(&HandleGetDiscordCode)
-                .SetNoLogged(false),
-        };
+        std::vector<ChatCommandBuilder> commands;
+        commands.emplace_back("getdiscordcode");
+        commands.back().SetSecurity(SEC_PLAYER);
+        commands.back().SetHandler(&HandleGetDiscordCode);
+        commands.back().SetNoLogged(false);
+
+        return commands;
     }
 
     static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
