@@ -19,8 +19,8 @@ public:
 
         static ChatCommandTable discordVerifyCommandTable =
         {
-            // { commandName, handlerFunction, securityLevel, logging enum }
-            ChatCommandBuilder("getdiscordcode", &discord_verify_commandscript::HandleGetDiscordCode)
+            ChatCommandBuilder("getdiscordcode")
+                .SetHandler(&discord_verify_commandscript::HandleGetDiscordCode)
                 .SetSecurity(SEC_PLAYER)
         };
 
