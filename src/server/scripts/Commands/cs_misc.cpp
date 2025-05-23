@@ -144,27 +144,16 @@ public:
         return commandTable;
     }
 
-    static bool HandleAddDiscordCodeCommand(ChatHandler* handler, const char* args)
+    static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
             return false;
 
-        if (!*args)
-        {
-            handler->SendSysMessage("Usage: .adddiscordcode <code>");
-            return false;
-        }
+        std::string code = GenerateDiscordCode();
+        g_DiscordCodes[player->GetGUID()] = code;
 
-        std::string code = args;
-        uint32 guid = player->GetGUID().GetCounter();
-
-        // Insert or replace the code
-        WorldDatabase.PExecute(
-            "REPLACE INTO g_DiscordCodes (guid, code) VALUES (%u, '%s')",
-            guid, code.c_str());
-
-        handler->PSendSysMessage("Discord code |cff00ff00%s|r added to DB for your account.", code.c_str());
+        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cff00ff00%s|r", code.c_str());
         return true;
     }
 
