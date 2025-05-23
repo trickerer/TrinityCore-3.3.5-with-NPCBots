@@ -1,7 +1,6 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
-#include "WorldSession.h"
 #include <unordered_map>
 #include <ctime>
 #include <cstdlib>
@@ -13,17 +12,22 @@ class discord_verify_commandscript : public CommandScript
 public:
     discord_verify_commandscript() : CommandScript("discord_verify_commandscript") {}
 
-    ChatCommand* GetCommands() const override
+    ChatCommandTable GetCommands() const override
     {
-        static ChatCommand commandTable[] =
+        static ChatCommandTable discordVerifyCommandTable =
         {
-            { "getdiscordcode", SEC_PLAYER, false, &HandleGetDiscordCode, "", nullptr },
-            { nullptr, 0, false, nullptr, "", nullptr } // Terminator
+            { "getdiscordcode", HandleGetDiscordCode, SEC_PLAYER, Console::No }
         };
+
+        static ChatCommandTable commandTable =
+        {
+            { "discordverify", discordVerifyCommandTable }
+        };
+
         return commandTable;
     }
 
-    static bool HandleGetDiscordCode(ChatHandler* handler, const char* /*args*/)
+    static bool HandleGetDiscordCode(ChatHandler* handler)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player)
@@ -51,6 +55,5 @@ public:
 
 void AddSC_discord_verify_commandscript()
 {
-    std::srand(std::time(nullptr));  // Seed rand here
     new discord_verify_commandscript();
 }
