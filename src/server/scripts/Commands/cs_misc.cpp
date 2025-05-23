@@ -154,7 +154,7 @@ public:
 
         // Check if a code already exists in DB for this player
         QueryResult result = WorldDatabase.PQuery(
-            "SELECT code FROM discord_verification WHERE player_guid = {} AND verified = 0", guid);
+            "SELECT code FROM discord_verification WHERE player_guid = {} AND verified != 1", guid);
 
         if (result)
         {
@@ -173,7 +173,7 @@ public:
         WorldDatabase.PExecute(
             "REPLACE INTO discord_verification (player_guid, code, verified) VALUES({}, '{}', 0)", guid, code);
 
-        handler->PSendSysMessage("Join our Discord and DM the bot with this code: |cff00ff00%s|r", code.c_str());
+        handler->PSendSysMessage("Join our Discord and DM 'MGAWoW Verify Bot' with this code: |cff00ff00%s|r", code.c_str());
         return true;
     }
 
