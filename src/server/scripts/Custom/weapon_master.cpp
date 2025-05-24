@@ -16,6 +16,43 @@ public:
     {
         npc_weapon_masterAI(Creature* creature) : ScriptedAI(creature) {}
 
+        bool CanUseWeaponSkill(Player* player, uint32 skillId)
+        {
+            switch (player->getClass())
+            {
+                case CLASS_WARRIOR:
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES ||
+                            skillId == SKILL_TWO_HANDED_SWORDS || skillId == SKILL_TWO_HANDED_AXES || skillId == SKILL_TWO_HANDED_MACES ||
+                            skillId == SKILL_POLEARMS || skillId == SKILL_STAVES);
+                case CLASS_PALADIN:
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_TWO_HANDED_SWORDS ||
+                            skillId == SKILL_TWO_HANDED_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES);
+                case CLASS_HUNTER:
+                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS ||
+                            skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES);
+                case CLASS_ROGUE:
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES ||
+                            skillId == SKILL_FIST_WEAPONS || skillId == SKILL_THROWN);
+                case CLASS_DEATH_KNIGHT:
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES ||
+                            skillId == SKILL_TWO_HANDED_SWORDS || skillId == SKILL_TWO_HANDED_AXES || skillId == SKILL_TWO_HANDED_MACES);
+                case CLASS_SHAMAN:
+                    return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_TWO_HANDED_AXES ||
+                            skillId == SKILL_TWO_HANDED_MACES || skillId == SKILL_STAVES);
+                case CLASS_MAGE:
+                    return (skillId == SKILL_STAVES || skillId == SKILL_WANDS);
+                case CLASS_PRIEST:
+                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS);
+                case CLASS_WARLOCK:
+                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS);
+                case CLASS_DRUID:
+                    return (skillId == SKILL_FIST_WEAPONS || skillId == SKILL_STAVES);
+
+                default:
+                    return false;
+            }
+        }
+
         bool OnGossipHello(Player* player) override
         {
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Train me in all weapon skills I can use.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -44,15 +81,20 @@ public:
                     SKILL_GUNS,
                     SKILL_CROSSBOWS,
                     SKILL_THROWN,
-                    SKILL_WANDS
+                    SKILL_WANDS,
+                    SKILL_TWO_HANDED_SWORDS,
+                    SKILL_TWO_HANDED_AXES,
+                    SKILL_TWO_HANDED_MACES
                 };
 
-                uint32 maxSkill = player->GetMaxSkillValueForLevel(player);
+                uint32 maxSkill = player->GetMaxSkillValueForLevel(player->GetLevel());
 
                 for (uint32 skillId : skills)
                 {
-                    if (!player->HasSkill(skillId))
-                        player->SetSkill(skillId, 1, maxSkill, maxSkill);
+                    if (CanUseWeaponSkill(player, skillId) && !player->HasSkill(skillId))
+                    {
+                        player->LearnSkill(skillId, 1, maxSkill);
+                    }
                 }
 
                 CloseGossipMenuFor(player);
