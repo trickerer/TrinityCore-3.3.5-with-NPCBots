@@ -44,16 +44,15 @@ public:
                     SKILL_GUNS,
                     SKILL_CROSSBOWS,
                     SKILL_THROWN,
-                    SKILL_WANDS,
-                    SKILL_TWO_HANDED_SWORDS,
-                    SKILL_TWO_HANDED_MACES,
-                    SKILL_TWO_HANDED_AXES
+                    SKILL_WANDS
                 };
+
+                uint32 maxSkill = player->GetMaxSkillValueForLevel(player);
 
                 for (uint32 skillId : skills)
                 {
                     if (!player->HasSkill(skillId))
-                        player->LearnSkill(skillId, 1, player->GetMaxSkillValueForLevel(player->GetLevel()));
+                        player->SetSkill(skillId, 1, maxSkill, maxSkill);
                 }
 
                 CloseGossipMenuFor(player);
