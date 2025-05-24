@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Chat.h"
 #include "GossipDef.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "ScriptPCH.h"
 
 class npc_weapon_master : public CreatureScript
