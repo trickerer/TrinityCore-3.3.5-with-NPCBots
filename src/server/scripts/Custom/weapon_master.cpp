@@ -22,19 +22,19 @@ public:
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
                 
                 case CLASS_PALADIN:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_POLEARMS || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_POLEARMS || skillId == SKILL_DEFENSE || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
                 
                 case CLASS_HUNTER:
-                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
                 
                 case CLASS_ROGUE:
                     return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
                 
                 case CLASS_DEATH_KNIGHT:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_POLEARMS || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_POLEARMS || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
                 
                 case CLASS_SHAMAN:
                     return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
@@ -86,7 +86,10 @@ public:
                     SKILL_THROWN,
                     SKILL_WANDS,
                     SKILL_UNARMED,
-                    SKILL_DEFENSE
+                    SKILL_DEFENSE,
+                    SKILL_2H_AXES,
+                    SKILL_2H_MACES,
+                    SKILL_2H_SWORDS
                 };
 
                 uint32 maxSkill = player->GetMaxSkillValueForLevel(player);
