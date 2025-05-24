@@ -40,7 +40,7 @@ void AddSC_item_temp_mailbox();
 void AddSC_item_temp_gvault();
 void AddSC_ItemAuraVisualScript();
 void AddSC_TestLoginHook();
-void AddSC_npc_weapon_trainer();
+void AddSC_npc_weapon_master();
  
 void AddCustomScripts()
 {
@@ -63,5 +63,5 @@ void AddCustomScripts()
     AddSC_item_temp_gvault();
     AddSC_ItemAuraVisualScript();
     AddSC_TestLoginHook();
-    AddSC_npc_weapon_trainer();
+    AddSC_npc_weapon_master();
 }
