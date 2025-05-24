@@ -82,7 +82,7 @@ public:
 
                 for (uint32 skillId : skills)
                 {
-                    if (!player->HasSkill(skillId))
+                    if (CanUseWeaponSkill(player, skillId) && !player->HasSkill(skillId))
                         player->SetSkill(skillId, 1, maxSkill, maxSkill);
                 }
 
