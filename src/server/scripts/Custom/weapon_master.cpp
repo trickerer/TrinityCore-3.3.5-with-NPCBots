@@ -22,23 +22,17 @@ public:
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES ||
-                            skillId == SKILL_POLEARMS || skillId == SKILL_STAVES);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN);
                 case CLASS_PALADIN:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES ||
-                            skillId == SKILL_POLEARMS || skillId == SKILL_STAVES);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES);
                 case CLASS_HUNTER:
-                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS ||
-                            skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES);
+                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES);
                 case CLASS_ROGUE:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES ||
-                            skillId == SKILL_FIST_WEAPONS || skillId == SKILL_THROWN);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_THROWN);
                 case CLASS_DEATH_KNIGHT:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES ||
-                            skillId == SKILL_TWO_HANDED_SWORDS || skillId == SKILL_TWO_HANDED_AXES || skillId == SKILL_TWO_HANDED_MACES);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES);
                 case CLASS_SHAMAN:
-                    return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_TWO_HANDED_AXES ||
-                            skillId == SKILL_TWO_HANDED_MACES || skillId == SKILL_STAVES);
+                    return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_STAVES);
                 case CLASS_MAGE:
                     return (skillId == SKILL_STAVES || skillId == SKILL_WANDS);
                 case CLASS_PRIEST:
