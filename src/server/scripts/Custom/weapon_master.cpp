@@ -1,6 +1,7 @@
 #include "ScriptMgr.h"
 #include "Creature.h"
 #include "Player.h"
+#include "Chat.h"
 #include "GossipDef.h"
 #include "ScriptPCH.h"
 
