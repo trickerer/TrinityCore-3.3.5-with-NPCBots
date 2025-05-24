@@ -5,6 +5,7 @@
 #include "GossipDef.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SharedDefines.h"
 #include "ScriptPCH.h"
 
 class npc_weapon_master : public CreatureScript
@@ -18,7 +19,7 @@ public:
 
         bool CanUseWeaponSkill(Player* player, uint32 skillId)
         {
-            switch (player->getClass())
+            switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
                     return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES ||
@@ -87,14 +88,12 @@ public:
                     SKILL_TWO_HANDED_MACES
                 };
 
-                uint32 maxSkill = player->GetMaxSkillValueForLevel(player->GetLevel());
+                uint32 maxSkill = player->GetMaxSkillValueForLevel(player);
 
                 for (uint32 skillId : skills)
                 {
-                    if (CanUseWeaponSkill(player, skillId) && !player->HasSkill(skillId))
-                    {
-                        player->LearnSkill(skillId, 1, maxSkill);
-                    }
+                    if (!player->HasSkill(skillId))
+                        player->SetSkill(skillId, 1, maxSkill, maxSkill);
                 }
 
                 CloseGossipMenuFor(player);
