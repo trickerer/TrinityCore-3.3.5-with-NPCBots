@@ -46,7 +46,7 @@ public:
                     return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
                 
                 case CLASS_WARLOCK:
-                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_SWORD);
+                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_SWORDS);
                 
                 case CLASS_DRUID:
                     return (skillId == SKILL_FIST_WEAPONS || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
