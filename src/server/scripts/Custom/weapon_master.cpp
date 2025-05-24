@@ -5,65 +5,76 @@
 #include "GossipDef.h"
 #include "ScriptPCH.h"
 
-class npc_weapon_trainer : public CreatureScript
+class npc_weapon_master : public CreatureScript
 {
 public:
-    npc_weapon_trainer() : CreatureScript("npc_weapon_trainer") {}
+    npc_weapon_master() : CreatureScript("npc_weapon_master") {}
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    struct npc_weapon_masterAI : public ScriptedAI
     {
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, "Train me in all weapon skills I can use.", GOSSIP_SENDER_MAIN, 1);
-        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-        return true;
-    }
+        npc_weapon_masterAI(Creature* creature) : ScriptedAI(creature) {}
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-
-        if (sender == GOSSIP_SENDER_MAIN && action == 1)
+        bool OnGossipHello(Player* player) override
         {
-            static const uint32 weaponSkills[] =
-            {
-                SKILL_AXES,
-                SKILL_BOWS,
-                SKILL_CROSSBOWS,
-                SKILL_DAGGERS,
-                SKILL_FIST_WEAPONS,
-                SKILL_GUNS,
-                SKILL_MACES,
-                SKILL_POLEARMS,
-                SKILL_STAVES,
-                SKILL_SWORDS,
-                SKILL_THROWN,
-                SKILL_WANDS,
-                SKILL_UNARMED,
-                SKILL_TWO_HANDED_SWORDS,
-                SKILL_TWO_HANDED_MACES,
-                SKILL_TWO_HANDED_AXES
-            };
-
-            uint32 trainedCount = 0;
-
-            for (uint32 skillId : weaponSkills)
-            {
-                if (player->CanUseSkill(skillId) && !player->HasSkill(skillId))
-                {
-                    player->LearnSkill(skillId, 1, player->GetMaxSkillValueForLevel(player->getLevel(), skillId));
-                    trainedCount++;
-                }
-            }
-
-            ChatHandler(player->GetSession()).PSendSysMessage("You have been trained in %u weapon skill(s).", trainedCount);
-            player->CLOSE_GOSSIP_MENU();
+            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Train me in all weapon skills I can use.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Nevermind.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, me->GetGUID());
             return true;
         }
 
-        return false;
+        bool OnGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
+        {
+            uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
+            ClearGossipMenuFor(player);
+
+            if (action == GOSSIP_ACTION_INFO_DEF + 1)
+            {
+                static const uint32 skills[] =
+                {
+                    SKILL_SWORDS,
+                    SKILL_AXES,
+                    SKILL_MACES,
+                    SKILL_POLEARMS,
+                    SKILL_STAVES,
+                    SKILL_DAGGERS,
+                    SKILL_FIST_WEAPONS,
+                    SKILL_BOWS,
+                    SKILL_GUNS,
+                    SKILL_CROSSBOWS,
+                    SKILL_THROWN,
+                    SKILL_WANDS,
+                    SKILL_TWO_HANDED_SWORDS,
+                    SKILL_TWO_HANDED_MACES,
+                    SKILL_TWO_HANDED_AXES
+                };
+
+                for (uint32 skillId : skills)
+                {
+                    if (!player->HasSkill(skillId))
+                        player->LearnSkill(skillId, 1, player->GetMaxSkillValueForLevel(player->GetLevel()));
+                }
+
+                CloseGossipMenuFor(player);
+                return true;
+            }
+
+            if (action == GOSSIP_ACTION_INFO_DEF + 2)
+            {
+                CloseGossipMenuFor(player);
+                return true;
+            }
+
+            return true;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_weapon_masterAI(creature);
     }
 };
 
-void AddSC_npc_weapon_trainer()
+void AddSC_npc_weapon_master()
 {
-    new npc_weapon_trainer();
+    new npc_weapon_master();
 }
