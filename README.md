@@ -1,1 +1,1 @@
-MGAWoW Core
+Biglads Core
