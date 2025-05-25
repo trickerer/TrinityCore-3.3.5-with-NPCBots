@@ -227,7 +227,6 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
             pinfo.SetModerator(true);
         }
     }
-	player->TrackJoinedChannel(GetName());
 }
 
 bool Channel::IsMember(ObjectGuid guid) const
@@ -298,8 +297,6 @@ void Channel::LeaveChannel(Player* player, bool send)
                 _isOwnerInvisible = true;
         }
     }
-	
-	player->TrackLeftChannel(GetName());
 }
 
 void Channel::KickOrBan(Player const* player, std::string const& badname, bool ban)
