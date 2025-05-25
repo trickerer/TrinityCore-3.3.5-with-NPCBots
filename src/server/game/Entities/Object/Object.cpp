@@ -238,6 +238,19 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
 {
     ASSERT(target);
 
+    if (IsUnit())
+    {
+        if (Battleground* bg = target->GetBattleground())
+        {
+            if (bg->isArena())
+            {
+                WorldPacket data(SMSG_ARENA_UNIT_DESTROYED, 8);
+                data << uint64(GetGUID());
+                target->SendDirectMessage(&data);
+            }
+        }
+    }
+
     WorldPacket data(SMSG_DESTROY_OBJECT, 8 + 1);
     data << uint64(GetGUID());
     //! If the following bool is true, the client will call "void CGUnit_C::OnDeath()" for this object.
@@ -352,10 +365,10 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
             *data << object->GetOrientation();
 
-            if (transport)
-                *data << float(object->GetTransOffsetO());
-            else
+            if (GetTypeId() == TYPEID_CORPSE)
                 *data << float(object->GetOrientation());
+            else
+                *data << float(0);
         }
         else
         {
@@ -1005,9 +1018,17 @@ void WorldObject::setActive(bool on)
         return;
 
     if (on)
-        map->AddToActive(this);
+    {
+        if (GetTypeId() == TYPEID_UNIT)
+            map->AddToActive(ToCreature());
+        else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
+            map->AddToActive((DynamicObject*)this);
+		else if (GetTypeId() == TYPEID_GAMEOBJECT)
+			map->AddToActive((DynamicObject*)this);
+    }
     else
         map->RemoveFromActive(this);
+
 }
 
 void WorldObject::SetFarVisible(bool on)
@@ -1966,7 +1987,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     //npcbot: totem emul step 2
-    if (summoner && summoner->IsNPCBot() && !summon->IsTempBot())
+    if (summoner && summoner->IsNPCBot())
         summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
     //end npcbot
 

@@ -67,19 +67,18 @@ enum PetSpellType
     PETSPELL_TALENT = 2
 };
 
-enum class PetActionFeedback : uint8
+enum ActionFeedback
 {
-    None            = 0,
-    Dead            = 1,
-    NoTarget        = 2,
-    InvalidTarget   = 3,
-    NoPath          = 4
+    FEEDBACK_NONE            = 0,
+    FEEDBACK_PET_DEAD        = 1,
+    FEEDBACK_NOTHING_TO_ATT  = 2,
+    FEEDBACK_CANT_ATT_TARGET = 3
 };
 
-enum PetAction : int32
+enum PetTalk
 {
-    PET_ACTION_SPECIAL_SPELL    = 0,
-    PET_ACTION_ATTACK           = 1
+    PET_TALK_SPECIAL_SPELL  = 0,
+    PET_TALK_ATTACK         = 1
 };
 
 #define PET_FOLLOW_DIST  1.0f

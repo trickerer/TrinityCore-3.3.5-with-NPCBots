@@ -109,22 +109,23 @@ class BotBattlegroundEnterEvent : public BasicEvent
     const ObjectGuid _playerGUID;
     const ObjectGuid _botGUID;
     const BattlegroundQueueTypeId _bgQueueTypeId;
+    const BattlegroundTypeId _bgTypeId;
     const uint64 _removeTime;
 
 public:
-    BotBattlegroundEnterEvent(ObjectGuid playerGUID, ObjectGuid botGUID, BattlegroundQueueTypeId bgQueueTypeId, uint64 removeTime)
-        : _playerGUID(playerGUID), _botGUID(botGUID), _bgQueueTypeId(bgQueueTypeId), _removeTime(removeTime) {}
+    BotBattlegroundEnterEvent(ObjectGuid playerGUID, ObjectGuid botGUID, BattlegroundQueueTypeId bgQueueTypeId, BattlegroundTypeId bgTypeId, uint64 removeTime)
+        : _playerGUID(playerGUID), _botGUID(botGUID), _bgQueueTypeId(bgQueueTypeId), _bgTypeId(bgTypeId), _removeTime(removeTime) {}
 
     void AbortMe()
     {
-        BOT_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting bot {} bg {}!", _botGUID.GetEntry(), uint32(_bgQueueTypeId.BattlemasterListId));
+        BOT_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting bot {} bg {}!", _botGUID.GetEntry(), uint32(_bgQueueTypeId));
         sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId).RemovePlayer(_botGUID, true);
         BotDataMgr::DespawnWandererBot(_botGUID.GetEntry());
     }
 
     void AbortAll()
     {
-        BOT_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting ALL bots by {} bg {}!", _playerGUID.GetCounter(), uint32(_bgQueueTypeId.BattlemasterListId));
+        BOT_LOG_ERROR("npcbots", "BotBattlegroundEnterEvent: Aborting ALL bots by {} bg {}!", _playerGUID.GetCounter(), uint32(_bgQueueTypeId));
         AbortMe();
         botBGJoinEvents.at(_playerGUID).KillAllEvents(false);
     }
@@ -142,7 +143,7 @@ public:
             BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(_bgQueueTypeId);
             BattlegroundQueue::QueuedPlayersMap::const_iterator qpm_citr = queue.m_QueuedPlayers.find(_botGUID);
             GroupQueueInfo const* my_gqi = qpm_citr != queue.m_QueuedPlayers.cend() ? qpm_citr->second.GroupInfo : nullptr;
-            Battleground* bg = my_gqi ? sBattlegroundMgr->GetBattleground(my_gqi->IsInvitedToBGInstanceGUID, BattlegroundTypeId(_bgQueueTypeId.BattlemasterListId)) : nullptr;
+            Battleground* bg = my_gqi ? sBattlegroundMgr->GetBattleground(my_gqi->IsInvitedToBGInstanceGUID, _bgTypeId) : nullptr;
 
             if (!bg || bg->GetPlayersCountByTeam(ALLIANCE) + bg->GetPlayersCountByTeam(HORDE) >= bg->GetMaxPlayersPerTeam() * 2)
             {
@@ -171,7 +172,7 @@ public:
             else if (std::any_of(queue.m_QueuedPlayers.cbegin(), queue.m_QueuedPlayers.cend(), [=](BattlegroundQueue::QueuedPlayersMap::value_type const& qpm_pair) {
                 return qpm_pair.first.IsPlayer() && qpm_pair.second.GroupInfo->IsInvitedToBGInstanceGUID == my_gqi->IsInvitedToBGInstanceGUID;
             }))
-                botBGJoinEvents.at(_playerGUID).AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
+                botBGJoinEvents.at(_playerGUID).AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _bgTypeId, _removeTime), 2s);
             else
                 AbortAll();
         }
@@ -1692,10 +1693,11 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     if (!BotMgr::IsBotGenerationEnabledBGs())
         return true;
 
-    BattlegroundQueueTypeId bgqTypeId = queue->GetQueueId();
-    BattlegroundTypeId bgTypeId = BattlegroundTypeId(bgqTypeId.BattlemasterListId);
+    BattlegroundTypeId bgTypeId = gqinfo->BgTypeId;
+    uint8 atype = gqinfo->ArenaType;
     uint32 ammr = gqinfo->ArenaMatchmakerRating;
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
+    BattlegroundQueueTypeId bgqTypeId = sBattlegroundMgr->BGQueueTypeId(bgTypeId, atype);
 
     uint32 tarteamplayers = BotMgr::GetBGTargetTeamPlayersCount(bgTypeId);
 
@@ -1753,7 +1755,7 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     uint32 queued_players_h = 0;
     for (uint8 i = 0; i < BG_QUEUE_GROUP_TYPES_COUNT; ++i)
     {
-        for (GroupQueueInfo const* qgr : queue->m_QueuedGroups[i])
+        for (GroupQueueInfo const* qgr : queue->m_QueuedGroups[bracketId][i])
         {
             if (qgr->Team == ALLIANCE)
                 queued_players_a += qgr->Players.size();
@@ -1829,8 +1831,8 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     ASSERT(uint32(spawned_bots_a.size()) == needed_bots_count_a);
     ASSERT(uint32(spawned_bots_h.size()) == needed_bots_count_h);
 
-    botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset([ammr = ammr, bgqTypeId = bgqTypeId]() {
-        sBattlegroundMgr->ScheduleQueueUpdate(ammr, bgqTypeId);
+    botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset([ammr = ammr, atype = atype, bgqTypeId = bgqTypeId, bgTypeId = bgTypeId, bracketId = bracketId]() {
+        sBattlegroundMgr->ScheduleQueueUpdate(ammr, atype, bgqTypeId, bgTypeId, bracketId);
     }, Seconds(2));
 
     uint8 maxlevel = BotMgr::IsBotLevelCappedByConfigBGFirstPlayer() ? groupLeader->GetLevel() : 0;
@@ -1846,11 +1848,11 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
             if (maxlevel && bot->GetLevel() > maxlevel)
                 const_cast<Creature*>(bot)->SetLevel(maxlevel);
             queue->AddBotAsGroup(bot->GetGUID(), GetTeamIdForFaction(bot->GetFaction()) == TEAM_HORDE ? HORDE : ALLIANCE,
-                bracketEntry, false, gqinfo->ArenaTeamRating, ammr);
+                bgTypeId, bracketEntry, atype, false, gqinfo->ArenaTeamRating, ammr);
 
             seconds_delay = std::min<uint32>(uint32(MINUTE * 2), seconds_delay + std::max<uint32>(1u, uint32((MINUTE / 2) / std::max<uint32>(needed_bots_count_a, needed_bots_count_h))));
 
-            BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId,
+            BotBattlegroundEnterEvent* bbe = new BotBattlegroundEnterEvent(groupLeader->GetGUID(), bot->GetGUID(), bgqTypeId, bgTypeId,
                 botBGJoinEvents[groupLeader->GetGUID()].CalculateTime(Milliseconds(uint32(INVITE_ACCEPT_WAIT_TIME) + uint32(BG_START_DELAY_2M))).count());
             botBGJoinEvents[groupLeader->GetGUID()].AddEventAtOffset(bbe, Seconds(seconds_delay));
         }

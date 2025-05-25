@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include "AchievementMgr.h"
 #include "CharacterDatabaseCleaner.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
@@ -107,7 +108,7 @@ void CharacterDatabaseCleaner::CheckUnique(char const* column, char const* table
 
 bool CharacterDatabaseCleaner::AchievementProgressCheck(uint32 criteria)
 {
-    return sAchievementCriteriaStore.LookupEntry(criteria) != nullptr;
+    return sAchievementMgr->GetAchievementCriteria(criteria) != nullptr;
 }
 
 void CharacterDatabaseCleaner::CleanCharacterAchievementProgress()

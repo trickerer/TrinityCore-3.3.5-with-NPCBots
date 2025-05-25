@@ -97,7 +97,7 @@ enum RBACPermissions
     RBAC_PERM_RECEIVE_GLOBAL_GM_TEXTMESSAGE                  = 44,
     RBAC_PERM_SILENTLY_JOIN_CHANNEL                          = 45,
     RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR                   = 46,
-    RBAC_PERM_CAN_IGNORE_LOWER_SECURITY_CHECK                = 47,
+    RBAC_PERM_CHECK_FOR_LOWER_SECURITY                       = 47,
     RBAC_PERM_COMMANDS_PINFO_CHECK_PERSONAL_DATA             = 48,
     RBAC_PERM_EMAIL_CONFIRM_FOR_PASS_CHANGE                  = 49,
     RBAC_PERM_MAY_CHECK_OWN_EMAIL                            = 50,
@@ -752,6 +752,9 @@ enum RBACPermissions
     // IF YOU ADD NEW PERMISSIONS, ADD THEM IN MASTER BRANCH AS WELL!
     //
     // custom permissions 1000+
+    
+    RBAC_PERM_COMMAND_GETDISCORDCODE                        = 50000,
+    
     //NPCBot
     RBAC_PERM_COMMAND_NPCBOT                                 = 70001,
     RBAC_PERM_COMMAND_NPCBOT_ADD                             = 70002,

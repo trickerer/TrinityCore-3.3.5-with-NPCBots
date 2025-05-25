@@ -28,6 +28,17 @@ namespace WorldPackets
 {
     namespace Spells
     {
+        class CancelCast final : public ClientPacket
+        {
+        public:
+            CancelCast(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_CAST, std::move(packet)) { }
+
+            void Read() override;
+
+            uint8 CastID = 0;
+            uint32 SpellID = 0;
+        };
+
         class CancelAura final : public ClientPacket
         {
         public:
@@ -38,22 +49,15 @@ namespace WorldPackets
             uint32 SpellID = 0;
         };
 
-        class CancelAutoRepeatSpell final : public ClientPacket
+        class PetCancelAura final : public ClientPacket
         {
         public:
-            CancelAutoRepeatSpell(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_AUTO_REPEAT_SPELL, std::move(packet)) { }
-
-            void Read() override { }
-        };
-
-        class CancelChannelling final : public ClientPacket
-        {
-        public:
-            CancelChannelling(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_CHANNELLING, std::move(packet)) { }
+            PetCancelAura(WorldPacket&& packet) : ClientPacket(CMSG_PET_CANCEL_AURA, std::move(packet)) { }
 
             void Read() override;
 
-            uint32 ChannelSpell = 0;
+            ObjectGuid PetGUID;
+            uint32 SpellID = 0;
         };
 
         class CancelGrowthAura final : public ClientPacket
@@ -72,31 +76,22 @@ namespace WorldPackets
             void Read() override { }
         };
 
-        class PetCancelAura final : public ClientPacket
+        class CancelAutoRepeatSpell final : public ClientPacket
         {
         public:
-            PetCancelAura(WorldPacket&& packet) : ClientPacket(CMSG_PET_CANCEL_AURA, std::move(packet)) { }
+            CancelAutoRepeatSpell(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_AUTO_REPEAT_SPELL, std::move(packet)) { }
+
+            void Read() override { }
+        };
+
+        class CancelChannelling final : public ClientPacket
+        {
+        public:
+            CancelChannelling(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_CHANNELLING, std::move(packet)) { }
 
             void Read() override;
 
-            ObjectGuid PetGUID;
-            uint32 SpellID = 0;
-        };
-
-        struct TargetLocation
-        {
-            ObjectGuid Transport;
-            Position Location;
-        };
-
-        struct SpellTargetData
-        {
-            uint32 Flags = 0;
-            Optional<ObjectGuid> Unit;
-            Optional<ObjectGuid> Item;
-            Optional<TargetLocation> SrcLocation;
-            Optional<TargetLocation> DstLocation;
-            Optional<std::string> Name;
+            uint32 ChannelSpell = 0;
         };
 
         struct SpellMissStatus
@@ -131,6 +126,22 @@ namespace WorldPackets
             uint32 Value = 0;
         };
 
+        struct TargetLocation
+        {
+            ObjectGuid Transport;
+            Position Location;
+        };
+
+        struct SpellTargetData
+        {
+            uint32 Flags = 0;
+            Optional<ObjectGuid> Unit;
+            Optional<ObjectGuid> Item;
+            Optional<TargetLocation> SrcLocation;
+            Optional<TargetLocation> DstLocation;
+            Optional<std::string> Name;
+        };
+
         struct SpellCastData
         {
             ObjectGuid CasterGUID;
@@ -139,62 +150,38 @@ namespace WorldPackets
             uint32 SpellID = 0;
             uint32 CastFlags = 0;
             uint32 CastTime = 0;
-            Optional<std::vector<ObjectGuid>> HitTargets;
-            Optional<std::vector<SpellMissStatus>> MissStatus;
+            mutable Optional<std::vector<ObjectGuid>> HitTargets;
+            mutable Optional<std::vector<SpellMissStatus>> MissStatus;
             SpellTargetData Target;
             Optional<uint32> RemainingPower;
             Optional<RuneData> RemainingRunes;
             Optional<MissileTrajectoryResult> MissileTrajectory;
             Optional<SpellAmmo> Ammo;
-            Optional<uint8> DestLocSpellCastIndex;
-            Optional<std::vector<TargetLocation>> TargetPoints;
             Optional<CreatureImmunities> Immunities;
-        };
-
-        class SpellStart final : public ServerPacket
-        {
-        public:
-            SpellStart() : ServerPacket(SMSG_SPELL_START) { }
-
-            WorldPacket const* Write() override;
-
-            SpellCastData Cast;
         };
 
         class SpellGo final : public ServerPacket
         {
-        public:
-            SpellGo() : ServerPacket(SMSG_SPELL_GO)
-            {
-                Cast.HitTargets.emplace();
-                Cast.MissStatus.emplace();
-            }
+            public:
+                SpellGo() : ServerPacket(SMSG_SPELL_GO)
+                {
+                    Cast.HitTargets.emplace();
+                    Cast.MissStatus.emplace();
+                }
 
-            WorldPacket const* Write() override;
+                WorldPacket const* Write() override;
 
-            SpellCastData Cast;
+                SpellCastData Cast;
         };
 
-        class PlaySpellVisualKit final : public ServerPacket
+        class SpellStart final : public ServerPacket
         {
-        public:
-            PlaySpellVisualKit(int32 kitType) : ServerPacket(kitType ? SMSG_PLAY_SPELL_IMPACT : SMSG_PLAY_SPELL_VISUAL, 8 + 4) { }
+            public:
+                SpellStart() : ServerPacket(SMSG_SPELL_START) { }
 
-            WorldPacket const* Write() override;
+                WorldPacket const* Write() override;
 
-            ObjectGuid Unit;
-            int32 KitRecID = 0;
-        };
-
-        class CancelCast final : public ClientPacket
-        {
-        public:
-            CancelCast(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_CAST, std::move(packet)) { }
-
-            void Read() override;
-
-            uint8 CastID = 0;
-            uint32 SpellID = 0;
+                SpellCastData Cast;
         };
 
         struct ResyncRune

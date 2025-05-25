@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TransmogDisplayVendorConf.h"
 #include "WorldSession.h"
 #include "Common.h"
 #include "Config.h"
@@ -187,7 +188,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     // additional check, client outputs message on its own
     if (!player->IsAlive())
     {
-        player->SendEquipError(EQUIP_ERR_PLAYER_DEAD, nullptr, nullptr);
+        player->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
         return;
     }
 
@@ -213,7 +214,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     // Verify that the bag is an actual bag or wrapped item that can be used "normally"
     if (!proto->HasFlag(ITEM_FLAG_HAS_LOOT) && !item->IsWrapped())
     {
-        player->SendEquipError(EQUIP_ERR_CLIENT_LOCKED_OUT, item, nullptr);
+        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         TC_LOG_ERROR("entities.player.cheat", "Possible hacking attempt: Player {} {} tried to open item [{}, entry: {}] which is not openable!",
             player->GetName(), player->GetGUID().ToString(), item->GetGUID().ToString(), proto->ItemId);
         return;
@@ -493,7 +494,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPackets::Spells::PetCancelAura
 
     if (!pet->IsAlive())
     {
-        pet->SendPetActionFeedback(PetActionFeedback::Dead, 0);
+        pet->SendPetActionFeedback(FEEDBACK_PET_DEAD);
         return;
     }
 
@@ -762,7 +763,12 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
             else if (*itr == EQUIPMENT_SLOT_BACK && player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK))
                 data << uint32(0);
             else if (Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
-                data << uint32(item->GetTemplate()->DisplayInfoID);
+            {
+                if (uint32 entry = TransmogDisplayVendorMgr::GetFakeEntry(item))
+                    data << uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
+                else
+                    data << uint32(item->GetTemplate()->DisplayInfoID);
+            }
             else
                 data << uint32(0);
         }

@@ -84,74 +84,74 @@ typedef std::map<ObjectGuid, time_t> PlayerTimerMap;
 
 class TC_GAME_API BfCapturePoint
 {
-    public:
-        explicit BfCapturePoint(Battlefield* bf);
-        BfCapturePoint(BfCapturePoint const&) = delete;
-        BfCapturePoint(BfCapturePoint&&) = delete;
-        BfCapturePoint& operator=(BfCapturePoint const&) = delete;
-        BfCapturePoint& operator=(BfCapturePoint&&) = delete;
+public:
+    explicit BfCapturePoint(Battlefield* bf);
+    BfCapturePoint(BfCapturePoint const&) = delete;
+    BfCapturePoint(BfCapturePoint&&) = delete;
+    BfCapturePoint& operator=(BfCapturePoint const&) = delete;
+    BfCapturePoint& operator=(BfCapturePoint&&) = delete;
 
-        virtual ~BfCapturePoint();
+    virtual ~BfCapturePoint();
 
-        virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
-        // Send world state update to all players present
-        void SendUpdateWorldState(uint32 field, uint32 value);
+    // Send world state update to all players present
+    void SendUpdateWorldState(uint32 field, uint32 value);
 
-        // Send kill notify to players in the controlling faction
-        void SendObjectiveComplete(uint32 id, ObjectGuid guid);
+    // Send kill notify to players in the controlling faction
+    void SendObjectiveComplete(uint32 id, ObjectGuid guid);
 
-        // Used when player is activated/inactivated in the area
-        virtual bool HandlePlayerEnter(Player* player);
-        virtual GuidSet::iterator HandlePlayerLeave(Player* player);
-        //virtual void HandlePlayerActivityChanged(Player* player);
+    // Used when player is activated/inactivated in the area
+    virtual bool HandlePlayerEnter(Player* player);
+    virtual GuidSet::iterator HandlePlayerLeave(Player* player);
+    //virtual void HandlePlayerActivityChanged(Player* player);
 
-        // Checks if player is in range of a capture credit marker
-        bool IsInsideObjective(Player* player) const;
+    // Checks if player is in range of a capture credit marker
+    bool IsInsideObjective(Player* player) const;
 
-        // Returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
-        virtual bool Update(uint32 diff);
-        virtual void ChangeTeam(TeamId /*oldTeam*/) { }
-        virtual void SendChangePhase();
+    // Returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
+    virtual bool Update(uint32 diff);
+    virtual void ChangeTeam(TeamId /*oldTeam*/) { }
+    virtual void SendChangePhase();
 
-        bool SetCapturePointData(GameObject* capturePoint);
-        GameObject* GetCapturePointGo();
-        uint32 GetCapturePointEntry() const { return m_capturePointEntry; }
+    virtual bool SetCapturePointData(GameObject* capturePoint);
+    GameObject* GetCapturePointGo();
+    uint32 GetCapturePointEntry() const { return m_capturePointEntry; }
 
-        TeamId GetTeamId() const { return m_team; }
+    TeamId GetTeamId() const { return m_team; }
 
-    protected:
-        bool DelCapturePoint();
+protected:
+    bool DelCapturePoint();
 
-        // active Players in the area of the objective, 0 - alliance, 1 - horde
-        GuidSet m_activePlayers[PVP_TEAMS_COUNT];
+    // active Players in the area of the objective, 0 - alliance, 1 - horde
+    GuidSet m_activePlayers[PVP_TEAMS_COUNT];
 
-        // Total shift needed to capture the objective
-        float m_maxValue;
-        float m_minValue;
+    // Total shift needed to capture the objective
+    float m_maxValue;
+    float m_minValue;
 
-        // Maximum speed of capture
-        float m_maxSpeed;
+    // Maximum speed of capture
+    float m_maxSpeed;
 
-        // The status of the objective
-        float m_value;
-        TeamId m_team;
+    // The status of the objective
+    float m_value;
+    TeamId m_team;
 
-        // Objective states
-        BattlefieldObjectiveStates m_OldState;
-        BattlefieldObjectiveStates m_State;
+    // Objective states
+    BattlefieldObjectiveStates m_OldState;
+    BattlefieldObjectiveStates m_State;
 
-        // Neutral value on capture bar
-        uint32 m_neutralValuePct;
+    // Neutral value on capture bar
+    uint32 m_neutralValuePct;
 
-        // Pointer to the Battlefield this objective belongs to
-        Battlefield* m_Bf;
+    // Pointer to the Battlefield this objective belongs to
+    Battlefield* m_Bf;
 
-        // Capture point entry
-        uint32 m_capturePointEntry;
+    // Capture point entry
+    uint32 m_capturePointEntry;
 
-        // Gameobject related to that capture point
-        ObjectGuid m_capturePointGUID;
+    // Gameobject related to that capture point
+    ObjectGuid m_capturePointGUID;
 };
 
 class TC_GAME_API BfGraveyard

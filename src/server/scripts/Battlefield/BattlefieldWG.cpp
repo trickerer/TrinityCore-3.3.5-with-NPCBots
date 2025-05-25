@@ -15,16 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/// @todo Implement proper support for vehicle+player teleportation
-/// @todo Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
-/// @todo Add proper implement of achievement
+ /// @todo Implement proper support for vehicle+player teleportation
+ /// @todo Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
+ /// @todo Add proper implement of achievement
 
 #include "BattlefieldWG.h"
 #include "AchievementMgr.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
 #include "GameObject.h"
 #include "GameTime.h"
 #include "Log.h"
@@ -41,6 +40,9 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
+#include "Custom/discord/DiscordWebhookMgr.h"
+
+#include <nlohmann/json.hpp>
 
 struct BfWGCoordGY
 {
@@ -62,19 +64,19 @@ BfWGCoordGY const WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
     { { 5140.790f, 2179.120f, 390.950f, 1.972220f }, 1332, BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE, TEAM_ALLIANCE },
 };
 
-uint32 const ClockWorldState[]         = { 3781, 4354 };
-uint32 const WintergraspFaction[]      = { FACTION_ALLIANCE_GENERIC_WG, FACTION_HORDE_GENERIC_WG, FACTION_FRIENDLY };
+uint32 const ClockWorldState[] = { 3781, 4354 };
+uint32 const WintergraspFaction[] = { FACTION_ALLIANCE_GENERIC_WG, FACTION_HORDE_GENERIC_WG, FACTION_FRIENDLY };
 
-Position const WintergraspStalkerPos   = { 4948.985f, 2937.789f, 550.5172f,  1.815142f };
+Position const WintergraspStalkerPos = { 4948.985f, 2937.789f, 550.5172f,  1.815142f };
 
-Position const WintergraspRelicPos     = { 5440.379f, 2840.493f, 430.2816f, -1.832595f };
-QuaternionData const WintergraspRelicRot    = { 0.f, 0.f, -0.7933531f, 0.6087617f };
+Position const WintergraspRelicPos = { 5440.379f, 2840.493f, 430.2816f, -1.832595f };
+QuaternionData const WintergraspRelicRot = { 0.f, 0.f, -0.7933531f, 0.6087617f };
 
-uint8 const WG_MAX_OBJ              = 32;
-uint8 const WG_MAX_TURRET           = 15;
-uint8 const WG_MAX_TELEPORTER       = 12;
-uint8 const WG_MAX_WORKSHOP         = 6;
-uint8 const WG_MAX_TOWER            = 7;
+uint8 const WG_MAX_OBJ = 32;
+uint8 const WG_MAX_TURRET = 15;
+uint8 const WG_MAX_TELEPORTER = 12;
+uint8 const WG_MAX_WORKSHOP = 6;
+uint8 const WG_MAX_TOWER = 7;
 
 // *****************************************************
 // ************ Destructible (Wall, Tower..) ***********
@@ -297,77 +299,77 @@ WintergraspTowerCannonData const TowerCannon[WG_MAX_TOWER_CANNON] =
     {
         190221,
         {
-            // no cannons at bottom
-        },
-        {
-            { 5255.88f, 3047.63f, 438.499f, 3.13677f },
-            { 5280.90f, 3071.32f, 438.499f, 1.62879f }
-        }
+        // no cannons at bottom
     },
     {
-        190373,
-        {
-            // no cannons at bottom
-        },
-        {
-            { 5138.59f, 2935.16f, 439.845f, 3.11723f },
-            { 5163.06f, 2959.52f, 439.846f, 1.47258f }
-        }
-    },
-    {
-        190377,
-        {
-            // no cannons at bottom
-        },
-        {
-            { 5163.84f, 2723.74f, 439.844f, 1.39940f },
-            { 5139.69f, 2747.40f, 439.844f, 3.17221f }
-        }
-    },
-    {
-        190378,
-        {
-            // no cannons at bottom
-        },
-        {
-            { 5278.21f, 2607.23f, 439.755f, 4.71944f },
-            { 5255.01f, 2631.98f, 439.755f, 3.15257f }
-        }
-    },
-    {
-        190356,
-        {
-            { 4537.380371f, 3599.531738f, 402.886993f, 3.998462f },
-            { 4581.497559f, 3604.087158f, 402.886963f, 5.651723f }
-        },
-        {
-            { 4469.448242f, 1966.623779f, 465.647217f, 1.153573f },
-            { 4581.895996f, 3626.438477f, 426.539062f, 0.117806f }
-        }
-    },
-    {
-        190357,
-        {
-            { 4421.640137f, 2799.935791f, 412.630920f, 5.459298f },
-            { 4420.263184f, 2845.340332f, 412.630951f, 0.742197f }
-        },
-        {
-            { 4423.430664f, 2822.762939f, 436.283142f, 6.223487f },
-            { 4397.825684f, 2847.629639f, 436.283325f, 1.579430f },
-            { 4398.814941f, 2797.266357f, 436.283051f, 4.703747f }
-        }
-    },
-    {
-        190358,
-        {
-            { 4448.138184f, 1974.998779f, 441.995911f, 1.967238f },
-            { 4448.713379f, 1955.148682f, 441.995178f, 0.380733f }
-        },
-        {
-            { 4469.448242f, 1966.623779f, 465.647217f, 1.153573f },
-            { 4481.996582f, 1933.658325f, 465.647186f, 5.873029f }
-        }
+        { 5255.88f, 3047.63f, 438.499f, 3.13677f },
+        { 5280.90f, 3071.32f, 438.499f, 1.62879f }
     }
+},
+{
+    190373,
+    {
+        // no cannons at bottom
+    },
+    {
+        { 5138.59f, 2935.16f, 439.845f, 3.11723f },
+        { 5163.06f, 2959.52f, 439.846f, 1.47258f }
+    }
+},
+{
+    190377,
+    {
+        // no cannons at bottom
+    },
+    {
+        { 5163.84f, 2723.74f, 439.844f, 1.39940f },
+        { 5139.69f, 2747.40f, 439.844f, 3.17221f }
+    }
+},
+{
+    190378,
+    {
+        // no cannons at bottom
+    },
+    {
+        { 5278.21f, 2607.23f, 439.755f, 4.71944f },
+        { 5255.01f, 2631.98f, 439.755f, 3.15257f }
+    }
+},
+{
+    190356,
+    {
+        { 4537.380371f, 3599.531738f, 402.886993f, 3.998462f },
+        { 4581.497559f, 3604.087158f, 402.886963f, 5.651723f }
+    },
+    {
+        { 4469.448242f, 1966.623779f, 465.647217f, 1.153573f },
+        { 4581.895996f, 3626.438477f, 426.539062f, 0.117806f }
+    }
+},
+{
+    190357,
+    {
+        { 4421.640137f, 2799.935791f, 412.630920f, 5.459298f },
+        { 4420.263184f, 2845.340332f, 412.630951f, 0.742197f }
+    },
+    {
+        { 4423.430664f, 2822.762939f, 436.283142f, 6.223487f },
+        { 4397.825684f, 2847.629639f, 436.283325f, 1.579430f },
+        { 4398.814941f, 2797.266357f, 436.283051f, 4.703747f }
+    }
+},
+{
+    190358,
+    {
+        { 4448.138184f, 1974.998779f, 441.995911f, 1.967238f },
+        { 4448.713379f, 1955.148682f, 441.995178f, 0.380733f }
+    },
+    {
+        { 4469.448242f, 1966.623779f, 465.647217f, 1.153573f },
+        { 4481.996582f, 1933.658325f, 465.647186f, 5.873029f }
+    }
+}
 };
 
 // *********************************************************
@@ -406,6 +408,15 @@ BattlefieldWG::~BattlefieldWG()
 
     for (BfWGGameObjectBuilding* building : BuildingsInZone)
         delete building;
+}
+
+void BattlefieldWG::CapturePointTaken(uint32 areaId)
+{
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+        for (GuidUnorderedSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                if (player->GetAreaId() == areaId)
+                    player->UpdateAreaDependentAuras(areaId);
 }
 
 bool BattlefieldWG::SetupBattlefield()
@@ -447,7 +458,7 @@ bool BattlefieldWG::SetupBattlefield()
 
     // Load from db
     if ((sWorld->getWorldState(WS_BATTLEFIELD_WG_ACTIVE) == 0) && (sWorld->getWorldState(WS_BATTLEFIELD_WG_DEFENDER) == 0)
-            && (sWorld->getWorldState(ClockWorldState[0]) == 0))
+        && (sWorld->getWorldState(ClockWorldState[0]) == 0))
     {
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ACTIVE, uint64(false));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDER, uint64(urand(0, 1)));
@@ -488,10 +499,19 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_NE)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
+        //NORTH
+        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
             workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        //SOUTH
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        //FORTRESS  
+        if (i == BATTLEFIELD_WG_WORKSHOP_KEEP_WEST || i == BATTLEFIELD_WG_WORKSHOP_KEEP_EAST)
+            workshop->GiveControlTo(GetAttackerTeam(), true); //BACKWARDS??? WHY IS THIS???
+
+
 
         // Note: Capture point is added once the gameobject is created.
         Workshops[i] = workshop;
@@ -547,6 +567,7 @@ bool BattlefieldWG::SetupBattlefield()
 bool BattlefieldWG::Update(uint32 diff)
 {
     bool m_return = Battlefield::Update(diff);
+
     if (m_saveTimer <= diff)
     {
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ACTIVE, m_isActive);
@@ -556,6 +577,8 @@ bool BattlefieldWG::Update(uint32 diff)
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_A, GetData(BATTLEFIELD_WG_DATA_DEF_A));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_ATTACKED_H, GetData(BATTLEFIELD_WG_DATA_WON_H));
         sWorld->setWorldState(WS_BATTLEFIELD_WG_DEFENDED_H, GetData(BATTLEFIELD_WG_DATA_DEF_H));
+
+
         m_saveTimer = 60 * IN_MILLISECONDS;
     }
     else
@@ -600,9 +623,14 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
 
-    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
-    for (WintergraspWorkshop* workshop : Workshops)
-        workshop->UpdateGraveyardAndWorkshop();
+    // Set Sliders capture points data to his owners when battle start
+    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    {
+
+        //SendWarning (DOCAPUPDATETEXT);
+        //itr->second->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE;
+
+    }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
@@ -620,10 +648,49 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i == BATTLEFIELD_WG_WORKSHOP_NE || i == BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
+
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->Save();
+
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
     // Send start warning to all players
     SendWarning(BATTLEFIELD_WG_TEXT_START_BATTLE);
+    
+    // Check the team that controls Wintergrasp, using GetDefenderTeam() for 3.3.5a
+    TeamId controllingTeam = GetDefenderTeam();  // Assuming GetDefenderTeam() is correct for 3.3.5a
+
+    // If controllingTeam is 1, it's the Horde; otherwise, it's the Alliance
+    std::string owner = (controllingTeam == TEAM_HORDE) ? "🔴 **Horde" : "🔵 **Alliance";  // Use TEAM_HORDE for 3.3.5a
+
+    // Prepare the Discord message
+    std::string winnerMessage = "⚔️ ** Wintergrasp has Started! Defenders " + owner + "";
+ 
+    // Send the message to Discord
+    SendDiscordMessage(winnerMessage);
+
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
@@ -645,6 +712,11 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
     }
 
     UpdateVehicleCountWG();
+}
+
+BattlefieldWG::BattlefieldWG()
+{
+    // You can leave this empty or initialize variables as needed
 }
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
@@ -753,9 +825,116 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     }
 
     if (!endByTimer) // win alli/horde
+    {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_CAPTURE_HORDE);
+    }
     else // defend alli/horde
+    {
         SendWarning(GetDefenderTeam() == TEAM_ALLIANCE ? BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_ALLIANCE : BATTLEFIELD_WG_TEXT_FORTRESS_DEFEND_HORDE);
+    }
+
+
+
+    // UPDATE MAP TEXT
+    //SendWarning(TEST);
+
+    for (BfWGGameObjectBuilding* building : BuildingsInZone)
+    {
+        building->Rebuild();
+        building->UpdateTurretAttack(false);
+    }
+
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_DEF, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
+    SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_DEF, 0);
+
+    // Remove turret
+    for (auto itr = CanonList.begin(); itr != CanonList.end(); ++itr)
+    {
+        if (Creature* creature = GetCreature(*itr))
+        {
+            if (!endByTimer)
+                creature->SetFaction(WintergraspFaction[GetDefenderTeam()]);
+            HideNpc(creature);
+        }
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_NE || i < BATTLEFIELD_WG_WORKSHOP_NW)
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+        else
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    {
+        WintergraspWorkshop* workshop = new WintergraspWorkshop(this, i);
+        if (i < BATTLEFIELD_WG_WORKSHOP_SE || i < BATTLEFIELD_WG_WORKSHOP_SW)
+            workshop->GiveControlTo(GetDefenderTeam(), true);
+        else
+            workshop->GiveControlTo(GetAttackerTeam(), true);
+
+        // Note: Capture point is added once the gameobject is created.
+        Workshops[i] = workshop;
+    }
+
+
+    for (WintergraspWorkshop* workshop : Workshops)
+        workshop->UpdateGraveyardAndWorkshop();
+
+    // SEMD WORLD UPDATE??
+    // NEED TO RESET THE CAP BAR
+    
+    bool allianceWon = (GetDefenderTeam() == TEAM_ALLIANCE);
+    std::string owner = allianceWon ? "🔵 ** Alliance" : "🔴 ** Horde";
+    std::string method = endByTimer ? "defended" : "captured";
+    std::string winnerMessage = "⚔️ ** Wintergrasp has ended!\\n" + owner + " has " + method + " the fortress!";
+    // Send to Discord
+    SendDiscordMessage(winnerMessage);
+    //SendDiscordMessage("✅ MGAWoW webhook test message");
+    
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+    {
+        for (auto itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+            {
+                // Remove phase auras
+                player->RemoveAurasDueToSpell(m_DefenderTeam == TEAM_ALLIANCE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player->GetGUID());
+                player->AddAura(m_DefenderTeam == TEAM_HORDE ? SPELL_HORDE_CONTROL_PHASE_SHIFT : SPELL_ALLIANCE_CONTROL_PHASE_SHIFT, player);
+
+                // Determine if player is on the winning team
+                if (player->GetTeamId() == GetDefenderTeam())
+                {
+                    // Teleport to fortress — customize coords as needed
+                    float x = 5311.055664f;
+                    float y = 2842.945068f;
+                    float z = 409.260651f;
+                    float o = 6.166933;
+                    player->TeleportTo(571, x, y, z, o); // 571 = Northrend
+                }
+                else
+                {
+                    if (player->m_homebindMapId && !(player->m_homebindX == 0.0f && player->m_homebindY == 0.0f))
+                    {
+                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
+                    }
+                    else
+                    {
+                        // Fallback safe location (DALA INN)
+                        player->TeleportTo(571, 5769.09f, 729.62f, 643.01f, 3.1f);
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 // *******************************************************
@@ -763,24 +942,24 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 // *******************************************************
 void BattlefieldWG::DoCompleteOrIncrementAchievement(uint32 achievement, Player* player, uint8 /*incrementNumber*/)
 {
-    AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(achievement);
+    AchievementEntry const* achievementEntry = sAchievementMgr->GetAchievement(achievement);
 
     if (!achievementEntry)
         return;
 
     switch (achievement)
     {
-        case ACHIEVEMENTS_WIN_WG_100:
-        {
-            // player->UpdateAchievementCriteria();
-            break;
-        }
-        default:
-        {
-            if (player)
-                player->CompletedAchievement(achievementEntry);
-            break;
-        }
+    case ACHIEVEMENTS_WIN_WG_100:
+    {
+        // player->UpdateAchievementCriteria();
+        break;
+    }
+    default:
+    {
+        if (player)
+            player->CompletedAchievement(achievementEntry);
+        break;
+    }
     }
 
 }
@@ -794,23 +973,23 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
 {
     switch (areaId)
     {
-        case AREA_WINTERGRASP_FORTRESS:
-            return BATTLEFIELD_WG_GY_KEEP;
-        case AREA_THE_SUNKEN_RING:
-            return BATTLEFIELD_WG_GY_WORKSHOP_NE;
-        case AREA_THE_BROKEN_TEMPLATE:
-            return BATTLEFIELD_WG_GY_WORKSHOP_NW;
-        case AREA_WESTPARK_WORKSHOP:
-            return BATTLEFIELD_WG_GY_WORKSHOP_SW;
-        case AREA_EASTPARK_WORKSHOP:
-            return BATTLEFIELD_WG_GY_WORKSHOP_SE;
-        case AREA_WINTERGRASP:
-            return BATTLEFIELD_WG_GY_ALLIANCE;
-        case AREA_THE_CHILLED_QUAGMIRE:
-            return BATTLEFIELD_WG_GY_HORDE;
-        default:
-            TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id {}", areaId);
-            break;
+    case AREA_WINTERGRASP_FORTRESS:
+        return BATTLEFIELD_WG_GY_KEEP;
+    case AREA_THE_SUNKEN_RING:
+        return BATTLEFIELD_WG_GY_WORKSHOP_NE;
+    case AREA_THE_BROKEN_TEMPLATE:
+        return BATTLEFIELD_WG_GY_WORKSHOP_NW;
+    case AREA_WESTPARK_WORKSHOP:
+        return BATTLEFIELD_WG_GY_WORKSHOP_SW;
+    case AREA_EASTPARK_WORKSHOP:
+        return BATTLEFIELD_WG_GY_WORKSHOP_SE;
+    case AREA_WINTERGRASP:
+        return BATTLEFIELD_WG_GY_ALLIANCE;
+    case AREA_THE_CHILLED_QUAGMIRE:
+        return BATTLEFIELD_WG_GY_HORDE;
+    default:
+        TC_LOG_ERROR("bg.battlefield", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id {}", areaId);
+        break;
     }
 
     return 0;
@@ -821,15 +1000,15 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     // Accessing to db spawned creatures
     switch (creature->GetEntry())
     {
-        case NPC_DWARVEN_SPIRIT_GUIDE:
-        case NPC_TAUNKA_SPIRIT_GUIDE:
-        {
-            TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
-            uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
-            if (m_GraveyardList[graveyardId])
-                m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
-            break;
-        }
+    case NPC_DWARVEN_SPIRIT_GUIDE:
+    case NPC_TAUNKA_SPIRIT_GUIDE:
+    {
+        TeamId teamId = (creature->GetEntry() == NPC_DWARVEN_SPIRIT_GUIDE ? TEAM_ALLIANCE : TEAM_HORDE);
+        uint8 graveyardId = GetSpiritGraveyardId(creature->GetAreaId());
+        if (m_GraveyardList[graveyardId])
+            m_GraveyardList[graveyardId]->SetSpirit(creature, teamId);
+        break;
+    }
     }
 
     // untested code - not sure if it is valid.
@@ -837,89 +1016,89 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     {
         switch (creature->GetEntry())
         {
-            case NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE:
-            case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
-            case NPC_WINTERGRASP_CATAPULT:
-            case NPC_WINTERGRASP_DEMOLISHER:
+        case NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE:
+        case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
+        case NPC_WINTERGRASP_CATAPULT:
+        case NPC_WINTERGRASP_DEMOLISHER:
+        {
+            if (!creature->ToTempSummon() || !creature->ToTempSummon()->GetSummonerGUID() || !ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID()))
             {
-                if (!creature->ToTempSummon() || !creature->ToTempSummon()->GetSummonerGUID() || !ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID()))
+                creature->DespawnOrUnsummon();
+                return;
+            }
+
+            Player* creator = ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
+            TeamId team = creator->GetTeamId();
+
+            if (team == TEAM_HORDE)
+            {
+                if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
+                {
+                    UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, 1);
+                    creature->AddAura(SPELL_HORDE_FLAG, creature);
+                    m_vehicles[team].insert(creature->GetGUID());
+                    UpdateVehicleCountWG();
+                }
+                else
                 {
                     creature->DespawnOrUnsummon();
                     return;
                 }
-
-                Player* creator = ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
-                TeamId team = creator->GetTeamId();
-
-                if (team == TEAM_HORDE)
+            }
+            else
+            {
+                if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A))
                 {
-                    if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
-                    {
-                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, 1);
-                        creature->AddAura(SPELL_HORDE_FLAG, creature);
-                        m_vehicles[team].insert(creature->GetGUID());
-                        UpdateVehicleCountWG();
-                    }
-                    else
-                    {
-                        creature->DespawnOrUnsummon();
-                        return;
-                    }
+                    UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, 1);
+                    creature->AddAura(SPELL_ALLIANCE_FLAG, creature);
+                    m_vehicles[team].insert(creature->GetGUID());
+                    UpdateVehicleCountWG();
                 }
                 else
                 {
-                    if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A))
-                    {
-                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, 1);
-                        creature->AddAura(SPELL_ALLIANCE_FLAG, creature);
-                        m_vehicles[team].insert(creature->GetGUID());
-                        UpdateVehicleCountWG();
-                    }
-                    else
-                    {
-                        creature->DespawnOrUnsummon();
-                        return;
-                    }
+                    creature->DespawnOrUnsummon();
+                    return;
                 }
-
-                creature->CastSpell(creator, SPELL_GRAB_PASSENGER, true);
-                break;
             }
+
+            creature->CastSpell(creator, SPELL_GRAB_PASSENGER, true);
+            break;
+        }
         }
     }
 }
 
 void BattlefieldWG::OnCreatureRemove(Creature* /*creature*/)
 {
-/* possibly can be used later
-    if (IsWarTime())
-    {
-        switch (creature->GetEntry())
+    /* possibly can be used later
+        if (IsWarTime())
         {
-            case NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE:
-            case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
-            case NPC_WINTERGRASP_CATAPULT:
-            case NPC_WINTERGRASP_DEMOLISHER:
+            switch (creature->GetEntry())
             {
-                uint8 team;
-                if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
-                    team = TEAM_ALLIANCE;
-                else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
-                    team = TEAM_HORDE;
-                else
-                    return;
+                case NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE:
+                case NPC_WINTERGRASP_SIEGE_ENGINE_HORDE:
+                case NPC_WINTERGRASP_CATAPULT:
+                case NPC_WINTERGRASP_DEMOLISHER:
+                {
+                    uint8 team;
+                    if (creature->GetFaction() == WintergraspFaction[TEAM_ALLIANCE])
+                        team = TEAM_ALLIANCE;
+                    else if (creature->GetFaction() == WintergraspFaction[TEAM_HORDE])
+                        team = TEAM_HORDE;
+                    else
+                        return;
 
-                m_vehicles[team].erase(creature->GetGUID());
-                if (team == TEAM_HORDE)
-                    UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, -1);
-                else
-                    UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, -1);
-                UpdateVehicleCountWG();
+                    m_vehicles[team].erase(creature->GetGUID());
+                    if (team == TEAM_HORDE)
+                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, -1);
+                    else
+                        UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, -1);
+                    UpdateVehicleCountWG();
 
-                break;
+                    break;
+                }
             }
-        }
-    }*/
+        }*/
 }
 
 void BattlefieldWG::OnGameObjectCreate(GameObject* go)
@@ -928,20 +1107,20 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 
     switch (go->GetEntry())
     {
-        case GO_WINTERGRASP_FACTORY_BANNER_NE:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_NE;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_NW:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_NW;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SE:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_SE;
-            break;
-        case GO_WINTERGRASP_FACTORY_BANNER_SW:
-            workshopId = BATTLEFIELD_WG_WORKSHOP_SW;
-            break;
-        default:
-            return;
+    case GO_WINTERGRASP_FACTORY_BANNER_NE:
+        workshopId = BATTLEFIELD_WG_WORKSHOP_NE;
+        break;
+    case GO_WINTERGRASP_FACTORY_BANNER_NW:
+        workshopId = BATTLEFIELD_WG_WORKSHOP_NW;
+        break;
+    case GO_WINTERGRASP_FACTORY_BANNER_SE:
+        workshopId = BATTLEFIELD_WG_WORKSHOP_SE;
+        break;
+    case GO_WINTERGRASP_FACTORY_BANNER_SW:
+        workshopId = BATTLEFIELD_WG_WORKSHOP_SW;
+        break;
+    default:
+        return;
     }
 
     for (WintergraspWorkshop* workshop : Workshops)
@@ -1086,7 +1265,7 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
     else
     {
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) > 0)
-           player->SetAuraStack(SPELL_TOWER_CONTROL, player, GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
+            player->SetAuraStack(SPELL_TOWER_CONTROL, player, GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
     }
     SendInitWorldStatesTo(player);
 }
@@ -1136,16 +1315,16 @@ uint32 BattlefieldWG::GetData(uint32 data) const
     {
         // Used to determine when the phasing spells must be cast
         // See: SpellArea::IsFitToRequirements
-        case AREA_THE_SUNKEN_RING:
-        case AREA_THE_BROKEN_TEMPLATE:
-        case AREA_WESTPARK_WORKSHOP:
-        case AREA_EASTPARK_WORKSHOP:
-            // Graveyards and Workshops are controlled by the same team.
-            if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardId(data)))
-                return graveyard->GetControlTeamId();
-            break;
-        default:
-            break;
+    case AREA_THE_SUNKEN_RING:
+    case AREA_THE_BROKEN_TEMPLATE:
+    case AREA_WESTPARK_WORKSHOP:
+    case AREA_EASTPARK_WORKSHOP:
+        // Graveyards and Workshops are controlled by the same team.
+        if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardId(data)))
+            return graveyard->GetControlTeamId();
+        break;
+    default:
+        break;
     }
 
     return Battlefield::GetData(data);
@@ -1291,9 +1470,9 @@ void BattlefieldWG::UpdateDamagedTowerCount(TeamId team)
 // Update vehicle count WorldState to player
 void BattlefieldWG::UpdateVehicleCountWG()
 {
-    SendUpdateWorldState(WS_BATTLEFIELD_WG_VEHICLE_H,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+    SendUpdateWorldState(WS_BATTLEFIELD_WG_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
     SendUpdateWorldState(WS_BATTLEFIELD_WG_MAX_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
-    SendUpdateWorldState(WS_BATTLEFIELD_WG_VEHICLE_A,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+    SendUpdateWorldState(WS_BATTLEFIELD_WG_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
     SendUpdateWorldState(WS_BATTLEFIELD_WG_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
 }
 
@@ -1404,18 +1583,18 @@ void BfWGGameObjectBuilding::Rebuild()
 {
     switch (_type)
     {
-        case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-        case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-            _teamControl = _wg->GetDefenderTeam();      // Objects that are part of the keep should be the defender's
-            break;
-        case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-            _teamControl = _wg->GetAttackerTeam();      // The towers in the south should be the attacker's
-            break;
-        default:
-            _teamControl = TEAM_NEUTRAL;
-            break;
+    case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+    case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
+    case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+    case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+        _teamControl = _wg->GetDefenderTeam();      // Objects that are part of the keep should be the defender's
+        break;
+    case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+        _teamControl = _wg->GetAttackerTeam();      // The towers in the south should be the attacker's
+        break;
+    default:
+        _teamControl = TEAM_NEUTRAL;
+        break;
     }
 
     if (GameObject* build = _wg->GetGameObject(_buildGUID))
@@ -1486,22 +1665,22 @@ void BfWGGameObjectBuilding::Destroyed()
     switch (_type)
     {
         // Inform the global wintergrasp script of the destruction of this object
-        case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-        case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-            _wg->UpdatedDestroyedTowerCount(_teamControl);
-            break;
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-            if (GameObject* build = _wg->GetGameObject(_buildGUID))
-                if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
-                    go->SetGoState(GO_STATE_ACTIVE);
-            _wg->SetRelicInteractible(true);
-            if (_wg->GetRelic())
-                _wg->GetRelic()->RemoveFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
-            else
-                TC_LOG_ERROR("bg.battlefield.wg", "Titan Relic not found.");
-            break;
-        default:
-            break;
+    case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+    case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+        _wg->UpdatedDestroyedTowerCount(_teamControl);
+        break;
+    case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
+        if (GameObject* build = _wg->GetGameObject(_buildGUID))
+            if (GameObject* go = build->FindNearestGameObject(GO_WINTERGRASP_KEEP_COLLISION_WALL, 50.0f))
+                go->SetGoState(GO_STATE_ACTIVE);
+        _wg->SetRelicInteractible(true);
+        if (_wg->GetRelic())
+            _wg->GetRelic()->RemoveFlag(GO_FLAG_IN_USE | GO_FLAG_NOT_SELECTABLE);
+        else
+            TC_LOG_ERROR("bg.battlefield.wg", "Titan Relic not found.");
+        break;
+    default:
+        break;
     }
 
     _wg->BrokenWallOrTower(_teamControl, this);
@@ -1517,66 +1696,66 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
 
     switch (_type)
     {
-        case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
-        case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-        case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-            _teamControl = _wg->GetDefenderTeam();           // Objects that are part of the keep should be the defender's
-            break;
-        case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-            _teamControl = _wg->GetAttackerTeam();           // The towers in the south should be the attacker's
-            break;
-        default:
-            _teamControl = TEAM_NEUTRAL;
-            break;
+    case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+    case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
+    case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+    case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+        _teamControl = _wg->GetDefenderTeam();           // Objects that are part of the keep should be the defender's
+        break;
+    case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+        _teamControl = _wg->GetAttackerTeam();           // The towers in the south should be the attacker's
+        break;
+    default:
+        _teamControl = TEAM_NEUTRAL;
+        break;
     }
 
     _state = WintergraspGameObjectState(sWorld->getWorldState(_worldState));
     switch (_state)
     {
-        case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT:
-        case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
-        case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
-            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
-            break;
-        case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DESTROY:
-        case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
-        case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
-            go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
-            break;
-        case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DAMAGE:
-        case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE:
-        case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DAMAGE:
-            go->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
-            break;
-        default:
-            break;
+    case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_INTACT:
+    case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
+    case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
+        go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
+        break;
+    case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DESTROY:
+    case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
+    case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
+        go->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+        break;
+    case BATTLEFIELD_WG_OBJECTSTATE_NEUTRAL_DAMAGE:
+    case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE:
+    case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DAMAGE:
+        go->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
+        break;
+    default:
+        break;
     }
 
     int32 towerId = -1;
     switch (go->GetEntry())
     {
-        case GO_WINTERGRASP_FORTRESS_TOWER_1:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
-            break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_2:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SW;
-            break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_3:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SE;
-            break;
-        case GO_WINTERGRASP_FORTRESS_TOWER_4:
-            towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NE;
-            break;
-        case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_SHADOWSIGHT;
-            break;
-        case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_WINTER_S_EDGE;
-            break;
-        case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-            towerId = BATTLEFIELD_WG_TOWER_FLAMEWATCH;
-            break;
+    case GO_WINTERGRASP_FORTRESS_TOWER_1:
+        towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NW;
+        break;
+    case GO_WINTERGRASP_FORTRESS_TOWER_2:
+        towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SW;
+        break;
+    case GO_WINTERGRASP_FORTRESS_TOWER_3:
+        towerId = BATTLEFIELD_WG_TOWER_FORTRESS_SE;
+        break;
+    case GO_WINTERGRASP_FORTRESS_TOWER_4:
+        towerId = BATTLEFIELD_WG_TOWER_FORTRESS_NE;
+        break;
+    case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+        towerId = BATTLEFIELD_WG_TOWER_SHADOWSIGHT;
+        break;
+    case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+        towerId = BATTLEFIELD_WG_TOWER_WINTER_S_EDGE;
+        break;
+    case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+        towerId = BATTLEFIELD_WG_TOWER_FLAMEWATCH;
+        break;
     }
 
     if (towerId >= BATTLEFIELD_WG_TOWER_SHADOWSIGHT) // Attacker towers
@@ -1615,17 +1794,17 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
                 m_TowerCannonBottomList.push_back(turret->GetGUID());
                 switch (go->GetEntry())
                 {
-                    case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                        turret->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
-                        break;
-                    case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                    case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                    case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                        turret->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
-                        break;
+                case GO_WINTERGRASP_FORTRESS_TOWER_1:
+                case GO_WINTERGRASP_FORTRESS_TOWER_2:
+                case GO_WINTERGRASP_FORTRESS_TOWER_3:
+                case GO_WINTERGRASP_FORTRESS_TOWER_4:
+                    turret->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
+                    break;
+                case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+                case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+                case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+                    turret->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
+                    break;
                 }
 
                 _wg->HideNpc(turret);
@@ -1640,17 +1819,17 @@ void BfWGGameObjectBuilding::Init(GameObject* go)
                 m_TurretTopList.push_back(turret->GetGUID());
                 switch (go->GetEntry())
                 {
-                    case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                    case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                        turret->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
-                        break;
-                    case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                    case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                    case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                        turret->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
-                        break;
+                case GO_WINTERGRASP_FORTRESS_TOWER_1:
+                case GO_WINTERGRASP_FORTRESS_TOWER_2:
+                case GO_WINTERGRASP_FORTRESS_TOWER_3:
+                case GO_WINTERGRASP_FORTRESS_TOWER_4:
+                    turret->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
+                    break;
+                case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+                case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+                case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+                    turret->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
+                    break;
                 }
                 _wg->HideNpc(turret);
             }
@@ -1699,21 +1878,21 @@ void BfWGGameObjectBuilding::UpdateTurretAttack(bool disable)
 
             switch (_buildGUID.GetEntry())
             {
-                case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                {
-                    creature->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
-                    break;
-                }
-                case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                {
-                    creature->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
-                    break;
-                }
+            case GO_WINTERGRASP_FORTRESS_TOWER_1:
+            case GO_WINTERGRASP_FORTRESS_TOWER_2:
+            case GO_WINTERGRASP_FORTRESS_TOWER_3:
+            case GO_WINTERGRASP_FORTRESS_TOWER_4:
+            {
+                creature->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
+                break;
+            }
+            case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+            case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+            case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+            {
+                creature->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
+                break;
+            }
             }
         }
     }
@@ -1729,21 +1908,21 @@ void BfWGGameObjectBuilding::UpdateTurretAttack(bool disable)
 
             switch (_buildGUID.GetEntry())
             {
-                case GO_WINTERGRASP_FORTRESS_TOWER_1:
-                case GO_WINTERGRASP_FORTRESS_TOWER_2:
-                case GO_WINTERGRASP_FORTRESS_TOWER_3:
-                case GO_WINTERGRASP_FORTRESS_TOWER_4:
-                {
-                    creature->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
-                    break;
-                }
-                case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
-                case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
-                case GO_WINTERGRASP_FLAMEWATCH_TOWER:
-                {
-                    creature->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
-                    break;
-                }
+            case GO_WINTERGRASP_FORTRESS_TOWER_1:
+            case GO_WINTERGRASP_FORTRESS_TOWER_2:
+            case GO_WINTERGRASP_FORTRESS_TOWER_3:
+            case GO_WINTERGRASP_FORTRESS_TOWER_4:
+            {
+                creature->SetFaction(WintergraspFaction[_wg->GetDefenderTeam()]);
+                break;
+            }
+            case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
+            case GO_WINTERGRASP_WINTER_S_EDGE_TOWER:
+            case GO_WINTERGRASP_FLAMEWATCH_TOWER:
+            {
+                creature->SetFaction(WintergraspFaction[_wg->GetAttackerTeam()]);
+                break;
+            }
             }
         }
     }
@@ -1776,54 +1955,32 @@ uint8 WintergraspWorkshop::GetId() const
 
 void WintergraspWorkshop::GiveControlTo(TeamId teamId, bool init /*= false*/)
 {
-    switch (teamId)
+    if (teamId == TEAM_NEUTRAL)
     {
-        case TEAM_NEUTRAL:
-        {
-            // Send warning message to all player for inform a faction attack a workshop
-            // alliance / horde attacking workshop
-            _wg->SendWarning(_teamControl == TEAM_ALLIANCE ? _staticInfo->TextIds.HordeAttack : _staticInfo->TextIds.AllianceAttack);
-            break;
-        }
-        case TEAM_ALLIANCE:
-        {
-            // Updating worldstate
-            _state = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
-
-            // Warning message
-            if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.AllianceCapture); // workshop taken - alliance
-
-            // Found associate graveyard and update it
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_ALLIANCE);
-
-            _teamControl = teamId;
-            break;
-        }
-        case TEAM_HORDE:
-        {
-            // Update worldstate
-            _state = BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT;
-            _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
-
-            // Warning message
-            if (!init)
-                _wg->SendWarning(_staticInfo->TextIds.HordeCapture); // workshop taken - horde
-
-            // Update graveyard control
-            if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-                if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
-                    gy->GiveControlTo(TEAM_HORDE);
-
-            _teamControl = teamId;
-            break;
-        }
+        // Send warning message to all player for inform a faction attack a workshop
+        // alliance / horde attacking workshop
+        _wg->SendWarning(_teamControl == TEAM_ALLIANCE ? _staticInfo->TextIds.HordeAttack : _staticInfo->TextIds.AllianceAttack);
     }
-    if (!init)
+    else {
+        // Update worldstate
+        _state = teamId == TEAM_HORDE ? BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT : BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT;
+        _wg->SendUpdateWorldState(_staticInfo->WorldStateId, _state);
+
+        // Warning message
+        if (!init)
+            _wg->SendWarning(teamId == TEAM_HORDE ? _staticInfo->TextIds.HordeCapture : _staticInfo->TextIds.AllianceCapture); // workshop taken - horde
+
+        // Update graveyard control
+        if (_staticInfo->WorkshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+            if (BfGraveyard* gy = _wg->GetGraveyardById(_staticInfo->WorkshopId))
+                gy->GiveControlTo(teamId);
+
+        _teamControl = teamId;
+    }
+    if (!init) {
         _wg->UpdateCounterVehicle(false);
+        _wg->CapturePointTaken(_staticInfo->WorkshopId);
+    }
 }
 
 void WintergraspWorkshop::UpdateGraveyardAndWorkshop()

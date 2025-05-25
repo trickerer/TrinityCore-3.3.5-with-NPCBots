@@ -20,6 +20,9 @@ GetInstallOffset(INSTALL_OFFSET)
 # when using predefined templates for script building
 # like dynamic, static, minimal-static...
 # Sets SCRIPTS_DEFAULT_LINKAGE
+
+include_directories(${CMAKE_SOURCE_DIR}/src/server/scripts) 
+
 if(SCRIPTS MATCHES "dynamic")
   set(SCRIPTS_DEFAULT_LINKAGE "dynamic")
 elseif(SCRIPTS MATCHES "static")
@@ -228,6 +231,8 @@ if(USE_SCRIPTPCH)
   add_cxx_pch("scripts" ${PRIVATE_PCH_HEADER} ${DYNAMIC_SCRIPT_MODULE_PROJECTS})
   reuse_cxx_pch("${DYNAMIC_SCRIPT_MODULE_PROJECTS}" scripts)
 endif()
+
+
 
 # Remove all shared libraries in the installl directory which
 # are contained in the static library already.

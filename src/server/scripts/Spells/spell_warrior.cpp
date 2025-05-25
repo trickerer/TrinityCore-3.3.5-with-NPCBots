@@ -200,10 +200,10 @@ class spell_warr_damage_shield : public AuraScript
         PreventDefaultAction();
 
         // % of amount blocked
-        int32 damage = CalculatePct(int32(eventInfo.GetActionTarget()->GetShieldBlockValue()), aurEff->GetAmount());
+        int32 damage = CalculatePct(int32(GetTarget()->GetShieldBlockValue()), aurEff->GetAmount());
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(damage);
-        eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE, args);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE, args);
     }
 
     void Register() override
@@ -291,7 +291,7 @@ class spell_warr_deep_wounds_aura : public AuraScript
 
         CastSpellExtraArgs args(aurEff);
         args.AddSpellBP0(damage);
-        actor->CastSpell(eventInfo.GetActionTarget(), GetEffectInfo(EFFECT_0).TriggerSpell, args);
+        actor->CastSpell(eventInfo.GetProcTarget(), GetEffectInfo(EFFECT_0).TriggerSpell, args);
     }
 
     void Register() override
@@ -631,13 +631,13 @@ class spell_warr_retaliation : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // check attack comes not from behind and warrior is not stunned
-        return eventInfo.GetActionTarget()->isInFront(eventInfo.GetActor(), float(M_PI)) && !GetTarget()->HasUnitState(UNIT_STATE_STUNNED);
+        return GetTarget()->isInFront(eventInfo.GetActor(), float(M_PI)) && !GetTarget()->HasUnitState(UNIT_STATE_STUNNED);
     }
 
     void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), SPELL_WARRIOR_RETALIATION_DAMAGE, aurEff);
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_WARRIOR_RETALIATION_DAMAGE, aurEff);
     }
 
     void Register() override
@@ -744,7 +744,7 @@ class spell_warr_sweeping_strikes : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        _procTarget = eventInfo.GetActor()->SelectNearbyTarget(eventInfo.GetActionTarget());
+        _procTarget = eventInfo.GetActor()->SelectNearbyTarget(eventInfo.GetProcTarget());
         return _procTarget != nullptr;
     }
 

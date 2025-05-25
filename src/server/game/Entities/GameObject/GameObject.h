@@ -42,7 +42,6 @@ union GameObjectValue
     {
         SpellTargetCheckTypes TargetSearcherCheckType;
     } Trap;
-    //11 GAMEOBJECT_TYPE_TRANSPORT
     struct
     {
         uint32 PathProgress;

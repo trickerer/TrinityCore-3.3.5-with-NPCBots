@@ -40,6 +40,7 @@ struct WintergraspObjectPositionData;
 
 typedef std::vector<BfWGGameObjectBuilding*> GameObjectBuildingVect;
 typedef std::vector<WintergraspWorkshop*> WorkshopVect;
+typedef std::map<uint32, BfCapturePoint*> BfCapturePointVector;
 
 enum WintergraspSpells
 {
@@ -198,6 +199,11 @@ class WintergraspCapturePoint : public BfCapturePoint
 
         void LinkToWorkshop(WintergraspWorkshop* workshop) { m_Workshop = workshop; }
 
+        //void SetCapturePointDataWithTeam(GameObject* go, TeamId team);
+        //void SetTeam(TeamId team) { m_team = team; }
+
+        //void SetCapturePointData(GameObject*);  // or just declared, not implemented
+
         void ChangeTeam(TeamId oldteam) override;
         TeamId GetTeam() const { return m_team; }
 
@@ -211,8 +217,16 @@ class WintergraspCapturePoint : public BfCapturePoint
 
 class BattlefieldWG : public Battlefield
 {
+    private:
+        bool m_EventEnded;       // To track if the event is finished
+        int m_WinnerTeam;        // To store the winning team (0 - Alliance, 1 - Horde)
+
     public:
+        BattlefieldWG();          // Constructor to initialize variables
         ~BattlefieldWG();
+        bool IsEventEnded();      // Returns whether the event is ended
+        int GetWinner();          // Returns the winner (0 = Alliance, 1 = Horde)
+        void EndEvent(bool isAllianceWinner); // Method to mark event as ended
         /**
          * \brief Called when the battle start
          * - Spawn relic and turret
@@ -336,6 +350,7 @@ class BattlefieldWG : public Battlefield
 
         void UpdateVehicleCountWG();
         void UpdateCounterVehicle(bool init);
+        void CapturePointTaken(uint32 areaId);
 
         void SendInitWorldStatesToAll() override;
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
@@ -468,7 +483,8 @@ enum WintergraspText
     BATTLEFIELD_WG_TEXT_SW_KEEPTOWER_DESTROY            = 36,
 
     BATTLEFIELD_WG_TEXT_RANK_CORPORAL                   = 37,
-    BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT           = 38
+    BATTLEFIELD_WG_TEXT_RANK_FIRST_LIEUTENANT           = 38,
+    DOCAPUPDATETEXT                                     = 39
 };
 
 enum WintergraspGameObject
