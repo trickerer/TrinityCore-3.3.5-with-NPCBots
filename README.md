@@ -1,1 +1,1 @@
-MGAWO Core
+MGAWoW Core
