@@ -13499,10 +13499,9 @@ bool Player::CanTitanGrip(Item const* item) const
                 break;
         }
         return 0u;
-    }();
+    }
 
     return !subClassMask || subClassMask & (1 << itemTemplate->SubClass);
-}
 
     m_canTitanGrip = value;
     if (value)
