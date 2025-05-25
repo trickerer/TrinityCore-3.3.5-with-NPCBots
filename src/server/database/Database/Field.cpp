@@ -108,10 +108,10 @@ double Field::GetDouble() const
 
 SystemTimePoint Field::GetDate() const
 {
-     if (!_value)
-         return SystemTimePoint::min();
- 
-     return _meta->Converter->GetDate(_value, _length, _meta);
+    if (!_value)
+        return SystemTimePoint::min();
+
+    return _meta->Converter->GetDate(_value, _length, _meta);
 }
 
 char const* Field::GetCString() const
