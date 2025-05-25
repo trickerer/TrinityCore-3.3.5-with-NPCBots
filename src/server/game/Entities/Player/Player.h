@@ -2259,6 +2259,11 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         std::string GetCoordsMapAreaAndZoneString() const;
 
         std::string GetDebugInfo() const override;
+        
+                TransmogMapType transmogMap; // transmogMap[iGUID] = entry
+#ifdef PRESETS
+        PresetMapType presetMap; // presetMap[presetId] = presetData
+#endif
 
         /*****************************************************************/
         /***                        NPCBOT SYSTEM                      ***/
