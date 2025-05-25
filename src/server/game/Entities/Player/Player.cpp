@@ -13499,10 +13499,13 @@ bool Player::CanTitanGrip(Item const* item) const
                 break;
         }
         return 0u;
-    }
+    }();
 
     return !subClassMask || subClassMask & (1 << itemTemplate->SubClass);
+}
 
+void Player::SetCanTitanGrip(bool value, uint32 penaltySpellId /*= 0*/, int32 allowedItemClass /*= 0*/, int32 allowedItemSubClassMask /*= 0*/)
+{
     m_canTitanGrip = value;
     if (value)
     {
