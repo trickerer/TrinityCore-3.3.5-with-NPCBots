@@ -51,20 +51,6 @@
 #include "WeatherMgr.h"
 #include "World.h"
 #include "WorldSession.h"
-#include <unordered_map>
-#include <cstdlib>
-
-static std::unordered_map<uint64, std::string> g_DiscordCodes;
-
-static std::string GenerateDiscordCode(size_t length = 6)
-{
-    static const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    std::string result;
-    result.reserve(length);
-    for (size_t i = 0; i < length; ++i)
-        result += charset[rand() % (sizeof(charset) - 1)];
-    return result;
-}
 
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
@@ -139,42 +125,8 @@ public:
             { "unstuck",          HandleUnstuckCommand,          rbac::RBAC_PERM_COMMAND_UNSTUCK,          Console::Yes },
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
-            { "getdiscordcode",   misc_commandscript::HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
         };
         return commandTable;
-    }
-
-    static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
-
-        uint64 guid = player->GetGUID();
-
-        // Check if a code already exists in DB for this player
-        QueryResult result = WorldDatabase.PQuery(
-            "SELECT code FROM discord_verification WHERE player_guid = {}", guid);
-
-        if (result)
-        {
-            // Player already has an unverified code
-            Field* fields = result->Fetch();
-            std::string existingCode = fields[0].GetString();
-
-            handler->PSendSysMessage("You already have a Discord code: |cff00ff00%s|r", existingCode.c_str());
-            return true;
-        }
-
-        // Otherwise generate a new code
-        std::string code = GenerateDiscordCode();
-
-        // Insert or update the DB
-        WorldDatabase.PExecute(
-            "REPLACE INTO discord_verification (player_guid, code, verified) VALUES({}, '{}', 0)", guid, code);
-
-        handler->PSendSysMessage("Join our Discord and DM 'MGAWoW Verify Bot' with this code: |cff00ff00%s|r", code.c_str());
-        return true;
     }
 
     static bool HandlePvPstatsCommand(ChatHandler* handler)
