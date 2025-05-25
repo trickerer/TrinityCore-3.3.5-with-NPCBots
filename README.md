@@ -1,1 +1,1 @@
-MGAWO Core
+Biglads Core
