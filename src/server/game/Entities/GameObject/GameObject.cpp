@@ -375,9 +375,8 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
                 m_invisibility.AddFlag(INVISIBILITY_TRAP);
                 m_invisibility.AddValue(INVISIBILITY_TRAP, 300);
             }
-		
-			m_goValue.Trap.TargetSearcherCheckType = TARGET_CHECK_ENEMY;
 
+            m_goValue.Trap.TargetSearcherCheckType = TARGET_CHECK_ENEMY;
             if (SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(goinfo->trap.spellId))
             {
                 // positive spells may require enemy targets
@@ -2620,8 +2619,16 @@ void GameObject::SetLootState(LootState state, Unit* unit)
     AI()->OnLootStateChanged(state, unit);
 
     // Start restock timer if the chest is partially looted or not looted at all
-    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && state == GO_ACTIVATED && GetGOInfo()->chest.chestRestockTime > 0 && m_restockTime == 0)
-        m_restockTime = GameTime::GetGameTime() + GetGOInfo()->chest.chestRestockTime;
+    if (GetGoType() == GAMEOBJECT_TYPE_CHEST && state == GO_ACTIVATED)
+    {
+        GameObjectTemplate const* goInfo = GetGOInfo();
+        if (goInfo->chest.chestRestockTime > 0 && m_restockTime == 0)
+            m_restockTime = GameTime::GetGameTime() + goInfo->chest.chestRestockTime;
+
+        // If world chests were opened, despawn them after 5 minutes
+        if (goInfo->chest.chestRestockTime == 0 && GetMap()->IsWorldMap())
+            DespawnOrUnsummon(5min);
+    }
 
     if (GetGoType() == GAMEOBJECT_TYPE_DOOR) // only set collision for doors on SetGoState
         return;

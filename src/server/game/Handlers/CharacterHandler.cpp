@@ -53,12 +53,6 @@
 #include "SystemPackets.h"
 #include "QueryHolder.h"
 #include "World.h"
-#include "Channel.h"
-#include "ChannelAppenders.h"
-#include "StringConvert.h"
-#include "World.h"
-#include "AccountMgr.h"
-#include "ChannelMgr.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -756,8 +750,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     pCurrChar->GetMotionMaster()->Initialize();
     pCurrChar->SendDungeonDifficulty(false);
-	
-	//DiscordWebhookPlayerActivity().OnLogin(pCurrChar); 
 
     WorldPackets::Character::LoginVerifyWorld loginVerifyWorld;
     loginVerifyWorld.MapID = pCurrChar->GetMapId();
@@ -784,12 +776,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         Field* fields = resultGuild->Fetch();
         pCurrChar->SetInGuild(fields[0].GetUInt32());
-        pCurrChar->SetRank(fields[1].GetUInt8());
+        pCurrChar->SetGuildRank(fields[1].GetUInt8());
     }
     else if (pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about non existed membership
     {
         pCurrChar->SetInGuild(0);
-        pCurrChar->SetRank(0);
+        pCurrChar->SetGuildRank(0);
     }
 
     if (pCurrChar->GetGuildId() != 0)
@@ -810,7 +802,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     SendPacket(&data);
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
-    sScriptMgr->OnPlayerLogin(pCurrChar, true); // true for first login
 
     //Show cinematic at the first time that player login
     if (!pCurrChar->getCinematic())
@@ -1013,30 +1004,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
 
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
+
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
-
-    // say something as player logs in
-    //if (pCurrChar->IsAlive())
-    //{
-    //    pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
-    //}
-    //MGAWoW Auto Invite to world channel
-    // TODO ONLY ASK IF NOT IN CHANNEL
-    
-
-
-    std::string m_name = "world";  // in-game channel name
-    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-    data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
-    data << m_name.c_str();            // Channel name ("world")
-    data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
-    
-    pCurrChar->GetSession()->SendPacket(&data);
-
-
-
-	
-
 }
 
 void WorldSession::SendFeatureSystemStatus()
@@ -1336,7 +1305,7 @@ void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 
     // 0 - ok
     // 1, 3 - not enough money
-    // 2 - you have to seat on barber chair
+    // 2 - you have to sit on barber chair
     if (!_player->HasEnoughMoney(cost))
     {
         SendBarberShopResult(BARBER_SHOP_RESULT_NO_MONEY);

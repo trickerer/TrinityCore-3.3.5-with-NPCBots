@@ -1978,7 +1978,7 @@ public:
             return true;
         }
 
-        target->SendPlaySpellVisual(kit.value_or(0));
+        target->SendPlaySpellVisualKit(1, kit.value_or(0));
         return true;
     }
 
@@ -3326,9 +3326,6 @@ public:
             uint32 id = itr->second.Entry;
 
             if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
-                continue;
-            //Blademaster disabled
-            if (botclass == BOT_CLASS_BM)
                 continue;
 
             NpcBotExtras const* _botExtras = BotDataMgr::SelectNpcBotExtras(id);

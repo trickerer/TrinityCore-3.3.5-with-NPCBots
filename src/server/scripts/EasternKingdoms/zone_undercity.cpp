@@ -155,7 +155,7 @@ public:
         {
             if (summoned->GetEntry() == NPC_HIGHBORNE_BUNNY)
             {
-				summoned->SetDisableGravity(true);
+                summoned->SetDisableGravity(true);
 
                 if (Creature* target = ObjectAccessor::GetCreature(*summoned, targetGUID))
                 {

@@ -22,7 +22,6 @@
  * Scriptnames of files in this file should be prefixed with "spell_gen_"
  */
 
-#include "TransmogDisplayVendorConf.h"
 #include "ScriptMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
@@ -968,12 +967,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
-                    {
-                        if (uint32 entry = TransmogDisplayVendorMgr::GetFakeEntry(mainItem))
-                            target->SetVirtualItem(0, entry);
-                        else
-                            target->SetVirtualItem(0, mainItem->GetEntry());
-                    }
+                        target->SetVirtualItem(0, mainItem->GetEntry());
                 }
                 else
                     target->SetVirtualItem(0, caster->GetVirtualItemId(0));
@@ -987,12 +981,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                    {
-                        if (uint32 entry = TransmogDisplayVendorMgr::GetFakeEntry(offItem))
-                            target->SetVirtualItem(1, entry);
-                        else
-                            target->SetVirtualItem(1, offItem->GetEntry());
-                    }
+                        target->SetVirtualItem(1, offItem->GetEntry());
                 }
                 else
                     target->SetVirtualItem(1, caster->GetVirtualItemId(1));
@@ -1005,12 +994,7 @@ class spell_gen_clone_weapon_aura : public AuraScript
                 if (Player* player = caster->ToPlayer())
                 {
                     if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
-                    {
-                        if (uint32 entry = TransmogDisplayVendorMgr::GetFakeEntry(rangedItem))
-                            target->SetVirtualItem(2, entry);
-                        else
-                            target->SetVirtualItem(2, rangedItem->GetEntry());
-                    }
+                        target->SetVirtualItem(2, rangedItem->GetEntry());
                 }
                 else
                     target->SetVirtualItem(2, caster->GetVirtualItemId(2));
@@ -1566,7 +1550,7 @@ class spell_ethereal_pet_aura : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        uint32 levelDiff = std::abs(GetTarget()->GetLevel() - eventInfo.GetProcTarget()->GetLevel());
+        uint32 levelDiff = std::abs(eventInfo.GetActor()->GetLevel() - eventInfo.GetActionTarget()->GetLevel());
         return levelDiff <= 9;
     }
 
@@ -1581,7 +1565,7 @@ class spell_ethereal_pet_aura : public AuraScript
             if (minion->IsAIEnabled())
             {
                 minion->AI()->Talk(SAY_STEAL_ESSENCE);
-                minion->CastSpell(eventInfo.GetProcTarget(), SPELL_STEAL_ESSENCE_VISUAL);
+                minion->CastSpell(eventInfo.GetActionTarget(), SPELL_STEAL_ESSENCE_VISUAL);
             }
         }
     }

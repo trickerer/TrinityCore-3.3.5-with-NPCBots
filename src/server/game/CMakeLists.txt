@@ -20,8 +20,6 @@ endif()
 
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_definitions(-DTRINITY_API_EXPORT_GAME)
-
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC_INCLUDES
@@ -42,14 +40,15 @@ target_link_libraries(game-interface
     Detour)
 
 add_library(game
-  ${PRIVATE_SOURCES}
-  ${CMAKE_SOURCE_DIR}/src/server/scripts/Custom/discord/DiscordWebhookMgr.cpp
-  )
+  ${PRIVATE_SOURCES})
 
 target_include_directories(game
   PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/src/server/scripts)
+    ${CMAKE_CURRENT_BINARY_DIR})
+
+set_target_properties(game
+  PROPERTIES
+    DEFINE_SYMBOL TRINITY_API_EXPORT_GAME)
 
 target_link_libraries(game
   PRIVATE

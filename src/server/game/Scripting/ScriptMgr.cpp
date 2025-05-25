@@ -1941,11 +1941,6 @@ void ScriptMgr::OnPlayerLogout(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnLogout(player);
 }
 
-void ScriptMgr::OnAchievementEarned(Player* player, AchievementEntry const* achievement)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnAchievementEarned(player, achievement);
-}
-
 void ScriptMgr::OnPlayerCreate(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnCreate(player);

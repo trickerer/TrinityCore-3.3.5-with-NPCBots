@@ -62,7 +62,6 @@
 #include <boost/program_options.hpp>
 #include <csignal>
 #include <iostream>
-#include <Poco/Net/SSLManager.h>
 
 using namespace boost::program_options;
 namespace fs = boost::filesystem;
@@ -94,26 +93,26 @@ int m_ServiceStatus = -1;
 
 class FreezeDetector
 {
-    public:
+public:
     FreezeDetector(Trinity::Asio::IoContext& ioContext, uint32 maxCoreStuckTime)
         : _timer(ioContext), _worldLoopCounter(0), _lastChangeMsTime(getMSTime()), _maxCoreStuckTimeInMs(maxCoreStuckTime) { }
 
-        static void Start(std::shared_ptr<FreezeDetector> const& freezeDetector)
+    static void Start(std::shared_ptr<FreezeDetector> const& freezeDetector)
+    {
+        freezeDetector->_timer.expires_after(5s);
+        freezeDetector->_timer.async_wait([freezeDetectorRef = std::weak_ptr(freezeDetector)](boost::system::error_code const& error) mutable
         {
-            freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(5));
-            freezeDetector->_timer.async_wait([freezeDetectorRef = std::weak_ptr<FreezeDetector>(freezeDetector)](boost::system::error_code const& error)
-            {
-                return Handler(freezeDetectorRef, error);
-            });
-        }
+            Handler(std::move(freezeDetectorRef), error);
+        });
+    }
 
-        static void Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, boost::system::error_code const& error);
+    static void Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, boost::system::error_code const& error);
 
-    private:
-        Trinity::Asio::DeadlineTimer _timer;
-        uint32 _worldLoopCounter;
-        uint32 _lastChangeMsTime;
-        uint32 _maxCoreStuckTimeInMs;
+private:
+    Trinity::Asio::DeadlineTimer _timer;
+    uint32 _worldLoopCounter;
+    uint32 _lastChangeMsTime;
+    uint32 _maxCoreStuckTimeInMs;
 };
 
 void SignalHandler(boost::system::error_code const& error, int signalNumber);
@@ -129,7 +128,6 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, f
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
-    Poco::Net::initializeSSL();
     Trinity::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
     signal(SIGABRT, &Trinity::AbortHandler);
 
@@ -431,8 +429,7 @@ extern int main(int argc, char** argv)
     // 0 - normal shutdown
     // 1 - shutdown at error
     // 2 - restart command used, this code can be used by restarter for restart Trinityd
-    
-    Poco::Net::uninitializeSSL();
+
     return World::GetExitCode();
 }
 
@@ -577,10 +574,10 @@ void FreezeDetector::Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, bo
                 }
             }
 
-            freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(1));
-            freezeDetector->_timer.async_wait([freezeDetectorRef](boost::system::error_code const& timerError)
+            freezeDetector->_timer.expires_after(1s);
+            freezeDetector->_timer.async_wait([freezeDetectorRef = std::move(freezeDetectorRef)](boost::system::error_code const& error) mutable
             {
-                return Handler(freezeDetectorRef, timerError);
+                Handler(std::move(freezeDetectorRef), error);
             });
         }
     }
