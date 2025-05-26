@@ -41,6 +41,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
+#include "Config.h"
 
 #include "Custom/discord/DiscordWebhookMgr.h"
 
