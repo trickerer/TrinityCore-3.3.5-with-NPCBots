@@ -663,6 +663,11 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
     UpdateVehicleCountWG();
 }
 
+BattlefieldWG::BattlefieldWG()
+{
+    // You can leave this empty or initialize variables as needed
+}
+
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
     // Remove relic
