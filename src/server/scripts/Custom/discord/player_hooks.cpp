@@ -40,7 +40,7 @@ public:
         
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return; // or skip webhook logic
-        TC_LOG_INFO("player.hooks", "Achievement earned hook called for player: {}", player->GetName());
+        //TC_LOG_INFO("player.hooks", "Achievement earned hook called for player: {}", player->GetName());
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -55,7 +55,7 @@ public:
         std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
-        TC_LOG_INFO("player.hooks", "Sending webhook for achievement: {}", achievementName);
+        //TC_LOG_INFO("player.hooks", "Sending webhook for achievement: {}", achievementName);
         try
         {
             SendDiscordWebhook(webhookUrl, messageStream.str());
@@ -128,8 +128,8 @@ private:
         //messageStream << gmTag << "" << status << " `" << name << "`";
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
-        TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
-        TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
+        //TC_LOG_INFO("player.hooks", "Sending webhook for player: {}", name);
+        //TC_LOG_INFO("player.hooks", "Message content: {}", messageStream.str());
 
         SendDiscordWebhook(webhookUrl, messageStream.str());
     }
@@ -173,7 +173,7 @@ private:
             json.stringify(payloadStream);
             std::string payload = payloadStream.str();
 
-            TC_LOG_INFO("player.hooks", "Payload being sent: {}", payload.c_str());
+            //TC_LOG_INFO("player.hooks", "Payload being sent: {}", payload.c_str());
 
             std::unique_ptr<Poco::Net::HTTPClientSession> session;
             if (uri.getScheme() == "https")
@@ -196,10 +196,10 @@ private:
 
             std::string responseBody = ss.str();
 
-            if (!responseBody.empty())
-                TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
-            else
-                TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
+            //if (!responseBody.empty())
+            //    TC_LOG_INFO("player.hooks", "Webhook response body: {}", responseBody);
+            //else
+            //    TC_LOG_INFO("player.hooks", "Webhook response body is empty (expected for 204).");
         }
         catch (const Poco::Exception& ex)
         {

@@ -76,7 +76,7 @@ public:
         // Check if the server is shutting down, and prevent notifications if true
         if (serverShuttingDown)
         {
-            TC_LOG_INFO("server.hooks", "Server is shutting down, not sending login/logout notifications.");
+            //TC_LOG_INFO("server.hooks", "Server is shutting down, not sending login/logout notifications.");
             return;
         }
 
@@ -144,10 +144,10 @@ private:
             Poco::StreamCopier::copyStream(rs, ss);
             std::string responseBody = ss.str();
 
-            if (!responseBody.empty())
-                TC_LOG_INFO("server.hooks", "Webhook response body: %s", responseBody.c_str());
-            else
-                TC_LOG_INFO("server.hooks", "Webhook response body is empty (expected for 204).");
+            //if (!responseBody.empty())
+            //    TC_LOG_INFO("server.hooks", "Webhook response body: %s", responseBody.c_str());
+            //else
+            //    TC_LOG_INFO("server.hooks", "Webhook response body is empty (expected for 204).");
         }
         catch (const Poco::Exception& ex)
         {
