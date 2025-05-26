@@ -24,12 +24,9 @@
 #include "DBCStores.h"
 #include "AchievementMgr.h"
 
-// Forward declaration for TrinityCore 3.3.5a thread pool
-namespace Threading
-{
-    class ThreadPool;
-}
-extern Threading::ThreadPool* sThreadPool;
+// Remove ThreadPool forward declaration and extern
+// namespace Threading { class ThreadPool; }
+// extern Threading::ThreadPool* sThreadPool;
 
 static std::unordered_set<uint64> LoggedInGuids;
 
@@ -41,7 +38,7 @@ public:
         TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
     }
 
-    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) //override NOT USED!!
+    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) // override NOT USED!!
     {
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return;
@@ -62,7 +59,7 @@ public:
 
         try
         {
-            SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+            SendDiscordWebhook(webhookUrl, messageStream.str());
         }
         catch (const std::exception& e)
         {
@@ -97,7 +94,7 @@ public:
             const std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
             if (!webhookUrl.empty())
             {
-                SendDiscordWebhookAsync(webhookUrl, message);
+                SendDiscordWebhook(webhookUrl, message);
             }
             return;
         }
@@ -129,7 +126,7 @@ private:
         std::ostringstream messageStream;
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
-        SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        SendDiscordWebhook(webhookUrl, messageStream.str());
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
@@ -196,21 +193,6 @@ private:
         {
             TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
         }
-    }
-
-    void SendDiscordWebhookAsync(const std::string& url, const std::string& message)
-    {
-        sThreadPool->Queue([url, message, this]()
-        {
-            try
-            {
-                SendDiscordWebhook(url, message);
-            }
-            catch (const std::exception& e)
-            {
-                TC_LOG_ERROR("player.hooks", "Exception in webhook thread: {}", e.what());
-            }
-        });
     }
 };
 
