@@ -49,6 +49,10 @@
 #include "botmgr.h"
 //end npcbot
 
+#include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
+#include "Config.h"
+#include "Common.h"
+
 void BattlegroundScore::AppendToPacket(WorldPackets::Battleground::PVPLogData_Player& playerData)
 {
     playerData.PlayerGUID = PlayerGuid;
@@ -1183,6 +1187,24 @@ void Battleground::Reset()
 
 void Battleground::StartBattleground()
 {
+    
+    // Ensure webhookUrl is declared before its usage
+    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+
+    // Check if webhook URL is valid before sending it
+    if (!webhookUrl.empty())
+    {
+        uint32 alliancePlayers = GetPlayersCountByTeam(ALLIANCE);
+        uint32 hordePlayers = GetPlayersCountByTeam(HORDE);
+
+        std::ostringstream bracketStream;
+        bracketStream << "Level " << GetMinLevel() << "-" << GetMaxLevel();
+        std::string bracket = bracketStream.str();
+
+        if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
+            SendBattlegroundDiscordWebhook(webhookUrl, GetName(), alliancePlayers, hordePlayers, bracket);
+    }
+
     SetStartTime(0);
     SetLastResurrectTime(0);
     // add BG to free slot queue
