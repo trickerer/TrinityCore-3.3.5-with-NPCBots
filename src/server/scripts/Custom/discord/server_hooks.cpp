@@ -34,6 +34,8 @@ public:
             TC_LOG_ERROR("server.hooks", "Webhook URL is not configured.");
             return;
         }
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
 
         std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
@@ -64,6 +66,8 @@ public:
     // You can modify the Notify function if required
     void Notify(Player* player, bool loggingIn)
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
         // Check if the server is shutting down, and prevent notifications if true
         if (serverShuttingDown)
         {
@@ -94,6 +98,9 @@ public:
 private:
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+        
         try
         {
             Poco::URI uri(url);
