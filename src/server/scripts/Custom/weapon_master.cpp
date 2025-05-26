@@ -66,7 +66,7 @@ public:
                             skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
 
                 case CLASS_DRUID:
-                    return (skillId == SKILL_STAVES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_STAVES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_MACES);
 
 
                 default:
