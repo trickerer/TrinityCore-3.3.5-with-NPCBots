@@ -35,11 +35,11 @@ public:
 	{
 		TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
 	}
-    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
-        return; // or skip webhook logic
     void OnAchievementEarned(Player* player, AchievementEntry const* achievement) //override
     {
         
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
         TC_LOG_INFO("player.hooks", "Achievement earned hook called for player: {}", player->GetName());
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
@@ -103,6 +103,9 @@ public:
 private:
     void Notify(Player* player, bool loggingIn)
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic        
+        
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -143,6 +146,10 @@ private:
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
+        
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic        
+        
         try
         {
             Poco::URI uri(url);
