@@ -45,6 +45,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WowTime.h"
+#include "Custom/discord/DiscordWebhookMgr.h"
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -1509,6 +1510,15 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // Disable for GameMasters with GM-mode enabled or for players that don't have the related RBAC permission
     if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
+    
+    std::string name = GetPlayer()->GetName();
+    std::string achievementName = GetLocalizedAchievementName(achievement->ID);
+
+    std::ostringstream messageStream;
+
+    messageStream << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
+
+    SendDiscordMessage(messageStream.str());
 
     if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
