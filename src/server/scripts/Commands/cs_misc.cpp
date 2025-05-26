@@ -129,6 +129,40 @@ public:
         };
         return commandTable;
     }
+    
+    static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        uint64 guid = player->GetGUID();
+
+        // Check if a code already exists in DB for this player
+        QueryResult result = WorldDatabase.PQuery(
+            "SELECT code FROM discord_verification WHERE player_guid = {}", guid);
+
+        if (result)
+        {
+            // Player already has an unverified code
+            Field* fields = result->Fetch();
+            std::string existingCode = fields[0].GetString();
+
+            handler->PSendSysMessage("You already have a Discord code: |cff00ff00%s|r", existingCode.c_str());
+            return true;
+        }
+
+        // Otherwise generate a new code
+        std::string code = GenerateDiscordCode();
+
+        // Insert or update the DB
+        WorldDatabase.PExecute(
+            "REPLACE INTO discord_verification (player_guid, code, verified) VALUES({}, '{}', 0)", guid, code);
+
+        handler->PSendSysMessage("Join our Discord and DM 'MGAWoW Verify Bot' with this code: |cff00ff00%s|r", code.c_str());
+        return true;
+    }
+
 
     static bool HandlePvPstatsCommand(ChatHandler* handler)
     {
