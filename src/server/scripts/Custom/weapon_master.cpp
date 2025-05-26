@@ -22,39 +22,58 @@ public:
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS || skillId == SKILL_DAGGERS);
-                
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS ||
+                            skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_BOWS ||
+                            skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE ||
+                            skillId == SKILL_2H_SWORDS || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_DAGGERS);
+
                 case CLASS_PALADIN:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
-                
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_AXES || skillId == SKILL_POLEARMS ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE ||
+                            skillId == SKILL_2H_SWORDS || skillId == SKILL_2H_MACES || skillId == SKILL_2H_AXES);
+
                 case CLASS_HUNTER:
-                    return (skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
-                
+                    return (skillId == SKILL_DAGGERS || skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_POLEARMS ||
+                            skillId == SKILL_STAVES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_2H_SWORDS || skillId == SKILL_2H_AXES ||
+                            skillId == SKILL_BOWS || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
                 case CLASS_ROGUE:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
-                
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS || skillId == SKILL_AXES || skillId == SKILL_FIST_WEAPONS ||
+                            skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
                 case CLASS_DEATH_KNIGHT:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_POLEARMS || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
-                
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE ||
+                            skillId == SKILL_2H_SWORDS || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES);
+
                 case CLASS_SHAMAN:
-                    return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
-                
+                    return (skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_STAVES || skillId == SKILL_UNARMED ||
+                            skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_FIST_WEAPONS);
+
+
                 case CLASS_MAGE:
-                    return (skillId == SKILL_STAVES || skillId == SKILL_WANDS || skillId == SKILL_UNARMED || skillId == SKILL_SWORDS || skillId == SKILL_DEFENSE);
-                
+                    return (skillId == SKILL_STAVES || skillId == SKILL_WANDS || skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
                 case CLASS_PRIEST:
-                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS || skillId == SKILL_MACES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
-                
+                    return (skillId == SKILL_STAVES || skillId == SKILL_WANDS || skillId == SKILL_MACES || skillId == SKILL_DAGGERS ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
+
                 case CLASS_WARLOCK:
-                    return (skillId == SKILL_STAVES || skillId == SKILL_DAGGERS || skillId == SKILL_WANDS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_SWORDS);
-                
+                    return (skillId == SKILL_STAVES || skillId == SKILL_WANDS || skillId == SKILL_SWORDS || skillId == SKILL_DAGGERS ||
+                            skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
                 case CLASS_DRUID:
-                    return (skillId == SKILL_FIST_WEAPONS || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+                    return (skillId == SKILL_STAVES || skillId == SKILL_FIST_WEAPONS || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE);
+
 
                 default:
                     return false;
             }
         }
+
 
         bool OnGossipHello(Player* player) override
         {
