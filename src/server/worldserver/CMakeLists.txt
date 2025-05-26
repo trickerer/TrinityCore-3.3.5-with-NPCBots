@@ -54,6 +54,9 @@ CollectIncludeDirectories(
   # Exclude
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
+find_package(CURL REQUIRED)
+target_link_libraries(worldserver PRIVATE CURL::libcurl)
+
 target_include_directories(worldserver
   PUBLIC
     ${PUBLIC_INCLUDES}
