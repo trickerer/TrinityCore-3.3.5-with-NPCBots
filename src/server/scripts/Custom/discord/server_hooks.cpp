@@ -154,17 +154,7 @@ private:
 
     void SendDiscordWebhookAsync(const std::string& url, const std::string& message)
     {
-        sThreadPool->Queue([url, message, this]()
-        {
-            try
-            {
-                SendDiscordWebhook(url, message);
-            }
-            catch (const std::exception& e)
-            {
-                TC_LOG_ERROR("server.hooks", "Exception in webhook thread: {}", e.what());
-            }
-        });
+        SendDiscordWebhook(url, message);
     }
 };
 
