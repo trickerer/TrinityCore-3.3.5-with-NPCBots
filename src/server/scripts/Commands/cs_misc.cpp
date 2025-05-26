@@ -52,6 +52,19 @@
 #include "World.h"
 #include "WorldSession.h"
 
+static std::unordered_map<uint64, std::string> g_DiscordCodes;
+
+static std::string GenerateDiscordCode(size_t length = 6)
+{
+    static const char charset[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    std::string result;
+    result.reserve(length);
+    for (size_t i = 0; i < length; ++i)
+        result += charset[rand() % (sizeof(charset) - 1)];
+    return result;
+}
+
+
 // temporary hack until includes are sorted out (don't want to pull in Windows.h)
 #ifdef GetClassName
 #undef GetClassName
