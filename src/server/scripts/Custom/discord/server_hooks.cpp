@@ -13,6 +13,7 @@
 
 #include <sstream>
 #include <memory>
+#include <thread>
 
 #include "ScriptMgr.h"
 #include "Config.h"
@@ -154,7 +155,17 @@ private:
 
     void SendDiscordWebhookAsync(const std::string& url, const std::string& message)
     {
-        SendDiscordWebhook(url, message);
+        std::thread([this, url, message]()
+        {
+            try
+            {
+                SendDiscordWebhook(url, message);
+            }
+            catch (const std::exception& e)
+            {
+                TC_LOG_ERROR("server.hooks", "Exception in webhook thread: %s", e.what());
+            }
+        }).detach(); // Run the thread independently
     }
 };
 
