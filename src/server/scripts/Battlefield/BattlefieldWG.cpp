@@ -639,7 +639,8 @@ void BattlefieldWG::OnBattleStart()
     std::string winnerMessage = "⚔️ ** Wintergrasp has Started! Defenders " + owner + "";
  
     // Send the message to Discord
-    SendDiscordMessage(winnerMessage);
+    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+        SendDiscordMessage(winnerMessage);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
