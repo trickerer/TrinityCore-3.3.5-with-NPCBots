@@ -641,7 +641,7 @@ void BattlefieldWG::OnBattleStart()
  
     // Send the message to Discord
     if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
-        SendDiscordMessage(messageStream.str());
+        SendDiscordMessage(winnerMessage.str());
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
