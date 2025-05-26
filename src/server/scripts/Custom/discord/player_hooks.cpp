@@ -135,10 +135,7 @@ private:
     }
     
     static std::string GetLocalizedAchievementName(uint32 id)
-    {
-        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
-            return; // or skip webhook logic
-        
+    {        
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(id);
         if (!achievement)
             return "Unknown Achievement";
