@@ -44,6 +44,9 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 {
     try
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+
         std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
         
         Poco::URI uri(webhookUrl);
