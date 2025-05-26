@@ -23735,6 +23735,7 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
     // need unequip offhand for 2h-weapon without TitanGrip (in any from hands)
     if (!force)
     {
+        Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
         if ((!mainItem || mainItem->GetTemplate()->InventoryType != INVTYPE_2HWEAPON)
             && offhandTemplate->InventoryType != INVTYPE_2HWEAPON)
             return;
