@@ -28,6 +28,9 @@ public:
 
     void OnStartup() override
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+        
         std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -46,6 +49,8 @@ public:
 
     void OnShutdown() override
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
         // Set the flag that the server is shutting down
         serverShuttingDown = true;
 

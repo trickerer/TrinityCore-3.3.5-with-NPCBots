@@ -68,7 +68,10 @@ public:
 
     void OnLogin(Player* player, bool /*firstLogin*/)
 	{
-		uint64 guid = player->GetGUID();
+		if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+        
+        uint64 guid = player->GetGUID();
 
 		if (LoggedInGuids.find(guid) != LoggedInGuids.end())
 			return; // Already notified
@@ -81,7 +84,10 @@ public:
 
     void OnLogout(Player* player)
 	{
-		if (serverShuttingDown)
+		if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+        
+        if (serverShuttingDown)
 		{
 			std::string message = "👢 All online players have been logged out..";
 			std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
@@ -130,6 +136,9 @@ private:
     
     static std::string GetLocalizedAchievementName(uint32 id)
     {
+        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
+            return; // or skip webhook logic
+        
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(id);
         if (!achievement)
             return "Unknown Achievement";
