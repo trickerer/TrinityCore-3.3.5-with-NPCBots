@@ -22,7 +22,7 @@ public:
             switch (player->GetClass())
             {
                 case CLASS_WARRIOR:
-                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
+                    return (skillId == SKILL_SWORDS || skillId == SKILL_AXES || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_CROSSBOWS || skillId == SKILL_GUNS || skillId == SKILL_THROWN || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_AXES || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS || skillId == SKILL_DAGGERS);
                 
                 case CLASS_PALADIN:
                     return (skillId == SKILL_SWORDS || skillId == SKILL_MACES || skillId == SKILL_POLEARMS || skillId == SKILL_STAVES || skillId == SKILL_UNARMED || skillId == SKILL_DEFENSE || skillId == SKILL_2H_MACES || skillId == SKILL_2H_SWORDS);
