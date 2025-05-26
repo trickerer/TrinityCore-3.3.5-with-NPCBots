@@ -13,6 +13,7 @@
 
 #include <unordered_set>
 #include <sstream>
+#include <memory>
 
 #include "ScriptMgr.h"
 #include "Config.h"
