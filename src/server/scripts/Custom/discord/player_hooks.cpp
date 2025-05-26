@@ -14,6 +14,7 @@
 #include <unordered_set>
 #include <sstream>
 #include <memory>
+#include <thread>
 
 #include "ScriptMgr.h"
 #include "Config.h"
@@ -25,10 +26,6 @@
 #include "DBCStores.h"
 #include "AchievementMgr.h"
 
-// Remove ThreadPool forward declaration and extern
-// namespace Threading { class ThreadPool; }
-// extern Threading::ThreadPool* sThreadPool;
-
 static std::unordered_set<uint64> LoggedInGuids;
 
 class DiscordWebhookPlayerActivity : public PlayerScript
@@ -39,7 +36,7 @@ public:
         TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
     }
 
-    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) // override NOT USED!!
+    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) override
     {
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return;
@@ -53,19 +50,12 @@ public:
 
         const std::string name = player->GetName();
         const std::string achievementName = GetLocalizedAchievementName(achievement->ID);
-        std::ostringstream messageStream;
-
         const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+
+        std::ostringstream messageStream;
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
-        try
-        {
-            SendDiscordWebhook(webhookUrl, messageStream.str());
-        }
-        catch (const std::exception& e)
-        {
-            TC_LOG_ERROR("player.hooks", "Exception sending achievement webhook: {}", e.what());
-        }
+        SendDiscordWebhookAsync(webhookUrl, messageStream.str());
     }
 
     void OnLogin(Player* player, bool /*firstLogin*/) override
@@ -73,14 +63,11 @@ public:
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return;
 
-        const uint64 guid = player->GetGUID();
+        uint64 guid = player->GetGUID();
 
-        if (LoggedInGuids.find(guid) != LoggedInGuids.end())
+        if (!LoggedInGuids.insert(guid).second)
             return;
 
-        LoggedInGuids.insert(guid);
-
-        TC_LOG_INFO("player.hooks", "OnLogin function triggered for: {}", player->GetName());
         Notify(player, true);
     }
 
@@ -91,27 +78,22 @@ public:
 
         if (serverShuttingDown)
         {
-            const std::string message = "👢 All online players have been logged out..";
             const std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
             if (!webhookUrl.empty())
             {
-                SendDiscordWebhook(webhookUrl, message);
+                const std::string message = "👢 All online players have been logged out..";
+                SendDiscordWebhookAsync(webhookUrl, message);
             }
             return;
         }
 
-        const uint64 guid = player->GetGUID();
-        LoggedInGuids.erase(guid);
-
+        LoggedInGuids.erase(player->GetGUID());
         Notify(player, false);
     }
 
 private:
     void Notify(Player* player, bool loggingIn)
     {
-        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
-            return;
-
         const std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
         if (webhookUrl.empty())
         {
@@ -127,7 +109,7 @@ private:
         std::ostringstream messageStream;
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
-        SendDiscordWebhook(webhookUrl, messageStream.str());
+        SendDiscordWebhookAsync(webhookUrl, messageStream.str());
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
@@ -148,9 +130,6 @@ private:
 
     void SendDiscordWebhook(const std::string& url, const std::string& message)
     {
-        if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
-            return;
-
         try
         {
             Poco::URI uri(url);
@@ -184,16 +163,29 @@ private:
 
             Poco::Net::HTTPResponse response;
             std::istream& rs = session->receiveResponse(response);
+
             std::stringstream ss;
             Poco::StreamCopier::copyStream(rs, ss);
-
-            // Optional: log the response or status if needed
-            // std::string responseBody = ss.str();
         }
         catch (const Poco::Exception& ex)
         {
             TC_LOG_ERROR("player.hooks", "Webhook failed: {}", ex.displayText());
         }
+    }
+
+    void SendDiscordWebhookAsync(const std::string& url, const std::string& message)
+    {
+        std::thread([this, url, message]()
+        {
+            try
+            {
+                SendDiscordWebhook(url, message);
+            }
+            catch (const std::exception& e)
+            {
+                TC_LOG_ERROR("player.hooks", "Exception in webhook thread: %s", e.what());
+            }
+        }).detach();
     }
 };
 

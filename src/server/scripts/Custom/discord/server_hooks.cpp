@@ -22,12 +22,6 @@
 #include "WorldSession.h"
 #include "server_shutdown.h"
 
-// Forward declaration for TrinityCore 3.3.5a thread pool
-namespace Threading
-{
-    class ThreadPool;
-}
-extern Threading::ThreadPool* sThreadPool;
 
 bool serverShuttingDown = false;  // Global flag to track server shutdown
 
