@@ -36,7 +36,7 @@ public:
         TC_LOG_INFO("player.hooks", "DiscordWebhookPlayerActivity script loaded.");
     }
 
-    void OnAchievementEarned(Player* player, AchievementEntry const* achievement) override
+    void OnAchievementEarned(Player* player, AchievementEntry const* achievement)
     {
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return;
