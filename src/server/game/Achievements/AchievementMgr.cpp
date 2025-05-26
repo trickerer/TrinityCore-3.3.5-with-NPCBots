@@ -1504,6 +1504,21 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
         m_timedAchievements.erase(timedIter);
     }
 }
+static std::string GetLocalizedAchievementName(uint32 id)
+{
+    AchievementEntry const* achievement = sAchievementStore.LookupEntry(id);
+    if (!achievement)
+        return "Unknown Achievement";
+
+    uint8 locale = sWorld->GetDefaultDbcLocale(); // e.g., 0 for enUS
+
+    if (achievement->Title[locale] && achievement->Title[locale][0] != '\0')
+        return std::string(achievement->Title[locale]);
+    else if (achievement->Title[0])
+        return std::string(achievement->Title[0]); // fallback to default locale
+
+    return "Unnamed Achievement";
+}
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
