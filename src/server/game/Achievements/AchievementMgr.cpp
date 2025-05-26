@@ -1534,7 +1534,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
     messageStream << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
-    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
+    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
         SendDiscordMessage(messageStream.str());
 
     if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
