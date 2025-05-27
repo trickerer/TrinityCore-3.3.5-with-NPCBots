@@ -4,6 +4,7 @@
 #include "InstanceScript.h"
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
+#include "Unit.h"
 
 using namespace std::chrono;
 
