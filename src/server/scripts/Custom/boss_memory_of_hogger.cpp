@@ -106,7 +106,7 @@ public:
         {
             if (!phaseTwo && HealthBelowPct(70))
             {
-                me->Yell("PHASE2", LANG_UNIVERSAL);
+                //me->Yell("PHASE2", LANG_UNIVERSAL);
                 phaseTwo = true;
                 Talk(SAY_PHASE_2);
                 events.Reset();
@@ -116,7 +116,7 @@ public:
             }
             else if (!phaseThree && HealthBelowPct(30))
             {
-                me->Yell("PHASE3", LANG_UNIVERSAL);
+                //me->Yell("PHASE3", LANG_UNIVERSAL);
                 phaseThree = true;
                 Talk(SAY_PHASE_3);
                 events.Reset();
@@ -194,7 +194,7 @@ public:
 
                     case EVENT_HOWL_OF_VOID:
                         DoCast(me, SPELL_HOWL_OF_VOID);
-                        me->Yell("VOID!!!", LANG_UNIVERSAL);
+                        //me->Yell("VOID!!!", LANG_UNIVERSAL);
                         for (int i = 0; i < 2; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
@@ -215,7 +215,7 @@ public:
                         break;
 
                     case EVENT_CHRONO_BURN:
-                        me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
+                        //me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
@@ -223,18 +223,18 @@ public:
 
                     case EVENT_UNSTABLE_RIFT:
                         // Optional hazard here
-                        me->Yell("SUNSTABLE RIFT", LANG_UNIVERSAL);
+                        me->Yell("SUNSTABLE RIFT NOT ACTIVE YET!", LANG_UNIVERSAL);
                         events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(45000));
                         break;
 
                     case EVENT_ECHO_SLAM:
-                        me->Yell("SLAM", LANG_UNIVERSAL);
+                        //me->Yell("SLAM", LANG_UNIVERSAL);
                         DoCast(me, SPELL_ECHO_SLAM);
                         events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                         break;
 
                     case EVENT_MEMORY_OVERLOAD:
-                        me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
+                        //me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
                         for (int i = 0; i < 4; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
