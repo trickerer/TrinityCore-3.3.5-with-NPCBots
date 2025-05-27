@@ -118,6 +118,19 @@ public:
         {
             if (!UpdateVictim())
                 return;
+            
+            if (!phaseTwo && HealthBelowPct(70))
+            {
+                phaseTwo = true;
+                Talk(SAY_PHASE_2);
+            }
+
+            if (!phaseThree && HealthBelowPct(30))
+            {
+                phaseThree = true;
+                Talk(SAY_PHASE_3);
+                DoCast(me, SPELL_BERSERK);
+            }
 
             events.Update(diff);
 
@@ -190,6 +203,7 @@ public:
 
                     case EVENT_UNSTABLE_RIFT:
                         // Optional hazard here
+                        me->Yell("SUNSTABLE RIFT", LANG_UNIVERSAL);
                         events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(45000));
                         break;
 
