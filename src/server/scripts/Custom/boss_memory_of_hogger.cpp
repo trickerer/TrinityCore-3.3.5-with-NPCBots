@@ -12,7 +12,7 @@ enum Spells
 {
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 40727,
-    SPELL_HOWL_OF_VOID      = 32325,
+    SPELL_HOWL_OF_VOID      = 36275,
     SPELL_CHRONO_BURN       = 43757,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 59620, 
