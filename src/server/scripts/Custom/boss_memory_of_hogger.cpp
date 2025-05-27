@@ -65,9 +65,9 @@ public:
         void EnterCombat(Unit* /*who*/) //override
         {
             Talk(0);
-            events.ScheduleEvent(EVENT_CLEAVE, 6000);
-            events.ScheduleEvent(EVENT_LEAP, 20000);
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, 30000);
+            events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
+            events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
         }
 
         void EnterEvadeMode() //override
@@ -90,9 +90,9 @@ public:
                 phaseTwo = true;
                 Talk(1);
                 events.Reset();
-                events.ScheduleEvent(EVENT_HOWL_OF_VOID, 25000);
-                events.ScheduleEvent(EVENT_CHRONO_BURN, 15000);
-                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, 10000);
+                events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
+                events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
+                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(10000));
             }
             else if (!phaseThree && HealthBelowPct(30))
             {
@@ -100,8 +100,8 @@ public:
                 Talk(2);
                 events.Reset();
                 DoCast(me, SPELL_BERSERK, true);
-                events.ScheduleEvent(EVENT_ECHO_SLAM, 15000);
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, 40000);
+                events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
             }
         }
 
@@ -118,14 +118,14 @@ public:
                 {
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 6000);
+                        events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
                         break;
 
                     case EVENT_LEAP:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                             DoCast(target, SPELL_LEAP);
-                        events.ScheduleEvent(EVENT_LEAP, 20000);
+                        events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
                     }
 
@@ -138,7 +138,7 @@ public:
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
                                 30000);
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, 30000);
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
@@ -154,23 +154,23 @@ public:
                                     TEMPSUMMON_TIMED_DESPAWN,
                                     20000);
                         }
-                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, 25000);
+                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                         break;
 
                     case EVENT_CHRONO_BURN:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             DoCast(target, SPELL_CHRONO_BURN);
-                        events.ScheduleEvent(EVENT_CHRONO_BURN, 15000);
+                        events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                         break;
 
                     case EVENT_UNSTABLE_RIFT:
                         // Optional hazard here
-                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, 45000);
+                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(45000));
                         break;
 
                     case EVENT_ECHO_SLAM:
                         DoCast(me, SPELL_ECHO_SLAM);
-                        events.ScheduleEvent(EVENT_ECHO_SLAM, 15000);
+                        events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                         break;
 
                     case EVENT_MEMORY_OVERLOAD:
@@ -182,7 +182,7 @@ public:
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
                                 20000);
-                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, 40000);
+                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
                         break;
 
                     default:
