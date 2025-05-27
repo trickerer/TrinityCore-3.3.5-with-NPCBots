@@ -61,9 +61,9 @@ public:
         void EnterCombat(Unit* /*who*/) //override
         {
             Talk(0); // Aggro text
-            events.ScheduleEvent(EVENT_CLEAVE, 6000);
-            events.ScheduleEvent(EVENT_LEAP, 20000);
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, 30000);
+            events.ScheduleEvent(EVENT_CLEAVE, Milliseconds(6000));
+            events.ScheduleEvent(EVENT_LEAP, Milliseconds(20000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, Milliseconds(30000));
         }
 
         void EnterEvadeMode() //override
@@ -86,9 +86,9 @@ public:
                 phaseTwo = true;
                 Talk(1); // Phase 2 text
                 events.Reset();
-                events.ScheduleEvent(EVENT_HOWL_OF_VOID, 25000);
-                events.ScheduleEvent(EVENT_CHRONO_BURN, 15000);
-                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, 10000);
+                events.ScheduleEvent(EVENT_HOWL_OF_VOID, Milliseconds(25000));
+                events.ScheduleEvent(EVENT_CHRONO_BURN, Milliseconds(15000));
+                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, Milliseconds(10000));
             }
             else if (!phaseThree && HealthBelowPct(30))
             {
@@ -96,8 +96,8 @@ public:
                 Talk(2); // Phase 3 text
                 events.Reset();
                 DoCast(me, SPELL_BERSERK, true);
-                events.ScheduleEvent(EVENT_ECHO_SLAM, 15000);
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, 40000);
+                events.ScheduleEvent(EVENT_ECHO_SLAM, Milliseconds(15000));
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, Milliseconds(40000));
             }
         }
 
@@ -114,19 +114,19 @@ public:
                 {
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 6000);
+                        events.ScheduleEvent(EVENT_CLEAVE, Milliseconds(6000));
                         break;
                     case EVENT_LEAP:
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                             DoCast(target, SPELL_LEAP);
-                        events.ScheduleEvent(EVENT_LEAP, 20000);
+                        events.ScheduleEvent(EVENT_LEAP, Milliseconds(20000));
                         break;
                     }
                     case EVENT_GNOLL_REINFORCEMENTS:
                         for (int i = 0; i < 3; ++i)
                             me->SummonCreature(NPC_GNOLL_ADDS, me->GetPositionX()+irand(-5,5), me->GetPositionY()+irand(-5,5), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, 30000);
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, Milliseconds(30000));
                         break;
                     case EVENT_HOWL_OF_VOID:
                         DoCast(me, SPELL_HOWL_OF_VOID); // AoE on self, affects nearby players
@@ -135,25 +135,25 @@ public:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                                 me->SummonCreature(NPC_PLAYER_CLONE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
                         }
-                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, 25000);
+                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, Milliseconds(25000));
                         break;
                     case EVENT_CHRONO_BURN:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             DoCast(target, SPELL_CHRONO_BURN);
-                        events.ScheduleEvent(EVENT_CHRONO_BURN, 15000);
+                        events.ScheduleEvent(EVENT_CHRONO_BURN, Milliseconds(15000));
                         break;
                     case EVENT_UNSTABLE_RIFT:
                         // Optional: Add spell or visual effect here for room hazard
-                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, 45000);
+                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, Milliseconds(45000));
                         break;
                     case EVENT_ECHO_SLAM:
                         DoCast(me, SPELL_ECHO_SLAM);
-                        events.ScheduleEvent(EVENT_ECHO_SLAM, 15000);
+                        events.ScheduleEvent(EVENT_ECHO_SLAM, Milliseconds(15000));
                         break;
                     case EVENT_MEMORY_OVERLOAD:
                         for (int i = 0; i < 4; ++i)
                             me->SummonCreature(NPC_CHANNELING_ADD, me->GetPositionX()+irand(-8,8), me->GetPositionY()+irand(-8,8), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
-                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, 40000);
+                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, Milliseconds(40000));
                         break;
                     default:
                         break;
