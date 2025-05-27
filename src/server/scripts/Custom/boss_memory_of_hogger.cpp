@@ -50,6 +50,50 @@ enum Yells
     SAY_DEATH   = 3
 };
 
+enum GnollSpells
+{
+    SPELL_GNOLL_ATTACK = 12345, // example spell ID, replace with real
+};
+
+class npc_memory_gnoll_add : public CreatureScript
+{
+public:
+    npc_memory_gnoll_add() : CreatureScript("npc_memory_gnoll_add") {}
+
+    struct npc_memory_gnoll_addAI : public ScriptedAI
+    {
+        npc_memory_gnoll_addAI(Creature* creature) : ScriptedAI(creature) {}
+
+        uint32 spellTimer;
+
+        void Reset() override
+        {
+            spellTimer = 7000; // cast every 7 seconds
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (spellTimer <= diff)
+            {
+                DoCastVictim(SPELL_GNOLL_ATTACK);
+                spellTimer = 7000;
+            }
+            else
+                spellTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_memory_gnoll_addAI(creature);
+    }
+};
+
 class boss_memory_of_hogger : public CreatureScript
 {
 public:
@@ -272,4 +316,5 @@ public:
 void AddSC_boss_memory_of_hogger()
 {
     new boss_memory_of_hogger();
+    new npc_memory_gnoll_add();
 }
