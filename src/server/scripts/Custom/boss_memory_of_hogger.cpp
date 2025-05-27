@@ -16,6 +16,7 @@ enum Spells
     SPELL_CHRONO_BURN       = 43757,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 47008,  // Added since you use it in phase 3
+    SPELL_UNSTABLE_RIFT     = 36463,
 };
 
 enum Events
@@ -249,7 +250,8 @@ public:
 
                     case EVENT_UNSTABLE_RIFT:
                         // Optional hazard here
-                        me->Yell("SUNSTABLE RIFT NOT ACTIVE YET!", LANG_UNIVERSAL);
+                        DoCast(me, SPELL_UNSTABLE_RIFT);
+                        //me->Yell("SUNSTABLE RIFT NOT ACTIVE YET!", LANG_UNIVERSAL);
                         events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(45000));
                         break;
 
