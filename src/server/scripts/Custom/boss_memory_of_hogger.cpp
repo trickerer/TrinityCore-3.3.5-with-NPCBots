@@ -306,8 +306,8 @@ public:
                 Talk(SAY_PHASE_2);
                 events.Reset();
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
-                events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
-                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(10000));
+                events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(10000));
+                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
                 events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5));
             }
 
@@ -319,7 +319,8 @@ public:
                 events.Reset();
                 DoCast(me, SPELL_BERSERK, true);
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(10000));
+                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
                 events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(1));
             }
 
