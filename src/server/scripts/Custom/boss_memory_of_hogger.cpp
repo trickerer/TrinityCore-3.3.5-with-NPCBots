@@ -47,7 +47,7 @@ public:
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/) //override
         {
             Talk(0); // Aggro
             events.ScheduleEvent(EVENT_CLEAVE, 6000);
@@ -61,7 +61,7 @@ public:
             _JustDied();
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) //override
         {
             if (!phaseTwo && HealthBelowPct(70))
             {
