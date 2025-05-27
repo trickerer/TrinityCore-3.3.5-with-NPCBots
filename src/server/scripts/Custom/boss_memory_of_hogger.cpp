@@ -9,6 +9,7 @@
 #define SELECT_TARGET_RANDOM 0
 #endif
 using namespace std::chrono;
+using namespace SelectTargetMethod;
 
 enum Spells
 {
@@ -124,7 +125,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
