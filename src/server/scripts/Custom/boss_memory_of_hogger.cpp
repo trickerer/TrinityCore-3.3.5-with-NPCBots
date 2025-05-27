@@ -52,7 +52,7 @@ enum Yells
 
 enum GnollSpells
 {
-    SPELL_GNOLL_ATTACK = 12345, // example spell ID, replace with real
+    SPELL_GNOLL_ATTACK = 40504, // example spell ID, replace with real
 };
 
 class npc_memory_gnoll_add : public CreatureScript
