@@ -5,7 +5,6 @@
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
 
-using namespace SelectTargetMethod;
 using namespace std::chrono;
 
 enum Spells
@@ -134,7 +133,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
@@ -156,7 +155,7 @@ public:
                         DoCast(me, SPELL_HOWL_OF_VOID);
                         for (int i = 0; i < 2; ++i)
                         {
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                                 me->SummonCreature(NPC_PLAYER_CLONE,
                                     target->GetPositionX(),
                                     target->GetPositionY(),
@@ -169,7 +168,7 @@ public:
                         break;
 
                     case EVENT_CHRONO_BURN:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                         break;
