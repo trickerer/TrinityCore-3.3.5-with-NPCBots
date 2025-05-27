@@ -179,12 +179,12 @@ public:
                 if (eventId == 1)
                 {
                     DoCastVictim(9613); // Shadowbolt
-                    events.ScheduleEvent(1, 3000);
+                    events.ScheduleEvent(1, milliseconds(3000));
                 }
                 else if (eventId == 2)
                 {
                     DoCastVictim(2767); // Shadow Word: Pain
-                    events.ScheduleEvent(2, 10000);
+                    events.ScheduleEvent(2, milliseconds(10000));
                 }
             }
 
