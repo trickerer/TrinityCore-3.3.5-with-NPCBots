@@ -13,10 +13,10 @@ enum Spells
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 40727,
     SPELL_HOWL_OF_VOID      = 8715,
-    SPELL_CHRONO_BURN       = 43757,
+    SPELL_CHRONO_BURN       = 38836,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 37023, 
-    SPELL_UNSTABLE_RIFT     = 40314,
+    SPELL_UNSTABLE_RIFT     = 71861,
 };
 
 enum Events
@@ -272,7 +272,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(20000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -344,7 +344,7 @@ public:
                     }
 
                     case EVENT_GNOLL_REINFORCEMENTS:
-                        me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
+                        //me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
@@ -364,7 +364,7 @@ public:
                         if (phaseTwo || phaseThree)
                             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
                         else
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(12000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
