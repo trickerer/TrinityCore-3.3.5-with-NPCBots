@@ -16,7 +16,7 @@ enum Spells
     SPELL_CHRONO_BURN       = 43757,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 37023, 
-    SPELL_UNSTABLE_RIFT     = 36736,
+    SPELL_UNSTABLE_RIFT     = 40314,
 };
 
 enum Events
