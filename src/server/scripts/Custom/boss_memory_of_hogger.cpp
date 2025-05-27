@@ -130,7 +130,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(40000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -216,7 +216,7 @@ public:
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(60000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
@@ -273,13 +273,13 @@ public:
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
-                                milliseconds(20000));
+                                milliseconds(50000));
 
                             if (channeler && me->GetVictim())
                                 channeler->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
+                        events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(50000));
                         break;
 
                     default:
