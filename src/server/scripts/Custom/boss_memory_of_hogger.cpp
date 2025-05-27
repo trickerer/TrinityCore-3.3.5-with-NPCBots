@@ -159,6 +159,7 @@ public:
 
                     case EVENT_HOWL_OF_VOID:
                         DoCast(me, SPELL_HOWL_OF_VOID);
+                        me->Yell("VOID!!!", LANG_UNIVERSAL);
                         for (int i = 0; i < 2; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
@@ -179,6 +180,7 @@ public:
                         break;
 
                     case EVENT_CHRONO_BURN:
+                        me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
@@ -190,11 +192,13 @@ public:
                         break;
 
                     case EVENT_ECHO_SLAM:
+                        me->Yell("SLAM", LANG_UNIVERSAL);
                         DoCast(me, SPELL_ECHO_SLAM);
                         events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                         break;
 
                     case EVENT_MEMORY_OVERLOAD:
+                        me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
                         for (int i = 0; i < 4; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
