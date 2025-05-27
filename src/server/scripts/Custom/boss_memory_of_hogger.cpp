@@ -191,7 +191,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
@@ -201,7 +201,7 @@ public:
                         me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             {
                                 Creature* gnoll = me->SummonCreature(NPC_GNOLL_ADDS,
                                 me->GetPositionX() + irand(-5, 5),
@@ -223,7 +223,7 @@ public:
                         //me->Yell("VOID!!!", LANG_UNIVERSAL);
                         for (int i = 0; i < 2; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             {
                                 Creature* clone = me->SummonCreature(NPC_PLAYER_CLONE,
                                 target->GetPositionX(),
@@ -242,7 +242,7 @@ public:
 
                     case EVENT_CHRONO_BURN:
                         //me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                         break;
@@ -263,7 +263,7 @@ public:
                         //me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
                         for (int i = 0; i < 4; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                             {    
                                 Creature* channeler = me->SummonCreature(NPC_CHANNELING_ADD,
                                 me->GetPositionX() + irand(-8, 8),
