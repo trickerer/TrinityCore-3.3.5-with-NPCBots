@@ -124,7 +124,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::SELECT_TARGET_RANDOM, 1))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
