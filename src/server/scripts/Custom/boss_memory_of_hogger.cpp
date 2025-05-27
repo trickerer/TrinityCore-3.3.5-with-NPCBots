@@ -129,7 +129,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -138,6 +138,7 @@ public:
             BossAI::EnterEvadeMode();
             phaseTwo = false;
             phaseThree = false;
+            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -148,26 +149,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage) //override
         {
-            if (!phaseTwo && HealthBelowPct(70))
-            {
-                //me->Yell("PHASE2", LANG_UNIVERSAL);
-                phaseTwo = true;
-                Talk(SAY_PHASE_2);
-                events.Reset();
-                events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
-                events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
-                events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(10000));
-            }
-            else if (!phaseThree && HealthBelowPct(30))
-            {
-                //me->Yell("PHASE3", LANG_UNIVERSAL);
-                phaseThree = true;
-                Talk(SAY_PHASE_3);
-                events.Reset();
-                DoCast(me, SPELL_BERSERK, true);
-                events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
-            }
+            //NOTHING TODO
         }
 
         void UpdateAI(uint32 diff) override
@@ -227,7 +209,7 @@ public:
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
-                                milliseconds(30000));
+                                milliseconds(50000));
 
                                 if (gnoll && me->GetVictim())
                                     gnoll->AI()->AttackStart(me->GetVictim());
