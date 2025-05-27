@@ -94,6 +94,7 @@ public:
         {
             if (!phaseTwo && HealthBelowPct(70))
             {
+                me->Yell("PHASE2", LANG_UNIVERSAL);
                 phaseTwo = true;
                 Talk(SAY_PHASE_2);
                 events.Reset();
@@ -103,6 +104,7 @@ public:
             }
             else if (!phaseThree && HealthBelowPct(30))
             {
+                me->Yell("PHASE3", LANG_UNIVERSAL);
                 phaseThree = true;
                 Talk(SAY_PHASE_3);
                 events.Reset();
@@ -154,7 +156,7 @@ public:
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
