@@ -12,7 +12,7 @@ enum Spells
 {
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 40727,
-    SPELL_HOWL_OF_VOID      = 28863,
+    SPELL_HOWL_OF_VOID      = 32325,
     SPELL_CHRONO_BURN       = 43757,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 59620, 
@@ -166,6 +166,7 @@ public:
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(10000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
             }
 
             if (!phaseThree && HealthBelowPct(30))
@@ -177,6 +178,7 @@ public:
                 DoCast(me, SPELL_BERSERK, true);
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                 events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
             }
 
             events.Update(diff);
