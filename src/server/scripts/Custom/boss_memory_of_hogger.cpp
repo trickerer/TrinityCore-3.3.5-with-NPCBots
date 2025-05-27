@@ -68,13 +68,13 @@ public:
             phaseThree = false;
         }
 
-        void EnterCombat(Unit* /*who*/) //override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            me->Say("Debug: EnterCombat called", LANG_UNIVERSAL);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+            BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
         void EnterEvadeMode() //override
