@@ -4,6 +4,7 @@
 #include "InstanceScript.h"
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
+#include "Select.h"
 #include <chrono>
 
 enum Spells
@@ -126,7 +127,7 @@ public:
                     }
                     case EVENT_GNOLL_REINFORCEMENTS:
                         for (int i = 0; i < 3; ++i)
-                            me->SummonCreature(NPC_GNOLL_ADDS, me->GetPositionX()+irand(-5,5), me->GetPositionY()+irand(-5,5), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                            me->SummonCreature(NPC_GNOLL_ADDS, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, std::chrono::milliseconds(30000));
                         events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, Milliseconds(30000));
                         break;
                     case EVENT_HOWL_OF_VOID:
