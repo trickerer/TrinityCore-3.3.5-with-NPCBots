@@ -70,7 +70,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, 5000); // Cleave every 5s
+            events.ScheduleEvent(1, milliseconds(5000)); // Cleave every 5s
         }
 
         void UpdateAI(uint32 diff) override
@@ -85,7 +85,7 @@ public:
                 if (eventId == 1)
                 {
                     DoCastVictim(40504); // Cleave
-                    events.ScheduleEvent(1, 5000);
+                    events.ScheduleEvent(1, milliseconds(5000));
                 }
             }
 
@@ -113,8 +113,8 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, 8000); // Charge
-            events.ScheduleEvent(2, 6000); // Rend
+            events.ScheduleEvent(1, milliseconds(8000)); // Charge
+            events.ScheduleEvent(2, milliseconds(6000)); // Rend
         }
 
         void UpdateAI(uint32 diff) override
@@ -130,12 +130,12 @@ public:
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                         DoCast(target, 42702); // Charge
-                    events.ScheduleEvent(1, 10000);
+                    events.ScheduleEvent(1, milliseconds(10000));
                 }
                 else if (eventId == 2)
                 {
                     DoCastVictim(11977); // Rend
-                    events.ScheduleEvent(2, 6000);
+                    events.ScheduleEvent(2, milliseconds(6000));
                 }
             }
 
@@ -163,8 +163,8 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, 2000); // Shadowbolt
-            events.ScheduleEvent(2, 8000); // Shadow Word: Pain
+            events.ScheduleEvent(1, milliseconds(2000)); // Shadowbolt
+            events.ScheduleEvent(2, milliseconds(8000)); // Shadow Word: Pain
         }
 
         void UpdateAI(uint32 diff) override
