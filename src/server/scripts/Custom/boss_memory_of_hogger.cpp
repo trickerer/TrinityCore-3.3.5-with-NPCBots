@@ -4,7 +4,6 @@
 #include "InstanceScript.h"
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
-#include "Select.h"
 #include <chrono>
 
 enum Spells
