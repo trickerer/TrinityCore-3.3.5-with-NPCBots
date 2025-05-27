@@ -12,10 +12,10 @@ enum Spells
 {
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 40727,
-    SPELL_HOWL_OF_VOID      = 30752,
+    SPELL_HOWL_OF_VOID      = 28863,
     SPELL_CHRONO_BURN       = 43757,
     SPELL_ECHO_SLAM         = 53399,
-    SPELL_BERSERK           = 47008,  // Added since you use it in phase 3
+    SPELL_BERSERK           = 59620, 
     SPELL_UNSTABLE_RIFT     = 36463,
 };
 
@@ -53,7 +53,7 @@ enum Yells
 
 enum GnollSpells
 {
-    SPELL_GNOLL_ATTACK = 40504, // example spell ID, replace with real
+    SPELL_GNOLL_ATTACK = 40504, 
 };
 
 class npc_memory_gnoll_add : public CreatureScript
@@ -130,7 +130,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -210,13 +210,13 @@ public:
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
-                                milliseconds(50000));
+                                milliseconds(30000));
 
                                 if (gnoll && me->GetVictim())
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
