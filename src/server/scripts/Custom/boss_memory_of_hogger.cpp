@@ -8,6 +8,7 @@
 #ifndef SELECT_TARGET_RANDOM
 #define SELECT_TARGET_RANDOM 0
 #endif
+using namespace std::chrono;
 
 enum Spells
 {
