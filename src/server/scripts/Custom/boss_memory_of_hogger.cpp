@@ -137,7 +137,7 @@ public:
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
-                                30000);
+                                milliseconds(30000));
                         events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
@@ -152,7 +152,7 @@ public:
                                     target->GetPositionZ(),
                                     0.f,
                                     TEMPSUMMON_TIMED_DESPAWN,
-                                    20000);
+                                    milliseconds(20000));
                         }
                         events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                         break;
@@ -181,7 +181,7 @@ public:
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
-                                20000);
+                                milliseconds(20000));
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
                         break;
 
