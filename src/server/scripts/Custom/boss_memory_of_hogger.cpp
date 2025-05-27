@@ -42,6 +42,14 @@ enum Data
     DATA_MEMORY_OF_HOGGER = 0,
 };
 
+enum Yells
+{
+    SAY_AGGRO   = 0,
+    SAY_PHASE_2 = 1,
+    SAY_PHASE_3 = 2,
+    SAY_DEATH   = 3
+};
+
 class boss_memory_of_hogger : public CreatureScript
 {
 public:
@@ -62,7 +70,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) //override
         {
-            Talk(0);
+            Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
@@ -77,7 +85,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            Talk(3);
+            Talk(SAY_DEATH);
             _JustDied();
         }
 
@@ -86,7 +94,7 @@ public:
             if (!phaseTwo && HealthBelowPct(70))
             {
                 phaseTwo = true;
-                Talk(1);
+                Talk(SAY_PHASE_2);
                 events.Reset();
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
@@ -95,7 +103,7 @@ public:
             else if (!phaseThree && HealthBelowPct(30))
             {
                 phaseThree = true;
-                Talk(2);
+                Talk(SAY_PHASE_3);
                 events.Reset();
                 DoCast(me, SPELL_BERSERK, true);
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
