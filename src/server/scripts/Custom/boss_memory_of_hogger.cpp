@@ -130,7 +130,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(40000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -216,7 +216,7 @@ public:
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(60000));
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(40000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
