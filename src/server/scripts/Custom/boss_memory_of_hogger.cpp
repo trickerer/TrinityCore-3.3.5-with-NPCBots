@@ -5,6 +5,7 @@
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
 
+using namespace SelectTargetMethod;
 using namespace std::chrono;
 
 enum Spells
