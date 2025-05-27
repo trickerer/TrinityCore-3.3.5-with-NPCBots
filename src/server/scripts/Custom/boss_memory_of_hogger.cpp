@@ -62,7 +62,7 @@ public:
             phaseThree = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* /*who*/) //override
         {
             Talk(0);
             events.ScheduleEvent(EVENT_CLEAVE, 6000);
@@ -70,7 +70,7 @@ public:
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, 30000);
         }
 
-        void EnterEvadeMode() override
+        void EnterEvadeMode() //override
         {
             BossAI::EnterEvadeMode();
             phaseTwo = false;
@@ -83,7 +83,7 @@ public:
             _JustDied();
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage) //override
         {
             if (!phaseTwo && HealthBelowPct(70))
             {
