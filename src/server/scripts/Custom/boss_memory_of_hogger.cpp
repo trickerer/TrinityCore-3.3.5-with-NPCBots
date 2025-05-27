@@ -11,10 +11,10 @@ using namespace std::chrono;
 enum Spells
 {
     SPELL_CLEAVE            = 40504,
-    SPELL_LEAP              = 57057,
-    SPELL_HOWL_OF_VOID      = 38684,
-    SPELL_CHRONO_BURN       = 67479,
-    SPELL_ECHO_SLAM         = 32014,
+    SPELL_LEAP              = 40727,
+    SPELL_HOWL_OF_VOID      = 30752,
+    SPELL_CHRONO_BURN       = 43757,
+    SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 47008,  // Added since you use it in phase 3
 };
 
