@@ -138,16 +138,18 @@ public:
 
                     case EVENT_GNOLL_REINFORCEMENTS:
                         for (int i = 0; i < 3; ++i)
-                            me->SummonCreature(NPC_GNOLL_ADDS,
+                        {
+                            Creature* gnoll = me->SummonCreature(NPC_GNOLL_ADDS,
                                 me->GetPositionX() + irand(-5, 5),
                                 me->GetPositionY() + irand(-5, 5),
                                 me->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
                                 milliseconds(30000));
-                                
-                                if (gnoll && me->GetVictim())
-                                    gnoll->AI()->AttackStart(me->GetVictim());
+
+                            if (gnoll && me->GetVictim())
+                                gnoll->AI()->AttackStart(me->GetVictim());
+                        }
                         events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
@@ -163,8 +165,6 @@ public:
                                     0.f,
                                     TEMPSUMMON_TIMED_DESPAWN,
                                     milliseconds(20000));
-                                    if (gnoll && me->GetVictim())
-                                        gnoll->AI()->AttackStart(me->GetVictim());
                         }
                         events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                         break;
@@ -187,6 +187,7 @@ public:
 
                     case EVENT_MEMORY_OVERLOAD:
                         for (int i = 0; i < 4; ++i)
+                        {
                             me->SummonCreature(NPC_CHANNELING_ADD,
                                 me->GetPositionX() + irand(-8, 8),
                                 me->GetPositionY() + irand(-8, 8),
@@ -194,8 +195,7 @@ public:
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
                                 milliseconds(20000));
-                                if (gnoll && me->GetVictim())
-                                    gnoll->AI()->AttackStart(me->GetVictim());
+                        }
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
                         break;
 
