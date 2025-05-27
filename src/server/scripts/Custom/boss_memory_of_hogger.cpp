@@ -145,6 +145,9 @@ public:
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
                                 milliseconds(30000));
+                                
+                                if (gnoll && me->GetVictim())
+                                    gnoll->AI()->AttackStart(me->GetVictim());
                         events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
@@ -160,6 +163,8 @@ public:
                                     0.f,
                                     TEMPSUMMON_TIMED_DESPAWN,
                                     milliseconds(20000));
+                                    if (gnoll && me->GetVictim())
+                                        gnoll->AI()->AttackStart(me->GetVictim());
                         }
                         events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                         break;
@@ -189,6 +194,8 @@ public:
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
                                 milliseconds(20000));
+                                if (gnoll && me->GetVictim())
+                                    gnoll->AI()->AttackStart(me->GetVictim());
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
                         break;
 
