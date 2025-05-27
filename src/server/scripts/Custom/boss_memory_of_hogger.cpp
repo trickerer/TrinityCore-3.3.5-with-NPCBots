@@ -84,8 +84,8 @@ public:
             {
                 if (eventId == 1)
                 {
-                    DoCastVictim(40504); // Cleave
-                    events.ScheduleEvent(1, milliseconds(5000));
+                    DoCastVictim(69492); // Cleave
+                    events.ScheduleEvent(1, milliseconds(6000));
                 }
             }
 
