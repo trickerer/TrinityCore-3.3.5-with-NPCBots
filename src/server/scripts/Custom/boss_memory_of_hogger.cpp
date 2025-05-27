@@ -128,7 +128,7 @@ public:
             {
                 if (eventId == 1)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                         DoCast(target, 42702); // Charge
                     events.ScheduleEvent(1, milliseconds(10000));
                 }
