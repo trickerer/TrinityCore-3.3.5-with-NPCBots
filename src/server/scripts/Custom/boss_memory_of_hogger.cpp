@@ -204,12 +204,12 @@ public:
                         me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             {
                                 Creature* gnoll = me->SummonCreature(NPC_GNOLL_ADDS,
-                                me->GetPositionX() + irand(-5, 5),
-                                me->GetPositionY() + irand(-5, 5),
-                                me->GetPositionZ(),
+                                -90.582489,
+                                136.845551,
+                                -40.375099,
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
                                 milliseconds(30000));
@@ -267,12 +267,12 @@ public:
                         //me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
                         for (int i = 0; i < 4; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             {    
                                 Creature* channeler = me->SummonCreature(NPC_CHANNELING_ADD,
-                                me->GetPositionX() + irand(-8, 8),
-                                me->GetPositionY() + irand(-8, 8),
-                                me->GetPositionZ(),
+                                -90.582489,
+                                136.845551,
+                                -40.375099,
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
                                 milliseconds(50000));
