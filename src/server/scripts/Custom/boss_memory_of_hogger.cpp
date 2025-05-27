@@ -41,18 +41,6 @@ enum Data
     DATA_MEMORY_OF_HOGGER = 0,
 };
 
-enum SelectTargetType
-{
-    SELECT_TARGET_DONTCARE,
-    SELECT_TARGET_SELF,
-    SELECT_TARGET_VICTIM,
-    SELECT_TARGET_TOPAGGRO,
-    SELECT_TARGET_BOTTOMAGGRO,
-    SELECT_TARGET_RANDOM,
-    SELECT_TARGET_NEAREST,
-    SELECT_TARGET_FARTHEST
-};
-
 class boss_memory_of_hogger : public CreatureScript
 {
 public:
