@@ -137,6 +137,7 @@ public:
                     }
 
                     case EVENT_GNOLL_REINFORCEMENTS:
+                        me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true))
