@@ -272,7 +272,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(20000));
             BossAI::JustEngagedWith(who); // important for encounter logic
         }
 
@@ -308,7 +308,7 @@ public:
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(10000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5));
             }
 
             if (!phaseThree && HealthBelowPct(30))
@@ -320,7 +320,7 @@ public:
                 DoCast(me, SPELL_BERSERK, true);
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                 events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(40000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(1));
             }
 
             events.Update(diff);
@@ -360,7 +360,10 @@ public:
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
+                        if (phaseTwo || phaseThree)
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
+                        else
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
