@@ -33,6 +33,12 @@ enum NPCs
     NPC_CHANNELING_ADD  = 3494302,
 };
 
+enum Data
+{
+    DATA_MEMORY_OF_HOGGER = 0,
+    // add other boss IDs here if needed
+};
+
 class boss_memory_of_hogger : public CreatureScript
 {
 public:
@@ -40,7 +46,7 @@ public:
 
     struct boss_memory_of_hoggerAI : public BossAI
     {
-        boss_memory_of_hoggerAI(Creature* creature) : BossAI(creature, DATA_GENERIC_BOSS) {}
+        boss_memory_of_hoggerAI(Creature* creature) : BossAI(creature, DATA_MEMORY_OF_HOGGER) {}
 
         void Reset() override
         {
