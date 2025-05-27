@@ -194,7 +194,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
@@ -218,7 +218,7 @@ public:
                                     gnoll->AI()->AttackStart(me->GetVictim());
                             }
                         }
-                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(40000));
+                        events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(50000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
@@ -226,7 +226,7 @@ public:
                         //me->Yell("VOID!!!", LANG_UNIVERSAL);
                         for (int i = 0; i < 2; ++i)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             {
                                 Creature* clone = me->SummonCreature(NPC_PLAYER_CLONE,
                                 target->GetPositionX(),
@@ -240,12 +240,12 @@ public:
                                     clone->AI()->AttackStart(target);
                             }
                         }
-                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
+                        events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(45000));
                         break;
 
                     case EVENT_CHRONO_BURN:
                         //me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                         break;
