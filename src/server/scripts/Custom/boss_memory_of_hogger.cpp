@@ -400,7 +400,7 @@ public:
                         // Optional hazard here
                         DoCast(me, SPELL_UNSTABLE_RIFT);
                         //me->Yell("SUNSTABLE RIFT NOT ACTIVE YET!", LANG_UNIVERSAL);
-                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(45000));
+                        events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(15000));
                         break;
 
                     case EVENT_ECHO_SLAM:
