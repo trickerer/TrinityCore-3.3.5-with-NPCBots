@@ -56,6 +56,148 @@ enum GnollSpells
     SPELL_GNOLL_ATTACK = 40504, 
 };
 
+class npc_riverpaw_hideflayer : public CreatureScript
+{
+public:
+    npc_riverpaw_hideflayer() : CreatureScript("npc_riverpaw_hideflayer") { }
+
+    struct npc_riverpaw_hideflayerAI : public ScriptedAI
+    {
+        npc_riverpaw_hideflayerAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
+
+        void Reset() override
+        {
+            events.Reset();
+            events.ScheduleEvent(1, 5000); // Cleave every 5s
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == 1)
+                {
+                    DoCastVictim(40504); // Cleave
+                    events.ScheduleEvent(1, 5000);
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_riverpaw_hideflayerAI(creature);
+    }
+};
+
+class npc_riverpaw_pack_warder : public CreatureScript
+{
+public:
+    npc_riverpaw_pack_warder() : CreatureScript("npc_riverpaw_pack_warder") { }
+
+    struct npc_riverpaw_pack_warderAI : public ScriptedAI
+    {
+        npc_riverpaw_pack_warderAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
+
+        void Reset() override
+        {
+            events.Reset();
+            events.ScheduleEvent(1, 8000); // Charge
+            events.ScheduleEvent(2, 6000); // Rend
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == 1)
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        DoCast(target, 42702); // Charge
+                    events.ScheduleEvent(1, 10000);
+                }
+                else if (eventId == 2)
+                {
+                    DoCastVictim(11977); // Rend
+                    events.ScheduleEvent(2, 6000);
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_riverpaw_pack_warderAI(creature);
+    }
+};
+
+class npc_riverpaw_bone_chanter : public CreatureScript
+{
+public:
+    npc_riverpaw_bone_chanter() : CreatureScript("npc_riverpaw_bone_chanter") { }
+
+    struct npc_riverpaw_bone_chanterAI : public ScriptedAI
+    {
+        npc_riverpaw_bone_chanterAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
+
+        void Reset() override
+        {
+            events.Reset();
+            events.ScheduleEvent(1, 2000); // Shadowbolt
+            events.ScheduleEvent(2, 8000); // Shadow Word: Pain
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == 1)
+                {
+                    DoCastVictim(9613); // Shadowbolt
+                    events.ScheduleEvent(1, 3000);
+                }
+                else if (eventId == 2)
+                {
+                    DoCastVictim(2767); // Shadow Word: Pain
+                    events.ScheduleEvent(2, 10000);
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_riverpaw_bone_chanterAI(creature);
+    }
+};
+
 class npc_memory_gnoll_add : public CreatureScript
 {
 public:
@@ -303,4 +445,7 @@ void AddSC_boss_memory_of_hogger()
 {
     new boss_memory_of_hogger();
     new npc_memory_gnoll_add();
+    new npc_riverpaw_hideflayer();
+    new npc_riverpaw_pack_warder();
+    new npc_riverpaw_bone_chanter();
 }
