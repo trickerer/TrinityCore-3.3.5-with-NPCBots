@@ -395,9 +395,11 @@ public:
 
                         if (furthestTarget)
                         {
-                            DoCast(furthestTarget, 58963);
-                            DoCastVictim(41959);  //GRAB
+                            //DoCast(furthestTarget, 58963);
+                            //DoCastVictim(50770);  //GRAB
                         }
+                        DoCast(me, 58963); //knock back
+                        DoCastVictim(50770); // pull back
 
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
