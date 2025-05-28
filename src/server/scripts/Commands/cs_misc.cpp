@@ -145,9 +145,9 @@ public:
         return commandTable;
     }
 
-    static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    static bool HandleSendWorldCommand(ChatHandler* handler, std::string const& args)
     {
-        if (!*args)
+        if (args.empty())
         {
             handler->SendSysMessage("Usage: .sendworld <message>");
             return false;
@@ -157,9 +157,8 @@ public:
         if (!player)
             return false;
 
-        // Get the custom channel "world"
         ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam());
-        Channel* channel = cMgr->GetChannel(0, "world", player, false); // 'false' = don't send system packet if not in channel
+        Channel* channel = cMgr->GetChannel(0, "world", player, false);
 
         if (!channel)
         {
@@ -167,9 +166,7 @@ public:
             return false;
         }
 
-        // Broadcast as if the player said it
-        channel->Say(player->GetGUID(), args, LANG_UNIVERSAL);
-
+        channel->Say(player->GetGUID(), args.c_str(), LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent to the world channel.");
         return true;
     }
