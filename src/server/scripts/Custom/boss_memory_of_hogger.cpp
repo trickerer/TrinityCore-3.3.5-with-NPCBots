@@ -14,10 +14,10 @@ enum Spells
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 58963,
     SPELL_HOWL_OF_VOID      = 8715,
-    SPELL_CHRONO_BURN       = 37161,
+    SPELL_CHRONO_BURN       = 46394,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 37023, 
-    SPELL_UNSTABLE_RIFT     = 70464,
+    SPELL_UNSTABLE_RIFT     = 36463,
 };
 
 enum Events
@@ -130,12 +130,12 @@ public:
                 if (eventId == 1)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
-                        DoCast(target, 42702); // Charge
+                        DoCast(target, 43651); // Charge
                     events.ScheduleEvent(1, milliseconds(10000));
                 }
                 else if (eventId == 2)
                 {
-                    DoCastVictim(11977); // Rend
+                    DoCastVictim(70435); // Rend
                     events.ScheduleEvent(2, milliseconds(6000));
                 }
             }
@@ -179,12 +179,12 @@ public:
             {
                 if (eventId == 1)
                 {
-                    DoCastVictim(9613); // Shadowbolt
+                    DoCastVictim(71254); // Shadowbolt
                     events.ScheduleEvent(1, milliseconds(3000));
                 }
                 else if (eventId == 2)
                 {
-                    DoCastVictim(2767); // Shadow Word: Pain
+                    DoCastVictim(48125); // Shadow Word: Pain
                     events.ScheduleEvent(2, milliseconds(10000));
                 }
             }
