@@ -272,6 +272,7 @@ public:
         {
             Talk(SAY_AGGRO);
             DoPlaySoundToSet(me, 1015);
+
             if (Player* player = who->ToPlayer())
             {
                 if (Group* group = player->GetGroup())
@@ -281,18 +282,25 @@ public:
                         Player* member = itr->GetSource();
                         if (member && member->IsInMap(me))
                         {
-                            me->GetThreatManager().AddThreat(member, 1.0f);
-                            me->Attack(member, true);    // Set combat target if needed
-                            member->SetInCombatWith(me); // Flag player as in combat
-                            me->SetInCombatWith(member); // Flag boss as in combat with them
+                            me->AddThreat(member, 1.0f);
+                            me->SetInCombatWith(member);
+                            member->SetInCombatWith(me);
+
+                            me->CombatStart(member);
+                            member->CombatStart(me);
+
+                            // Optional: fake damage or debuff to lock combat
+                            me->CastSpell(member, 1160, true); // Demo Shout
                         }
                     }
                 }
             }
+
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
-            BossAI::JustEngagedWith(who); // important for encounter logic
+
+            BossAI::JustEngagedWith(who); // critical for proper boss state
         }
 
         void EnterEvadeMode() //override
