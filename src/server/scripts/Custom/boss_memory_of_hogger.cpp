@@ -5,6 +5,7 @@
 #include "CreatureAIImpl.h"
 #include "ScriptedGossip.h"
 #include "Unit.h"
+#include "Group.h"
 
 using namespace std::chrono;
 
@@ -272,7 +273,6 @@ public:
             Talk(SAY_AGGRO);
             if (who && who->GetTypeId() == TYPEID_PLAYER)
             {
-                // Get the group of the player who pulled
                 if (Group* group = who->ToPlayer()->GetGroup())
                 {
                     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -281,11 +281,13 @@ public:
                         if (!member || !member->IsInWorld())
                             continue;
 
-                        if (me->IsWithinDistInMap(member, 200.0f)) // Optional range check
+                        if (me->IsWithinDistInMap(member, 100.0f))
                         {
-                            me->Attack(member, true); // Boss targets them
-                            member->SetInCombatWith(me); // Put player in combat
-                            me->AddThreat(member, 1.0f); // Add threat to ensure they're in combat
+                            me->Attack(member, true);
+                            member->SetInCombatWith(me);
+
+                            if (ThreatManager* threatMgr = me->GetThreatManager())
+                                threatMgr->AddThreat(member, 1.0f);
                         }
                     }
                 }
