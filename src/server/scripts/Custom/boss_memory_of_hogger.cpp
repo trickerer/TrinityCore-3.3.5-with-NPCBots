@@ -399,7 +399,19 @@ public:
                             //DoCastVictim(50770);  //GRAB
                         }
                         DoCast(me, 58963); //knock back
-                        DoCastVictim(50770); // pull back
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        {
+                            Player* player = itr->GetSource();
+                            if (!player || !player->IsAlive() || !me->IsWithinLOSInMap(player))
+                                continue;
+
+                            float x = me->GetPositionX();
+                            float y = me->GetPositionY();
+                            float z = me->GetPositionZ();
+
+                            player->NearTeleportTo(x, y, z, player->GetOrientation());
+                        }
 
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
