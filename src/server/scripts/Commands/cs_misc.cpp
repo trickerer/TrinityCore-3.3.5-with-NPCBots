@@ -202,7 +202,7 @@ public:
         WorldDatabase.PExecute(
             "REPLACE INTO discord_verification (player_guid, code, verified) VALUES({}, '{}', 0)", guid, code);
 
-        handler->PSendSysMessage("Join our |cFFFF4747D|cFFFFE547i|cFF7CFF47s|cFF47FFB0c|cFF47B0FFo|cFF7C47FFr|cFFFF47E5d (|cff00ff00 https://mgawow.online/discord |r)and DM 'MGAWoW Verify Bot' with this code: |cff00ff00%s|r", code.c_str());
+        handler->PSendSysMessage("Join our |cFFFF4747D|cFFFFE547i|cFF7CFF47s|cFF47FFB0c|cFF47B0FFo|cFF7C47FFr|cFFFF47E5d|r(|cff00ff00 https://mgawow.online/discord |r)and DM 'MGAWoW Verify Bot' with this code: |cff00ff00%s|r", code.c_str());
         return true;
     }
 
