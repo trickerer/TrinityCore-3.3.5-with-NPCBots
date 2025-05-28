@@ -336,7 +336,7 @@ public:
             
             if (phaseTwo && HealthBelowPct(50))
             {
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(1000));
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(30000));
             }
 
             if (!phaseThree && HealthBelowPct(30))
@@ -393,7 +393,7 @@ public:
                         if (furthestTarget)
                         {
                             DoCast(furthestTarget, SPELL_LEAP);
-                            DoCastVictim(64429);  //GRAB
+                            DoCastVictim(64430);  //GRAB
                         }
 
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
