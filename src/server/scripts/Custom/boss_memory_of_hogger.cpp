@@ -271,7 +271,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            DoPlaySoundToSet(me, 1015);
+            DoPlaySoundToSet(me, 1015); // Optional aggro sound
 
             if (Player* player = who->ToPlayer())
             {
@@ -282,15 +282,9 @@ public:
                         Player* member = itr->GetSource();
                         if (member && member->IsInMap(me))
                         {
-                            me->AddThreat(member, 1.0f);
                             me->SetInCombatWith(member);
                             member->SetInCombatWith(me);
-
-                            me->CombatStart(member);
-                            member->CombatStart(me);
-
-                            // Optional: fake damage or debuff to lock combat
-                            me->CastSpell(member, 1160, true); // Demo Shout
+                            me->GetThreatManager().AddThreat(member, 1.0f);
                         }
                     }
                 }
@@ -300,7 +294,7 @@ public:
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
 
-            BossAI::JustEngagedWith(who); // critical for proper boss state
+            BossAI::JustEngagedWith(who); // Ensure boss encounter is tracked properly
         }
 
         void EnterEvadeMode() //override
