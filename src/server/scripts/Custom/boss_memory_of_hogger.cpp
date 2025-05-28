@@ -285,7 +285,7 @@ public:
                         {
                             me->Attack(member, true);
                             member->SetInCombatWith(me);
-                            me->getThreatManager().addThreat(member, 1.0f);
+                            me->GetThreatManager().addThreat(member, 1.0f);
                         }
                     }
                 }
