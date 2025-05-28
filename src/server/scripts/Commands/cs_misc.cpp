@@ -141,9 +141,9 @@ public:
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
             { "getdiscordcode",   misc_commandscript::HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
             { "sendworld",        misc_commandscript::HandleSendWorldCommand,   rbac::RBAC_PERM_COMMAND_SENDWORLD,   Console::Yes },
-        };
+        }
         return commandTable;
-    };
+    }
     
     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
