@@ -446,7 +446,7 @@ public:
                                 if (gnoll && me->GetVictim())
                                 {
                                     gnoll->AI()->AttackStart(target);
-                                    gnoll->AddThreat(target, 100.0f);
+                                    gnoll->GetThreatManager().AddThreat(target, 100.0f);
                                     gnoll->SetInCombatWith(target); 
                                     gnoll->GetMotionMaster()->MoveChase(target);
                                     gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 2000.0f);
