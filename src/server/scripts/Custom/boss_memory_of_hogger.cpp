@@ -286,10 +286,15 @@ public:
                         {
                             me->SetInCombatWith(member);
                             member->SetInCombatWith(me);
+                            who->SetInCombatWith(me);
                             me->GetThreatManager().AddThreat(member, 1.0f);
                         }
                     }
                 }
+            }
+            else
+            {
+                me->Yell("COUNT NTO AGGRO!", LANG_UNIVERSAL);
             }
 
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
@@ -373,7 +378,7 @@ public:
 
                     case EVENT_LEAP:
                     {
-                        me->Yell("LEAP!", LANG_UNIVERSAL);
+                        //me->Yell("LEAP!", LANG_UNIVERSAL);
 
                         Unit* furthestTarget = nullptr;
                         float maxDistance = 0.0f;
@@ -425,7 +430,7 @@ public:
 
                     case EVENT_GNOLL_REINFORCEMENTS:
                     {
-                        me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
+                        //me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
@@ -441,6 +446,13 @@ public:
                                 if (gnoll && me->GetVictim())
                                 {
                                     gnoll->AI()->AttackStart(target);
+                                    gnoll->AddThreat(target, 100.0f);
+                                    gnoll->SetInCombatWith(target); 
+                                    gnoll->GetMotionMaster()->MoveChase(target);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 2000.0f);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 3500.0f);
+                                    gnoll->UpdateDamagePhysical(BASE_ATTACK);
+                                    target->SetInCombatWith(gnoll);
                                 }
                                 else
                                 {
