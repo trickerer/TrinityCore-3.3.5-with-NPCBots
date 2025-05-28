@@ -281,8 +281,9 @@ public:
                         Player* member = itr->GetSource();
                         if (member && member->IsInMap(me))
                         {
-                            me->AddThreat(member, 1.0f); // Put them on the threat table
-                            me->AttackStart(member);     // Set combat target if needed
+                            if (ThreatManager* threatMgr = me->GetThreatManager())
+                                threatMgr->AddThreat(member, 1.0f);
+                            me->Attack(member, true);    // Set combat target if needed
                             member->SetInCombatWith(me); // Flag player as in combat
                             me->SetInCombatWith(member); // Flag boss as in combat with them
                         }
