@@ -281,13 +281,11 @@ public:
                         if (!member || !member->IsInWorld())
                             continue;
 
-                        if (me->IsWithinDistInMap(member, 100.0f))
+                        if (me->IsWithinDistInMap(member, 200.0f))
                         {
                             me->Attack(member, true);
                             member->SetInCombatWith(me);
-
-                            if (ThreatManager* threatMgr = me->GetThreatManager())
-                                threatMgr->AddThreat(member, 1.0f);
+                            me->getThreatManager().addThreat(member, 1.0f);
                         }
                     }
                 }
