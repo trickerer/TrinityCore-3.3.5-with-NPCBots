@@ -406,13 +406,15 @@ public:
                             if (!player || !player->IsAlive() || !me->IsWithinDistInMap(player, 100.0f))
                                 continue;
 
-                            float angle = me->GetPosition().GetAngle(player->GetPosition());
-                            float distance = 2.0f + (rand() % 3); // slight spread
+                            float dx = player->GetPositionX() - me->GetPositionX();
+                            float dy = player->GetPositionY() - me->GetPositionY();
+                            float angle = std::atan2(dy, dx);
+                            float distance = 1.5f + (rand() % 3); // 1.5 to 3.5 yards
                             float x = me->GetPositionX() + distance * std::cos(angle);
                             float y = me->GetPositionY() + distance * std::sin(angle);
                             float z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, me->GetPositionZ());
 
-                            player->NearTeleportTo(x, y, z, me->GetOrientation());
+                            player->NearTeleportTo(x, y, z, player->GetOrientation());
                         }
                         me->CastSpell(me, 51336, true); // Visual effect (e.g., DK-like grip aura)
                         DoPlaySoundToSet(me, 16856); // Optional sound
