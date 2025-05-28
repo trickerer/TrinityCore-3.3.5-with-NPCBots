@@ -51,6 +51,7 @@
 #include "WeatherMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "ChannelMgr.h"
 
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
