@@ -7,6 +7,7 @@
 #include "Unit.h"
 #include "Group.h"
 #include "Map.h"
+#include "InstanceScript.h"
 
 using namespace std::chrono;
 
