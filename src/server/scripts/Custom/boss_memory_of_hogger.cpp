@@ -455,8 +455,8 @@ public:
                                     gnoll->GetThreatManager().AddThreat(target, 100.0f);
                                     gnoll->SetInCombatWith(target); 
                                     gnoll->GetMotionMaster()->MoveChase(target);
-                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 2000.0f);
-                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 3500.0f);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 100.0f);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 150.0f);
                                     gnoll->UpdateDamagePhysical(BASE_ATTACK);
                                     target->SetInCombatWith(gnoll);
                                 }
