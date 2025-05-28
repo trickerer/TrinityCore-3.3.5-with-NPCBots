@@ -535,6 +535,13 @@ public:
 
                             if (channeler && me->GetVictim())
                                 channeler->AI()->AttackStart(target);
+                                channeler->GetThreatManager().AddThreat(target, 100.0f);
+                                channeler->SetInCombatWith(target); 
+                                channeler->GetMotionMaster()->MoveChase(target);
+                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 100.0f);
+                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 150.0f);
+                                channeler->UpdateDamagePhysical(BASE_ATTACK);
+                                target->SetInCombatWith(channeler);
                             }
                         }
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(50000));
