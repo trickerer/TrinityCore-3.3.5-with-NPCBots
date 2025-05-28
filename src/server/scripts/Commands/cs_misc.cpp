@@ -156,13 +156,20 @@ public:
         if (!player)
             return false;
 
-        // Replace "world" with your exact channel name
-        std::string channelName = "world";
-        Channel::GetChannelName(channelName, 0, player->GetSession()->GetSessionDbcLocale(), zoneEntry);
+        // Get the custom channel "world"
+        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam());
+        Channel* channel = cMgr->GetChannel(0, "world", player, false); // 'false' = don't send system packet if not in channel
 
-        std::string msg = args;
-        channel->Say(player->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
-        handler->SendSysMessage("Message sent to world channel.");
+        if (!channel)
+        {
+            handler->SendSysMessage("Custom channel 'world' not found or no one is in it.");
+            return false;
+        }
+
+        // Broadcast as if the player said it
+        channel->Say(player->GetGUID(), args, LANG_UNIVERSAL);
+
+        handler->SendSysMessage("Message sent to the world channel.");
         return true;
     }
 
