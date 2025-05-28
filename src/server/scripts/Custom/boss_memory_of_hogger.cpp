@@ -272,21 +272,19 @@ public:
         {
             Talk(SAY_AGGRO);
             DoPlaySoundToSet(me, 10978);
-            if (who && who->GetTypeId() == TYPEID_PLAYER)
+            if (Player* player = who->ToPlayer())
             {
-                if (Group* group = who->ToPlayer()->GetGroup())
+                if (Group* group = player->GetGroup())
                 {
                     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                     {
                         Player* member = itr->GetSource();
-                        if (!member || !member->IsInWorld())
-                            continue;
-
-                        if (me->IsWithinDistInMap(member, 200.0f))
+                        if (member && member->IsInMap(me))
                         {
-                            me->Attack(member, true);
-                            member->SetInCombatWith(me);
-                            me->GetThreatManager().AddThreat(member, 1.0f);
+                            me->AddThreat(member, 1.0f); // Put them on the threat table
+                            me->AttackStart(member);     // Set combat target if needed
+                            member->SetInCombatWith(me); // Flag player as in combat
+                            me->SetInCombatWith(member); // Flag boss as in combat with them
                         }
                     }
                 }
