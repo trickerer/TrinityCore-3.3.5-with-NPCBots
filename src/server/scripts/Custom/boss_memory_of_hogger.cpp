@@ -406,7 +406,7 @@ public:
                             if (!player || !player->IsAlive() || !me->IsWithinDistInMap(player, 100.0f))
                                 continue;
 
-                            float angle = me->GetAngle(player); // Pull from their direction
+                            float angle = me->GetAngle(player->GetPositionX(), player->GetPositionY());
                             float distance = 2.0f + (rand() % 3); // slight spread
                             float x = me->GetPositionX() + distance * std::cos(angle);
                             float y = me->GetPositionY() + distance * std::sin(angle);
