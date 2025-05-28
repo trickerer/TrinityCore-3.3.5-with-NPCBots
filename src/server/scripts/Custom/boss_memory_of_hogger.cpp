@@ -378,26 +378,26 @@ public:
                         Unit* furthestTarget = nullptr;
                         float maxDistance = 0.0f;
 
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        {
-                            Player* player = itr->GetSource();
-                            if (!player || !player->IsAlive() || !me->IsWithinLOSInMap(player))
-                                continue;
-
-                            float distance = me->GetDistance(player);
-                            if (distance > maxDistance)
+                        /*Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
-                                maxDistance = distance;
-                                furthestTarget = player;
-                            }
-                        }
+                                Player* player = itr->GetSource();
+                                if (!player || !player->IsAlive() || !me->IsWithinLOSInMap(player))
+                                    continue;
 
-                        if (furthestTarget)
-                        {
-                            //DoCast(furthestTarget, 58963);
-                            //DoCastVictim(50770);  //GRAB
-                        }
+                                float distance = me->GetDistance(player);
+                                if (distance > maxDistance)
+                                {
+                                    maxDistance = distance;
+                                    furthestTarget = player;
+                                }
+                            }
+
+                            if (furthestTarget)
+                            {
+                                //DoCast(furthestTarget, 58963);
+                                //DoCastVictim(50770);  //GRAB
+                            }*/
                         DoCast(me, 58963); //knock back
                         Map::PlayerList const& players = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
