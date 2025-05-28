@@ -156,13 +156,6 @@ public:
         if (!player)
             return false;
 
-        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam());
-        if (!cMgr)
-        {
-            handler->SendSysMessage("Could not access Channel Manager.");
-            return false;
-        }
-
         // Replace "world" with your exact channel name
         Channel* channel = cMgr->GetChannel("world", player);
         if (!channel)
