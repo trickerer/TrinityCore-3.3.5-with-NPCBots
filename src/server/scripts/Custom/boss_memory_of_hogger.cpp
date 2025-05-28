@@ -6,6 +6,7 @@
 #include "ScriptedGossip.h"
 #include "Unit.h"
 #include "Group.h"
+#include "Map.h"
 
 using namespace std::chrono;
 
