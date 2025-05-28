@@ -52,6 +52,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
+#include "Channel.h"
 
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
