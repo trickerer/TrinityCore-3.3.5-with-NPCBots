@@ -307,7 +307,7 @@ public:
 
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
-            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
+            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(8000));
 
             BossAI::JustEngagedWith(who);
         }
@@ -354,7 +354,7 @@ public:
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(10000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(8000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(12000));
                 events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
             
@@ -376,7 +376,7 @@ public:
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                 events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(10000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
                 events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
 
@@ -478,9 +478,9 @@ public:
                             }
                         }
                         if (phaseTwo || phaseThree)
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(20000));
-                        else
                             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
+                        else
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(40000));
                         break;
                     }
                     case EVENT_HOWL_OF_VOID:
