@@ -53,6 +53,7 @@
 #include "SystemPackets.h"
 #include "QueryHolder.h"
 #include "World.h"
+#include "ChannelMgr.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
