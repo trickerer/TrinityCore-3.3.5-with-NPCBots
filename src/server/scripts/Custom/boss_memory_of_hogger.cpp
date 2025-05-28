@@ -164,8 +164,8 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(1, milliseconds(2000)); // Shadowbolt
-            events.ScheduleEvent(2, milliseconds(8000)); // Shadow Word: Pain
+            events.ScheduleEvent(1, milliseconds(4000)); // Shadowbolt
+            events.ScheduleEvent(2, milliseconds(1000)); // Shadow Word: Pain
         }
 
         void UpdateAI(uint32 diff) override
@@ -180,7 +180,7 @@ public:
                 if (eventId == 1)
                 {
                     DoCastVictim(71254); // Shadowbolt
-                    events.ScheduleEvent(1, milliseconds(3000));
+                    events.ScheduleEvent(1, milliseconds(8000));
                 }
                 else if (eventId == 2)
                 {
@@ -222,7 +222,7 @@ public:
 
             if (spellTimer <= diff)
             {
-                DoCastVictim(SPELL_GNOLL_ATTACK);
+                DoCastVictim(71254); //shadowbolt
                 spellTimer = 7000;
             }
             else
@@ -318,10 +318,32 @@ public:
             me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
-            _JustDied();
+
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                Map* map = me->GetMap();
+                if (map && map->IsDungeon()) // Only bind in actual instances
+                {
+                    // Try to get the player who killed the boss (or owner of killer)
+                    if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    {
+                        // Bind player to instance
+                        if (Group* group = player->GetGroup())
+                        {
+                            group->BindToInstance(map, true);
+                        }
+                        else
+                        {
+                            player->BindToInstance(map, true);
+                        }
+                    }
+                }
+            }
+
+            BossAI::JustDied(killer); // Important for encounter tracking
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) //override
