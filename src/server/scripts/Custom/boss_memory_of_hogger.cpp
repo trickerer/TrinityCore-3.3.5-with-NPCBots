@@ -388,6 +388,7 @@ public:
                         if (furthestTarget)
                         {
                             DoCast(furthestTarget, SPELL_LEAP);
+                            DoCastVictim(64429);  //GRAB
                         }
 
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
@@ -420,9 +421,9 @@ public:
                             }
                         }
                         if (phaseTwo || phaseThree)
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(15000));
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(20000));
                         else
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(18000));
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(30000));
                         break;
                     }
                     case EVENT_HOWL_OF_VOID:
