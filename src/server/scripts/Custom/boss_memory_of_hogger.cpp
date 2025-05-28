@@ -366,8 +366,30 @@ public:
                     case EVENT_LEAP:
                     {
                         me->Yell("LEAP!", LANG_UNIVERSAL);
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
+                        Unit* furthestTarget = nullptr;
+                        float maxDistance = 0.0f;
+
+                        std::list<Player*> playerList;
+                        Trinity::AnyPlayerInObjectRangeCheck checker(me, 200.0f); // max range
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, playerList, checker);
+                        me->VisitNearbyWorldObject(200.0f, searcher);
+
+                        for (Player* player : playerList)
+                        {
+                            if (!player->IsAlive())
+                                continue;
+
+                            float distance = me->GetDistance(player);
+                            if (distance > maxDistance)
+                            {
+                                maxDistance = distance;
+                                furthestTarget = player;
+                            }
+                        }
+                        if (furthestTarget)
+                        {
                             DoCast(target, SPELL_LEAP);
+                        }
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
                     }
