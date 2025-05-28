@@ -144,7 +144,7 @@ public:
         return commandTable;
     }
     
-     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
         {
@@ -157,12 +157,8 @@ public:
             return false;
 
         // Replace "world" with your exact channel name
-        Channel* channel = cMgr->GetChannel("world", player);
-        if (!channel)
-        {
-            handler->SendSysMessage("Channel 'world' not found.");
-            return false;
-        }
+        std::string channelName = "world";
+        Channel::GetChannelName(channelName, 0, player->GetSession()->GetSessionDbcLocale(), zoneEntry);
 
         std::string msg = args;
         channel->Say(player->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
