@@ -12,7 +12,7 @@ using namespace std::chrono;
 enum Spells
 {
     SPELL_CLEAVE            = 40504,
-    SPELL_LEAP              = 40727,
+    SPELL_LEAP              = 54786,
     SPELL_HOWL_OF_VOID      = 8715,
     SPELL_CHRONO_BURN       = 37161,
     SPELL_ECHO_SLAM         = 53399,
@@ -365,6 +365,7 @@ public:
 
                     case EVENT_LEAP:
                     {
+                        me->Yell("LEAP!", LANG_UNIVERSAL);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             DoCast(target, SPELL_LEAP);
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
