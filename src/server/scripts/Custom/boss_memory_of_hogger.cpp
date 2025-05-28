@@ -328,13 +328,11 @@ public:
             {
                 if (Group* group = player->GetGroup())
                 {
-                    if (Map* map = me->GetMap())
-                        group->BindToInstance(map, true);
+                    group->BindToInstance(); // <- 3.3.5a-compatible
                 }
                 else
                 {
-                    if (Map* map = me->GetMap())
-                        player->BindToInstance(map, true);
+                    player->BindToInstance(); // <- 3.3.5a-compatible
                 }
             }
 
