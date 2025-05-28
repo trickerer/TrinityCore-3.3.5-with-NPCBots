@@ -248,12 +248,14 @@ public:
         boss_memory_of_hoggerAI(Creature* creature) : BossAI(creature, DATA_MEMORY_OF_HOGGER) {}
         bool phaseTwo = false;
         bool phaseThree = false;
+        bool phaseFour = false;
 
         void Reset() override
         {
             _Reset();
             phaseTwo = false;
             phaseThree = false;
+            phaseFour = false;
             // Apply freeze/slow/movement-impairing immunities
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
@@ -334,9 +336,10 @@ public:
                 events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
             
-            if (phaseTwo && !phaseThree && HealthBelowPct(50) && !HealthBelowPct(45))
+            if (!phaseFour && phaseTwo && !phaseThree && HealthBelowPct(50) && !HealthBelowPct(45))
             {
-                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(30000));
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(10000));
+                phaseFour = true;
             }
 
             if (!phaseThree && HealthBelowPct(30))
