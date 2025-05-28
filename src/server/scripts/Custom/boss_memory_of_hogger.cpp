@@ -333,6 +333,11 @@ public:
                 events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(8000));
                 events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
+            
+            if (phaseTwo && HealthBelowPct(50))
+            {
+                events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(1000));
+            }
 
             if (!phaseThree && HealthBelowPct(30))
             {
