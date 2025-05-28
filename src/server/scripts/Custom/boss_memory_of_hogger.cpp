@@ -355,9 +355,11 @@ public:
                 switch (eventId)
                 {
                     case EVENT_CLEAVE:
+                    {
                         DoCastVictim(SPELL_CLEAVE);
                         events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
                         break;
+                    }
 
                     case EVENT_LEAP:
                     {
@@ -368,6 +370,7 @@ public:
                     }
 
                     case EVENT_GNOLL_REINFORCEMENTS:
+                    {
                         me->Yell("Come Forth My Minions, Assist Me!", LANG_UNIVERSAL);
                         for (int i = 0; i < 3; ++i)
                         {
@@ -390,8 +393,9 @@ public:
                         else
                             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(18000));
                         break;
-
+                    }
                     case EVENT_HOWL_OF_VOID:
+                    {
                         DoCast(me, SPELL_HOWL_OF_VOID);
                         me->Yell("VOID!!!", LANG_UNIVERSAL);
                         for (int i = 0; i < 2; ++i)
@@ -412,28 +416,32 @@ public:
                         }
                         events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(45000));
                         break;
-
+                    }
                     case EVENT_CHRONO_BURN:
+                    {
                         me->Yell("CHRONO BURN!!", LANG_UNIVERSAL);
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             DoCast(target, SPELL_CHRONO_BURN);
                         events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(15000));
                         break;
-
+                    }
                     case EVENT_UNSTABLE_RIFT:
+                    {
                         // Optional hazard here
                         DoCast(me, SPELL_UNSTABLE_RIFT);
                         me->Yell("SUNSTABLE RIFT", LANG_UNIVERSAL);
                         events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(15000));
                         break;
-
+                    }
                     case EVENT_ECHO_SLAM:
+                    {
                         me->Yell("SLAM", LANG_UNIVERSAL);
                         DoCast(me, SPELL_ECHO_SLAM);
                         events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                         break;
-
+                    }
                     case EVENT_MEMORY_OVERLOAD:
+                    {
                         me->Yell("MEMORY OVER LOAD!", LANG_UNIVERSAL);
                         for (int i = 0; i < 4; ++i)
                         {
@@ -453,7 +461,7 @@ public:
                         }
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(50000));
                         break;
-
+                    }
                     default:
                         break;
                 }
