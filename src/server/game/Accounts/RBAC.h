@@ -754,6 +754,7 @@ enum RBACPermissions
     // custom permissions 1000+
     
     RBAC_PERM_COMMAND_GETDISCORDCODE                        = 50000,
+    RBAC_PERM_COMMAND_SENDWORLD                             = 50001,
     
     //NPCBot
     RBAC_PERM_COMMAND_NPCBOT                                 = 70001,
