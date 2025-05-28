@@ -326,25 +326,23 @@ public:
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 Map* map = me->GetMap();
-                if (map && map->IsDungeon()) // Only bind in actual instances
+                if (map && map->IsDungeon())
                 {
-                    // Try to get the player who killed the boss (or owner of killer)
-                    if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    InstanceSave* save = map->ToInstanceMap()->GetInstanceSave();
+                    if (save)
                     {
-                        // Bind player to instance
-                        if (Group* group = player->GetGroup())
+                        if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                         {
-                            group->BindToInstance(map, true);
-                        }
-                        else
-                        {
-                            player->BindToInstance(map, true);
+                            if (Group* group = player->GetGroup())
+                                group->BindToInstance(save, true);
+                            else
+                                player->BindToInstance(save, true);
                         }
                     }
                 }
             }
 
-            BossAI::JustDied(killer); // Important for encounter tracking
+            BossAI::JustDied(killer);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage) //override
