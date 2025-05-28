@@ -13,10 +13,10 @@ enum Spells
     SPELL_CLEAVE            = 40504,
     SPELL_LEAP              = 40727,
     SPELL_HOWL_OF_VOID      = 8715,
-    SPELL_CHRONO_BURN       = 38836,
+    SPELL_CHRONO_BURN       = 37161,
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 37023, 
-    SPELL_UNSTABLE_RIFT     = 71861,
+    SPELL_UNSTABLE_RIFT     = 70464,
 };
 
 enum Events
@@ -308,7 +308,8 @@ public:
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(10000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(8000));
+                events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
 
             if (!phaseThree && HealthBelowPct(30))
@@ -321,7 +322,8 @@ public:
                 events.ScheduleEvent(EVENT_ECHO_SLAM, milliseconds(15000));
                 events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(10000));
                 events.ScheduleEvent(EVENT_UNSTABLE_RIFT, milliseconds(5000));
-                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(1));
+                events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
+                events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             }
 
             events.Update(diff);
@@ -358,13 +360,13 @@ public:
                                 milliseconds(30000));
 
                                 if (gnoll && me->GetVictim())
-                                    gnoll->AI()->AttackStart(me->GetVictim());
+                                    gnoll->AI()->AttackStart(target);
                             }
                         }
                         if (phaseTwo || phaseThree)
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(10000));
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(15000));
                         else
-                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(12000));
+                            events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(18000));
                         break;
 
                     case EVENT_HOWL_OF_VOID:
@@ -424,7 +426,7 @@ public:
                                 milliseconds(50000));
 
                             if (channeler && me->GetVictim())
-                                channeler->AI()->AttackStart(me->GetVictim());
+                                channeler->AI()->AttackStart(target);
                             }
                         }
                         events.ScheduleEvent(EVENT_MEMORY_OVERLOAD, milliseconds(50000));
