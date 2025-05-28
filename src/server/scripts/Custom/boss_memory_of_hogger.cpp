@@ -324,16 +324,12 @@ public:
         {
             Talk(SAY_DEATH);
 
-            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
-                if (Group* group = player->GetGroup())
-                {
-                    group->BindToInstance(); // <- 3.3.5a-compatible
-                }
-                else
-                {
-                    player->BindToInstance(); // <- 3.3.5a-compatible
-                }
+                Player* player = itr->GetSource();
+                if (player)
+                    player->BindToInstance();
             }
 
             BossAI::JustDied(killer);
