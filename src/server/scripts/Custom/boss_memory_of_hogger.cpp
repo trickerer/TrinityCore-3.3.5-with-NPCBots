@@ -271,6 +271,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
+            DoPlaySoundToSet(me, 10978);
             if (who && who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (Group* group = who->ToPlayer()->GetGroup())
@@ -324,6 +325,7 @@ public:
             {
                 phaseTwo = true;
                 Talk(SAY_PHASE_2);
+                me->PlayDirectSound(9263);
                 events.Reset();
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(10000));
@@ -336,6 +338,8 @@ public:
             {
                 phaseThree = true;
                 Talk(SAY_PHASE_3);
+                me->PlayDirectSound(12477);
+                me->CastSpell(me, 18499, true);
                 DoCast(me, SPELL_BERSERK);
                 events.Reset();
                 DoCast(me, SPELL_BERSERK, true);
