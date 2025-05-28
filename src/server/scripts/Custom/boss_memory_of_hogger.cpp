@@ -403,12 +403,14 @@ public:
                         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         {
                             Player* player = itr->GetSource();
-                            if (!player || !player->IsAlive() || !me->IsWithinLOSInMap(player))
+                            if (!player || !player->IsAlive() || !me->IsWithinDistInMap(player, 100.0f) /*|| player->IsGameMaster()*/)
                                 continue;
 
-                            float x = me->GetPositionX();
-                            float y = me->GetPositionY();
-                            float z = me->GetPositionZ();
+                            float angle = me->GetAngle(player);
+                            float distance = 1.5f + (rand() % 3); // Random small offset
+                            float x = me->GetPositionX() + distance * std::cos(angle);
+                            float y = me->GetPositionY() + distance * std::sin(angle);
+                            float z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, me->GetPositionZ());
 
                             player->NearTeleportTo(x, y, z, player->GetOrientation());
                         }
