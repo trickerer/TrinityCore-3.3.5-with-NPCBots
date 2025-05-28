@@ -143,7 +143,7 @@ public:
             { "sendworld",        misc_commandscript::HandleSendWorldCommand,   rbac::RBAC_PERM_COMMAND_SENDWORLD,   Console::Yes },
         };
         return commandTable;
-    }
+    };
     
     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
     {
