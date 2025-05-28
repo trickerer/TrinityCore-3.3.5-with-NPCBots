@@ -366,17 +366,15 @@ public:
                     case EVENT_LEAP:
                     {
                         me->Yell("LEAP!", LANG_UNIVERSAL);
+
                         Unit* furthestTarget = nullptr;
                         float maxDistance = 0.0f;
 
-                        std::list<Player*> playerList;
-                        Trinity::AnyPlayerInObjectRangeCheck checker(me, 200.0f); // max range
-                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, playerList, checker);
-                        me->VisitNearbyWorldObject(200.0f, searcher);
-
-                        for (Player* player : playerList)
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         {
-                            if (!player->IsAlive())
+                            Player* player = itr->GetSource();
+                            if (!player || !player->IsAlive() || !me->IsWithinLOSInMap(player))
                                 continue;
 
                             float distance = me->GetDistance(player);
@@ -386,10 +384,12 @@ public:
                                 furthestTarget = player;
                             }
                         }
+
                         if (furthestTarget)
                         {
-                            DoCast(target, SPELL_LEAP);
+                            DoCast(furthestTarget, SPELL_LEAP);
                         }
+
                         events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
                         break;
                     }
@@ -410,7 +410,13 @@ public:
                                 milliseconds(30000));
 
                                 if (gnoll && me->GetVictim())
+                                {
                                     gnoll->AI()->AttackStart(target);
+                                }
+                                else
+                                {
+                                   me->Yell("Why Do You Not assist Your Master!", LANG_UNIVERSAL); 
+                                }
                             }
                         }
                         if (phaseTwo || phaseThree)
