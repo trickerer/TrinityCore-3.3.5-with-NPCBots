@@ -477,8 +477,8 @@ public:
                                     gnoll->GetThreatManager().AddThreat(target, 100.0f);
                                     gnoll->SetInCombatWith(target); 
                                     gnoll->GetMotionMaster()->MoveChase(target);
-                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 100.0f);
-                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 150.0f);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 50.0f);
+                                    gnoll->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 75.0f);
                                     gnoll->UpdateDamagePhysical(BASE_ATTACK);
                                     target->SetInCombatWith(gnoll);
                                 }
@@ -560,8 +560,8 @@ public:
                                 channeler->GetThreatManager().AddThreat(target, 100.0f);
                                 channeler->SetInCombatWith(target); 
                                 channeler->GetMotionMaster()->MoveChase(target);
-                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 100.0f);
-                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 150.0f);
+                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 75.0f);
+                                channeler->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 100.0f);
                                 channeler->UpdateDamagePhysical(BASE_ATTACK);
                                 target->SetInCombatWith(channeler);
                             }
