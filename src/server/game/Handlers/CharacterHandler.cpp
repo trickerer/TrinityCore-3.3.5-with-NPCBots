@@ -54,6 +54,8 @@
 #include "QueryHolder.h"
 #include "World.h"
 #include "ChannelMgr.h"
+#include "AccountMgr.h"
+#include "ChannelAppenders.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
