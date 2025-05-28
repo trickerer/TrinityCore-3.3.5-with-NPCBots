@@ -324,22 +324,17 @@ public:
         {
             Talk(SAY_DEATH);
 
-            if (InstanceScript* instance = me->GetInstanceScript())
+            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                Map* map = me->GetMap();
-                if (map && map->IsDungeon())
+                if (Group* group = player->GetGroup())
                 {
-                    InstanceSave* save = map->ToInstanceMap()->GetInstanceSave();
-                    if (save)
-                    {
-                        if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        {
-                            if (Group* group = player->GetGroup())
-                                group->BindToInstance(save, true);
-                            else
-                                player->BindToInstance(save, true);
-                        }
-                    }
+                    if (Map* map = me->GetMap())
+                        group->BindToInstance(map, true);
+                }
+                else
+                {
+                    if (Map* map = me->GetMap())
+                        player->BindToInstance(map, true);
                 }
             }
 
