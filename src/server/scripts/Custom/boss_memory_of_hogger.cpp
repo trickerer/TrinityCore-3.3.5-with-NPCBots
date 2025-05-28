@@ -271,7 +271,7 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            DoPlaySoundToSet(me, 10978);
+            DoPlaySoundToSet(me, 1015);
             if (Player* player = who->ToPlayer())
             {
                 if (Group* group = player->GetGroup())
@@ -323,7 +323,7 @@ public:
             {
                 phaseTwo = true;
                 Talk(SAY_PHASE_2);
-                me->PlayDirectSound(9263);
+                me->PlayDirectSound(13174);
                 events.Reset();
                 events.ScheduleEvent(EVENT_HOWL_OF_VOID, milliseconds(25000));
                 events.ScheduleEvent(EVENT_CHRONO_BURN, milliseconds(10000));
@@ -336,7 +336,7 @@ public:
             {
                 phaseThree = true;
                 Talk(SAY_PHASE_3);
-                me->PlayDirectSound(12477);
+                me->PlayDirectSound(11438);
                 me->CastSpell(me, 18499, true);
                 DoCast(me, SPELL_BERSERK);
                 events.Reset();
@@ -374,9 +374,9 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             {
                                 Creature* gnoll = me->SummonCreature(NPC_GNOLL_ADDS,
-                                -90.582489,
-                                136.845551,
-                                -40.375099,
+                                target->GetPositionX(),
+                                target->GetPositionY(),
+                                target->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,
                                 milliseconds(30000));
@@ -440,9 +440,9 @@ public:
                             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                             {    
                                 Creature* channeler = me->SummonCreature(NPC_CHANNELING_ADD,
-                                -90.582489,
-                                136.845551,
-                                -40.375099,
+                                target->GetPositionX(),
+                                target->GetPositionY(),
+                                target->GetPositionZ(),
                                 0.f,
                                 TEMPSUMMON_TIMED_DESPAWN,
                                 milliseconds(50000));
