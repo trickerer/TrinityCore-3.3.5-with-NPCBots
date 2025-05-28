@@ -270,6 +270,26 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
+            if (who && who->GetTypeId() == TYPEID_PLAYER)
+            {
+                // Get the group of the player who pulled
+                if (Group* group = who->ToPlayer()->GetGroup())
+                {
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    {
+                        Player* member = itr->GetSource();
+                        if (!member || !member->IsInWorld())
+                            continue;
+
+                        if (me->IsWithinDistInMap(member, 200.0f)) // Optional range check
+                        {
+                            me->Attack(member, true); // Boss targets them
+                            member->SetInCombatWith(me); // Put player in combat
+                            me->AddThreat(member, 1.0f); // Add threat to ensure they're in combat
+                        }
+                    }
+                }
+            }
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
