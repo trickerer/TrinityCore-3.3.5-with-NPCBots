@@ -275,7 +275,13 @@ public:
             Talk(SAY_AGGRO);
             DoPlaySoundToSet(me, 1015); // Optional aggro sound
 
-            if (Player* player = who->ToPlayer())
+            Player* player = nullptr;
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                player = who->ToPlayer();
+            else if (who->GetTypeId() == TYPEID_UNIT) // Maybe it's a pet or summoned unit
+                player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (player)
             {
                 if (Group* group = player->GetGroup())
                 {
@@ -294,14 +300,14 @@ public:
             }
             else
             {
-                me->Yell("COUNT NTO AGGRO!", LANG_UNIVERSAL);
+                // Optional: ignore or do something else with non-player units
             }
 
             events.ScheduleEvent(EVENT_CLEAVE, milliseconds(6000));
             events.ScheduleEvent(EVENT_LEAP, milliseconds(20000));
             events.ScheduleEvent(EVENT_GNOLL_REINFORCEMENTS, milliseconds(5000));
 
-            BossAI::JustEngagedWith(who); // Ensure boss encounter is tracked properly
+            BossAI::JustEngagedWith(who);
         }
 
         void EnterEvadeMode() //override
