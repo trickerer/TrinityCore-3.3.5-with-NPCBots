@@ -406,7 +406,7 @@ public:
                             if (!player || !player->IsAlive() || !me->IsWithinDistInMap(player, 100.0f) /*|| player->IsGameMaster()*/)
                                 continue;
 
-                            float angle = me->GetAngle(player);
+                            float angle = me->GetOrientation();
                             float distance = 1.5f + (rand() % 3); // Random small offset
                             float x = me->GetPositionX() + distance * std::cos(angle);
                             float y = me->GetPositionY() + distance * std::sin(angle);
