@@ -139,9 +139,44 @@ public:
             { "wchange",          HandleChangeWeather,           rbac::RBAC_PERM_COMMAND_WCHANGE,          Console::No },
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
             { "getdiscordcode",   misc_commandscript::HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
+            { "sendworld",        misc_commandscript::HandleSendWorldCommand,   rbac::RBAC_PERM_COMMAND_SENDWORLD,   Console::Yes },
         };
         return commandTable;
     }
+    
+     static bool HandleSendWorldCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage("Usage: .sendworld <message>");
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam());
+        if (!cMgr)
+        {
+            handler->SendSysMessage("Could not access Channel Manager.");
+            return false;
+        }
+
+        // Replace "world" with your exact channel name
+        Channel* channel = cMgr->GetChannel("world", player);
+        if (!channel)
+        {
+            handler->SendSysMessage("Channel 'world' not found.");
+            return false;
+        }
+
+        std::string msg = args;
+        channel->Say(player->GetGUID(), msg.c_str(), LANG_UNIVERSAL);
+        handler->SendSysMessage("Message sent to world channel.");
+        return true;
+    }
+
     
     static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
     {
