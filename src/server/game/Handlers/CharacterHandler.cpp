@@ -1019,7 +1019,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     std::string m_name = "world";  // in-game channel name
     // Check if player is already in the channel
-    Channel* worldChannel = sChannelMgr->GetChannel(m_name, pCurrChar, pCurrChar->GetTeam());
+    Channel* worldChannel = ChannelMgr.GetChannel(m_name, pCurrChar, pCurrChar->GetTeam());
     if (!worldChannel)
     {
         // Channel not found or player can't join
