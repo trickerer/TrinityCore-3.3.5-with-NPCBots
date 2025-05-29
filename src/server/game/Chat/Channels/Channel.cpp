@@ -748,7 +748,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
             std::string content = "**" + playerName + "** Says: " + what;
             //TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
                 if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
-                    return;
+                    return false;
             SendDiscordMessageWorld(content); // this function must be defined below or included
         }
     }
