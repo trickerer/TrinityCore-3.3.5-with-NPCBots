@@ -154,29 +154,21 @@ public:
             return false;
         }
 
-        // Default to team 0 (Alliance) if no session/player (console)
-        teamId = TeamId(player->GetTeam());
-
-        if (handler->GetSession())
-        {
-            Player* player = handler->GetSession()->GetPlayer();
-            if (player)
-                teamId = player->GetTeam();
-        }
+        TeamId teamId = TEAM_ALLIANCE; // Or decide faction if you want
 
         ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
-        Channel* channel = cMgr->GetChannel("world", nullptr);
-
+        Channel* channel = cMgr->GetChannel(0, "world", nullptr, false);
         if (!channel)
         {
-            handler->SendSysMessage("Custom channel 'world' not found or no one is in it.");
+            handler->SendSysMessage("World channel not found.");
             return false;
         }
 
-        channel->Say(nullptr, args.c_str(), LANG_UNIVERSAL);
-        handler->SendSysMessage("Message sent to the world channel.");
+        channel->SayBot("Discord", args, LANG_UNIVERSAL);
+
+        handler->SendSysMessage("Message sent as Discord bot.");
         return true;
-}
+    }
 
     
     static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
