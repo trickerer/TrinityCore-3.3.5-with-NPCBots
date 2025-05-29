@@ -679,17 +679,19 @@ void Channel::Announce(Player const* player)
 void Channel::SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
-    data << uint8(CHAT_MSG_CHANNEL);                   // ChatType
-    data << uint32(language);                          // Language
-    data << uint64(ObjectGuid::Empty);                 // Sender GUID
-    data << uint32(0);                                 // Account ID
-    data << senderName;                                // Sender Name
-    data << std::string("world");                        // Channel name
-    data << uint64(ObjectGuid::Empty);                 // Receiver GUID
-    data << message;                                   // Message
-    data << uint8(0);                                  // ChatTag
 
-    SendToAll(data, sender ? sender->GetGUID() : ObjectGuid::Empty, language, nullptr);
+    data << uint8(CHAT_MSG_CHANNEL);               // Chat type
+    data << uint32(language);                       // Language
+    data << uint64(ObjectGuid::Empty);             // Fake sender GUID
+    data << uint32(0);                              // Fake account ID
+    data << senderName;                             // Sender name
+    data << std::string("world");                              // Channel name
+    data << uint64(ObjectGuid::Empty);             // Receiver GUID
+    data << message;                                // Message text
+    data << uint8(0);                               // Chat tag (usually 0)
+
+    // Send to all members, passing only the packet and sender GUID
+    SendToAll(data, sender ? sender->GetGUID() : ObjectGuid::Empty);
 }
 
 
