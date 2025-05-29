@@ -746,7 +746,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
             std::string playerName = player->GetName();
             std::string content = "[WORLD] **" + playerName + "**: " + what;
             TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
-            SendDiscordMessage(content); // this function must be defined below or included
+            SendDiscordMessageWorld(content); // this function must be defined below or included
         }
     }
 
