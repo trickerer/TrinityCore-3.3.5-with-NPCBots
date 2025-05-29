@@ -33,10 +33,6 @@
 #include "StringConvert.h"
 #include "World.h"
 
-#ifndef HIGHGUID_UNIT
-#define HIGHGUID_UNIT 0xF
-#endif
-
 Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zoneEntry /*= nullptr*/) :
     _isDirty(false),
     _nextActivityUpdateTime(0),
