@@ -149,7 +149,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleSendWorldCommand(ChatHandler* handler, std::string const& args)
+    static bool HandleSendWorldCommand(ChatHandler* handler, char const* args)
     {
         if (args.empty())
         {
@@ -168,8 +168,8 @@ public:
             handler->SendSysMessage("World channel not found. Make sure at least one player is in it.");
             return false;
         }
-
-        channel->SayAsFake(handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr, "Discord", args, LANG_UNIVERSAL);
+        std::string fullMessage = handler->GetFullParsedArgumentString();
+        channel->SayAsFake(handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr, "Discord", fullMessage, LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
