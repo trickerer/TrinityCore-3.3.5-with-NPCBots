@@ -678,14 +678,15 @@ void Channel::Announce(Player const* player)
 void Channel::SayAsFake(std::string const& senderName, std::string const& message, uint32 language)
 {
     WorldPacket data(SMSG_CHANNEL_NOTIFY, 200);
-    data << uint8(CHAT_MSG_CHANNEL);
-    data << uint32(language);
-    data << senderName;
-    data << uint64(3125); // fake GUID
-    data << uint32(32); // account id
-    data << name;
-    data << message;
-    SendToAll(&data);
+    data << uint8(CHAT_MSG_CHANNEL);     // Chat message type
+    data << uint32(language);            // Language
+    data << senderName;                  // Sender name
+    data << uint64(0);                   // Fake GUID (can leave as 0)
+    data << uint32(0);                   // Fake account id (unused)
+    data << GetName();                   // Channel name
+    data << message;                     // Message content
+
+    SendToAll(data);                     // No '&' needed
 }
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
