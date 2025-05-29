@@ -676,20 +676,32 @@ void Channel::Announce(Player const* player)
     _isDirty = true;
 }
 
+struct FakeSayBuilder
+{
+    std::string SenderName;
+    std::string Message;
+    uint32 Language;
+
+    FakeSayBuilder(std::string sender, std::string msg, uint32 lang)
+        : SenderName(std::move(sender)), Message(std::move(msg)), Language(lang) {}
+
+    void operator()(WorldPacket& data, LocaleConstant) const
+    {
+        data.Initialize(SMSG_CHANNEL_NOTIFY, 200);
+        data << uint8(CHAT_MSG_CHANNEL);
+        data << uint32(Language);
+        data << SenderName;
+        data << uint64(0);         // Fake GUID
+        data << uint32(0);         // Fake Account ID
+        data << std::string("world"); // Channel name
+        data << Message;
+    }
+};
+
 void Channel::SayAsFake(std::string const& senderName, std::string const& message, uint32 language)
 {
-    auto builder = [=](WorldPacket& data, LocaleConstant) {
-        data.Initialize(SMSG_CHANNEL_NOTIFY, 200);
-        data << uint8(CHAT_MSG_CHANNEL); // Type
-        data << uint32(language);        // Language
-        data << senderName;              // Name
-        data << uint64(0);               // Fake GUID
-        data << uint32(0);               // Fake Account ID
-        data << std::string("world");    // Channel name world channel
-        data << message;                 // Message
-    };
-
-    SendToAll(builder, ObjectGuid::Empty); // Send using builder
+    FakeSayBuilder builder(senderName, message, language);
+    SendToAll(builder, ObjectGuid::Empty);
 }
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
