@@ -3,7 +3,44 @@
 #include "Chat.h"
 #include "ChannelMgr.h"
 #include "Log.h"
-#include "DiscordWebhookMgr.h"
+#include "Config.h"
+
+#include <curl/curl.h>
+#include <json/json.h>
+
+void SendDiscordMessage(const std::string& content)
+{
+    std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+
+    CURL* curl = curl_easy_init();
+    if (!curl)
+    {
+        TC_LOG_ERROR("chatrelay", "Failed to initialize CURL");
+        return;
+    }
+
+    Json::Value root;
+    root["content"] = content;
+    Json::StreamWriterBuilder writer;
+    const std::string jsonData = Json::writeString(writer, root);
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curl, CURLOPT_URL, webhookURL.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)jsonData.size());
+
+    CURLcode res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
+    {
+        TC_LOG_ERROR("chatrelay", "CURL send to Discord failed: %s", curl_easy_strerror(res));
+    }
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+}
 
 class ChatRelayScript : public PlayerScript
 {
@@ -22,7 +59,6 @@ public:
 
         TC_LOG_INFO("chatrelay", "%s", content.c_str());
 
-        // Send message to Discord
         SendDiscordMessage(content);
     }
 };
