@@ -61,7 +61,7 @@ class ChatRelayChannelScript : public ChannelScript
 public:
     ChatRelayChannelScript() : ChannelScript("ChatRelayChannelScript") { }
 
-    void OnMessageSend(Channel* channel, Player* player, std::string& msg) override
+    void OnMessageSend(Channel* channel, Player* player, std::string& msg) //override
     {
         if (channel->GetName() != "world")
             return;
