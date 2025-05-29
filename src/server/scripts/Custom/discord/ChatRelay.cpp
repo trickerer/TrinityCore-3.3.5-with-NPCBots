@@ -3,6 +3,7 @@
 #include "Chat.h"
 #include "ChannelMgr.h"
 #include "Log.h"
+#include "DiscordWebhookMgr.h"
 
 class ChatRelayScript : public PlayerScript
 {
