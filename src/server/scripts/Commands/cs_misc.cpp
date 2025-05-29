@@ -54,10 +54,6 @@
 #include "ChannelMgr.h"
 #include "Channel.h"
 #include "ObjectGuid.h"
-
-#ifndef HIGHGUID_PLAYER
-#define HIGHGUID_PLAYER 0x00000000
-#endif
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -169,9 +165,7 @@ public:
             return false;
         }
 
-        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);  //ID for char named discord
-
-        channel->SayAsFake(gmGuid, args, LANG_UNIVERSAL);
+        channel->SayAsFake("Discord", args, LANG_UNIVERSAL);
 
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
