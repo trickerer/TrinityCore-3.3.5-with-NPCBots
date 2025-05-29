@@ -55,6 +55,10 @@
 #include "Channel.h"
 #include "ObjectGuid.h"
 
+#ifndef HIGHGUID_PLAYER
+#define HIGHGUID_PLAYER 0x00000000
+#endif
+
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
 static std::string GenerateDiscordCode(size_t length = 6)
