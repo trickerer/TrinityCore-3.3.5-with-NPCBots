@@ -7,38 +7,57 @@
 
 #include <curl/curl.h>
 
-void SendDiscordMessage(const std::string& content)
+
+void SendDiscordMessage(const std::string& message)
 {
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
+    std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
 
-    CURL* curl = curl_easy_init();
-    if (!curl)
+    if (webhookUrl.empty())
     {
-        TC_LOG_ERROR("chatrelay", "Failed to initialize CURL");
+        TC_LOG_ERROR("module", "Webhook URL is empty. Check your config (Webhook.URL)");
         return;
     }
 
-    Json::Value root;
-    root["content"] = content;
-    Json::StreamWriterBuilder writer;
-    const std::string jsonData = Json::writeString(writer, root);
+    CURL* curl;
+    CURLcode res;
 
-    struct curl_slist* headers = nullptr;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
 
-    curl_easy_setopt(curl, CURLOPT_URL, webhookURL.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)jsonData.size());
-
-    CURLcode res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
+    if (curl)
     {
-        TC_LOG_ERROR("chatrelay", "CURL send to Discord failed: %s", curl_easy_strerror(res));
+        // Escape double quotes in message
+        std::string escapedMessage = message;
+        size_t pos = 0;
+        while ((pos = escapedMessage.find("\"", pos)) != std::string::npos)
+        {
+            escapedMessage.replace(pos, 1, "\\\"");
+            pos += 2;
+        }
+
+        // Construct JSON payload
+        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
+        if (!avatarUrl.empty())
+            payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
+        payload += "}";
+
+        struct curl_slist* headers = nullptr;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+
+        curl_easy_setopt(curl, CURLOPT_URL, webhookUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK)
+            TC_LOG_ERROR("module", "CURL failed: {}", curl_easy_strerror(res));
+
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
     }
 
-    curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
+    curl_global_cleanup();
 }
 
 class ChatRelayScript : public PlayerScript
