@@ -155,10 +155,10 @@ public:
             return false;
         }
 
-        TeamId teamId = TEAM_ALLIANCE; // Or decide faction if you want
+        TeamId teamId = TEAM_ALLIANCE; // or TEAM_HORDE
 
         ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
-        Channel* channel = cMgr->GetChannel(0, "world", nullptr, false);
+        Channel* channel = cMgr->GetSystemChannel(0, nullptr);  // Get system world channel
         if (!channel)
         {
             handler->SendSysMessage("World channel not found.");
