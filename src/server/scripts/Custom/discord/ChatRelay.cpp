@@ -6,7 +6,6 @@
 #include "Config.h"
 
 #include <curl/curl.h>
-#include <json/json.h>
 
 void SendDiscordMessage(const std::string& content)
 {
