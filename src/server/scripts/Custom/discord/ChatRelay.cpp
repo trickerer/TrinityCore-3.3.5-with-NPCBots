@@ -70,13 +70,15 @@ public:
         if (type != CHAT_MSG_CHANNEL)
             return;
 
-        if (player->GetSession()->GetLastChannelName() != "world")
+        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
+        Channel* channel = cMgr->GetJoinChannelForPlayer(player);
+        if (!channel || channel->GetName() != "world")
             return;
 
         std::string playerName = player->GetName();
         std::string content = "[WORLD] **" + playerName + "**: " + msg;
 
-        TC_LOG_INFO("chatrelay", "%s", content.c_str());
+        TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
 
         SendDiscordMessage(content);
     }
