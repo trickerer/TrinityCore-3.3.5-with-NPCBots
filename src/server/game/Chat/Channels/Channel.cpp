@@ -744,7 +744,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         {
             std::string playerName = player->GetName();
-            std::string content = "[WORLD] **" + playerName + "**: " + what;
+            std::string content = "**" + playerName + "** Says: " + what;
             TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
             SendDiscordMessageWorld(content); // this function must be defined below or included
         }
