@@ -54,7 +54,7 @@ void SendDiscordMessage(const std::string& message)
     }
 
     curl_global_cleanup();
-}
+};
 
 class ChatRelayChannelScript : public ChannelScript
 {
