@@ -690,7 +690,6 @@ void SayAsFake(Player* sender, std::string const& senderName, std::string const&
     };
 
     SendToAll(builder, ObjectGuid::Empty);
-}SendToAll(builder, ObjectGuid::Empty);
 }
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
