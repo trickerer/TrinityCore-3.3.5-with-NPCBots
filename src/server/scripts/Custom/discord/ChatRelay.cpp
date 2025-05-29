@@ -67,6 +67,7 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
+       TC_LOG_INFO("chatrelay", "TRYING!!!");
        // if (type != CHAT_MSG_CHANNEL)
         //    return;
 
