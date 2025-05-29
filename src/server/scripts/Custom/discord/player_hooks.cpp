@@ -110,6 +110,7 @@ private:
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        SendDiscordMessageWorld(messageStream.str());
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
