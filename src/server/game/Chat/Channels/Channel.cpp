@@ -32,6 +32,7 @@
 #include "SocialMgr.h"
 #include "StringConvert.h"
 #include "World.h"
+#include "Config.h"
 #include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zoneEntry /*= nullptr*/) :
