@@ -169,9 +169,9 @@ public:
             return false;
         }
 
-        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);
+        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);  //ID for char named discord
 
-        channel->Say(gmGuid, args, LANG_UNIVERSAL);
+        channel->SayAsFake(gmGuid, args, LANG_UNIVERSAL);
 
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
