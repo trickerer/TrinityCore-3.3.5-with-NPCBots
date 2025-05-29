@@ -165,7 +165,9 @@ public:
             return false;
         }
 
-        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);
+        uint64 gmGuid64 = MAKE_NEW_GUID(3125, 0, HIGHGUID_PLAYER);
+        ObjectGuid gmGuid = ObjectGuid(gmGuid64);
+
         channel->Say(gmGuid, args, LANG_UNIVERSAL);
 
         handler->SendSysMessage("Message sent as Discord bot.");
