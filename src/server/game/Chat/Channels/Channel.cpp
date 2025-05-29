@@ -676,7 +676,7 @@ void Channel::Announce(Player const* player)
     _isDirty = true;
 }
 
-void SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language = LANG_UNIVERSAL)
+void Channel::SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language)
 {
     auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_CHANNEL_NOTIFY, 200);
