@@ -158,9 +158,9 @@ public:
         }
 
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
-        TeamId teamId = player ? player->GetTeamId() : TEAM_ALLIANCE; // Default to Alliance if CLI
+        //TeamId teamId = player ? player->GetTeamId() : TEAM_ALLIANCE; // Default to Alliance if CLI
 
-        ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
+        ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
 
         if (!channel)
