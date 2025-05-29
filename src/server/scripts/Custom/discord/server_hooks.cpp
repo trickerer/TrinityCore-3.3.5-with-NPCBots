@@ -21,6 +21,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "server_shutdown.h"
+#include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 
 bool serverShuttingDown = false;  // Global flag to track server shutdown
@@ -47,6 +48,8 @@ public:
         messageStream << "✅ **Server is online** - Realm: " << realmName;
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        // SEND TO WORLD CHAT
+        SendDiscordMessageWorld(messageStream.str);
     }
 
     void OnShutdown() override
@@ -68,6 +71,8 @@ public:
         messageStream << "🛑 **Server is restarting, 2 mins downtime..** Realm: " << realmName;
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        // SEND TO WORLD CHAT
+        SendDiscordMessageWorld(messageStream.str);
     }
 
     void Notify(Player* player, bool loggingIn)
@@ -93,6 +98,8 @@ public:
         messageStream << gmTag << status << " `" << name << "`";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        // SEND TO WORLD CHAT
+        SendDiscordMessageWorld(messageStream.str);
     }
 
 private:
