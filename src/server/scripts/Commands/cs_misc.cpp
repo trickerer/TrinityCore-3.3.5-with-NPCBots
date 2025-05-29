@@ -164,7 +164,7 @@ public:
             return false;
         }
 
-        channel->SayBot("Discord", args, LANG_UNIVERSAL);
+        channel->Say("Discord", args, LANG_UNIVERSAL);
 
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
