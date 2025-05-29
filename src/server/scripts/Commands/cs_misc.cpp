@@ -53,6 +53,7 @@
 #include "WorldSession.h"
 #include "ChannelMgr.h"
 #include "Channel.h"
+#include "ObjectGuid.h"
 
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -164,7 +165,8 @@ public:
             return false;
         }
 
-        channel->Say(ObjectGuid::Empty, args, LANG_UNIVERSAL);
+        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);
+        channel->Say(gmGuid, args, LANG_UNIVERSAL);
 
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
