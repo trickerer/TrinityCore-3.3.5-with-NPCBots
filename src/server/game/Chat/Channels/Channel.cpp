@@ -678,7 +678,7 @@ void Channel::Announce(Player const* player)
 
 void Channel::SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language)
 {
-    auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
+    auto builder = [this, sender, senderName, message, language](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_MESSAGECHAT, 200);
 
         data << uint8(CHAT_MSG_CHANNEL);           // Chat type
@@ -703,6 +703,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
 
     TC_LOG_INFO("network", "SendToAll called");
 }
+
 
 
 
