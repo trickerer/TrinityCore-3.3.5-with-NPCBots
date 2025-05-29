@@ -697,7 +697,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
         data << uint8(0);                           // Chat tag
     };
 
-    TC_LOG_INFO("network", "Sending fake message to channel %s: %s", _name.c_str(), message.c_str());
+    TC_LOG_INFO("network", "Sending fake message to channel world: %s", message.c_str());
 
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 
