@@ -675,6 +675,18 @@ void Channel::Announce(Player const* player)
 
     _isDirty = true;
 }
+void Channel::SayAsFake(std::string const& senderName, std::string const& message, uint32 language)
+{
+    WorldPacket data(SMSG_CHANNEL_NOTIFY, 200);
+    data << uint8(CHAT_MSG_CHANNEL);
+    data << uint32(language);
+    data << senderName;
+    data << uint64(3125); // fake GUID
+    data << uint32(32); // account id
+    data << name;
+    data << message;
+    SendToAll(&data);
+}
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
 {

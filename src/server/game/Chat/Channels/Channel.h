@@ -210,6 +210,8 @@ class TC_GAME_API Channel
         void JoinNotify(ObjectGuid guid) const;                                       // invisible notify
         void LeaveNotify(ObjectGuid guid) const;                                      // invisible notify
         void SetOwnership(bool ownership) { _ownershipEnabled = ownership; }
+        
+        void SayAsFake(std::string const& senderName, std::string const& message, uint32 language = LANG_UNIVERSAL);
 
     private:
 
