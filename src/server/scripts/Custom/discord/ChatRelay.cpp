@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Chat.h"
 #include "ChannelMgr.h"
+#include "Log.h"
 
 class ChatRelayScript : public PlayerScript
 {
