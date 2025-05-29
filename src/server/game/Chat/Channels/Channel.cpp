@@ -681,12 +681,12 @@ void Channel::SayAsFake(std::string const& senderName, std::string const& messag
     auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_CHANNEL_NOTIFY, 200);
         data << uint8(CHAT_MSG_CHANNEL);         // Message type: channel
-        data << uint32(language);                 // Language
-        data << senderName;                       // Sender name (string)
-        data << uint64(ObjectGuid(HighGuid::Creature, 1, 999999)); // Fake GUID 0 (unit)
+        data << uint32(language);                // Language
+        data << senderName;                      // Sender name
+        data << uint64(ObjectGuid(HighGuid::Unit, 1, static_cast<ObjectGuid::LowType>(999999))); // Valid fake GUID
         data << uint32(0);                        // Fake Account ID
-        data << std::string("world");             // Channel name (important!)
-        data << message;                          // Actual message text
+        data << std::string("world");            // Channel name
+        data << message;                         // Actual message
     };
 
     SendToAll(builder, ObjectGuid::Empty);
