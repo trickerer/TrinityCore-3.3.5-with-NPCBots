@@ -695,7 +695,6 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
             data << uint32(32); // fake account ID
         }
 
-        data << uint32(0);                          // Account ID (fake)
         data << senderName;                         // Sender name
         data << GetName();                               // Channel name (use actual channel name)
         data << uint64(ObjectGuid::Empty);         // Receiver GUID (empty for channels)
