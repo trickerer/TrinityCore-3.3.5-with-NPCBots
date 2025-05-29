@@ -681,19 +681,27 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
     auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_MESSAGECHAT, 200);
 
-        data << uint8(CHAT_MSG_CHANNEL);             // Chat type
-        data << uint32(language);                     // Language
-        data << uint64(ObjectGuid::Empty);           // Fake sender GUID
-        data << uint32(0);                            // Fake account ID
-        data << senderName;                           // Sender name
-        data << std::string("world");                            // Channel name
-        data << uint64(ObjectGuid::Empty);           // Receiver GUID
-        data << message;                              // Message text
-        data << uint8(0);                             // Chat tag (usually 0)
+        data << uint8(CHAT_MSG_CHANNEL);          // Chat type
+        data << uint32(language);                  // Language
+
+        // Use sender's GUID if sender exists, else a fake but valid GUID:
+        if (sender)
+            data << uint64(sender->GetGUID());
+        else
+            data << uint64(ObjectGuid(HighGuid::Unit, 1, 99999)); // dummy fake GUID
+
+        data << uint32(0);                         // Account ID (fake)
+
+        data << senderName;                        // Sender name
+        data << "world";                         // Channel name (make sure it's the correct channel name)
+        data << uint64(ObjectGuid::Empty);        // Receiver GUID (empty for channel)
+        data << message;                          // Message text
+        data << uint8(0);                         // Chat tag
     };
 
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 }
+
 
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
