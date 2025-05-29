@@ -59,7 +59,9 @@
 #define HIGHGUID_PLAYER 0x00000000
 #endif
 
-#define MAKE_NEW_GUID(low, entry, high) \ ((uint64)(low) | ((uint64)(entry) << 24) | ((uint64)(high) << 48))
+#define MAKE_NEW_GUID(low, entry, high) \
+    ((uint64)(low) | ((uint64)(entry) << 24) | ((uint64)(high) << 48))
+
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
