@@ -154,12 +154,18 @@ public:
             return false;
         }
 
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
+        // Default to team 0 (Alliance) if no session/player (console)
+        TeamId teamId = TEAM_ALLIANCE;
 
-        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeam());
-        Channel* channel = cMgr->GetChannel(0, "world", player, false);
+        if (handler->GetSession())
+        {
+            Player* player = handler->GetSession()->GetPlayer();
+            if (player)
+                teamId = player->GetTeam();
+        }
+
+        ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
+        Channel* channel = cMgr->GetChannel("world", nullptr);
 
         if (!channel)
         {
@@ -167,10 +173,10 @@ public:
             return false;
         }
 
-        channel->Say(player->GetGUID(), args.c_str(), LANG_UNIVERSAL);
+        channel->Say(nullptr, args.c_str(), LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent to the world channel.");
         return true;
-    }
+}
 
     
     static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
