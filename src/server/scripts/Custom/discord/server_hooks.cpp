@@ -49,7 +49,7 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        SendDiscordMessageWorld(messageStream);
+        SendDiscordMessageWorld(messageStream.str());
     }
 
     void OnShutdown() override
@@ -72,7 +72,7 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        SendDiscordMessageWorld(messageStream);
+        SendDiscordMessageWorld(messageStream.str());
     }
 
     void Notify(Player* player, bool loggingIn)
@@ -99,7 +99,7 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        SendDiscordMessageWorld(messageStream);
+        SendDiscordMessageWorld(messageStream.str());
     }
 
 private:
