@@ -169,7 +169,7 @@ public:
             return false;
         }
 
-        channel->SayAsFake("Discord", args, LANG_UNIVERSAL);
+        channel->SayAsFake(handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr, "Discord", args, LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
