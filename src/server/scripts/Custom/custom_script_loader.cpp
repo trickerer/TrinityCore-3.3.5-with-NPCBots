@@ -42,8 +42,7 @@ void AddSC_ItemAuraVisualScript();
 void AddSC_TestLoginHook();
 void AddSC_npc_weapon_master();
 void AddSC_boss_memory_of_hogger();
-void AddChatRelayScript();
- 
+
 void AddCustomScripts()
 {
 	AddSC_npc_voters_zone();
@@ -67,5 +66,4 @@ void AddCustomScripts()
     AddSC_TestLoginHook();
     AddSC_npc_weapon_master();
     AddSC_boss_memory_of_hogger();
-    AddChatRelayScript();
 }

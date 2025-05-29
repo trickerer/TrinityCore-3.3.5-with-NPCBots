@@ -32,6 +32,7 @@
 #include "SocialMgr.h"
 #include "StringConvert.h"
 #include "World.h"
+#include "DiscordWebhookMgr.h"
 
 Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zoneEntry /*= nullptr*/) :
     _isDirty(false),
@@ -735,6 +736,18 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
         ChannelNameBuilder<MutedAppend> builder(this, appender);
         SendToOne(builder, guid);
         return;
+    }
+    
+    // 🚀 Discord relay for world channel
+    if (GetName() == "world")
+    {
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+        {
+            std::string playerName = player->GetName();
+            std::string content = "[WORLD] **" + playerName + "**: " + what;
+            TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
+            SendDiscordMessage(content); // this function must be defined below or included
+        }
     }
 
     auto builder = [&](WorldPacket& data, LocaleConstant locale)
