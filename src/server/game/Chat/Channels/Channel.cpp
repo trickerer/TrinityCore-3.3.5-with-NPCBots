@@ -685,7 +685,7 @@ void Channel::SayAsFake(std::string const& senderName, std::string const& messag
         data << senderName;              // Name
         data << uint64(0);               // Fake GUID
         data << uint32(0);               // Fake Account ID
-        data << "world";               // Channel name
+        data << std::string("world");    // Channel name world channel
         data << message;                 // Message
     };
 
