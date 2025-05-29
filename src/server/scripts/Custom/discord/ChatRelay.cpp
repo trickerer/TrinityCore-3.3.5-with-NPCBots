@@ -67,8 +67,8 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
-        if (type != CHAT_MSG_CHANNEL)
-            return;
+       // if (type != CHAT_MSG_CHANNEL)
+        //    return;
 
         ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
@@ -78,7 +78,7 @@ public:
         std::string playerName = player->GetName();
         std::string content = "[WORLD] **" + playerName + "**: " + msg;
 
-        TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
+        TC_LOG_INFO("chatrelay", "Relaying to Discord: {}", content);
 
         SendDiscordMessage(content);
     }
