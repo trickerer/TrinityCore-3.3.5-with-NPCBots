@@ -684,7 +684,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
     data << uint64(ObjectGuid::Empty);                 // Sender GUID
     data << uint32(0);                                 // Account ID
     data << senderName;                                // Sender Name
-    data << std::string(_name);                        // Channel name
+    data << std::string("world");                        // Channel name
     data << uint64(ObjectGuid::Empty);                 // Receiver GUID
     data << message;                                   // Message
     data << uint8(0);                                  // ChatTag
