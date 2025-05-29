@@ -19,9 +19,6 @@ public:
         if (!channel)
             return;
 
-        if (!channel->HasMember(player->GetGUID()))
-            return;
-
         std::string playerName = player->GetName();
         std::string content = "[WORLD] **" + playerName + "**: " + msg;
 
