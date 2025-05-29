@@ -676,20 +676,21 @@ void Channel::Announce(Player const* player)
     _isDirty = true;
 }
 
-void Channel::SayAsFake(std::string const& senderName, std::string const& message, uint32 language)
+void Channel::SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language)
 {
     auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_CHANNEL_NOTIFY, 200);
-        data << uint8(CHAT_MSG_CHANNEL);         // Message type: channel
-        data << uint32(language);                // Language
-        data << senderName;                      // Sender name
-        data << uint64(ObjectGuid(HighGuid::Unit, 1, static_cast<ObjectGuid::LowType>(999999))); // Valid fake GUID
-        data << uint32(0);                        // Fake Account ID
-        data << std::string("world");            // Channel name
-        data << message;                         // Actual message
+        data << uint8(CHAT_MSG_CHANNEL);
+        data << uint32(language);
+        data << senderName;
+        data << uint64(sender ? sender->GetGUID() : 3125); // Use sender's GUID
+        data << uint32(0); // Account ID unused
+        data << std::string("world");
+        data << message;
     };
 
     SendToAll(builder, ObjectGuid::Empty);
+}SendToAll(builder, ObjectGuid::Empty);
 }
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
