@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "PlayerScript.h"
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Log.h"
 #include "DiscordWebhookMgr.h" // Your header where SendDiscordMessage is declared
