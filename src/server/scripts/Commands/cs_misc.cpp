@@ -157,18 +157,18 @@ public:
             return false;
         }
 
-        TeamId teamId = TEAM_ALLIANCE; // or TEAM_HORDE
-
+        TeamId teamId = TEAM_ALLIANCE; // You could choose based on player team too
         ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
-        Channel* channel = cMgr->GetSystemChannel(0, nullptr);  // Get system world channel
+
+        Channel* channel = cMgr->GetChannel("world", nullptr); // ← corrected from channelMgr to cMgr
+
         if (!channel)
         {
-            handler->SendSysMessage("World channel not found.");
+            handler->SendSysMessage("World channel not found. Try joining it in-game first.");
             return false;
         }
 
         channel->SayAsFake("Discord", args, LANG_UNIVERSAL);
-
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
