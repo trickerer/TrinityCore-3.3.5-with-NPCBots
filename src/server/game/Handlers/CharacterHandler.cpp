@@ -1016,17 +1016,18 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //    pCurrChar->Say("MGAWoW", LANG_UNIVERSAL);  
     //}
     //MGAWoW Auto Invite to world channel
-    // TODO ONLY ASK IF NOT IN CHANNEL
-    
-
 
     std::string m_name = "world";  // in-game channel name
-    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-    data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
-    data << m_name.c_str();            // Channel name ("world")
-    data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
-    
-    pCurrChar->GetSession()->SendPacket(&data);
+    // Check if player is already in the channel
+    if (!pCurrChar->IsInChannel(m_name))
+    {
+        WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1 + 8);
+        data << uint8(CHAT_INVITE_NOTICE);  // Invite notice
+        data << m_name.c_str();             // Channel name ("world")
+        data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
+        
+        pCurrChar->GetSession()->SendPacket(&data);
+    }
 }
 
 void WorldSession::SendFeatureSystemStatus()
