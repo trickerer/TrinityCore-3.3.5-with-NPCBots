@@ -168,16 +168,13 @@ public:
             return false;
         }
 
-        std::string fullMessage = handler->GetFullParsedArgumentString();
+        std::string fullMessage = args;
 
         channel->SayAsFake(player, "Discord", fullMessage, LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
 
-
-
-    
     static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
