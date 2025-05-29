@@ -1,8 +1,7 @@
-#include "Player.h"
 #include "ScriptMgr.h"
+#include "Player.h"
 #include "Chat.h"
-#include "Log.h"
-#include "DiscordWebhookMgr.h" // Your header where SendDiscordMessage is declared
+#include "ChannelMgr.h"
 
 class ChatRelayScript : public PlayerScript
 {
@@ -11,26 +10,30 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
-        // We want only world channel messages
-        // CHAT_MSG_CHANNEL = 7 for channel chat; world channel typically named "world"
-        if (type == CHAT_MSG_CHANNEL)
-        {
-            if (channelName == "world")
-            {
-                if (msg.find("[Discord]:") == std::string::npos)
-                {
-                    // Compose the message to send to Discord webhook
-                    std::string discordMsg = "[World] [" + player->GetName() + "]: " + msg;
+        // Get ChannelMgr singleton pointer
+        ChannelMgr* cMgr = ChannelMgr::getSingletonPtr();
+        if (!cMgr)
+            return;
 
-                    // Send to Discord
-                    SendDiscordMessage(discordMsg);
-                }
-            }
-        }
+        // Get the "world" channel (realm ID 0)
+        Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
+        if (!channel)
+            return;
+
+        // Check if player is a member of the "world" channel
+        if (!channel->HasMember(player->GetGUID()))
+            return;
+
+        // Only proceed if message type is say / yell / whatever you want, or just log all
+        // For example, let's just print all messages from the world channel:
+        std::string playerName = player->GetName();
+        TC_LOG_INFO("chatrelay", "[WORLD CHANNEL] <%s>: %s", playerName.c_str(), msg.c_str());
+
+        // Here you could add your Discord webhook or other integration
     }
 };
 
-void AddSC_chat_relay_script()
+void AddChatRelayScript()
 {
     new ChatRelayScript();
 }
