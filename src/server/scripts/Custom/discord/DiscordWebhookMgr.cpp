@@ -71,6 +71,9 @@ void SendBattlegroundDiscordWebhook(const std::string& battlegroundName, const s
 
 void SendDiscordMessage(const std::string& message)
 {
+    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
+        return;
+    
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
     std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
 
@@ -124,6 +127,9 @@ void SendDiscordMessage(const std::string& message)
 
 void SendDiscordMessageWorld(const std::string& message)
 {
+    if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
+        return;
+    
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook2.URL", "");
     std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook2.AvatarURL", "");
 
