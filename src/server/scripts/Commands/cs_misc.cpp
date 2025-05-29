@@ -54,6 +54,8 @@
 #include "ChannelMgr.h"
 #include "Channel.h"
 #include "ObjectGuid.h"
+#include "ObjectDefines.h"
+#include "Common.h"
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
