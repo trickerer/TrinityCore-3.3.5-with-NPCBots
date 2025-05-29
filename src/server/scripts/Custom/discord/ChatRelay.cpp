@@ -71,7 +71,7 @@ public:
             return;
 
         ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
-        Channel* channel = cMgr->GetJoinChannelForPlayer(player);
+        Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
         if (!channel || channel->GetName() != "world")
             return;
 
