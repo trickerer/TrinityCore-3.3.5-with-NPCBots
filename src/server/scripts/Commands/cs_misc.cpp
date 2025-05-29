@@ -157,14 +157,10 @@ public:
             return false;
         }
 
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
+        Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+        TeamId teamId = player ? player->GetTeamId() : TEAM_ALLIANCE; // Default to Alliance if CLI
 
-        TeamId teamId = player->GetTeamId();
         ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
-
-        // The 5 parameters are: channelId, name, player, pkt, zoneEntry
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
 
         if (!channel)
@@ -177,6 +173,7 @@ public:
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
+
 
     
     static bool HandleGetDiscordCodeCommand(ChatHandler* handler, const char* /*args*/)
