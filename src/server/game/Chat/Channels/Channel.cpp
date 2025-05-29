@@ -703,12 +703,12 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
             GetName(localeIdx));                  // channelName
     };
 
-    TC_LOG_INFO("network", "Sending fake message to channel {}: {}", GetName(), message);
+    //TC_LOG_INFO("network", "Sending fake message to channel {}: {}", GetName(), message);
 
     // Send the packet to all channel members except the sender to avoid duplication
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 
-    TC_LOG_INFO("network", "SendToAll called");
+    //TC_LOG_INFO("network", "SendToAll called");
 }
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
