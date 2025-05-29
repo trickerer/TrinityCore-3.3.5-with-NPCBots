@@ -681,29 +681,27 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
     auto builder = [=](WorldPacket& data, LocaleConstant /*loc*/) {
         data.Initialize(SMSG_MESSAGECHAT, 200);
 
-        data << uint8(CHAT_MSG_CHANNEL);
-        data << uint32(language);
+        data << uint8(CHAT_MSG_CHANNEL);           // Chat type
+        data << uint32(language);                   // Language
 
         if (sender)
-            data << uint64(sender->GetGUID());
+            data << uint64(sender->GetGUID());     // Sender GUID
         else
-            data << uint64(ObjectGuid(HighGuid::Unit, 1, static_cast<ObjectGuid::LowType>(9999)));
+            data << uint64(ObjectGuid(HighGuid::Unit, 1, static_cast<ObjectGuid::LowType>(9999))); // Dummy GUID
 
-        data << uint32(0);
-        data << senderName;
-
-        data << _name; // Use actual channel name here!
-
-        data << uint64(ObjectGuid::Empty);
-        data << message;
-        data << uint8(0);
+        data << uint32(0);                          // Account ID (fake)
+        data << senderName;                         // Sender name
+        data << _name;                              // Channel name (use actual channel name)
+        data << uint64(ObjectGuid::Empty);         // Receiver GUID (empty for channels)
+        data << message;                            // Message text
+        data << uint8(0);                           // Chat tag
     };
 
-    TC_LOG_INFO("Sending fake message to channel %s: %s", _name.c_str(), message.c_str());
+    TC_LOG_INFO("network", "Sending fake message to channel %s: %s", _name.c_str(), message.c_str());
 
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 
-    TC_LOG_INFO("SendToAll called");
+    TC_LOG_INFO("network", "SendToAll called");
 }
 
 
