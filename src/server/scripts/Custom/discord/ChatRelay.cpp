@@ -67,9 +67,10 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
-        ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-        Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
-        if (!channel)
+        if (type != CHAT_MSG_CHANNEL)
+            return;
+
+        if (player->GetSession()->GetLastChannelName() != "world")
             return;
 
         std::string playerName = player->GetName();
