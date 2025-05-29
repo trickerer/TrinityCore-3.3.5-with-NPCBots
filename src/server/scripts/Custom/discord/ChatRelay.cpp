@@ -10,10 +10,6 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
-        // Get ChannelMgr singleton pointer
-        ChannelMgr* cMgr = ChannelMgr::getSingletonPtr();
-        if (!cMgr)
-            return;
 
         // Get the "world" channel (realm ID 0)
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
