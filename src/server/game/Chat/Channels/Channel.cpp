@@ -678,39 +678,38 @@ void Channel::Announce(Player const* player)
 
 void Channel::SayAsFake(Player* sender, std::string const& senderName, std::string const& message, uint32 language)
 {
-    auto builder = [this, sender, senderName, message, language](WorldPacket& data, LocaleConstant /*loc*/) {
-        data.Initialize(SMSG_MESSAGECHAT, 200);
+    auto builder = [this, sender, senderName, message, language](WorldPacket& data, LocaleConstant /*locale*/)
+    {
+        // We will build a chat packet manually with a fake sender
+        LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(DEFAULT_LOCALE);
 
-        data << uint8(CHAT_MSG_CHANNEL);           // Chat type
-        data << uint32(language);                   // Language
+        // Create a dummy ObjectGuid for the fake sender
+        ObjectGuid fakeGuid = ObjectGuid(HighGuid::Player, 0, static_cast<ObjectGuid::LowType>(3125));
 
-        if (sender)
-        {
-            data << uint64(sender->GetGUID());
-            data << uint32(sender->GetSession()->GetAccountId());
-        }
-        else
-        {
-            data << uint64(ObjectGuid(HighGuid::Player, 0, static_cast<ObjectGuid::LowType>(3125))); // dummy valid player GUID
-            data << uint32(32); // fake account ID
-        }
-
-        data << senderName;                         // Sender name
-        data << GetName();                               // Channel name (use actual channel name)
-        data << uint64(ObjectGuid::Empty);         // Receiver GUID (empty for channels)
-        data << message;                            // Message text
-        data << uint8(0);                           // Chat tag
+        // Use the real sender's GUID if available for 'source' parameter to ChatHandler::BuildChatPacket
+        // but send the fake sender name and fakeGuid in the packet
+        ChatHandler::BuildChatPacket(
+            data,
+            CHAT_MSG_CHANNEL,
+            Language(language),
+            sender ? sender->GetGUID() : fakeGuid,  // source GUID in packet (who the message appears to come from)
+            fakeGuid,                              // actual GUID in packet (use fake here)
+            message,
+            0,                                    // chatTag
+            senderName,                           // senderName override
+            "",                                   // targetName (empty for channels)
+            0,                                    // channelId (0 means use channel name instead)
+            false,                                // isGM
+            GetName(localeIdx));                  // channelName
     };
 
-    TC_LOG_INFO("network", "Sending fake message to channel world: {} - {} ", message ,GetName());
+    TC_LOG_INFO("network", "Sending fake message to channel {}: {}", GetName(), message);
 
+    // Send the packet to all channel members except the sender to avoid duplication
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 
     TC_LOG_INFO("network", "SendToAll called");
 }
-
-
-
 
 void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
 {
