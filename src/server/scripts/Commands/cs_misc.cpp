@@ -58,10 +58,6 @@
 #ifndef HIGHGUID_PLAYER
 #define HIGHGUID_PLAYER 0x00000000
 #endif
-
-#define MAKE_NEW_GUID(low, entry, high) \
-    ((uint64)(low) | ((uint64)(entry) << 24) | ((uint64)(high) << 48))
-
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -173,8 +169,7 @@ public:
             return false;
         }
 
-        uint64 gmGuid64 = MAKE_NEW_GUID(3125, 0, HIGHGUID_PLAYER);
-        ObjectGuid gmGuid = ObjectGuid(gmGuid64);
+        ObjectGuid gmGuid = ObjectGuid(HIGHGUID_PLAYER, 3125);
 
         channel->Say(gmGuid, args, LANG_UNIVERSAL);
 
