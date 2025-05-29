@@ -155,7 +155,7 @@ public:
         }
 
         // Default to team 0 (Alliance) if no session/player (console)
-        TeamId teamId = TEAM_ALLIANCE;
+        teamId = TeamId(player->GetTeam());
 
         if (handler->GetSession())
         {
