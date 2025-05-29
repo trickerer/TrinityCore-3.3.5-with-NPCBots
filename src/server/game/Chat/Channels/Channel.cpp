@@ -685,9 +685,15 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
         data << uint32(language);                   // Language
 
         if (sender)
-            data << uint64(sender->GetGUID());     // Sender GUID
+        {
+            data << uint64(sender->GetGUID());
+            data << uint32(sender->GetSession()->GetAccountId());
+        }
         else
-            data << uint64(ObjectGuid(HighGuid::Unit, 1, static_cast<ObjectGuid::LowType>(9999))); // Dummy GUID
+        {
+            data << uint64(ObjectGuid(HighGuid::Player, 0, 3125)); // dummy valid player GUID
+            data << uint32(1); // fake account ID
+        }
 
         data << uint32(0);                          // Account ID (fake)
         data << senderName;                         // Sender name
@@ -697,7 +703,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
         data << uint8(0);                           // Chat tag
     };
 
-    TC_LOG_INFO("network", "Sending fake message to channel world: {}", message);
+    TC_LOG_INFO("network", "Sending fake message to channel world: {} - {} ", message ,GetName());
 
     SendToAll(builder, sender ? sender->GetGUID() : ObjectGuid::Empty);
 
