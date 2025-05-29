@@ -692,7 +692,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
         else
         {
             data << uint64(ObjectGuid(HighGuid::Player, 0, static_cast<ObjectGuid::LowType>(3125))); // dummy valid player GUID
-            data << uint32(1); // fake account ID
+            data << uint32(32); // fake account ID
         }
 
         data << uint32(0);                          // Account ID (fake)
