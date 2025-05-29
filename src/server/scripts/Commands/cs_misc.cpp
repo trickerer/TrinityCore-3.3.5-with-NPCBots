@@ -151,14 +151,13 @@ public:
 
     static bool HandleSendWorldCommand(ChatHandler* handler, char const* args)
     {
-        if (args.empty())
+        if (!*args)
         {
             handler->SendSysMessage("Usage: .sendworld <message>");
             return false;
         }
 
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
-        //TeamId teamId = player ? player->GetTeamId() : TEAM_ALLIANCE; // Default to Alliance if CLI
 
         ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
@@ -168,11 +167,14 @@ public:
             handler->SendSysMessage("World channel not found. Make sure at least one player is in it.");
             return false;
         }
+
         std::string fullMessage = handler->GetFullParsedArgumentString();
-        channel->SayAsFake(handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr, "Discord", fullMessage, LANG_UNIVERSAL);
+
+        channel->SayAsFake(player, "Discord", fullMessage, LANG_UNIVERSAL);
         handler->SendSysMessage("Message sent as Discord bot.");
         return true;
     }
+
 
 
     
