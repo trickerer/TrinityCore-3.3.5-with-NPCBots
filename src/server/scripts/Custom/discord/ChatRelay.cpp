@@ -11,18 +11,24 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver) override
     {
+        ChannelMgr* cMgr = ChannelMgr::getSingletonPtr();
+        if (!cMgr)
+            return;
 
-        // Get the "world" channel (realm ID 0)
-        ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
         Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
         if (!channel)
             return;
 
+        if (!channel->HasMember(player->GetGUID()))
+            return;
 
         std::string playerName = player->GetName();
-        TC_LOG_INFO("chatrelay", "[WORLD CHANNEL] {}: {}", playerName, msg);
+        std::string content = "[WORLD] **" + playerName + "**: " + msg;
 
-        // Here you could add your Discord webhook or other integration
+        TC_LOG_INFO("chatrelay", "%s", content.c_str());
+
+        // Send message to Discord
+        SendDiscordMessage(content);
     }
 };
 
