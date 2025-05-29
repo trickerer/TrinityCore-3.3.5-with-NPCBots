@@ -157,14 +157,19 @@ public:
             return false;
         }
 
-        TeamId teamId = TEAM_ALLIANCE; // You could choose based on player team too
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        TeamId teamId = player->GetTeamId();
         ChannelMgr* cMgr = ChannelMgr::forTeam(teamId);
 
-        Channel* channel = cMgr->GetChannel("world", nullptr); // ← corrected from channelMgr to cMgr
+        // The 5 parameters are: channelId, name, player, pkt, zoneEntry
+        Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
 
         if (!channel)
         {
-            handler->SendSysMessage("World channel not found. Try joining it in-game first.");
+            handler->SendSysMessage("World channel not found. Make sure at least one player is in it.");
             return false;
         }
 
