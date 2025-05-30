@@ -78,7 +78,7 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Reputation Rewards", GOSSIP_SENDER_MAIN, 1500);
             //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Mount Rewards", GOSSIP_SENDER_MAIN, 1600);
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Mount Rewards", GOSSIP_SENDER_MAIN, 1600);
 			
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye", GOSSIP_SENDER_MAIN, 2);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
@@ -584,11 +584,25 @@ public:
             break;
             case 1600:
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Peep's Whistle for 5 Tokens", GOSSIP_SENDER_MAIN, 1601);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Peep's Whistle for 5 Tokens", GOSSIP_SENDER_MAIN, 1601);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "X-53 Touring Rocket for 5 Tokens", GOSSIP_SENDER_MAIN, 1602);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "X-53 Touring Rocket for 5 Tokens", GOSSIP_SENDER_MAIN, 1602);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "[Back]", GOSSIP_SENDER_MAIN, 1);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Mimiron's Head for 5 Tokens", GOSSIP_SENDER_MAIN, 1603);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Invincible's Reins for 5 Tokens", GOSSIP_SENDER_MAIN, 1604);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Reins of the Green Proto-Drake for 5 Tokens", GOSSIP_SENDER_MAIN, 1605);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Reins of the Crimson Deathcharger for 5 Tokens", GOSSIP_SENDER_MAIN, 1606);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Reins of the Bloodbathed Frostbrood Vanquisher for 5 Tokens", GOSSIP_SENDER_MAIN, 1607);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Reins of the Violet Proto-Drake for 5 Tokens", GOSSIP_SENDER_MAIN, 1608);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Reins of the Time-Lost Proto-Drake for 5 Tokens", GOSSIP_SENDER_MAIN, 1609);
+                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "[Back]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
 				SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
 
@@ -626,6 +640,188 @@ public:
                 if (player->HasItemCount(21140, 5))
                 {
                     uint32 itemId = 54860;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1603:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 45693;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1604:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 50818;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1605:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 44707;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1606:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 52200;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1607:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 51954;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1608:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 44177;
+                    ItemPosCountVec dest;
+
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->DestroyItemCount(21140, 5, true);
+                        me->Say(tokentext18, LANG_UNIVERSAL);
+                    }
+                    else
+                    {
+                        player->SendEquipError(msg, NULL, NULL);
+                    }
+                }
+                else
+                {
+                    me->Yell(tokentext15, LANG_UNIVERSAL);
+                }
+            }
+            break;
+            case 1609:
+            {
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(21140, 5))
+                {
+                    uint32 itemId = 44168;
                     ItemPosCountVec dest;
 
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
