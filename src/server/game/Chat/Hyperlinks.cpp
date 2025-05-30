@@ -368,6 +368,9 @@ static bool ValidateLinkInfo(HyperlinkInfo const& info)
 // Validates all hyperlinks and control sequences contained in str
 bool Trinity::Hyperlinks::CheckAllLinks(std::string_view str)
 {
+    int32 const severity = static_cast<int32>(sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY));
+    if (severity >= 2)
+        return true;
     // Step 1: Disallow all control sequences except ||, |H, |h, |c and |r
     {
         std::string_view::size_type pos = 0;
