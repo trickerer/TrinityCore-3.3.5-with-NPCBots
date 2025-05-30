@@ -581,7 +581,7 @@ public:
                 }
             }
             break;
-            case 1500:
+            case 1600:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "Peep's Whistle", GOSSIP_SENDER_MAIN, 1601);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
