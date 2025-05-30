@@ -22,7 +22,7 @@ enum SpellsAndItemIDsAndCost
     MAINPROFF = 3,  // token cost
     SECPROFF = 2,   // token cost
 
-    ITEMCOSTID = 21140,  //MGA Token
+    ITEMCOSTID = 18154,  //MGA Mini Token
 
     FirstAidSkill = 129,
     FirstAidSPell = 65292,
@@ -249,7 +249,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 2 MGA Tokens, " + player->GetName() +" Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+SECPROFF" MGA Mini Tokens, " + player->GetName() +" Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -271,7 +271,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 2 MGA Tokens, " + player->GetName() + " Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+SECPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -293,7 +293,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 2 MGA Tokens, " + player->GetName() + " Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+SECPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 2 and come back and talk to me", LANG_UNIVERSAL);
                     
                 }
                 CloseGossipMenuFor(player);
@@ -319,7 +319,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -340,7 +340,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -361,7 +361,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -382,7 +382,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -403,7 +403,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -424,7 +424,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -445,7 +445,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -466,7 +466,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -487,7 +487,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -510,7 +510,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
@@ -531,7 +531,7 @@ public:
                 }
                 else
                 {
-                    me->Say("You are missing 3 MGA Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
+                    me->Say("You are missing "+MAINPROFF" MGA Mini Tokens, " + player->GetName() + " Go and get 3 and come back and talk to me", LANG_UNIVERSAL);
                 }
                 CloseGossipMenuFor(player);
                 return false;
