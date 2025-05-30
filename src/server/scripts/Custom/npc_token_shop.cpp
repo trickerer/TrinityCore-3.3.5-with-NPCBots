@@ -583,9 +583,9 @@ public:
             break;
             case 1600:
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Peep's Whistle", GOSSIP_SENDER_MAIN, 1601);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Peep's Whistle for 5 Tokens", GOSSIP_SENDER_MAIN, 1601);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "X-53 Touring Rocket", GOSSIP_SENDER_MAIN, 1602);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "X-53 Touring Rocket for 5 Tokens", GOSSIP_SENDER_MAIN, 1602);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, "[Back]", GOSSIP_SENDER_MAIN, 1);
                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
