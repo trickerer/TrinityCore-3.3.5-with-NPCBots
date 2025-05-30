@@ -475,6 +475,12 @@ public:
                         }
                     }
                 }
+                else
+                {
+                    me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    me->PlayDirectSound(11466);
+                }
                 break;
                 case 1018:
                 CloseGossipMenuFor(player);
@@ -491,12 +497,6 @@ public:
                     }
                 }
                 break;
-                else
-                {
-                    me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                    me->PlayDirectSound(11466);
-                }
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 9999)
             {
