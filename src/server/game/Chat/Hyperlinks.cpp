@@ -321,7 +321,7 @@ static bool ValidateAs(HyperlinkInfo const& info)
         return false;
 
     int32 const severity = static_cast<int32>(sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY));
-    if (severity == -1)
+    if (severity >= 2)
         return true;
     if (severity >= 0)
     {
