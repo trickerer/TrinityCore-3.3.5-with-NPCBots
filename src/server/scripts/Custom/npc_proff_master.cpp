@@ -308,7 +308,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2001) // blacksmith
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -329,7 +329,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2002) // leather working
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -350,7 +350,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2003) // ALCH
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -371,7 +371,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2004) // HERB
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -392,7 +392,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2005) // mining
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -413,7 +413,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2006) // tailor
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -434,7 +434,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2007) // eng
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -455,7 +455,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2008) // enchanter
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -476,7 +476,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2009) // skinner
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -497,7 +497,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2010) // jewel
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
@@ -520,7 +520,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2011) // scribe
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(21140, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
