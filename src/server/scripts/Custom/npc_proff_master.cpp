@@ -153,6 +153,9 @@ public:
 
             WorldSession* session = player->GetSession();
             // CHEDCK IF FREE SKILL SLOT
+            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Main Professions Cost 3 Mini Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Secondary Professions Cost 2 Mini Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_DOT, "Main Professions", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             if (freeProfs < 1)
             {

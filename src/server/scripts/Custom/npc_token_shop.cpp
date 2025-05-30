@@ -106,7 +106,7 @@ public:
                 //AddGossipItemFor(player,  GOSSIP_ICON_INTERACT_1, "Armor Rewards"    , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1400);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Reputation Rewards", GOSSIP_SENDER_MAIN, 1500);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Mount Rewards", GOSSIP_SENDER_MAIN, 1600);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, "Mount Rewards", GOSSIP_SENDER_MAIN, 1600);
 				
 				AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye", GOSSIP_SENDER_MAIN, 2);
 
