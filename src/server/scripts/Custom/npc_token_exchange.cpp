@@ -486,7 +486,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(461145, 1))
                 {
-                    uint32 itemId = 461145;
+                    uint32 itemId = 461146;
                     ItemPosCountVec dest;
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                     if (msg == EQUIP_ERR_OK)
