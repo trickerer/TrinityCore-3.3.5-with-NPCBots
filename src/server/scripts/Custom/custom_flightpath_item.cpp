@@ -33,7 +33,7 @@ public:
                 ++count;
             }
         }
-
+        player->Yell("DID IT RUN!", LANG_UNIVERSAL);
         player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
         ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
         return true;
