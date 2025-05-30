@@ -20,9 +20,11 @@ public:
             if (!node)
                 continue;
 
-            // Skip invalid or cross-faction taxi nodes
-            if ((player->GetTeam() == ALLIANCE && !(node->Flags & TAXI_NODE_FLAG_ALLIANCE)) ||
-                (player->GetTeam() == HORDE && !(node->Flags & TAXI_NODE_FLAG_HORDE)))
+            // Faction filtering using MountCreatureID
+            // Alliance typically has MountCreatureID[0], Horde has MountCreatureID[1]
+            if (player->GetTeam() == ALLIANCE && node->MountCreatureID[0] == 0)
+                continue;
+            if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
             if (!player->m_taxi.IsTaximaskNodeKnown(i))
