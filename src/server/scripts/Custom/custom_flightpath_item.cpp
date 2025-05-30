@@ -1,40 +1,44 @@
 #include "ScriptMgr.h"
 #include "Player.h"
 #include "DBCStores.h"
-#include "TaxiPathGraph.h"
+#include "WorldSession.h"
+#include "Chat.h"
 
-class item_flight_master_whistle : public ItemScript
+class item_learn_flightpaths : public ItemScript
 {
 public:
-    item_flight_master_whistle() : ItemScript("item_flight_master_whistle") {}
+    item_learn_flightpaths() : ItemScript("item_learn_flightpaths") {}
 
     bool OnUse(Player* player, Item* item, SpellCastTargets const&) override
     {
         uint32 count = 0;
 
-        for (uint32 i = 0; i < sTaxiPathNodesByPath.size(); ++i)
+        // Loop through all taxi nodes
+        for (uint32 i = 0; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
-            const TaxiPathNodeList& path = sTaxiPathNodesByPath[i];
-            if (!path.empty())
+            TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
+            if (!node)
+                continue;
+
+            // Skip invalid or cross-faction taxi nodes
+            if ((player->GetTeam() == ALLIANCE && !(node->Flags & TAXI_NODE_FLAG_ALLIANCE)) ||
+                (player->GetTeam() == HORDE && !(node->Flags & TAXI_NODE_FLAG_HORDE)))
+                continue;
+
+            if (!player->m_taxi.IsTaximaskNodeKnown(i))
             {
-                for (const TaxiPathNode& node : path)
-                {
-                    if (!player->HasTaxiPath(node.mapid, node.id))
-                    {
-                        player->SetTaxiPath(node.mapid, node.id);
-                        count++;
-                    }
-                }
+                player->m_taxi.SetTaximaskNode(i);
+                ++count;
             }
         }
 
-        player->GetSession()->SendAreaTriggerMessage("You have learned all flight paths!");
+        player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
         ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
         return true;
     }
 };
 
-void AddSC_item_flight_master_whistle()
+void AddSC_item_learn_flightpaths()
 {
-    new item_flight_master_whistle();
+    new item_learn_flightpaths();
 }
