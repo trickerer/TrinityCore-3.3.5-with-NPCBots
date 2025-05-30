@@ -36,6 +36,7 @@
 #define GOSSIP_HELLO_TSWAP15  "Summon Guild Vault item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP16  "Exchange 1 MGA Token For VIP Item"
 #define GOSSIP_HELLO_TSWAP17  "Exchange 50K gold For VIP Item"
+#define GOSSIP_HELLO_TSWAP18  "I see you are a VIP, Learn All FLight Paths!"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
@@ -95,7 +96,9 @@ public:
             
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP17, GOSSIP_SENDER_MAIN, 1017);
             
-			
+			if (player->HasItemCount(461145, 1))
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP18, GOSSIP_SENDER_MAIN, 1018);
+                
 			//AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP5, GOSSIP_SENDER_MAIN, 1005);
 
 		
@@ -472,6 +475,22 @@ public:
                         }
                     }
                 }
+                break;
+                case 1018:
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(461145, ))
+                {
+                    uint32 itemId = 461145;
+                    ItemPosCountVec dest;
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
+                        player->SendNewItem(item, 1, true, false);
+                        me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                    }
+                }
+                break;
                 else
                 {
                     me->Yell(tokentext2, LANG_UNIVERSAL); // Not enough items
