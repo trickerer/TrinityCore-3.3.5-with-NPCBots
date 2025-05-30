@@ -42,6 +42,7 @@ void AddSC_ItemAuraVisualScript();
 void AddSC_TestLoginHook();
 void AddSC_npc_weapon_master();
 void AddSC_boss_memory_of_hogger();
+void AddSC_item_flight_master_whistle();
 
 void AddCustomScripts()
 {
@@ -66,4 +67,5 @@ void AddCustomScripts()
     AddSC_TestLoginHook();
     AddSC_npc_weapon_master();
     AddSC_boss_memory_of_hogger();
+    AddSC_item_flight_master_whistle();
 }
