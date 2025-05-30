@@ -484,7 +484,7 @@ public:
                 break;
                 case 1018:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(461145, ))
+                if (player->HasItemCount(461145, 1))
                 {
                     uint32 itemId = 461145;
                     ItemPosCountVec dest;
