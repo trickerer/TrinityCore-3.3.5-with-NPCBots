@@ -91,7 +91,9 @@ public:
         }
 
         const std::string name = player->GetName();
-        const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+        const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
+                          ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+                          : "👤 ";
         const std::string status = loggingIn ? "🟢 Logged In" : "🛑 Logged Out";
 
         std::ostringstream messageStream;
