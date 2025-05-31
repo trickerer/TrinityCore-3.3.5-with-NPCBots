@@ -70,20 +70,6 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
         bool Initialize();
 };
 
-bool IsPlayerInChannel(Player* player, const std::string& channelName)
-{
-    ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
-    if (!cMgr)
-        return false;
-
-    const uint32 CHANNEL_ID_CUSTOM = 0; // 0 works for custom channels like "world"
-    if (Channel* channel = cMgr->GetChannel(CHANNEL_ID_CUSTOM, channelName, player, false))
-    {
-        return channel->HasPlayer(player->GetGUID());
-    }
-
-    return false;
-}
 
 bool LoginQueryHolder::Initialize()
 {
@@ -1025,7 +1011,20 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     
-    
+    bool IsPlayerInChannel(Player* player, const std::string& channelName)
+    {
+        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
+        if (!cMgr)
+            return false;
+
+        const uint32 CHANNEL_ID_CUSTOM = 0; // 0 works for custom channels like "world"
+        if (Channel* channel = cMgr->GetChannel(CHANNEL_ID_CUSTOM, channelName, player, false))
+        {
+            return channel->HasPlayer(player->GetGUID());
+        }
+
+        return false;
+    }
     // say something as player logs in
     //if (pCurrChar->IsAlive())
     //{
