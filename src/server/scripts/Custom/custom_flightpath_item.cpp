@@ -37,6 +37,8 @@ public:
         player->DestroyItemCount(461146, 1, true);
         player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
         ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
+        player->GetSession()->SendTaxiStatus(); // Refresh taxi map
+        player->SaveToDB(); // Persist learned nodes to the database
         return true;
     }
 };
