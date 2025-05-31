@@ -70,6 +70,23 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
         bool Initialize();
 };
 
+bool IsPlayerInChannel(Player* player, const std::string& channelName)
+{
+    // Get the channel manager for the player's team (or CHANNEL_ALL if global)
+    ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
+    if (!cMgr)
+        return false;
+
+    // Get the channel object by name
+    if (Channel* GetChannel(uint32 channelId, const std::string& name, Player* player, bool pkt = true, const AreaTableEntry* zoneEntry = nullptr);)
+    {
+        // Check if the player is in the channel
+        return channel->IsMember(player->GetGUID());
+    }
+
+    return false;
+}
+
 bool LoginQueryHolder::Initialize()
 {
     SetSize(MAX_PLAYER_LOGIN_QUERY);
@@ -1010,22 +1027,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
     
-    bool IsPlayerInChannel(Player* player, const std::string& channelName)
-    {
-        // Get the channel manager for the player's team (or CHANNEL_ALL if global)
-        ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
-        if (!cMgr)
-            return false;
-
-        // Get the channel object by name
-        if (Channel* GetChannel(uint32 channelId, const std::string& name, Player* player, bool pkt = true, const AreaTableEntry* zoneEntry = nullptr);)
-        {
-            // Check if the player is in the channel
-            return channel->IsMember(player->GetGUID());
-        }
-
-        return false;
-    }
+    
     // say something as player logs in
     //if (pCurrChar->IsAlive())
     //{
