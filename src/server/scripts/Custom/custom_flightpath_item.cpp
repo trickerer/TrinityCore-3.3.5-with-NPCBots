@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "DBCStores.h"
 #include "WorldSession.h"
+#include "World.h"
 #include "Chat.h"
 
 class item_learn_flightpaths : public ItemScript
