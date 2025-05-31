@@ -51,7 +51,9 @@ public:
 
         const std::string name = player->GetName();
         const std::string achievementName = GetLocalizedAchievementName(achievement->ID);
-        const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER ? "🛡️ " : "👤 ";
+        const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
+                          ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+                          : "👤 ";
 
         std::ostringstream messageStream;
         messageStream << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
