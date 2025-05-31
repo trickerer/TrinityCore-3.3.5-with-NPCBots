@@ -1035,6 +1035,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
 
 }
+
 bool IsPlayerInChannel(Player* player, const std::string& channelName)
 {
     ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
@@ -1044,7 +1045,8 @@ bool IsPlayerInChannel(Player* player, const std::string& channelName)
     const uint32 CHANNEL_ID_CUSTOM = 0; // 0 for custom channels like "world"
     if (Channel* channel = cMgr->GetChannel(CHANNEL_ID_CUSTOM, channelName, player, false))
     {
-        return channel->GetPlayers().find(player->GetGUID()) != channel->GetPlayers().end();
+        const auto& members = channel->GetMemberGUIDs(); // returns std::set<ObjectGuid>
+        return members.find(player->GetGUID()) != members.end();
     }
 
     return false;
