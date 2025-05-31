@@ -72,16 +72,14 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
 
 bool IsPlayerInChannel(Player* player, const std::string& channelName)
 {
-    // Get the channel manager for the player's team (or CHANNEL_ALL if global)
     ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
     if (!cMgr)
         return false;
 
-    // Get the channel object by name
-    if (Channel* GetChannel(uint32 channelId, const std::string& name, Player* player, bool pkt = true, const AreaTableEntry* zoneEntry = nullptr);)
+    const uint32 CHANNEL_ID_CUSTOM = 0; // 0 works for custom channels like "world"
+    if (Channel* channel = cMgr->GetChannel(CHANNEL_ID_CUSTOM, channelName, player, false))
     {
-        // Check if the player is in the channel
-        return channel->IsMember(player->GetGUID());
+        return channel->HasPlayer(player->GetGUID());
     }
 
     return false;
