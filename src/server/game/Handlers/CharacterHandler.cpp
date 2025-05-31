@@ -1018,15 +1018,35 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     
+    if (!IsPlayerInChannel(player, "world"))
+    {
+        std::string m_name = "world";  // in-game channel name
+        data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+        data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
+        data << m_name.c_str();            // Channel name ("world")
+        data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
+        
+        pCurrChar->GetSession()->SendPacket(&data);
+    }
 
 
-    std::string m_name = "world";  // in-game channel name
-    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-    data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
-    data << m_name.c_str();            // Channel name ("world")
-    data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
-    
-    pCurrChar->GetSession()->SendPacket(&data);
+}
+
+bool IsPlayerInChannel(Player* player, const std::string& channelName)
+{
+    // Get the channel manager for the player's team (or CHANNEL_ALL if global)
+    ChannelMgr* cMgr = ChannelMgr::forTeam(player->GetTeamId());
+    if (!cMgr)
+        return false;
+
+    // Get the channel object by name
+    if (Channel* channel = cMgr->GetChannel(channelName, player))
+    {
+        // Check if the player is in the channel
+        return channel->IsMember(player->GetGUID());
+    }
+
+    return false;
 }
 
 void WorldSession::SendFeatureSystemStatus()
