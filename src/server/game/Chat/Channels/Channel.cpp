@@ -34,6 +34,32 @@
 #include "World.h"
 #include "Config.h"
 #include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
+#include <regex>
+
+std::string StripWoWFormatting(const std::string& text)
+{
+    std::string result = text;
+
+    // Remove color codes |cAARRGGBB
+    result = std::regex_replace(result, std::regex("\\|c[0-9a-fA-F]{8}"), "");
+
+    // Remove reset code |r
+    result = std::regex_replace(result, std::regex("\\|r"), "");
+
+    // Replace hyperlink |H...|hTEXT|h with TEXT
+    // This regex finds |H anything |h TEXT |h and keeps TEXT only
+    std::smatch m;
+    std::string temp;
+    std::regex hyperlinkRegex("\\|H[^|]+\\|h([^|]+)\\|h");
+
+    // Replace all hyperlinks iteratively
+    while (std::regex_search(result, m, hyperlinkRegex))
+    {
+        result = std::regex_replace(result, hyperlinkRegex, m[1].str());
+    }
+
+    return result;
+}
 
 Channel::Channel(uint32 channelId, uint32 team /*= 0*/, AreaTableEntry const* zoneEntry /*= nullptr*/) :
     _isDirty(false),
@@ -745,10 +771,11 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang) const
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         {
             std::string playerName = player->GetName();
-            std::string content = "**" + playerName + "** Says: " + what;
-            //TC_LOG_INFO("chatrelay", "Relaying to Discord: %s", content.c_str());
-                if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
-                    SendDiscordMessageWorld(content); // this function must be defined below or included
+            std::string cleanedMessage = StripWoWFormatting(what);  // clean it here
+            std::string content = "**" + playerName + "** Says: " + cleanedMessage;
+
+            if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
+                SendDiscordMessageWorld(content);
         }
     }
 
