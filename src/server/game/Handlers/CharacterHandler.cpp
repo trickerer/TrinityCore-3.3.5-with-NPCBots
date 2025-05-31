@@ -1042,11 +1042,10 @@ bool IsPlayerInChannel(Player* player, const std::string& channelName)
     if (!cMgr)
         return false;
 
-    const uint32 CHANNEL_ID_CUSTOM = 0; // 0 for custom channels like "world"
+    const uint32 CHANNEL_ID_CUSTOM = 0; // 0 = custom channels like "world"
     if (Channel* channel = cMgr->GetChannel(CHANNEL_ID_CUSTOM, channelName, player, false))
     {
-        const auto& members = channel->GetMemberGUIDs(); // returns std::set<ObjectGuid>
-        return members.find(player->GetGUID()) != members.end();
+        return channel->HasMember(player->GetGUID());
     }
 
     return false;
