@@ -23728,8 +23728,6 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
     
     ItemTemplate const* offhandTemplate = offItem->GetTemplate();
 
-    ItemTemplate const* offhandTemplate = offItem->GetTemplate();
-
     // unequip offhand weapon if player doesn't have dual wield anymore
     if (!CanDualWield() && (offhandTemplate->InventoryType == INVTYPE_WEAPONOFFHAND || offhandTemplate->InventoryType == INVTYPE_WEAPON))
         force = true;
