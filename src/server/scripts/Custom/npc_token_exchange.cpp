@@ -34,8 +34,8 @@
 #define GOSSIP_HELLO_TSWAP13  "Summon Aaron item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP14  "Summon Mailbox item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP15  "Summon Guild Vault item. (cost 10 mini tokens)"
-#define GOSSIP_HELLO_TSWAP16  "Exchange 1 MGA Token For VIP Item"
-#define GOSSIP_HELLO_TSWAP17  "Exchange 50K gold For VIP Item"
+#define GOSSIP_HELLO_TSWAP16  "Exchange 5 MGA Tokens For VIP Item"
+#define GOSSIP_HELLO_TSWAP17  "Exchange 450K gold For VIP Item"
 #define GOSSIP_HELLO_TSWAP18  "I see you are a VIP, Learn All FLight Paths!"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
@@ -415,7 +415,7 @@ public:
                 break;
                 case 1016:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(21140, 1))
+                if (player->HasItemCount(21140, 5))
                 {
                     if (player->HasItemCount(461145, 1))
                     {
@@ -435,7 +435,7 @@ public:
                         {
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
-                            player->DestroyItemCount(21140, 1, true);
+                            player->DestroyItemCount(21140, 5, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
@@ -447,7 +447,7 @@ public:
                 break;
                 case 1017:
                 CloseGossipMenuFor(player);
-                if (player->GetMoney() >= 500000000)
+                if (player->GetMoney() >= 4500000000)
                 {
                     if (player->HasItemCount(461145, 1))
                     {
@@ -466,7 +466,7 @@ public:
                         {
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
-                            player->ModifyMoney(-500000000);
+                            player->ModifyMoney(-4500000000);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
