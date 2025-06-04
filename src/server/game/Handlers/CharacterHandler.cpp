@@ -1027,7 +1027,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     if (spellInfo)
     {
         pCurrChar->Yell("I Don't hvae the MGAWoW Client, MGAWoW custom content will not work for me! - Download out client here https://mgawow.online/downlaod/ - This is optional", LANG_UNIVERSAL);  
-        pCurrChar->GetSession().PSendSysMessage("I Don't hvae the MGAWoW Client, MGAWoW custom content will not work for me! - Download out client here https://mgawow.online/downlaod/ - This is optional");
+        pCurrChar->PSendSysMessage("I Don't hvae the MGAWoW Client, MGAWoW custom content will not work for me! - Download out client here https://mgawow.online/downlaod/ - This is optional");
     }
 
     std::string m_name = "world";  // in-game channel name
