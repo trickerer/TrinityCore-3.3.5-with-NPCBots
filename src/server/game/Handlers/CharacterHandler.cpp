@@ -56,6 +56,7 @@
 #include "ChannelMgr.h"
 #include "AccountMgr.h"
 #include "ChannelAppenders.h"
+#include "SpellMgr.h"
 
 bool IsPlayerInChannel(Player* player, const std::string& channelName);
 
