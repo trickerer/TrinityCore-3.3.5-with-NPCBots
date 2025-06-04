@@ -246,6 +246,26 @@ private:
                     player->RemoveAura(spellId);
             }
         }
+        
+        uint32 itemId = 461144;
+        std::vector<uint32> auraSpellIds = {80872};
+
+        if (player->HasItemCount(itemId, 1))
+        {
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (!player->HasAura(spellId))
+                    player->CastSpell(player, spellId, true);
+            }
+        }
+        else
+        {
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (player->HasAura(spellId))
+                    player->RemoveAura(spellId);
+            }
+        }
     }
 };
 
@@ -281,6 +301,26 @@ private:
     {
         uint32 itemId = 461145;
         std::vector<uint32> auraSpellIds = {28126, 36945};
+
+        if (player->HasItemCount(itemId, 1))
+        {
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (!player->HasAura(spellId))
+                    player->CastSpell(player, spellId, true);
+            }
+        }
+        else
+        {
+            for (uint32 spellId : auraSpellIds)
+            {
+                if (player->HasAura(spellId))
+                    player->RemoveAura(spellId);
+            }
+        }
+        
+        uint32 itemId = 461144;
+        std::vector<uint32> auraSpellIds = {80872};
 
         if (player->HasItemCount(itemId, 1))
         {
