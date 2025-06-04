@@ -1029,14 +1029,25 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
     if (spellInfo)
     {
-        // Directly check castability without creating Spell instance
-        SpellCastResult result = spellInfo->CheckCast(pCurrChar, pCurrChar, true);
-        
-        if (result != SPELL_CAST_OK)
+        SpellCastTargets targets;
+        targets.SetUnitTarget(pCurrChar); // self-cast
+
+        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
+        testSpell->m_targets = targets;
+
+        // prepare expects const ref, pass the variable directly
+        SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr);
+
+        SpellCastResult resultCheck = testSpell->CheckCast(true);
+
+        delete testSpell;
+
+        if (resultPrepare != SPELL_CAST_OK || resultCheck != SPELL_CAST_OK)
         {
             pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
         }
     }
+
 
 
     std::string m_name = "world";  // in-game channel name
