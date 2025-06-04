@@ -1021,7 +1021,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
+    if (player->CanCast(spellInfo))
+    {
+        pCurrChar->Say("You Have the MGAWoW Client!", LANG_UNIVERSAL);  
+    }
 
     std::string m_name = "world";  // in-game channel name
     data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
