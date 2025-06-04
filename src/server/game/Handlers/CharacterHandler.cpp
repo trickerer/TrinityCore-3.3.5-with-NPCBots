@@ -1050,21 +1050,20 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
         if (resultCheck != SPELL_CAST_OK)
         {
-            TC_LOG_INFO("custom", "Spell cast check failed for player %s (GUID: %u)", pCurrChar->GetName().c_str(), GUID_LOPART(pCurrChar->GetGUID()));
+            TC_LOG_INFO("custom", "Spell cast check failed for player %s (GUID: %u)", pCurrChar->GetName().c_str(), pCurrChar->GetGUID().GetCounter());
 
-            // Delay message so client is ready to receive it
-            uint64 playerGUID = pCurrChar->GetGUID();
-            sWorld->ScheduleDelayedTask(5 * IN_MILLISECONDS, [playerGUID]() {
-                Player* player = sObjectAccessor->FindPlayer(playerGUID);
+            sWorld->AddEvent([playerGUID = pCurrChar->GetGUID().GetRawValue()]() {
+                Player* player = ObjectAccessor::FindPlayer(ObjectGuid(playerGUID));
                 if (player && player->GetSession())
                 {
                     player->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
                     player->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
                     ChatHandler(player->GetSession()).SendSysMessage("System message: Spell cast check failed.");
                 }
-            });
+            }, 5000); // 5000ms = 5 seconds delay
         }
     }
+
 
     std::string m_name = "world";  // in-game channel name
     data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
