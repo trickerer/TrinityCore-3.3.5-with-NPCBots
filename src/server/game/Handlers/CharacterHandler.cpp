@@ -1029,20 +1029,29 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
     if (spellInfo)
     {
-        SpellCastResult result = spellInfo->CheckCast(pCurrChar, pCurrChar, true);
-        if (result != SPELL_CAST_OK)
+        SpellCastTargets targets;
+        targets.SetUnitTarget(pCurrChar); // self-cast for testing
+
+        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
+        testSpell->m_targets = targets;
+
+        // 'prepare' expects a const reference, not a pointer
+        SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr); 
+        if (resultPrepare != SPELL_CAST_OK)
         {
-            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+            // if prepare failed, no point in checking cast
+            delete testSpell;
+            pCurrChar->Yell("This spell cannot be cast (prepare failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+            return;
         }
-        else
+
+        SpellCastResult resultCheck = testSpell->CheckCast(true); // strict check
+        delete testSpell;
+
+        if (resultCheck != SPELL_CAST_OK)
         {
-            // For debugging
-            pCurrChar->Yell("Spell can be cast.", LANG_UNIVERSAL);
+            pCurrChar->Yell("This spell cannot be cast (CheckCast failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
         }
-    }
-    else
-    {
-        pCurrChar->Yell("SpellInfo not found!", LANG_UNIVERSAL);
     }
 
 
