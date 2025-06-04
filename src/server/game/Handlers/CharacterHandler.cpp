@@ -1024,9 +1024,16 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
-    if (spellInfo && !pCurrChar->CanCast(spellInfo))
+    if (spellInfo)
     {
-        pCurrChar->Yell("I don't have the MGAWoW Client, MGAWoW custom content will not work for me! - Download our client here https://mgawow.online/download/ - This is optional", LANG_UNIVERSAL);
+        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
+        SpellCastResult result = testSpell->CheckCast(true); // `true` = strict check
+        delete testSpell;
+
+        if (result != SPELL_CAST_OK)
+        {
+            pCurrChar->Yell("I don't have the MGAWoW Client, MGAWoW custom content will not work for me! - Download our client here https://mgawow.online/download/ - This is optional", LANG_UNIVERSAL);
+        }
     }
 
     std::string m_name = "world";  // in-game channel name
