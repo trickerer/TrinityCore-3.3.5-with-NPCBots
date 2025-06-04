@@ -1029,19 +1029,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
     if (spellInfo)
     {
-        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
-
         SpellCastTargets targets;
-        targets.SetUnitTarget(pCurrChar); // self-cast for testing
+        targets.SetUnitTarget(pCurrChar); // simulate self-cast
 
+        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
         testSpell->m_targets = targets;
-        SpellCastResult result = testSpell->CheckCast(true); // true = strict check
+
+        // Initialize spell before checking cast
+        testSpell->prepare(&targets, nullptr); // note: usually used for real casts
+        SpellCastResult result = testSpell->CheckCast(true); // true = strict checks
 
         delete testSpell;
 
         if (result != SPELL_CAST_OK)
         {
-            pCurrChar->Yell("This spell cannot be cast.", LANG_UNIVERSAL);
+            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
         }
     }
 
