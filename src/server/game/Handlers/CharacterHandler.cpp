@@ -1050,22 +1050,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
         if (resultCheck != SPELL_CAST_OK)
         {
-            ObjectGuid playerGuid = pCurrChar->GetGUID();
-
-            sScriptMgr->AddTimedDelayedCallback(5000, [playerGuid]() // 5000 ms delay
-            {
-                if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-                {
-                    if (player->GetSession())
-                    {
-                        player->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
-                        player->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
-                        ChatHandler(player->GetSession()).SendSysMessage("System message: Spell cast check failed.");
-                    }
-                }
-            });
+            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+            pCurrChar->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
+            ChatHandler(pCurrChar->GetSession()).SendSysMessage("System message: Spell cast check failed.");
         }
     }
+
 
 
 
