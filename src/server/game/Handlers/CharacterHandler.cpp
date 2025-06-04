@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Spell.h"
 #include "WorldSession.h"
 #include "ArenaTeamMgr.h"
 #include "CalendarMgr.h"
@@ -58,6 +59,8 @@
 #include "ChannelAppenders.h"
 #include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellDefines.h"
+
 
 bool IsPlayerInChannel(Player* player, const std::string& channelName);
 
