@@ -1046,12 +1046,14 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 
         // After successful prepare, do the stricter cast check
         SpellCastResult resultCheck = testSpell->CheckCast(true); // strict check
+
         testSpell->finish();  // finish properly before deleting
         delete testSpell;
 
         if (resultCheck != SPELL_CAST_OK)
         {
-            pCurrChar->Yell("This spell cannot be cast (CheckCast failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+            pCurrChar->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
         }
     }
 
