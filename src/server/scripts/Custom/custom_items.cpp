@@ -260,7 +260,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds2)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
@@ -280,7 +280,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds3)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
@@ -300,7 +300,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds4)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
@@ -372,7 +372,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds2)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
@@ -392,7 +392,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds3)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
@@ -412,7 +412,7 @@ private:
         }
         else
         {
-            for (uint32 spellId : auraSpellIds)
+            for (uint32 spellId : auraSpellIds4)
             {
                 if (player->HasAura(spellId))
                     player->RemoveAura(spellId);
