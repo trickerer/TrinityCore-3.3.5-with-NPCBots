@@ -1054,12 +1054,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             pCurrChar->Yell("This spell cannot be cast (CheckCast failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
         }
     }
-    else
-    {
-        sLog->outInfo(LOG_FILTER_GENERAL, "Spell 80875 info not found or player/session invalid.");
-    }
-
-
 
     std::string m_name = "world";  // in-game channel name
     data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
