@@ -1030,12 +1030,18 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     if (spellInfo)
     {
         Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
-        SpellCastResult result = testSpell->CheckCast(true); // `true` = strict check
+
+        SpellCastTargets targets;
+        targets.SetUnitTarget(pCurrChar); // self-cast for testing
+
+        testSpell->m_targets = targets;
+        SpellCastResult result = testSpell->CheckCast(true); // true = strict check
+
         delete testSpell;
 
         if (result != SPELL_CAST_OK)
         {
-            pCurrChar->Yell("I don't have the MGAWoW Client, MGAWoW custom content will not work for me! - Download our client here https://mgawow.online/download/ - This is optional", LANG_UNIVERSAL);
+            pCurrChar->Yell("This spell cannot be cast.", LANG_UNIVERSAL);
         }
     }
 
