@@ -1035,7 +1035,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
         testSpell->m_targets = targets;
 
-        // Prepare the spell first (sets up conditions, costs, etc)
         SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr);
         if (resultPrepare != SPELL_CAST_OK)
         {
@@ -1044,16 +1043,26 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             return;
         }
 
-        // After successful prepare, do the stricter cast check
         SpellCastResult resultCheck = testSpell->CheckCast(true); // strict check
 
-        testSpell->finish();  // finish properly before deleting
+        testSpell->finish();
         delete testSpell;
 
         if (resultCheck != SPELL_CAST_OK)
         {
-            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
-            pCurrChar->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
+            TC_LOG_INFO("custom", "Spell cast check failed for player %s (GUID: %u)", pCurrChar->GetName().c_str(), GUID_LOPART(pCurrChar->GetGUID()));
+
+            // Delay message so client is ready to receive it
+            uint64 playerGUID = pCurrChar->GetGUID();
+            sWorld->ScheduleDelayedTask(5 * IN_MILLISECONDS, [playerGUID]() {
+                Player* player = sObjectAccessor->FindPlayer(playerGUID);
+                if (player && player->GetSession())
+                {
+                    player->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+                    player->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
+                    ChatHandler(player->GetSession()).SendSysMessage("System message: Spell cast check failed.");
+                }
+            });
         }
     }
 
