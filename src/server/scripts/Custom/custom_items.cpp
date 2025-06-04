@@ -247,10 +247,10 @@ private:
             }
         }
         
-        uint32 itemId = 461144;
+        uint32 itemId2 = 461144;
         std::vector<uint32> auraSpellIds = {80872};
 
-        if (player->HasItemCount(itemId, 1))
+        if (player->HasItemCount(itemId2, 1))
         {
             for (uint32 spellId : auraSpellIds)
             {
@@ -319,10 +319,10 @@ private:
             }
         }
         
-        uint32 itemId = 461144;
+        uint32 itemId2 = 461144;
         std::vector<uint32> auraSpellIds = {80872};
 
-        if (player->HasItemCount(itemId, 1))
+        if (player->HasItemCount(itemId2, 1))
         {
             for (uint32 spellId : auraSpellIds)
             {
