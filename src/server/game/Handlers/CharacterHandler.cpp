@@ -1036,7 +1036,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         testSpell->m_targets = targets;
 
         // Initialize spell before checking cast
-        testSpell->prepare(&targets, nullptr); // note: usually used for real casts
+        testSpell->prepare(targets, nullptr); // note: usually used for real casts
         SpellCastResult result = testSpell->CheckCast(true); // true = strict checks
 
         delete testSpell;
