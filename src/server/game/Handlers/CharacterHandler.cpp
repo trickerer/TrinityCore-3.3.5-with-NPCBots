@@ -1027,34 +1027,46 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
-    if (spellInfo && pCurrChar && pCurrChar->GetSession())
+    if (!spellInfo)
     {
-        SpellCastTargets targets;
-        targets.SetUnitTarget(pCurrChar); // self-cast for testing
-
-        Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
-        testSpell->m_targets = targets;
-
-        SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr);
-        if (resultPrepare != SPELL_CAST_OK)
-        {
-            delete testSpell;
-            pCurrChar->Yell("This spell cannot be cast (prepare failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
-            return;
-        }
-
-        SpellCastResult resultCheck = testSpell->CheckCast(true); // strict check
-
-        testSpell->finish();
-        delete testSpell;
-
-        if (resultCheck != SPELL_CAST_OK)
-        {
-            pCurrChar->Yell("This spell cannot be cast. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
-            pCurrChar->GetSession()->SendAreaTriggerMessage("Debug: Spell cast check failed.");
-            ChatHandler(pCurrChar->GetSession()).SendSysMessage("System message: Spell cast check failed.");
-        }
+        if (pCurrChar)
+            pCurrChar->Yell("Spell 80875 not found in DBC. Check your MGAWoW patch.", LANG_UNIVERSAL);
+        sLog->outError("DEBUG: Spell ID 80875 not found in Spell.dbc.");
+        return;
     }
+
+    if (!pCurrChar || !pCurrChar->GetSession())
+        return;
+
+    SpellCastTargets targets;
+    targets.SetUnitTarget(pCurrChar); // Self-cast
+
+    Spell* spell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
+    spell->m_targets = targets;
+
+    // First: run spell preparation (handles costs, range, etc.)
+    SpellCastResult resultPrepare = spell->prepare(targets, nullptr);
+    if (resultPrepare != SPELL_CAST_OK)
+    {
+        pCurrChar->Yell("Cannot cast: spell prepare failed. Likely missing client patch.", LANG_UNIVERSAL);
+        pCurrChar->GetSession()->SendAreaTriggerMessage("Spell prepare failed.");
+        ChatHandler(pCurrChar->GetSession()).PSendSysMessage("Prepare failed for spell 80875. Result: %u", resultPrepare);
+        delete spell;
+        return;
+    }
+
+    // Second: strict cast check
+    SpellCastResult resultCheck = spell->CheckCast(true);
+    spell->finish();
+    delete spell;
+
+    if (resultCheck != SPELL_CAST_OK)
+    {
+        pCurrChar->Yell("Spell cast check failed. You may not be using the MGAWoW client.", LANG_UNIVERSAL);
+        pCurrChar->GetSession()->SendAreaTriggerMessage("Spell cast check failed.");
+        ChatHandler(pCurrChar->GetSession()).PSendSysMessage("Spell 80875 cast check failed. Result: %u", resultCheck);
+    }
+
 
 
 
