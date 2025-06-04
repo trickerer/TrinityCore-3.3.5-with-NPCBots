@@ -1031,7 +1031,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         if (pCurrChar)
             pCurrChar->Yell("Spell 80875 not found in DBC. Check your MGAWoW patch.", LANG_UNIVERSAL);
-        sLog->outError("DEBUG: Spell ID 80875 not found in Spell.dbc.");
+        //sLog->outError("DEBUG: Spell ID 80875 not found in Spell.dbc.");
         return;
     }
 
