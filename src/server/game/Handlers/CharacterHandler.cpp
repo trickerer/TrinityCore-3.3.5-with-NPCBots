@@ -1027,7 +1027,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
-    if (spellInfo)
+    if (spellInfo && pCurrChar && pCurrChar->GetSession())
     {
         SpellCastTargets targets;
         targets.SetUnitTarget(pCurrChar); // self-cast for testing
@@ -1035,23 +1035,28 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         Spell* testSpell = new Spell(pCurrChar, spellInfo, TRIGGERED_NONE);
         testSpell->m_targets = targets;
 
-        // 'prepare' expects a const reference, not a pointer
-        SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr); 
+        // Prepare the spell first (sets up conditions, costs, etc)
+        SpellCastResult resultPrepare = testSpell->prepare(targets, nullptr);
         if (resultPrepare != SPELL_CAST_OK)
         {
-            // if prepare failed, no point in checking cast
             delete testSpell;
             pCurrChar->Yell("This spell cannot be cast (prepare failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
             return;
         }
 
+        // After successful prepare, do the stricter cast check
         SpellCastResult resultCheck = testSpell->CheckCast(true); // strict check
+        testSpell->finish();  // finish properly before deleting
         delete testSpell;
 
         if (resultCheck != SPELL_CAST_OK)
         {
             pCurrChar->Yell("This spell cannot be cast (CheckCast failed). You may not be using the MGAWoW client.", LANG_UNIVERSAL);
         }
+    }
+    else
+    {
+        sLog->outInfo(LOG_FILTER_GENERAL, "Spell 80875 info not found or player/session invalid.");
     }
 
 
