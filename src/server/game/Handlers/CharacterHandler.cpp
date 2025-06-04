@@ -57,6 +57,7 @@
 #include "AccountMgr.h"
 #include "ChannelAppenders.h"
 #include "SpellMgr.h"
+#include "SpellInfo.h"
 
 bool IsPlayerInChannel(Player* player, const std::string& channelName);
 
@@ -1023,7 +1024,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(80875);
-    if (pCurrChar->CanCast(spellInfo))
+    if (spellInfo)
     {
         pCurrChar->Say("You Have the MGAWoW Client!", LANG_UNIVERSAL);  
     }
