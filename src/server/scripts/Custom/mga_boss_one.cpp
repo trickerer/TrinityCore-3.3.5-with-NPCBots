@@ -448,9 +448,9 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
 		
-		void EnterEvadeMode() 
+		void EnterEvadeMode()
 		{
-			WorldDatabase.PExecute(_QUERY1_);
+			WorldDatabase.Execute(_QUERY1_);
             me->DisappearAndDie();
             me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
@@ -587,12 +587,6 @@ public:
                     }
                 }
             }
-        }
-        
-        void JustDespawned() //override
-        {
-            WorldDatabase.Execute(_QUERY1_);
-            me->Yell("BYE NOOBS!", LANG_UNIVERSAL);
         }
 		
 		void EnterCombat(Unit* Who)
