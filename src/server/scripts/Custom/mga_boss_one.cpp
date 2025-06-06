@@ -504,8 +504,8 @@ public:
 		{
 			if (me->IsWithinDistInMap(who, 10.0f))
 			{
-				//if (me->IsValidAttackTarget(who) && !HasStarted)
-				//{
+				if (me->IsValidAttackTarget(who) && !HasStarted)
+				{
                     me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
                     me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
                     me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
@@ -532,6 +532,7 @@ public:
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
+                        GuardSpwanCD = urand(12000, 16000);
                     }
                     else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
@@ -540,18 +541,20 @@ public:
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
+                        GuardSpwanCD = urand(12000, 16000);
                     }
                     else
                     {
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
+                        GuardSpwanCD = urand(12000, 16000);
                     }
                     SlimePoolCD = 18000;
                     me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
-				//}
+				}
 			}
 		
 		}
