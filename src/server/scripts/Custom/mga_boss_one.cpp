@@ -604,12 +604,11 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-			bool anyPlayerAlive = false;
-
-            // Try to select a random player from threat list who is alive
+			
             if (HasStarted)
             {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true); // this might need tweaking!!
+                bool anyPlayerAlive = false;
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 400, true); // this might need tweaking!!
 
                 if (target && target->IsPlayer() && target->IsAlive())
                     anyPlayerAlive = true;
