@@ -450,7 +450,7 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
         
-        DespawnOrUnsummon()
+        DespawnOrUnsummon(Creature* creature)
         {
             WorldDatabase.Execute(_QUERY1_);
             me->Yell("DON'T WASTE MY TIME!", LANG_UNIVERSAL);
