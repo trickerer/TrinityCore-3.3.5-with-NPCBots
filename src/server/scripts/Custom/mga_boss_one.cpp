@@ -443,7 +443,7 @@ public:
 			DoPull = false;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
-            DespawnTimer = 60000; // 60 seconds until despawn
+            DespawnTimer = 120000; // 120 seconds until despawn
             TimerStarted = true;
             
 			
@@ -603,7 +603,23 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-			if (TimerStarted)
+			bool anyPlayerAlive = false;
+            for (Unit* target : me->GetThreatManager().GetThreatList())
+            {
+                if (target && target->IsAlive() && target->IsPlayer())
+                {
+                    anyPlayerAlive = true;
+                    break;
+                }
+            }
+
+            if (!anyPlayerAlive)
+            {
+                EnterEvadeMode();  // No alive players in threat list = party wipe
+                return;
+            }
+            
+            if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
                 {
@@ -618,6 +634,7 @@ public:
                 else
                     DespawnTimer -= uiDiff;
             }
+            
             if (!UpdateVictim())
                 return;
 
