@@ -61,7 +61,7 @@ public:
             }
             else
             {
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss IS ACTIVE!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "MGAWoW Mega Boss IS ACTIVE!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001);
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
