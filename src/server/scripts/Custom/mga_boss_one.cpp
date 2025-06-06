@@ -441,9 +441,7 @@ public:
 			DoPull = false;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
-            WorldDatabase.Execute(_QUERY1_);
-            me->DisappearAndDie();
-            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
+            
 			
         }
 
@@ -455,6 +453,10 @@ public:
 		
 		void EnterEvadeMode()
 		{
+            WorldDatabase.Execute(_QUERY1_);
+            me->DisappearAndDie();
+            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
+            Reset();
             ScriptedAI::EnterEvadeMode();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
