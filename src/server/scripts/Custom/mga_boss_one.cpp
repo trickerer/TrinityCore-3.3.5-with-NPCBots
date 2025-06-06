@@ -380,9 +380,9 @@ public:
         return new mga_boss_oneAI(creature);
     }
 
-    struct mga_boss_oneAI : public ScriptedAI
+    struct mga_boss_oneAI : public BossAI
     {
-        mga_boss_oneAI(Creature* creature) : ScriptedAI(creature)
+        mga_boss_oneAI(Creature* creature) : BossAI(creature)
         {
         }
 
@@ -501,8 +501,7 @@ public:
 			}
 		}
 		
-		//void MoveInLineOfSight(Unit* who)
-        void JustEngagedWith(Unit* who) override
+		void MoveInLineOfSight(Unit* who)
 		{
 			if (me->IsWithinDistInMap(who, 10.0f))
 			{
@@ -543,6 +542,10 @@ public:
 			}
 		
 		}
+        void JustEngagedWith(Unit* who) override
+        {
+            BossAI::JustEngagedWith(who);
+        }
 		
 		void EnterCombat(Unit* Who)
 		{
