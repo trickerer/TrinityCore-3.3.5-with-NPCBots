@@ -88,9 +88,7 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_5MAN, -9676.397461, -6.144296, -20.832001, 2.609818, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
-                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
-                channel->SayAsFake(player, "Discord", "MGA Mega Boss - 5 Mnn Mode Started!", LANG_UNIVERSAL);
+                sWorld->SendWorldText(LANG_UNIVERSAL, "The MGA Mega Boss event has started! Prepare yourselves!");
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1001)
@@ -98,9 +96,7 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_10MAN, -9676.397461, -6.144296, -20.832001, 2.609818, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
-                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
-                channel->SayAsFake(player, "Discord", "MGA Mega Boss - 10 Mnn Mode Started!", LANG_UNIVERSAL);
+                sWorld->SendWorldText(LANG_UNIVERSAL, "The MGA Mega Boss event has started! Prepare yourselves!");
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1002)
@@ -108,9 +104,7 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_25MAN, -9676.397461, -6.144296, -20.832001, 2.609818, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
-                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
-                channel->SayAsFake(player, "Discord", "MGA Mega Boss - 25 Mnn Mode Started!", LANG_UNIVERSAL);
+                sWorld->SendWorldText(LANG_UNIVERSAL, "The MGA Mega Boss event has started! Prepare yourselves!");
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 8000)

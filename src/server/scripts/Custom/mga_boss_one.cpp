@@ -450,6 +450,11 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
         
+        DespawnOrUnsummon()
+        {
+            WorldDatabase.Execute(_QUERY1_);
+            me->Yell("DON'T WASTE MY TIME!", LANG_UNIVERSAL);
+        }
 		
 		void EnterEvadeMode()
 		{
