@@ -4,6 +4,8 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Chat.h"
+#include "TaxiNodes.h"
+#include "TaxiPathGraph.h"
 
 class item_learn_flightpaths : public ItemScript
 {
@@ -14,32 +16,41 @@ public:
     {
         uint32 count = 0;
 
-        // Loop through all taxi nodes
-        for (uint32 i = 0; i < sTaxiNodesStore.GetNumRows(); ++i)
+        // Iterate over TaxiNodesStore by ID list instead of row index
+        for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
             if (!node)
                 continue;
 
-            // Faction filtering using MountCreatureID
-            // Alliance typically has MountCreatureID[0], Horde has MountCreatureID[1]
+            // Faction filtering
             if (player->GetTeam() == ALLIANCE && node->MountCreatureID[0] == 0)
                 continue;
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            if (!player->m_taxi.IsTaximaskNodeKnown(i))
-            {
-                player->m_taxi.SetTaximaskNode(i);
-                ++count;
-            }
+            // Already known?
+            if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
+                continue;
+
+            // Learn node
+            player->m_taxi.SetTaximaskNode(node->ID);
+            player->SendDiscoverNewTaxiNode(node->ID); // Notify client
+            ++count;
         }
-        //player->Yell("DID IT RUN!", LANG_UNIVERSAL);
-        player->DestroyItemCount(461146, 1, true);
-        player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
-        ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
-        player->GetSession()->SendTaxiStatus(player->GetGUID());
-        player->SaveToDB(); // Persist learned nodes to the database
+
+        if (count > 0)
+        {
+            player->DestroyItemCount(item->GetEntry(), 1, true);
+            player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
+            ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
+            player->SaveToDB();
+        }
+        else
+        {
+            player->GetSession()->SendAreaTriggerMessage("You already know all available flight paths.");
+        }
+
         return true;
     }
 };
