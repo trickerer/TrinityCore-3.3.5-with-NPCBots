@@ -446,7 +446,8 @@ public:
 		
 		void EnterEvadeMode() 
 		{
-			/*WorldDatabase.PExecute(_QUERY1_);
+			WorldDatabase.PExecute(_QUERY1_);
+            /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
 			std::string title ="Mega Boss Event";
@@ -501,7 +502,7 @@ public:
 			{
 				if (me->IsValidAttackTarget(who) && !HasStarted)
 				{
-				//WorldDatabase.PExecute(_QUERY2_);
+				WorldDatabase.PExecute(_QUERY2_);
 				me->PlayDirectSound(15771) ; // UR_FemaleYogg_Prefight01.wav
 				HasStarted = true;
 				EnterCombat(who);
