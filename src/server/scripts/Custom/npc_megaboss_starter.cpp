@@ -90,7 +90,7 @@ public:
                 me->SummonCreature(NPC_BOSS_5MAN, -9676.397461, -6.144296, -20.832001, 2.609818, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
                 if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
                 {
-                    if (Channel* channel = channelMgr->GetChannel("world", player))
+                    if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                     {
                         channel->Say(ObjectGuid::Empty, "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
                     }
