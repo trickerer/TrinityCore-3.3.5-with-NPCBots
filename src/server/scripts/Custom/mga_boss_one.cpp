@@ -672,7 +672,7 @@ public:
 		   {
 			    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 				if (!target)
-					target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 				if (target)
 					DoCast(target, SPELL_FELL_FIREBALL);
 
