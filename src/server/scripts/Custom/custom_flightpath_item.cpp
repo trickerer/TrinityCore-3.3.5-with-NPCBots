@@ -4,7 +4,6 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Chat.h"
-#include "TaxiMgr.h"
 
 class item_learn_flightpaths : public ItemScript
 {
@@ -15,7 +14,6 @@ public:
     {
         uint32 count = 0;
 
-        // Iterate over TaxiNodesStore by ID list instead of row index
         for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
@@ -28,13 +26,10 @@ public:
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            // Already known?
             if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
                 continue;
 
-            // Learn node
             player->m_taxi.SetTaximaskNode(node->ID);
-            player->SendDiscoverNewTaxiNode(node->ID); // Notify client
             ++count;
         }
 
