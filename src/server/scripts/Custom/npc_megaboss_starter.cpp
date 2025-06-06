@@ -64,6 +64,10 @@ public:
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 10 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 20 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             }
+            else
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "YOU HAVE STARTED!!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
+            }
             
 
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
@@ -93,6 +97,9 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_10MAN, -9676.397461, -6.144296, -20.832001, 5.506104, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
+                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
+                channel->SayAsFake(player, "EVENT MASTER", "MGA Mega Boss - 10 Mnn Mode Started!", LANG_UNIVERSAL);
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1002)
@@ -100,6 +107,9 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_25MAN, -9676.397461, -6.144296, -20.832001, 5.506104, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
+                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
+                channel->SayAsFake(player, "EVENT MASTER", "MGA Mega Boss - 25 Mnn Mode Started!", LANG_UNIVERSAL);
                 return true;
             }
             CloseGossipMenuFor(player);

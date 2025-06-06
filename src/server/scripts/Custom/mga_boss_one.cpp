@@ -591,7 +591,7 @@ public:
         
         void JustDespawned() //override
         {
-            WorldDatabase.PExecute(_QUERY1_);
+            WorldDatabase.Execute(_QUERY1_);
             me->Yell("BYE NOOBS!", LANG_UNIVERSAL);
         }
 		
