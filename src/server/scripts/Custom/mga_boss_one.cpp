@@ -27,6 +27,7 @@
 #include "Group.h"
 #include "Map.h"
 #include "CreatureAIImpl.h"
+#include "WorldDatabase.h"
 
 
 using namespace std::chrono;
