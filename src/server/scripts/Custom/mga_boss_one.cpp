@@ -300,9 +300,9 @@ public:
 			
 			if (uiSwpadd <= uiDiff)
 			{
-				me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+				me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				if (me->GetEntry() == NPC_GUARD_HARDMODE)
-					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 					
 				uiSwpadd = urand(60000, 65000);
 			}
@@ -450,6 +450,8 @@ public:
 		{
 			WorldDatabase.PExecute(_QUERY1_);
             me->DisappearAndDie();
+            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
+            ScriptedAI::EnterEvadeMode();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
@@ -529,24 +531,24 @@ public:
                     MGAImmune = true;
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
                     {
-                        me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                        me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(12000, 16000);
                     }
                     else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
-                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(12000, 16000);
                     }
                     else
                     {
-                        me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                        me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(12000, 16000);
                     }
@@ -560,33 +562,7 @@ public:
 		}
         void JustEngagedWith(Unit* who) override
         {
-            if (me->GetEntry() == NPC_BOSS_MEDMODE)
-            {
-                me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
-                GuardSpwanCD = urand(12000, 16000);
-            }
-            else if (me->GetEntry() == NPC_BOSS_HARDMODE)
-            {
-                me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
-                GuardSpwanCD = urand(12000, 16000);
-            }
-            else
-            {
-                me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
-                me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
-                GuardSpwanCD = urand(12000, 16000);
-            }
-            SlimePoolCD = 18000;
-            me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
-            me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
-            ScriptedAI::JustEngagedWith(who);
+            //TODO BUT NOTHING REALLY NEEDS DOING LOL
         }
 		
 		void EnterCombat(Unit* Who)
@@ -647,15 +623,15 @@ public:
 				me->PlayDirectSound(5828) ; // AmnennarTheColdbringerSummon01.wav
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 				else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 				else
 				{
-					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
 			   GuardSpwanCD = urand(26000, 36000);
