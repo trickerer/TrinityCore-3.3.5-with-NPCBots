@@ -605,18 +605,23 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
 			bool anyPlayerAlive = false;
-            for (Unit* target : me->GetThreatManager().GetThreatList())
+            const auto& threatList = me->GetThreatManager().getThreatList();
+
+            for (auto const& threatRef : threatList)
             {
-                if (target && target->IsAlive() && target->IsPlayer())
+                if (Unit* target = threatRef->getTarget())
                 {
-                    anyPlayerAlive = true;
-                    break;
+                    if (target->IsAlive() && target->IsPlayer())
+                    {
+                        anyPlayerAlive = true;
+                        break;
+                    }
                 }
             }
 
             if (!anyPlayerAlive)
             {
-                EnterEvadeMode();  // No alive players in threat list = party wipe
+                EnterEvadeMode();
                 return;
             }
             
