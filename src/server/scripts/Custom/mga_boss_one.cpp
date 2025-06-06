@@ -522,7 +522,7 @@ public:
 					me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
 				}
 				SlimePoolCD = 18000;
-				me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 30000);
+				me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
 				me->Yell(AGGRO, LANG_UNIVERSAL, NULL);
 				DoStartNoMovement(who);
 				}
@@ -700,7 +700,7 @@ public:
 			   if (target && pullcheck < 2)
 			   {
 					DoCast(target, SPELL_ROOT); // root
-					me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
+					me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
 			   else if (pullcheck > 1 && pullcheck < 3 && !DoPull)
@@ -708,7 +708,7 @@ public:
 					DoPull = true;
 					DoCast(me, SPELL_FROST_SLOW );
 					DoStartNoMovement(me->GetVictim());
-					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
+					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
 					DoCast(me, SPELL_ICY_GRIP );
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
@@ -718,7 +718,7 @@ public:
 					if (target)
 					{
 						DoCast(target, SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					}
 					else
 					{
@@ -734,7 +734,7 @@ public:
 					if (target)
 					{
 						DoCast(target, SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					}
 			   }
 			   
