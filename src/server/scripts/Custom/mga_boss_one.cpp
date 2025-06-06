@@ -50,12 +50,6 @@ using namespace std::chrono;
 #define _QUERY1_ "UPDATE `mga_event_data` SET `active` = '1' WHERE `id` ='1'"
 #define _QUERY2_ "UPDATE `mga_event_data` SET `active` = '0' WHERE `id` ='1'"
 
-
-enum Data
-{
-    MEGABOSS_DATA = 0,
-};
-
 enum NPCs
 {
    NPC_GUARD							= 500924,
@@ -388,7 +382,7 @@ public:
 
     struct mga_boss_oneAI : public BossAI
     {
-        mga_boss_oneAI(Creature* creature) : BossAI(creature, MGABOSS_DATA) {}
+        mga_boss_oneAI(Creature* creature) : BossAI(creature)
         {
         }
 
@@ -546,7 +540,7 @@ public:
 				DoStartNoMovement(who);
 				}
 			}
-            BossAI::JustEngagedWith(who);
+            
 		
 		}
         void JustEngagedWith(Unit* who) override
