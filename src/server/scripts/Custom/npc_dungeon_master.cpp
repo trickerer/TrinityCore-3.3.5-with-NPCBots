@@ -50,11 +50,12 @@ public:
         bool OnGossipHello(Player* player) override
         {
             WorldSession* session = player->GetSession();
+            QueryResult result;
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Stormwind Vault 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             
-            result = WorldDatabase.PQuery("SELECT * FROM`mga_event_data` WHERE `id` = '1' AND `active` = '0'")
+            result = WorldDatabase.PQuery("SELECT * FROM`mga_event_data` WHERE `id` = '1' AND `active` = '0'");
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
