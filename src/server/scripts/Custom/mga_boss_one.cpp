@@ -23,6 +23,11 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Creature.h"
+#include "Unit.h"
+#include "Group.h"
+#include "Map.h"
+#include "CreatureAIImpl.h"
+
 
 using namespace std::chrono;
 
@@ -157,7 +162,7 @@ public:
 				if (BlindSpell <= uiDiff)
 				{
 					//DoCast(me, SPELL_RADIANCE );
-					Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 					if (target)
 						DoCast(target, SPELL_MANA_BURN);
 						
