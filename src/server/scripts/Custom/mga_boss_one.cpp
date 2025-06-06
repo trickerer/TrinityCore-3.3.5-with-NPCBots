@@ -208,7 +208,7 @@ public:
 
 		void JustSummoned(Creature* summon)
         {
-            summon->AI()->AttackStart(me->getVictim());
+            summon->AI()->AttackStart(me->GetVictim());
         }
 
 		void EnterEvadeMode() 
@@ -241,7 +241,7 @@ public:
 					{
 						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
 						me->SetReactState(REACT_AGGRESSIVE);
-						me->AddThreat(target, 100.0f);
+						me->GetThreatManager().AddThreat(target, 100.0f);
 						me->SetInCombatWith(target);
 						target->SetInCombatWith(me);
 						AttackStart(target);
@@ -434,7 +434,7 @@ public:
 
 		void JustSummoned(Creature* summon)
         {
-            summon->AI()->AttackStart(me->getVictim());
+            summon->AI()->AttackStart(me->GetVictim());
         }
 		
 		void EnterEvadeMode() 
@@ -499,7 +499,7 @@ public:
 				HasStarted = true;
 				EnterCombat(who);
 				DoCast(who, SPELL_ROOT); // root
-				me->AddThreat(who, 10.0f);
+				me->GetThreatManager().AddThreat(who, 10.0f);
 				DoCast(me, SPELL_SHIELD);
 				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 				//me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
@@ -561,7 +561,7 @@ public:
 					if (target)
 						DoCast(target, SPELL_FINGER);
 					else
-						DoCast(me->getVictim(), SPELL_FINGER);
+						DoCast(me->GetVictim(), SPELL_FINGER);
 					FingerCD = 3000;
 				}
 				else FingerCD -= uiDiff;
@@ -573,9 +573,9 @@ public:
 				MGAImmune = false;
 				me->RemoveAura(SPELL_SHIELD);
 				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
-				me->GetMotionMaster()->MoveChase(me->getVictim());
-				AttackStart(me->getVictim());
-				DoStartMovement(me->getVictim());
+				me->GetMotionMaster()->MoveChase(me->GetVictim());
+				AttackStart(me->GetVictim());
+				DoStartMovement(me->GetVictim());
 				SlimePoolCD = urand(12000, 14000);
 				me->Yell(PAUSEDONE, LANG_UNIVERSAL, NULL);
 				me->PlayDirectSound(15724) ; // UR_XT002_Aggro01.wav
@@ -588,15 +588,15 @@ public:
 				me->PlayDirectSound(5828) ; // AmnennarTheColdbringerSummon01.wav
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_MEDMODE, me->getVictim()->GetPositionX()-2, me->getVictim()->GetPositionY()+2, me->getVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_HARDMODE, me->getVictim()->GetPositionX()-2, me->getVictim()->GetPositionY()+2, me->getVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else
 				{
-					me->SummonCreature(NPC_GUARD, me->getVictim()->GetPositionX()-2, me->getVictim()->GetPositionY()+2, me->getVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
 			   GuardSpwanCD = urand(26000, 36000);
@@ -616,7 +616,7 @@ public:
 					Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 					if (target)
 					{
-						me->AddThreat(target, 20.0f);
+						me->GetThreatManager().AddThreat(target, 20.0f);
 						AttackStart(target);
 					}
 					me->RemoveAurasDueToSpell(SPELL_BONE_STORM);
@@ -638,10 +638,10 @@ public:
 					MGAImmune = false;
 					me->RemoveAura(SPELL_SHIELD);
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
-					me->GetMotionMaster()->MoveChase(me->getVictim());
+					me->GetMotionMaster()->MoveChase(me->GetVictim());
 					me->Yell(NOBUBBLE, LANG_UNIVERSAL, NULL);
-					DoStartMovement(me->getVictim());
-					AttackStart(me->getVictim());
+					DoStartMovement(me->GetVictim());
+					AttackStart(me->GetVictim());
 					if (me->GetEntry() == NPC_BOSS_MEDMODE)
 						ImmuneDuration = 13000;
 					else if (me->GetEntry() == NPC_BOSS_HARDMODE)
@@ -707,7 +707,7 @@ public:
 			   {
 					DoPull = true;
 					DoCast(me, SPELL_FROST_SLOW );
-					DoStartNoMovement(me->getVictim());
+					DoStartNoMovement(me->GetVictim());
 					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					me->Say(WIDOWMAKERPULL, LANG_UNIVERSAL, NULL);
 					DoCast(me, SPELL_ICY_GRIP );
@@ -722,8 +722,8 @@ public:
 					}
 					else
 					{
-						DoCast(me->getVictim(), SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, me->getVictim()->GetPositionX(), me->getVictim()->GetPositionY(), me->getVictim()->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						DoCast(me->GetVictim(), SPELL_ROOT); // root
+						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					}
 					me->Yell(DIEINAOE, LANG_UNIVERSAL, NULL); 
 			   }
@@ -754,7 +754,7 @@ public:
 		   if (IcyGripCD <= uiDiff)
 		   {
 		        DoCast(me, SPELL_ICY_GRIP );
-				me->GetMotionMaster()->MoveChase(me->getVictim());
+				me->GetMotionMaster()->MoveChase(me->GetVictim());
 				IcyGripCD = 300000;
 		   }
 		   else IcyGripCD -= uiDiff;
@@ -765,7 +765,7 @@ public:
 			   if (target)
 			   {
 				   AttackStart(target);
-				   me->AddThreat(target, 100.0f);
+				   me->GetThreatManager().AddThreat(target, 100.0f);
 				   me->GetMotionMaster()->MoveChase(target);
 			   }
 			   DoCast(me, SPELL_BONE_STORM);
@@ -806,7 +806,7 @@ public:
 			   DoCast(me, SPELL_SHIELD);
 			   me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 			   //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
-			   DoStartNoMovement(me->getVictim());
+			   DoStartNoMovement(me->GetVictim());
 			   ImmuneTimer = 30000;
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					ImmuneTimer = 25000;
