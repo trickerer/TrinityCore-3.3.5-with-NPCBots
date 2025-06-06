@@ -503,7 +503,7 @@ public:
 		
 		void MoveInLineOfSight(Unit* who)
 		{
-			if (me->IsWithinDistInMap(who, 10.0f))
+			if (me->IsWithinDistInMap(who, 100.0f))
 			{
 				if (me->IsValidAttackTarget(who) && !HasStarted)
 				{
@@ -540,11 +540,12 @@ public:
 				DoStartNoMovement(who);
 				}
 			}
+            BossAI::JustEngagedWith(who);
 		
 		}
         void JustEngagedWith(Unit* who) override
         {
-            BossAI::JustEngagedWith(who);
+            
         }
 		
 		void EnterCombat(Unit* Who)
