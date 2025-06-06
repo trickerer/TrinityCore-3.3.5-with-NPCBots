@@ -605,7 +605,7 @@ public:
         {
 			if (TimerStarted)
             {
-                if (DespawnTimer <= diff)
+                if (DespawnTimer <= uidiff)
                 {
                     TimerStarted = false; // Only once
 
