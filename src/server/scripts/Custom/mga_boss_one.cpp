@@ -380,7 +380,7 @@ public:
         return new mga_boss_oneAI(creature);
     }
 
-    struct mga_boss_oneAI : public BossAI
+    struct mga_boss_oneAI : public ScriptedAI
     {
         mga_boss_oneAI(Creature* creature) : ScriptedAI(creature)
         {
