@@ -305,6 +305,7 @@ public:
 					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
 					
 				uiSwpadd = urand(60000, 65000);
+                me->Say("SUMMON GUARDS!", LANG_UNIVERSAL, NULL);
 			}
 			else uiSwpadd -= uiDiff;
 			
@@ -449,6 +450,7 @@ public:
 		void EnterEvadeMode() 
 		{
 			WorldDatabase.PExecute(_QUERY1_);
+            me->DisappearAndDie();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
@@ -461,7 +463,8 @@ public:
 
 		void JustDied(Unit* /*killer*/)
 		{
-			//WorldDatabase.PExecute(_QUERY1_);
+			WorldDatabase.PExecute(_QUERY1_);
+            me->Yell("THIS CAN NOT BE!!!!", LANG_UNIVERSAL, NULL);
 			//if (me->GetEntry() == NPC_BOSS_HARDMODE)
 			//	SendMSGToAll("Has been downed in 25+ Man Mode.  Well Done!");
 			//else if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -498,7 +501,8 @@ public:
 			}
 		}
 		
-		void MoveInLineOfSight(Unit* who)
+		//void MoveInLineOfSight(Unit* who)
+        void JustEngagedWith(Unit* who) override
 		{
 			if (me->IsWithinDistInMap(who, 10.0f))
 			{
