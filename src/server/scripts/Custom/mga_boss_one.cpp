@@ -589,7 +589,7 @@ public:
             }
         }
         
-        void JustDespawned() override
+        void JustDespawned() //override
         {
             WorldDatabase.PExecute(_QUERY1_);
             me->Yell("BYE NOOBS!", LANG_UNIVERSAL);
