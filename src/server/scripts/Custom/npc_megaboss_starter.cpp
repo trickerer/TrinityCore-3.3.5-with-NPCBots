@@ -92,7 +92,7 @@ public:
                 {
                     if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                     {
-                        channel->Say(ObjectGuid::Empty, "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
+                        channel->Say(player->GetGUID(), "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
                     }
                 }
                 return true;
