@@ -241,7 +241,7 @@ public:
 		{
 			if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
 			{
-				if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true));
+				if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
@@ -435,7 +435,7 @@ public:
 			DoneSwam = false;
 			DoPull = false;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			me->setFaction(14);
+			me->SetFaction(14);
 			
         }
 
@@ -459,26 +459,26 @@ public:
 		void JustDied(Unit* /*killer*/)
 		{
 			//WorldDatabase.PExecute(_QUERY1_);
-			if (me->GetEntry() == NPC_BOSS_HARDMODE)
-				SendMSGToAll("Has been downed in 25+ Man Mode.  Well Done!");
-			else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-				SendMSGToAll("Has been downed in 15-25 Man Mode.  Well Done!");
-			else
-				SendMSGToAll("Has been downed in 10-15 Man Mode.  Well Done!");
+			//if (me->GetEntry() == NPC_BOSS_HARDMODE)
+			//	SendMSGToAll("Has been downed in 25+ Man Mode.  Well Done!");
+			//else if (me->GetEntry() == NPC_BOSS_MEDMODE)
+			//	SendMSGToAll("Has been downed in 15-25 Man Mode.  Well Done!");
+			//else
+			//	SendMSGToAll("Has been downed in 10-15 Man Mode.  Well Done!");
 				
-			QueryResult result;
-			result = WorldDatabase.PQuery("SELECT * FROM `bonus_rewards` WHERE `active` = '1' AND `name` = 'megaboss' LIMIT 1");
-			if(result)
-			{
-				Field *fields = result->Fetch();
-				uint32 bitem = fields[2].GetInt32();
-				uint32 bcount = fields[3].GetInt32();
-				if (bitem > 1 && bcount > 0)
-				{
+			//QueryResult result;
+			//result = WorldDatabase.PQuery("SELECT * FROM `bonus_rewards` WHERE `active` = '1' AND `name` = 'megaboss' LIMIT 1");
+			//if(result)
+			//{
+			//	Field *fields = result->Fetch();
+			//	uint32 bitem = fields[2].GetInt32();
+			//	uint32 bcount = fields[3].GetInt32();
+			//	if (bitem > 1 && bcount > 0)
+			//	{
 					//SPAWN A CHEST WITH EXTRA LOOTS
-					me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
-				}
-			}
+			//		me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
+			//	}
+			//}
 			/**std::string title ="Mega Boss Event";
 			std::string msg ="The Mega Boss has been DOWNED!!!, well done! | #mgawow ";
 			std::string url ="http://wrath.mgawow.co.uk/activity";
