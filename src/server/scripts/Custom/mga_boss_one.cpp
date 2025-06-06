@@ -607,17 +607,19 @@ public:
 			bool anyPlayerAlive = false;
 
             // Try to select a random player from threat list who is alive
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 1000, true); // this might need tweaking!!
-
-            if (target && target->IsPlayer() && target->IsAlive())
-                anyPlayerAlive = true;
-
-            if (!anyPlayerAlive)
+            if (HasStarted)
             {
-                EnterEvadeMode();
-                return;
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true); // this might need tweaking!!
+
+                if (target && target->IsPlayer() && target->IsAlive())
+                    anyPlayerAlive = true;
+
+                if (!anyPlayerAlive)
+                {
+                    EnterEvadeMode();
+                    return;
+                }
             }
-            
             if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
