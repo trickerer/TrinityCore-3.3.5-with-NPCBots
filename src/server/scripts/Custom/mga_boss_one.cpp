@@ -24,6 +24,7 @@
 #include "WorldSession.h"
 #include "Creature.h"
 
+using namespace std::chrono;
 
 #define AGGRO			1710000 
 #define	PAUSEDONE		1710001
