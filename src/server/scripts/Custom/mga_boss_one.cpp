@@ -30,6 +30,7 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
+#include "InstanceScript.h"
 
 using namespace std::chrono;
 
@@ -450,7 +451,6 @@ public:
         
         void Reset() override
         {
-            _Reset();
             WorldDatabase.Execute(_QUERY1_);
             me->DisappearAndDie();
             me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
