@@ -406,6 +406,8 @@ public:
 		uint32 FingerCD;
 		uint32 LeechTimer;
 		uint32 DoPullCD;
+        uint32 DespawnTimer;
+        bool TimerStarted;
 		bool PauseDone;
 		bool HasStarted;
 		bool MGAImmune;
@@ -441,6 +443,8 @@ public:
 			DoPull = false;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
+            DespawnTimer = 60000; // 60 seconds until despawn
+            TimerStarted = true;
             
 			
         }
@@ -599,7 +603,22 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-			if (!UpdateVictim())
+			if (TimerStarted)
+            {
+                if (DespawnTimer <= diff)
+                {
+                    TimerStarted = false; // Only once
+
+                    // Your SQL + message logic
+                    WorldDatabase.Execute(_QUERY1_);
+                    me->Yell("YOU COWARDS... RUN THEN!", LANG_UNIVERSAL);
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+                else
+                    DespawnTimer -= diff;
+            }
+            if (!UpdateVictim())
                 return;
 
 			if (EnrageTimer <= uiDiff)
