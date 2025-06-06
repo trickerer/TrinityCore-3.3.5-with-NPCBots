@@ -292,9 +292,9 @@ public:
 			
 			if (uiSwpadd <= uiDiff)
 			{
-				me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+				me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				if (me->GetEntry() == NPC_GUARD_HARDMODE)
-					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 					
 				uiSwpadd = urand(60000, 65000);
 			}
@@ -506,23 +506,23 @@ public:
 				MGAImmune = true;
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-					me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else
 				{
-					me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-					me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				SlimePoolCD = 18000;
-				me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
+				me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 30000);
 				me->Yell(AGGRO, LANG_UNIVERSAL, NULL);
 				DoStartNoMovement(who);
 				}
@@ -588,15 +588,15 @@ public:
 				me->PlayDirectSound(5828) ; // AmnennarTheColdbringerSummon01.wav
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 				{
-					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 				else
 				{
-					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 				}
 			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
 			   GuardSpwanCD = urand(26000, 36000);
@@ -700,7 +700,7 @@ public:
 			   if (target && pullcheck < 2)
 			   {
 					DoCast(target, SPELL_ROOT); // root
-					me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+					me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
 			   else if (pullcheck > 1 && pullcheck < 3 && !DoPull)
@@ -708,7 +708,7 @@ public:
 					DoPull = true;
 					DoCast(me, SPELL_FROST_SLOW );
 					DoStartNoMovement(me->GetVictim());
-					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
 					DoCast(me, SPELL_ICY_GRIP );
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
@@ -718,12 +718,12 @@ public:
 					if (target)
 					{
 						DoCast(target, SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					}
 					else
 					{
 						DoCast(me->GetVictim(), SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					}
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
@@ -734,7 +734,7 @@ public:
 					if (target)
 					{
 						DoCast(target, SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					}
 			   }
 			   
