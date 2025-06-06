@@ -384,9 +384,9 @@ public:
 		uint32 BlueSHitCD;
 		uint32 IcyGripCD;
 		uint32 GuardSpwanCD;
-		uint32 "NAB STORM!!!!!"CD;
+		uint32 NABSTORMCD;
 		uint32 BossPauseTimer;
-		uint32 "NAB STORM!!!!!"Timer;
+		uint32 NABSTORMTimer;
 		uint32 ImmuneTimer;
 		uint32 ImmuneDuration;
 		uint32 pullcheck;
@@ -412,8 +412,8 @@ public:
 			IcyGripCD = 180000; //done
 			GuardSpwanCD = 27000; //done
 			SlimePoolCD = 20000; //done
-			"NAB STORM!!!!!"CD = 22000; //done
-			"NAB STORM!!!!!"Timer = 7000; //done
+			NABSTORMCD = 22000; //done
+			NABSTORMTimer = 7000; //done
 			BossPauseTimer = 35000; //done
 			ImmuneTimer = 30000;
 			ImmuneDuration = 20000;
@@ -611,7 +611,7 @@ public:
 
 		   	if (me->HasAura(SPELL_BONE_STORM))
 			{
-				if ("NAB STORM!!!!!"Timer <= uiDiff)
+				if (NABSTORMTimer <= uiDiff)
 				{
 					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
@@ -620,9 +620,9 @@ public:
 						AttackStart(target);
 					}
 					me->RemoveAurasDueToSpell(SPELL_BONE_STORM);
-					"NAB STORM!!!!!"Timer = 10000;
+					NABSTORMTimer = 10000;
 				}
-				else "NAB STORM!!!!!"Timer -= uiDiff;
+				else NABSTORMTimer -= uiDiff;
 					
 				return;
 			}
@@ -759,7 +759,7 @@ public:
 		   }
 		   else IcyGripCD -= uiDiff;
 
-		   if ("NAB STORM!!!!!"CD <= uiDiff)
+		   if (NABSTORMCD <= uiDiff)
 		   {
 			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
@@ -770,13 +770,13 @@ public:
 			   }
 			   DoCast(me, SPELL_BONE_STORM);
 			   me->Yell("NAB STORM!!!!!", LANG_UNIVERSAL, NULL);
-			   "NAB STORM!!!!!"CD = urand(19000, 24000);
+			   NABSTORMCD = urand(19000, 24000);
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
-					"NAB STORM!!!!!"CD = urand(15000, 20000);
+					NABSTORMCD = urand(15000, 20000);
 				if (me->GetEntry() == NPC_BOSS_HARDMODE)
-					"NAB STORM!!!!!"CD = urand(15000, 20000);
+					NABSTORMCD = urand(15000, 20000);
 		   }
-		   else "NAB STORM!!!!!"CD -= uiDiff;
+		   else NABSTORMCD -= uiDiff;
 
 		   if (flightningCD <= uiDiff)
 		   {
