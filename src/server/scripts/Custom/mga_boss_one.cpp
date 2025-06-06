@@ -616,7 +616,7 @@ public:
                     return;
                 }
                 else
-                    DespawnTimer -= diff;
+                    DespawnTimer -= uidiff;
             }
             if (!UpdateVictim())
                 return;
