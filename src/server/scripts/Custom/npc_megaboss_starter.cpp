@@ -92,7 +92,7 @@ public:
                 {
                     if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                     {
-                        channel->SayAsFake(3181, "MGA Mega Boss event has started!  5 Man Mode! Prepare yourselves!");
+                        channel->Say(player->GetGUID(), "MGA Mega Boss event has started!  5 Man Mode! Prepare yourselves!", LANG_UNIVERSAL);
                     }
                 }
                 return true;
@@ -107,7 +107,7 @@ public:
                 {
                     if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                     {
-                        channel->SayAsFake(3181, "MGA Mega Boss event has started! 10 Man Mode! Prepare yourselves!");
+                        channel->Say(player->GetGUID(), "MGA Mega Boss event has started! 10 Man Mode! Prepare yourselves!", LANG_UNIVERSAL);
                     }
                 }
                 return true;
@@ -122,7 +122,7 @@ public:
                 {
                     if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                     {
-                        channel->SayAsFake(3181, "MGA Mega Boss event has started! 25 Man Mode! Prepare yourselves!");
+                        channel->Say(player->GetGUID(), "MGA Mega Boss event has started! 25 Man Mode! Prepare yourselves!", LANG_UNIVERSAL);
                     }
                 }
                 return true;
