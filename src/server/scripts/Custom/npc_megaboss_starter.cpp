@@ -11,6 +11,8 @@
 #include <sstream>
 #include <string>
 
+using namespace std::chrono;
+
 enum NPCs
 {
    NPC_BOSS_5MAN					= 500935,
