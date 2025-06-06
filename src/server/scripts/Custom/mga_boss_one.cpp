@@ -241,7 +241,7 @@ public:
 		{
 			if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
 			{
-				if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
+				if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
