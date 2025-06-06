@@ -305,7 +305,6 @@ public:
 					me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
 					
 				uiSwpadd = urand(60000, 65000);
-                me->Say("SUMMON GUARDS!", LANG_UNIVERSAL, NULL);
 			}
 			else uiSwpadd -= uiDiff;
 			
@@ -503,10 +502,21 @@ public:
 		
 		void MoveInLineOfSight(Unit* who)
 		{
-			if (me->IsWithinDistInMap(who, 100.0f))
+			if (me->IsWithinDistInMap(who, 10.0f))
 			{
-				if (me->IsValidAttackTarget(who) && !HasStarted)
-				{
+				//if (me->IsValidAttackTarget(who) && !HasStarted)
+				//{
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                    me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SLOW_ATTACK, true);
+                    me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
+                    me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
+                    
                     WorldDatabase.PExecute(_QUERY2_);
                     me->PlayDirectSound(15771) ; // UR_FemaleYogg_Prefight01.wav
                     HasStarted = true;
@@ -521,6 +531,7 @@ public:
                     {
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
                     }
                     else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
@@ -528,17 +539,19 @@ public:
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
                     }
                     else
                     {
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, milliseconds(2000));
+                        me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                     }
                     SlimePoolCD = 18000;
                     me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
-				}
+				//}
 			}
 		
 		}
