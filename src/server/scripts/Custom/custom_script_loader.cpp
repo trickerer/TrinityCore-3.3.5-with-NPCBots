@@ -44,6 +44,7 @@ void AddSC_npc_weapon_master();
 void AddSC_boss_memory_of_hogger();
 void AddSC_item_learn_flightpaths();
 void AddSC_mga_boss();
+void AddSC_npc_megaboss_starter();
 
 void AddCustomScripts()
 {
@@ -70,4 +71,5 @@ void AddCustomScripts()
     AddSC_boss_memory_of_hogger();
     AddSC_item_learn_flightpaths();
     AddSC_mga_boss();
+    AddSC_npc_megaboss_starter();
 }

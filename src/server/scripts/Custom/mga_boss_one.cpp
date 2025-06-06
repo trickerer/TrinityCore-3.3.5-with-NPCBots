@@ -47,8 +47,9 @@ using namespace std::chrono;
 
 #define WIDOWMAKERPULL	1710008
 
-#define _QUERY1_ "UPDATE `mga_event_data` SET `active` = '1' WHERE `id` ='1'"
-#define _QUERY2_ "UPDATE `mga_event_data` SET `active` = '0' WHERE `id` ='1'"
+
+#define _QUERY1_ "UPDATE `mga_event_data` SET `active` = '0' WHERE `id` ='1'"
+#define _QUERY2_ "UPDATE `mga_event_data` SET `active` = '1' WHERE `id` ='1'"
 
 enum NPCs
 {
@@ -241,7 +242,7 @@ public:
 		
 		void MoveInLineOfSight(Unit* who)
 		{
-			if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
+			if (me->IsWithinDistInMap(who, 200.0f) && who->GetTypeId() == TYPEID_PLAYER)
 			{
 				if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
 				{
@@ -563,7 +564,29 @@ public:
 		}
         void JustEngagedWith(Unit* who) override
         {
-            //TODO BUT NOTHING REALLY NEEDS DOING LOL
+            Player* player = nullptr;
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                player = who->ToPlayer();
+            else if (who->GetTypeId() == TYPEID_UNIT) // Maybe it's a pet or summoned unit
+                player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (player)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    {
+                        Player* member = itr->GetSource();
+                        if (member && member->IsInMap(me))
+                        {
+                            me->SetInCombatWith(member);
+                            member->SetInCombatWith(me);
+                            who->SetInCombatWith(me);
+                            me->GetThreatManager().AddThreat(member, 1.0f);
+                        }
+                    }
+                }
+            }
         }
 		
 		void EnterCombat(Unit* Who)
