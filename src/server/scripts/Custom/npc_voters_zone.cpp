@@ -84,19 +84,10 @@ public:
             
             //result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
            
-            if (result2)
+            if ((result2) || (player->IsGameMaster()))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
-                //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                
-            }
-            else if (player->IsGameMaster())
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
@@ -164,7 +155,6 @@ public:
             }
 			if (action == GOSSIP_ACTION_INFO_DEF + 1000)
 			{
-				//_Creature->Say("TELEPORT", LANG_UNIVERSAL);
 				CloseGossipMenuFor(player);
 				if (player->GetClass() == CLASS_DEATH_KNIGHT && player->GetLevel() < 80)
 					player->SetPhaseMask(PHASEMASK_NORMAL, false);
@@ -175,7 +165,6 @@ public:
 			if (action == GOSSIP_ACTION_INFO_DEF + 1001)
 			{
 				me->Say("Farewell "+player->GetName(), LANG_UNIVERSAL);
-				//me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
 				CloseGossipMenuFor(player);
 				return true;
 			}
@@ -183,14 +172,12 @@ public:
 			{
 				CloseGossipMenuFor(player);
 				me->Say("Farewell "+player->GetName(), LANG_UNIVERSAL);
-				//me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
 				return true;
 			}
 			if (action == GOSSIP_ACTION_INFO_DEF + 1003)
 			{
 				CloseGossipMenuFor(player);
                 player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
-				//player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
 				player->SetPvP(false);
 				return true;
 			}
