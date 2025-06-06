@@ -8,6 +8,7 @@
 #include "Group.h"
 #include "Map.h"
 #include "InstanceScript.h"
+#include "ThreatManager.h"
 
 using namespace std::chrono;
 

@@ -31,6 +31,7 @@
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
 #include "InstanceScript.h"
+#include "ThreatManager.h"
 
 using namespace std::chrono;
 
