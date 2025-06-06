@@ -605,19 +605,12 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
 			bool anyPlayerAlive = false;
-            const auto& threatList = me->GetThreatManager().getThreatList();
 
-            for (auto const& threatRef : threatList)
-            {
-                if (Unit* target = threatRef->getTarget())
-                {
-                    if (target->IsAlive() && target->IsPlayer())
-                    {
-                        anyPlayerAlive = true;
-                        break;
-                    }
-                }
-            }
+            // Try to select a random player from threat list who is alive
+            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true);
+
+            if (target && target->IsPlayer() && target->IsAlive())
+                anyPlayerAlive = true;
 
             if (!anyPlayerAlive)
             {
