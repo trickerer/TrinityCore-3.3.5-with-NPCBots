@@ -605,7 +605,7 @@ public:
         {
 			if (TimerStarted)
             {
-                if (DespawnTimer <= uidiff)
+                if (DespawnTimer <= uiDiff)
                 {
                     TimerStarted = false; // Only once
 
@@ -616,7 +616,7 @@ public:
                     return;
                 }
                 else
-                    DespawnTimer -= uidiff;
+                    DespawnTimer -= uiDiff;
             }
             if (!UpdateVictim())
                 return;
