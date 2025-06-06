@@ -51,11 +51,20 @@ public:
         {
             WorldSession* session = player->GetSession();
             QueryResult result;
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Stormwind Vault 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+            if(player->GetLevel() >= 77)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Stormwind Vault 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+            }
+            else
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Stormwind Vault 5 Man Dungeon You Need Level 77+", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Forgotten Scarlet Monastery 5 Man Dungeon You Need Level 77+", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "Karazhan Crypts 5 Man Dungeon You Need Level 77+", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
+            }
             
-            if(player->getLevel() >= 80)
+            if(player->GetLevel() >= 80)
             {
                 result = WorldDatabase.PQuery("SELECT * FROM `mga_event_data` WHERE `id` = '1' AND `active` = '0'");
                 if (result)
