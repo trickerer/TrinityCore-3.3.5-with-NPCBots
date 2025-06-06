@@ -54,9 +54,17 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             
-            
+            result = WorldDatabase.PQuery("SELECT * FROM`mga_event_data` WHERE `id` = '1' AND `active` = '0'")
+            if (result)
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+            }
+            else
+            {
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss IS ACTIVE!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001);
+            }
 
-            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
             return true;
@@ -91,8 +99,23 @@ public:
                 player->SetPvP(false);
                 return false;
             }
-
+            
             if (action == GOSSIP_ACTION_INFO_DEF + 2000)
+            {
+                CloseGossipMenuFor(player);
+                player->TeleportTo(1, -9954.21f, 128.26f, 0.38f, 1.664262f);
+                player->SetPvP(false);
+                return false;
+            }
+            
+            if (action == GOSSIP_ACTION_INFO_DEF + 2001)
+            {
+                me->Say(player->GetName() + " The MEGA Boss Fight Has Started, try later!", LANG_UNIVERSAL);
+                CloseGossipMenuFor(player);
+                return true;
+            }
+
+            if (action == GOSSIP_ACTION_INFO_DEF + 9000)
             {
                 me->Say(player->GetName() + " Bye.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
