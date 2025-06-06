@@ -441,6 +441,9 @@ public:
 			DoPull = false;
 			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
+            WorldDatabase.Execute(_QUERY1_);
+            me->DisappearAndDie();
+            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
 			
         }
 
@@ -449,12 +452,6 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
         
-        void Reset() override
-        {
-            WorldDatabase.Execute(_QUERY1_);
-            me->DisappearAndDie();
-            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
-        }
 		
 		void EnterEvadeMode()
 		{
