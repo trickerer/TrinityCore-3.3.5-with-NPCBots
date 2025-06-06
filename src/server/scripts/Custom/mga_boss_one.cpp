@@ -544,7 +544,7 @@ public:
 		}
         void JustEngagedWith(Unit* who) override
         {
-            BossAI::JustEngagedWith(who);
+            ScriptedAI::JustEngagedWith(who);
         }
 		
 		void EnterCombat(Unit* Who)
