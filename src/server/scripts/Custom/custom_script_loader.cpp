@@ -43,6 +43,7 @@ void AddSC_TestLoginHook();
 void AddSC_npc_weapon_master();
 void AddSC_boss_memory_of_hogger();
 void AddSC_item_learn_flightpaths();
+void AddSC_mga_boss();
 
 void AddCustomScripts()
 {
@@ -68,4 +69,5 @@ void AddCustomScripts()
     AddSC_npc_weapon_master();
     AddSC_boss_memory_of_hogger();
     AddSC_item_learn_flightpaths();
+    AddSC_mga_boss();
 }
