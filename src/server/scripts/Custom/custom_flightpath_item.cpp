@@ -35,7 +35,7 @@ public:
 
         if (count > 0)
         {
-            player->DestroyItemCount(item->GetEntry(), 1, true);
+            player->DestroyItemCount(461146, 1, true);
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
             player->SaveToDB();
