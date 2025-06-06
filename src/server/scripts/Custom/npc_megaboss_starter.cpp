@@ -4,6 +4,9 @@
 #include "GameEventMgr.h"
 #include "Player.h"
 #include "Unit.h"
+#include "Chat.h"
+#include "ChannelMgr.h"
+#include "Channel.h"
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
@@ -80,6 +83,9 @@ public:
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
                 me->SummonCreature(NPC_BOSS_5MAN, -9676.397461, -6.144296, -20.832001, 5.506104, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(60000));
+                ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+                Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
+                channel->SayAsFake(player, "EVENT MASTER", "MGA Mega Boss - 5 Mnn Mode Started!", LANG_UNIVERSAL);
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1001)
