@@ -120,7 +120,7 @@ public:
 			if (victim->GetTypeId() == TYPEID_PLAYER)
 			{
 				me->PlayDirectSound(14565) ; // EbonHold_WomanScream2_01.wav
-				me->Say(PLAYERDIEADD, LANG_UNIVERSAL, NULL);
+				me->Say("Mistress i killed one for you", LANG_UNIVERSAL, NULL);
 			}
 		}
 
@@ -137,7 +137,7 @@ public:
 			if (uiExplodeTimer <= uiDiff)
 			{
 				DoCast(me, SPELL_IMMOLATE, true);
-				me->Say(MINIADDFIRE, LANG_UNIVERSAL, NULL);
+				me->Say("Burn in my unholy fire, burn baby burn!!!", LANG_UNIVERSAL, NULL);
 				uiExplodeTimer = 12000;
 				HasPopped = true;
 			}
@@ -145,7 +145,7 @@ public:
 			
 			if (uiDespawnTimer <= uiDiff && HasPopped)
 			{
-				me->Say(MINIADDDIE, LANG_UNIVERSAL, NULL);
+				me->Say("No my time here is over, sorry Window Maker", LANG_UNIVERSAL, NULL);
 				me->PlayDirectSound(9818) ; // FelBoarDeathA.wav
 				EnterEvadeMode();
 			}
@@ -227,7 +227,7 @@ public:
 			if (victim->GetTypeId() == TYPEID_PLAYER)
 			{
 				me->PlayDirectSound(14565) ; // EbonHold_WomanScream2_01.wav
-				me->Say(PLAYERDIEADD, LANG_UNIVERSAL, NULL);
+				me->Say("Mistress i killed one for you", LANG_UNIVERSAL, NULL);
 			}
 		}
 		
@@ -384,9 +384,9 @@ public:
 		uint32 BlueSHitCD;
 		uint32 IcyGripCD;
 		uint32 GuardSpwanCD;
-		uint32 NabStormCD;
+		uint32 "NAB STORM!!!!!"CD;
 		uint32 BossPauseTimer;
-		uint32 NabStormTimer;
+		uint32 "NAB STORM!!!!!"Timer;
 		uint32 ImmuneTimer;
 		uint32 ImmuneDuration;
 		uint32 pullcheck;
@@ -412,8 +412,8 @@ public:
 			IcyGripCD = 180000; //done
 			GuardSpwanCD = 27000; //done
 			SlimePoolCD = 20000; //done
-			NabStormCD = 22000; //done
-			NabStormTimer = 7000; //done
+			"NAB STORM!!!!!"CD = 22000; //done
+			"NAB STORM!!!!!"Timer = 7000; //done
 			BossPauseTimer = 35000; //done
 			ImmuneTimer = 30000;
 			ImmuneDuration = 20000;
@@ -484,7 +484,7 @@ public:
 			if (victim->GetTypeId() == TYPEID_PLAYER)
 			{
 				me->PlayDirectSound(14565) ; // EbonHold_WomanScream2_01.wav
-				me->Say(PLAYERDIE, LANG_UNIVERSAL, NULL);
+				me->Say("Back to the graveyard for you.", LANG_UNIVERSAL, NULL);
 			}
 		}
 		
@@ -546,7 +546,7 @@ public:
 				DoCast(me, SPELL_ENRAGE);
 				HasEnraged = true;
 				EnrageTimer = 6000000;
-				me->Say(ENRAGE, LANG_UNIVERSAL, NULL);
+				me->Say("I HAVE HAD ENOUGH!", LANG_UNIVERSAL, NULL);
 			}
 			else EnrageTimer -= uiDiff;
 
@@ -577,7 +577,7 @@ public:
 				AttackStart(me->GetVictim());
 				DoStartMovement(me->GetVictim());
 				SlimePoolCD = urand(12000, 14000);
-				me->Yell(PAUSEDONE, LANG_UNIVERSAL, NULL);
+				me->Yell("Minions Assist Me Now, Kill them all!!!!", LANG_UNIVERSAL, NULL);
 				me->PlayDirectSound(15724) ; // UR_XT002_Aggro01.wav
 				
 			}else BossPauseTimer -= uiDiff;
@@ -611,7 +611,7 @@ public:
 
 		   	if (me->HasAura(SPELL_BONE_STORM))
 			{
-				if (NabStormTimer <= uiDiff)
+				if ("NAB STORM!!!!!"Timer <= uiDiff)
 				{
 					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
@@ -620,9 +620,9 @@ public:
 						AttackStart(target);
 					}
 					me->RemoveAurasDueToSpell(SPELL_BONE_STORM);
-					NabStormTimer = 10000;
+					"NAB STORM!!!!!"Timer = 10000;
 				}
-				else NabStormTimer -= uiDiff;
+				else "NAB STORM!!!!!"Timer -= uiDiff;
 					
 				return;
 			}
@@ -639,7 +639,7 @@ public:
 					me->RemoveAura(SPELL_SHIELD);
 					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 					me->GetMotionMaster()->MoveChase(me->GetVictim());
-					me->Yell(NOBUBBLE, LANG_UNIVERSAL, NULL);
+					me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
 					DoStartMovement(me->GetVictim());
 					AttackStart(me->GetVictim());
 					if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -701,7 +701,7 @@ public:
 			   {
 					DoCast(target, SPELL_ROOT); // root
 					me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
-					me->Yell(DIEINAOE, LANG_UNIVERSAL, NULL); 
+					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
 			   else if (pullcheck > 1 && pullcheck < 3 && !DoPull)
 			   {
@@ -709,9 +709,9 @@ public:
 					DoCast(me, SPELL_FROST_SLOW );
 					DoStartNoMovement(me->GetVictim());
 					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
-					me->Say(WIDOWMAKERPULL, LANG_UNIVERSAL, NULL);
+					me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
 					DoCast(me, SPELL_ICY_GRIP );
-					me->Yell(DIEINAOE, LANG_UNIVERSAL, NULL);
+					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
 			   }
 			   else
 			   {
@@ -725,7 +725,7 @@ public:
 						DoCast(me->GetVictim(), SPELL_ROOT); // root
 						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 29000);
 					}
-					me->Yell(DIEINAOE, LANG_UNIVERSAL, NULL); 
+					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
 			   
 			   if (me->GetEntry() == NPC_BOSS_HARDMODE)
@@ -759,7 +759,7 @@ public:
 		   }
 		   else IcyGripCD -= uiDiff;
 
-		   if (NabStormCD <= uiDiff)
+		   if ("NAB STORM!!!!!"CD <= uiDiff)
 		   {
 			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
@@ -769,14 +769,14 @@ public:
 				   me->GetMotionMaster()->MoveChase(target);
 			   }
 			   DoCast(me, SPELL_BONE_STORM);
-			   me->Yell(NABSTORM, LANG_UNIVERSAL, NULL);
-			   NabStormCD = urand(19000, 24000);
+			   me->Yell("NAB STORM!!!!!", LANG_UNIVERSAL, NULL);
+			   "NAB STORM!!!!!"CD = urand(19000, 24000);
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
-					NabStormCD = urand(15000, 20000);
+					"NAB STORM!!!!!"CD = urand(15000, 20000);
 				if (me->GetEntry() == NPC_BOSS_HARDMODE)
-					NabStormCD = urand(15000, 20000);
+					"NAB STORM!!!!!"CD = urand(15000, 20000);
 		   }
-		   else NabStormCD -= uiDiff;
+		   else "NAB STORM!!!!!"CD -= uiDiff;
 
 		   if (flightningCD <= uiDiff)
 		   {
@@ -802,7 +802,7 @@ public:
 		   {
 			   MGAImmune = true;
 			   me->PlayDirectSound(6918) ; // HumanFemaleLaugh01.wav
-			   me->Yell(HABUBBLE, LANG_UNIVERSAL, NULL);
+			   me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
 			   DoCast(me, SPELL_SHIELD);
 			   me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 			   //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
