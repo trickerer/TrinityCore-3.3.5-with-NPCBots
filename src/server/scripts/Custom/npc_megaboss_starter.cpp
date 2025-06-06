@@ -70,6 +70,7 @@ public:
             }
             
 
+            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Send Me Home!", GOSSIP_SENDER_MAIN, 8000);
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
@@ -110,6 +111,21 @@ public:
                 ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
                 Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
                 channel->SayAsFake(player, "Discord", "MGA Mega Boss - 25 Mnn Mode Started!", LANG_UNIVERSAL);
+                return true;
+            }
+            if (action == GOSSIP_ACTION_INFO_DEF + 8000)
+            {
+                CloseGossipMenuFor(player);
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
+				//player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
+				player->SetPvP(false);
+				return true;
+            }
+            if (action == GOSSIP_ACTION_INFO_DEF + 9000)
+            {
+                CloseGossipMenuFor(player);
+                me->Say("Farewell "+player->GetName(), LANG_UNIVERSAL);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                 return true;
             }
             CloseGossipMenuFor(player);

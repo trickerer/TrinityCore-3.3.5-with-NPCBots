@@ -243,7 +243,7 @@ public:
                 player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
 				//player->CastSpell(player, 8690, true); //https://www.wowhead.com/wotlk/spell=8690/hearthstone
 				player->SetPvP(false);
-				return true;;
+				return true;
             }
 			break;	
             case 2:
@@ -251,6 +251,7 @@ public:
                 CloseGossipMenuFor(player);
                 me->Say("Farewell "+player->GetName(), LANG_UNIVERSAL);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
+                return true;
             }
 			break;
             case 1001:
