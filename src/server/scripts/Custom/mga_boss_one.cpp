@@ -245,7 +245,7 @@ public:
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
-						me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+						//me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
 						me->SetReactState(REACT_AGGRESSIVE);
 						me->GetThreatManager().AddThreat(target, 100.0f);
 						me->SetInCombatWith(target);
@@ -530,7 +530,7 @@ public:
 				}
 				SlimePoolCD = 18000;
 				me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
-				me->Yell(AGGRO, LANG_UNIVERSAL, NULL);
+				me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
 				DoStartNoMovement(who);
 				}
 			}
