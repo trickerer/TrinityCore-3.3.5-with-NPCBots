@@ -263,7 +263,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-			if (me->HasUnitState(UNIT_STAT_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING))
                return;
 
 			if (!UpdateVictim())
@@ -550,14 +550,14 @@ public:
 			}
 			else EnrageTimer -= uiDiff;
 
-			if (me->HasUnitState(UNIT_STAT_CASTING))
+			if (me->HasUnitState(UNIT_STATE_CASTING))
                return;
 
 			if (HasEnraged)
 			{
 				if (FingerCD <= uiDiff)
 				{
-					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
 						DoCast(target, SPELL_FINGER);
 					else
@@ -613,7 +613,7 @@ public:
 			{
 				if (NabStormTimer <= uiDiff)
 				{
-					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
 					{
 						me->GetThreatManager().AddThreat(target, 20.0f);
@@ -696,7 +696,7 @@ public:
 					pullcheck = urand(1, 4);
 				else
 					pullcheck = urand(1, 6);
-			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target && pullcheck < 2)
 			   {
 					DoCast(target, SPELL_ROOT); // root
@@ -730,7 +730,7 @@ public:
 			   
 			   if (me->GetEntry() == NPC_BOSS_HARDMODE)
 			   {
-					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
 					{
 						DoCast(target, SPELL_ROOT); // root
@@ -740,7 +740,7 @@ public:
 			   
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
 			   {
-					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
 					{
 						DoCast(target, SPELL_FELL_FIREBALL);
@@ -761,7 +761,7 @@ public:
 
 		   if (NabStormCD <= uiDiff)
 		   {
-			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
 			   {
 				   AttackStart(target);
@@ -780,7 +780,7 @@ public:
 
 		   if (flightningCD <= uiDiff)
 		   {
-			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
 				   DoCast(target, SPELL_FEL_LIGHTING);
 
@@ -790,7 +790,7 @@ public:
 
 		   /*if (DeathCoilCD <= uiDiff)
 		   {
-			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true)
+			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
 				   DoCast(target, SPELL_DEATH_COIL);
 
