@@ -266,6 +266,7 @@ public:
 			me->m_CombatDistance = 100.0f;
 			AttackStart(Who);
 			DoMeleeAttackIfReady();
+            uiSwpadd = urand(10000, 15000);
 			//DoCast(Who, SPELL_FEAR);
 		}
 
