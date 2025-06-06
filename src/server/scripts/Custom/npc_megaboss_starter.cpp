@@ -92,7 +92,7 @@ public:
                 Player* player = nullptr; // no player context needed, but if you want one, pass a GM or dummy player
                 Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
                 if (channel)
-                    channel->Say("MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL, player);
+                    channel->Say(player->GetGUID(), "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1001)
@@ -104,7 +104,7 @@ public:
                 Player* player = nullptr; // no player context needed, but if you want one, pass a GM or dummy player
                 Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
                 if (channel)
-                    channel->Say("MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL, player);
+                    channel->Say(player->GetGUID(), "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 1002)
@@ -116,7 +116,7 @@ public:
                 Player* player = nullptr; // no player context needed, but if you want one, pass a GM or dummy player
                 Channel* channel = cMgr->GetChannel(0, "world", player, false, nullptr);
                 if (channel)
-                    channel->Say("MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL, player);
+                    channel->Say(player->GetGUID(), "MGA Mega Boss event has started! Prepare yourselves!", LANG_UNIVERSAL);
                 return true;
             }
             if (action == GOSSIP_ACTION_INFO_DEF + 8000)
