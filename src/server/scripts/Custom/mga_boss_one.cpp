@@ -607,7 +607,7 @@ public:
 			bool anyPlayerAlive = false;
 
             // Try to select a random player from threat list who is alive
-            Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 300, true);
 
             if (target && target->IsPlayer() && target->IsAlive())
                 anyPlayerAlive = true;
