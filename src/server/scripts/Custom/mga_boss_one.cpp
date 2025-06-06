@@ -309,10 +309,11 @@ public:
 
 				if (FearCD <= uiDiff)
 				{
-					Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me));
+					//Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me));
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true)
 					if (!target)
 					{
-						Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+						Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 						if (target)
 							DoCast(target, SPELL_FEAR);
 					}
@@ -669,7 +670,7 @@ public:
 
 		   if (FellFireballCD <= uiDiff)
 		   {
-			   Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me));
+			    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true)
 				if (!target)
 					target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 				if (target)
