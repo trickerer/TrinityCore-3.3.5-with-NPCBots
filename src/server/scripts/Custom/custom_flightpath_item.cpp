@@ -4,8 +4,7 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Chat.h"
-#include "TaxiNodes.h"
-#include "TaxiPathGraph.h"
+#include "TaxiMgr.h"
 
 class item_learn_flightpaths : public ItemScript
 {
