@@ -724,7 +724,7 @@ public:
 					else
 					{
 						DoCast(me->GetVictim(), SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, 29000);
+						me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					}
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
 			   }
