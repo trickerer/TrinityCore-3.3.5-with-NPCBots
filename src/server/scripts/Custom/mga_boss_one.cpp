@@ -28,7 +28,8 @@
 #include "Map.h"
 #include "CreatureAIImpl.h"
 #include "WorldDatabase.h"
-
+#include "DatabaseEnv.h"
+#include "WorldSession.h"
 
 using namespace std::chrono;
 
