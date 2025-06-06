@@ -55,14 +55,21 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
             AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts 5 Man Dungeon COMING SOON!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             
-            result = WorldDatabase.PQuery("SELECT * FROM `mga_event_data` WHERE `id` = '1' AND `active` = '0'");
-            if (result)
+            if(player->getLevel() >= 80)
             {
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+                result = WorldDatabase.PQuery("SELECT * FROM `mga_event_data` WHERE `id` = '1' AND `active` = '0'");
+                if (result)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "MGAWoW Mega Boss", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2000);
+                }
+                else
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_TALK, "MGAWoW Mega Boss IS ACTIVE!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
+                }
             }
             else
             {
-                AddGossipItemFor(player, GOSSIP_ICON_TALK, "MGAWoW Mega Boss IS ACTIVE!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001);
+                AddGossipItemFor(player, GOSSIP_ICON_TALK, "MGAWoW Mega Boss You Need Level 80", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
