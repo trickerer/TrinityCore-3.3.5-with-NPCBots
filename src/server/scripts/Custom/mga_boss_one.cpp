@@ -447,12 +447,17 @@ public:
         {
             summon->AI()->AttackStart(me->GetVictim());
         }
+        
+        void Reset() override
+        {
+            _Reset();
+            WorldDatabase.Execute(_QUERY1_);
+            me->DisappearAndDie();
+            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
+        }
 		
 		void EnterEvadeMode()
 		{
-			WorldDatabase.Execute(_QUERY1_);
-            me->DisappearAndDie();
-            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
