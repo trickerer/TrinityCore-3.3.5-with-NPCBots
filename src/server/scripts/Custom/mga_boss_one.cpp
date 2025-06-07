@@ -470,12 +470,14 @@ public:
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetFaction(14);
             DespawnTimer = 120000; // 120 seconds until despawn
-            TimerStarted = true;
-            me->Yell("Who Dares Challenge Me?? Come and Die!!", LANG_UNIVERSAL, NULL); 
-            
-            
+            TimerStarted = true; 
         }
-
+        
+        void JustAppeared() override
+        {
+            me->Yell("Who Dares Challenge Me?? Come and Die!!", LANG_UNIVERSAL, NULL);
+        }
+        
         void JustSummoned(Creature* summon)
         {
             summon->AI()->AttackStart(me->GetVictim());
