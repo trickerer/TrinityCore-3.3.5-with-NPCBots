@@ -541,7 +541,7 @@ public:
                     DoCast(who, SPELL_ROOT); // root
                     me->GetThreatManager().AddThreat(who, 10.0f);
                     DoCast(me, SPELL_SHIELD);
-                    //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
                     //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                     MGAImmune = true;
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -567,7 +567,7 @@ public:
                         //me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
-                        GuardSpwanCD = urand(22000, 26000);
+                        GuardSpwanCD = urand(32000, 36000);
                         SlimePoolCD = 18000;
                     }
                     me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
@@ -697,13 +697,13 @@ public:
 					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
-			   GuardSpwanCD = urand(26000, 36000);
+			   //GuardSpwanCD = urand(26000, 36000);
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					GuardSpwanCD = urand(16000, 18000);
 			   if (me->GetEntry() == NPC_BOSS_HARDMODE)
 			        GuardSpwanCD = urand(12000, 16000);
 				if (!PauseDone)
-				   GuardSpwanCD = urand(16000, 18000);
+				   GuardSpwanCD = urand(26000, 36000);
 		   }
 		   else GuardSpwanCD -= uiDiff;
 
@@ -735,7 +735,7 @@ public:
 				{
 					MGAImmune = false;
 					me->RemoveAura(SPELL_SHIELD);
-					//me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 					me->GetMotionMaster()->MoveChase(me->GetVictim());
 					me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
 					DoStartMovement(me->GetVictim());
