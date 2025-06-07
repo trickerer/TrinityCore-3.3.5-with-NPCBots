@@ -260,7 +260,7 @@ public:
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
-						me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+						me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 						me->SetReactState(REACT_AGGRESSIVE);
 						me->GetThreatManager().AddThreat(target, 100.0f);
 						me->SetInCombatWith(target);
@@ -977,7 +977,7 @@ public:
 			sIRC.Send_IRC_Channel(ircchan, sIRC.MakeMsg("\00304,08\037/!\\\037\017\00304 MGA Event Announcer \00304,08\037/!\\\037\017 %s", "%s", ss.str().c_str()), true);
 			//
 		}*/
-        sWorld->SendWorldText(9999);
+        //sWorld->SendWorldText(9999);
 	};
 
 };
