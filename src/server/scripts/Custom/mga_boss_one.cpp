@@ -852,11 +852,6 @@ public:
 					{
 						DoCast(target, SPELL_FELL_FIREBALL);
 					}
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
-					if (target)
-					{
-						DoCast(target, SPELL_FELL_FIREBALL);
-					}
 			   }
 			   
 			   SlimePoolCD = urand(15000, 20000);
