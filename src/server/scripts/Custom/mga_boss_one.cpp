@@ -70,7 +70,7 @@ enum NPCs
    MINI_ADD                             = 500926,
    NPC_SLIME                            = 500923,
    
-   NPC_SLIME_MEDMODE                    = 500932,
+   NPC_SLIME_MEDMODE                    = 500934,
    
    NPC_BOSS_MEDMODE                     = 500928,
    NPC_GUARD_MEDMODE                    = 500929,
