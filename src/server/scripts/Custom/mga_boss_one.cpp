@@ -38,6 +38,7 @@
 #include "TemporarySummon.h"
 #include "CreatureAIImpl.h"
 #include "ObjectMgr.h"
+#include "Aura.h"
 
 using namespace std::chrono;
 
