@@ -608,7 +608,7 @@ public:
             if (HasStarted)
             {
                 bool anyPlayerAlive = false;
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 400, true); // this might need tweaking!!
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 600, true); // this might need tweaking!!
 
                 if (target && target->IsPlayer() && target->IsAlive())
                     anyPlayerAlive = true;
