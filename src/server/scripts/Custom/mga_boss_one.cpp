@@ -532,11 +532,11 @@ public:
 			WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
             //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
             if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                me->SummonGameObject(999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
+                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
             else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                me->SummonGameObject(999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
+                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
             else
-                me->SummonGameObject(999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
+                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
 		}
 		
 		void KilledUnit(Unit* victim)
@@ -712,8 +712,8 @@ public:
 			}else BossPauseTimer -= uiDiff;
 			
 
-		   if (GuardSpwanCD <= uiDiff)
-		   {
+		    if (GuardSpwanCD <= uiDiff)
+		    {
 				me->PlayDirectSound(5828) ; // AmnennarTheColdbringerSummon01.wav
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
@@ -730,18 +730,18 @@ public:
 				{
 					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
-			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
+			    me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
 			   
-			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
+			    if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					GuardSpwanCD = urand(16000, 18000);
-			   else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+			    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 			        GuardSpwanCD = urand(12000, 16000);
                 else
                     GuardSpwanCD = urand(26000, 36000);
 				if (!PauseDone)
 				   GuardSpwanCD = urand(26000, 36000);
-		   }
-		   else GuardSpwanCD -= uiDiff;
+		    }
+		    else GuardSpwanCD -= uiDiff;
 
 		   	if (me->HasAura(SPELL_BONE_STORM))
 			{
@@ -788,30 +788,30 @@ public:
 				return;
 			}
 						
-		   if (CleaveCD <= uiDiff)
-		   {
-			   DoCastVictim(SPELL_CLEAVE);
-			   CleaveCD = urand(4000, 6000);
-		   }
-		   else CleaveCD -= uiDiff;
+		    if (CleaveCD <= uiDiff)
+		    {
+			    DoCastVictim(SPELL_CLEAVE);
+			    CleaveCD = urand(4000, 6000);
+		    }
+		    else CleaveCD -= uiDiff;
 
-		   if (FellFireballCD <= uiDiff)
-		   {
+		    if (FellFireballCD <= uiDiff)
+		    {
 			    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 				if (target)
 					DoCast(target, SPELL_FELL_FIREBALL);
 
 				FellFireballCD = urand(14000, 19000);
-		   }
-		   else FellFireballCD -= uiDiff;
+		    }
+		    else FellFireballCD -= uiDiff;
 
-		   if (BlueSHitCD <= uiDiff)
-		   {
-			   DoCastAOE(SPELL_COLDFLAME_NORMAL);
-			   BlueSHitCD = urand(4000, 6000);
-			   DoCastAOE(SPELL_COLDFLAME_NORMAL);
-		   }
-		   else BlueSHitCD -= uiDiff;
+            if (BlueSHitCD <= uiDiff)
+            {
+               DoCastAOE(SPELL_COLDFLAME_NORMAL);
+               BlueSHitCD = urand(4000, 6000);
+               DoCastAOE(SPELL_COLDFLAME_NORMAL);
+            }
+            else BlueSHitCD -= uiDiff;
 	
 			if (DoPullCD <= uiDiff)
 			{
