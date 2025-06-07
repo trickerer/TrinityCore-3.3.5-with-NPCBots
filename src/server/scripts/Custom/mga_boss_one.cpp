@@ -599,6 +599,11 @@ public:
         {
             //TODO
         }
+        
+        void DespawnOrUnsummon()
+        {
+            WorldDatabase.Execute(_QUERY1_);
+        }
 		
 		void EnterCombat(Unit* Who)
 		{
@@ -608,7 +613,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if (TimerStarted)
+            /*if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
                 {
@@ -623,7 +628,7 @@ public:
                 }
                 else
                     DespawnTimer -= uiDiff;
-            }
+            }*/
             
             if (!UpdateVictim())
                 return;
