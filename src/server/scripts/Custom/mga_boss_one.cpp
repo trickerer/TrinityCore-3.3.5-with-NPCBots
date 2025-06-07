@@ -506,11 +506,13 @@ public:
 			//		me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
 			//	}
 			//}
+            
 			/**std::string title ="Mega Boss Event";
 			std::string msg ="The Mega Boss has been DOWNED!!!, well done! | #mgawow ";
 			std::string url ="http://wrath.mgawow.co.uk/activity";
 			WorldDatabase.PExecute("INSERT INTO `rss_feed` (`title`, `msg`,`url`) VALUES ('%s','%s','%s')", title.c_str(), msg.c_str(), url.c_str());
 			WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
+            me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
 		}
 		
 		void KilledUnit(Unit* victim)
