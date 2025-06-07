@@ -99,7 +99,7 @@ enum Spells
     SPELL_CLEAVE                        = 19983,
     SPELL_FEL_LIGHTING                  = 66528,
     SPELL_FEL_LIGHTING2                 = 44536,
-    SPELL_SLIME_POOL_EFFECT             = 30916,
+    SPELL_SLIME_POOL_EFFECT             = 42023,
     SPELL_SLIME_POOL_EFFECT2            = 66881,
     SPELL_SLIME_POOL_EFFECT3            = 66882,
     SPELL_DEATH_COIL                    = 71490,
