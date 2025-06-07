@@ -593,7 +593,7 @@ public:
                     }
                     else
                     {
-                        me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        //me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(32000, 36000);
