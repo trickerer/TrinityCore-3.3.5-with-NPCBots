@@ -69,6 +69,8 @@ enum NPCs
    MINI_ADD								= 500926,
    NPC_SLIME							= 500923,
    
+   NPC_SLIME_MEDMODE					= 500932,
+   
    NPC_BOSS_MEDMODE						= 500928,
    NPC_GUARD_MEDMODE					= 500929,
    NPC_BOSS_HARDMODE					= 500930,
@@ -96,6 +98,7 @@ enum Spells
 	SPELL_CLEAVE						= 19983,
 	SPELL_FEL_LIGHTING					= 66528,
 	SPELL_SLIME_POOL_EFFECT				= 66882,
+    SPELL_SLIME_POOL_EFFECT2			= 38718,
 	SPELL_DEATH_COIL					= 71490,
 	SPELL_FELL_FIREBALL					= 66532,
 	SPELL_BONE_STORM					= 69076,
@@ -382,7 +385,12 @@ public:
 			if (!casted)
             {
                 casted = true;
-                DoCast(me, SPELL_SLIME_POOL_EFFECT);
+                if (me->GetEntry() == NPC_GUARD_MEDMODE)
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
+                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
+                else
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT2);
             }
         }
     };
@@ -438,7 +446,7 @@ public:
 			DeathCoilCD = 7000; // done
 			FellFireballCD = 7000; //done
 			BlueSHitCD = 2500; //done
-			IcyGripCD = 180000; //done
+			IcyGripCD = 120000; //done
 			GuardSpwanCD = 27000; //done
 			SlimePoolCD = 20000; //done
 			NABSTORMCD = 22000; //done
