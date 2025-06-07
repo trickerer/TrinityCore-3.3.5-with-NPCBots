@@ -106,7 +106,7 @@ enum Spells
 	SPELL_FROST_SLOW					= 72217,
 	SPELL_ROOT							= 22800,
 	SPELL_FEAR							= 65809,
-	SPELL_ENRAGE						= 68335,
+	SPELL_ENRAGE						= 37023, //68335,
 	SPELL_FINGER						= 31984,
 	SPELL_LEECHING_SWARM    			= 66118,
 	SPELL_MANA_BURN         			= 66100,
@@ -586,7 +586,7 @@ public:
                     }
                     else
                     {
-                        //me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(32000, 36000);
@@ -641,7 +641,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if (TimerStarted)
+            /*if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
                 {
@@ -656,7 +656,7 @@ public:
                 }
                 else
                     DespawnTimer -= uiDiff;
-            }
+            }*/
             
             if (!UpdateVictim())
                 return;
