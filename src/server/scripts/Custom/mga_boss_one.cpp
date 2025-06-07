@@ -843,12 +843,6 @@ public:
 						DoCast(target, SPELL_ROOT); // root
 						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					}
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
-					if (target)
-					{
-						DoCast(target, SPELL_ROOT); // root
-						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
-					}
 			   }
 			   
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
