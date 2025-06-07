@@ -603,6 +603,7 @@ public:
         void DespawnOrUnsummon()
         {
             WorldDatabase.Execute(_QUERY1_);
+            me->Yell("BYE BYE!", LANG_UNIVERSAL, NULL);
         }
 		
 		void EnterCombat(Unit* Who)
