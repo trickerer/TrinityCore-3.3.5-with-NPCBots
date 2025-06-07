@@ -879,7 +879,12 @@ public:
 					}
 			   }
 			   
-			   SlimePoolCD = urand(15000, 20000);
+			    if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                   SlimePoolCD = urand(15000, 20000);
+                else if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                   SlimePoolCD = urand(18000, 22000);
+                else 
+                   SlimePoolCD = urand(20000, 25000);
 		   }
 		   else SlimePoolCD -= uiDiff;
 		   
@@ -887,7 +892,12 @@ public:
 		   {
 		        DoCast(me, SPELL_ICY_GRIP );
 				me->GetMotionMaster()->MoveChase(me->GetVictim());
-				IcyGripCD = 300000;
+                if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                    IcyGripCD = 300000;
+                else if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                    IcyGripCD = 350000;
+                else
+                    IcyGripCD = 400000;
 		   }
 		   else IcyGripCD -= uiDiff;
 
@@ -950,11 +960,11 @@ public:
 			   DoStartNoMovement(me->GetVictim());
 			   
 			    if (me->GetEntry() == NPC_BOSS_MEDMODE)
-					ImmuneTimer = 25000;
+					ImmuneTimer = 35000;
 			    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
-					ImmuneTimer = 20000;
+					ImmuneTimer = 25000;
                 else
-                    ImmuneTimer = 30000;
+                    ImmuneTimer = 15000;
 		   }
 		   else ImmuneTimer  -= uiDiff;
 		   
