@@ -513,7 +513,7 @@ public:
 		
 		void MoveInLineOfSight(Unit* who)
 		{
-			if (me->IsWithinDistInMap(who, 10.0f))
+			if (me->IsWithinDistInMap(who, 20.0f))
 			{
 				if (me->IsValidAttackTarget(who) && !HasStarted)
 				{
@@ -566,34 +566,35 @@ public:
                     me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
 				}
+                Player* player = nullptr;
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    player = who->ToPlayer();
+                else if (who->GetTypeId() == TYPEID_UNIT) // Maybe it's a pet or summoned unit
+                    player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+                if (player)
+                {
+                    if (Group* group = player->GetGroup())
+                    {
+                        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                        {
+                            Player* member = itr->GetSource();
+                            if (member && member->IsInMap(me))
+                            {
+                                me->SetInCombatWith(member);
+                                member->SetInCombatWith(me);
+                                who->SetInCombatWith(me);
+                                me->GetThreatManager().AddThreat(member, 1.0f);
+                            }
+                        }
+                    }
+                }
 			}
 		
 		}
         void JustEngagedWith(Unit* who) override
         {
-            Player* player = nullptr;
-            if (who->GetTypeId() == TYPEID_PLAYER)
-                player = who->ToPlayer();
-            else if (who->GetTypeId() == TYPEID_UNIT) // Maybe it's a pet or summoned unit
-                player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
-
-            if (player)
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* member = itr->GetSource();
-                        if (member && member->IsInMap(me))
-                        {
-                            me->SetInCombatWith(member);
-                            member->SetInCombatWith(me);
-                            who->SetInCombatWith(me);
-                            me->GetThreatManager().AddThreat(member, 1.0f);
-                        }
-                    }
-                }
-            }
+            //TODO
         }
 		
 		void EnterCombat(Unit* Who)
