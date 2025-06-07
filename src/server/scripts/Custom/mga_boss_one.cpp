@@ -37,6 +37,7 @@
 #include "ObjectAccessor.h"
 #include "TemporarySummon.h"
 #include "CreatureAIImpl.h"
+#include "ObjectMgr.h"
 
 using namespace std::chrono;
 
@@ -528,6 +529,7 @@ public:
 			WorldDatabase.PExecute("INSERT INTO `rss_feed` (`title`, `msg`,`url`) VALUES ('%s','%s','%s')", title.c_str(), msg.c_str(), url.c_str());
 			WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
             //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
+            me->SummonGameObject(999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
 		}
 		
 		void KilledUnit(Unit* victim)
