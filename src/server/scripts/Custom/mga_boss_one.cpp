@@ -977,7 +977,7 @@ public:
 			sIRC.Send_IRC_Channel(ircchan, sIRC.MakeMsg("\00304,08\037/!\\\037\017\00304 MGA Event Announcer \00304,08\037/!\\\037\017 %s", "%s", ss.str().c_str()), true);
 			//
 		}*/
-        sWorld->SendWorldText("TEST");
+        sWorld->SendWorldText(9999);
 	};
 
 };
