@@ -392,9 +392,9 @@ public:
                 if (me->GetEntry() == NPC_GUARD_MEDMODE)
                     DoCast(me, SPELL_SLIME_POOL_EFFECT2);
                 else if (me->GetEntry() == NPC_GUARD_HARDMODE)
-                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
-                else
                     DoCast(me, SPELL_SLIME_POOL_EFFECT3);
+                else
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
             }
         }
     };
