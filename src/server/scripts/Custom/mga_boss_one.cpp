@@ -255,7 +255,7 @@ public:
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
-						//me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+						me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
 						me->SetReactState(REACT_AGGRESSIVE);
 						me->GetThreatManager().AddThreat(target, 100.0f);
 						me->SetInCombatWith(target);
@@ -445,7 +445,7 @@ public:
 			HasEnraged = false;
 			DoneSwam = false;
 			DoPull = false;
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
             DespawnTimer = 120000; // 120 seconds until despawn
             TimerStarted = true;
@@ -541,7 +541,7 @@ public:
                     DoCast(who, SPELL_ROOT); // root
                     me->GetThreatManager().AddThreat(who, 10.0f);
                     DoCast(me, SPELL_SHIELD);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                     //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                     MGAImmune = true;
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -670,7 +670,7 @@ public:
 				PauseDone = true;
 				MGAImmune = false;
 				me->RemoveAura(SPELL_SHIELD);
-				//me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
 				me->GetMotionMaster()->MoveChase(me->GetVictim());
 				AttackStart(me->GetVictim());
 				DoStartMovement(me->GetVictim());
@@ -735,7 +735,7 @@ public:
 				{
 					MGAImmune = false;
 					me->RemoveAura(SPELL_SHIELD);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+					me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 					me->GetMotionMaster()->MoveChase(me->GetVictim());
 					me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
 					DoStartMovement(me->GetVictim());
@@ -886,7 +886,7 @@ public:
 		   }
 		   else flightningCD -= uiDiff;
 
-		   /*if (DeathCoilCD <= uiDiff)
+		   if (DeathCoilCD <= uiDiff)
 		   {
 			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
@@ -894,7 +894,7 @@ public:
 
 			   DeathCoilCD  = urand(7000, 26000);
 		   }
-		   else DeathCoilCD  -= uiDiff;*/
+		   else DeathCoilCD  -= uiDiff;
 
 		   if (ImmuneTimer <= uiDiff)
 		   {
@@ -902,7 +902,7 @@ public:
 			   me->PlayDirectSound(6918) ; // HumanFemaleLaugh01.wav
 			   me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
 			   DoCast(me, SPELL_SHIELD);
-			   //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+			   me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 			   //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
 			   DoStartNoMovement(me->GetVictim());
 			   ImmuneTimer = 30000;
@@ -970,9 +970,9 @@ public:
 			ss << "MGA Boss ";
 			ss << bossmode;
 			sIRC.Send_IRC_Channel(ircchan, sIRC.MakeMsg("\00304,08\037/!\\\037\017\00304 MGA Event Announcer \00304,08\037/!\\\037\017 %s", "%s", ss.str().c_str()), true);
-			//sWorld->SendWorldText(9999, ss.str().c_str());
+			//
 		}*/
-
+        sWorld->SendWorldText(9999, ss.str().c_str());
 	};
 
 };
