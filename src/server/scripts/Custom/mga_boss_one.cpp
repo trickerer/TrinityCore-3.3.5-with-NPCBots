@@ -138,6 +138,11 @@ public:
             BlindSpell = 13000; 
             HasPopped = false;
         }
+                
+        void JustSummoned(Creature* summon)
+        {
+            summon->AI()->AttackStart(me->GetVictim());
+        }
 
         void EnterEvadeMode() 
         {
