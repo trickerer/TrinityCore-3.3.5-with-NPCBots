@@ -608,22 +608,6 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-			
-            if (HasStarted && TimerStarted)
-            {
-                bool anyPlayerAlive = false;
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 600, true); // this might need tweaking!!
-
-                if (target && target->IsPlayer() && target->IsAlive())
-                    anyPlayerAlive = true;
-
-                if (!anyPlayerAlive)
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-            }
-            
             if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
