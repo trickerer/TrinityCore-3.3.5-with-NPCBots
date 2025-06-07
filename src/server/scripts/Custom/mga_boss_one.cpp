@@ -613,7 +613,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            /*if (TimerStarted)
+            if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
                 {
@@ -628,7 +628,7 @@ public:
                 }
                 else
                     DespawnTimer -= uiDiff;
-            }*/
+            }
             
             if (!UpdateVictim())
                 return;
