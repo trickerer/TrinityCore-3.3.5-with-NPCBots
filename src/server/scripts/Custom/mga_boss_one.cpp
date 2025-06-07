@@ -78,7 +78,8 @@ enum NPCs
 enum Spells
 {
 	SPELL_ROT_WORM_SPAWNER              = 70675,
-	SPELL_FROSTBOLT_VOLLEY              = 70184, //shadow bolt volley spell
+	SPELL_FROSTBOLT_VOLLEY              = 70184, //shadow bolt volley spell 36275
+    SPELL_FROSTBOLT_VOLLEY_EASY         = 36275,
 	SPELL_FROSTBOLT_VOLLEY2             = 38836, //fire ball volley spell
     SPELL_MANA_VOID                     = 71179,
 	SPELL_ICY_GRIP              		= 70117,
@@ -293,7 +294,12 @@ public:
 			   
 			if (uiSpell1CD <= uiDiff)
 			{
-				DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
+				if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                    DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
+                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                    DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
+                else
+                    DoCast(me, SPELL_FROSTBOLT_VOLLEY_EASY ,true);
 				uiSpell1CD = urand(7000, 12000);
 			}
 			else uiSpell1CD -= uiDiff;
