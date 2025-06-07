@@ -383,9 +383,9 @@ public:
         return new mga_boss_oneAI(creature);
     }
 
-    struct mga_boss_oneAI : public ScriptedAI
+    struct mga_boss_oneAI : public BossAI
     {
-        mga_boss_oneAI(Creature* creature) : ScriptedAI(creature)
+        mga_boss_oneAI(Creature* creature) : BossAI(creature)
         {
         }
 
@@ -458,10 +458,11 @@ public:
 		void EnterEvadeMode()
 		{
             WorldDatabase.Execute(_QUERY1_);
-            me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
+            me->Yell("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
-            me->DespawnOrUnsummon();
+            //me->DespawnOrUnsummon();
             TimerStarted = true;
+            BossAI::EnterEvadeMode();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
