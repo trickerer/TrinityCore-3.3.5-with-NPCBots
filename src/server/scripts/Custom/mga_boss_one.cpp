@@ -458,7 +458,7 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
         
-		void EnterEvadeMode()
+		void EnterEvadeMode(EvadeReason /*why*/) override
 		{
             WorldDatabase.Execute(_QUERY1_);
             me->Yell("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....", LANG_UNIVERSAL);
