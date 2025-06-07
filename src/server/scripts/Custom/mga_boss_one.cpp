@@ -98,6 +98,7 @@ enum Spells
 	SPELL_COLDFLAME_NORMAL				= 69140,
 	SPELL_CLEAVE						= 19983,
 	SPELL_FEL_LIGHTING					= 66528,
+    SPELL_FEL_LIGHTING2					= 44536,
 	SPELL_SLIME_POOL_EFFECT				= 66882,
     SPELL_SLIME_POOL_EFFECT2			= 38718,
     SPELL_SLIME_POOL_EFFECT3			= 66881,
@@ -901,11 +902,13 @@ public:
 			   }
 			   DoCast(me, SPELL_BONE_STORM);
 			   me->Yell("NAB STORM!!!!!", LANG_UNIVERSAL, NULL);
-			   NABSTORMCD = urand(19000, 24000);
-			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
+			   
+			    if (me->GetEntry() == NPC_BOSS_HARDMODE)
 					NABSTORMCD = urand(15000, 20000);
-				if (me->GetEntry() == NPC_BOSS_HARDMODE)
+			    else if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					NABSTORMCD = urand(15000, 20000);
+                else
+                    NABSTORMCD = urand(19000, 24000);
 		   }
 		   else NABSTORMCD -= uiDiff;
 
@@ -913,7 +916,14 @@ public:
 		   {
 			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target)
-				   DoCast(target, SPELL_FEL_LIGHTING);
+               {
+				    if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                       DoCast(target, SPELL_FEL_LIGHTING);
+                    else if (me->GetEntry() == MEDMODE)
+                        DoCast(target, SPELL_FEL_LIGHTING);
+                    else
+                        DoCast(target, SPELL_FEL_LIGHTING2);
+               }
 
 			   flightningCD = urand(9000, 14000);
 		   }
