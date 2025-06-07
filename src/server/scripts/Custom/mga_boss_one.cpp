@@ -460,6 +460,7 @@ public:
             WorldDatabase.Execute(_QUERY1_);
             me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
+            me->DespawnOrUnsummon();
             TimerStarted = true;
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
@@ -543,7 +544,8 @@ public:
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
-                        GuardSpwanCD = urand(12000, 16000);
+                        GuardSpwanCD = urand(16000, 20000);
+                        SlimePoolCD = 8000;
                     }
                     else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
@@ -553,15 +555,16 @@ public:
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(12000, 16000);
+                        SlimePoolCD = 12000;
                     }
                     else
                     {
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
-                        GuardSpwanCD = urand(12000, 16000);
+                        GuardSpwanCD = urand(22000, 26000);
+                        SlimePoolCD = 18000;
                     }
-                    SlimePoolCD = 18000;
                     me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
@@ -606,7 +609,7 @@ public:
         void UpdateAI(const uint32 uiDiff)
         {
 			
-            if (HasStarted)
+            if (HasStarted && TimerStarted)
             {
                 bool anyPlayerAlive = false;
                 Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 600, true); // this might need tweaking!!
@@ -620,6 +623,7 @@ public:
                     return;
                 }
             }
+            
             if (TimerStarted)
             {
                 if (DespawnTimer <= uiDiff)
@@ -630,6 +634,7 @@ public:
                     WorldDatabase.Execute(_QUERY1_);
                     me->Yell("YOU COWARDS... RUN THEN!", LANG_UNIVERSAL);
                     me->DespawnOrUnsummon();
+                    //EnterEvadeMode();
                     return;
                 }
                 else
