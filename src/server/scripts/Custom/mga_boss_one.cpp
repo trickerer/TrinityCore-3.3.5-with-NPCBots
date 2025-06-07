@@ -104,6 +104,7 @@ enum Spells
     SPELL_SLIME_POOL_EFFECT3            = 66881,
     SPELL_DEATH_COIL                    = 71490,
     SPELL_FELL_FIREBALL                 = 66532,
+    SPELL_FELL_FIREBALL2                = 35913,
     SPELL_BONE_STORM                    = 69076,
     SPELL_FROST_SLOW                    = 72217,
     SPELL_ROOT                          = 22800,
@@ -801,7 +802,14 @@ public:
             {
                 Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
                 if (target)
-                    DoCast(target, SPELL_FELL_FIREBALL);
+                {
+                    if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                        DoCast(target, SPELL_FELL_FIREBALL);
+                    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                        DoCast(target, SPELL_FELL_FIREBALL);
+                    else
+                        DoCast(target, SPELL_FELL_FIREBALL2);
+                }
 
                 FellFireballCD = urand(14000, 19000);
             }
