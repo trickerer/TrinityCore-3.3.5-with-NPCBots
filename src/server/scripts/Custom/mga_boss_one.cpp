@@ -948,11 +948,13 @@ public:
 			   me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 			   //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
 			   DoStartNoMovement(me->GetVictim());
-			   ImmuneTimer = 30000;
-			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
+			   
+			    if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					ImmuneTimer = 25000;
-			    if (me->GetEntry() == NPC_BOSS_HARDMODE)
+			    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 					ImmuneTimer = 20000;
+                else
+                    ImmuneTimer = 30000;
 		   }
 		   else ImmuneTimer  -= uiDiff;
 		   
@@ -966,7 +968,7 @@ public:
 			else LeechTimer -= uiDiff;
 		}
 		
-		if (me->GetEntry() == NPC_BOSS_MEDMODE && me->HealthBelowPct(3) && !DoneSwam)
+		if (me->GetEntry() == NPC_BOSS_MEDMODE && me->HealthBelowPct(5) && !DoneSwam)
 		{
 			if (LeechTimer <= uiDiff)
 			{
@@ -976,7 +978,7 @@ public:
 			else LeechTimer -= uiDiff;
 		}
 		
-		if (me->GetEntry() != NPC_BOSS_MEDMODE && me->GetEntry() != NPC_BOSS_HARDMODE && me->HealthBelowPct(1) && !DoneSwam)
+		if (me->GetEntry() != NPC_BOSS_MEDMODE && me->GetEntry() != NPC_BOSS_HARDMODE && me->HealthBelowPct(3) && !DoneSwam)
 		{
 			if (LeechTimer <= uiDiff)
 			{
