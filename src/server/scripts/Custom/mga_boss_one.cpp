@@ -919,7 +919,7 @@ public:
                {
 				    if (me->GetEntry() == NPC_BOSS_HARDMODE)
                        DoCast(target, SPELL_FEL_LIGHTING);
-                    else if (me->GetEntry() == MEDMODE)
+                    else if (me->GetEntry() == NPC_BOSS_MEDMODE)
                         DoCast(target, SPELL_FEL_LIGHTING);
                     else
                         DoCast(target, SPELL_FEL_LIGHTING2);
