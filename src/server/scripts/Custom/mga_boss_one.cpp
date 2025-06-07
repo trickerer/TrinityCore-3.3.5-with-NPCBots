@@ -22,6 +22,7 @@
 #include "GameEventMgr.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "World.h"
 #include "Creature.h"
 #include "Unit.h"
 #include "Group.h"
@@ -259,7 +260,7 @@ public:
 				{
 					if (target->GetTypeId() == TYPEID_PLAYER)
 					{
-						me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
+						me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE);
 						me->SetReactState(REACT_AGGRESSIVE);
 						me->GetThreatManager().AddThreat(target, 100.0f);
 						me->SetInCombatWith(target);
@@ -449,7 +450,7 @@ public:
 			HasEnraged = false;
 			DoneSwam = false;
 			DoPull = false;
-			me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+			me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 			me->SetFaction(14);
             DespawnTimer = 120000; // 120 seconds until despawn
             TimerStarted = true;
