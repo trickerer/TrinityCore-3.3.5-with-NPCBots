@@ -61,8 +61,8 @@ public:
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 5 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 10 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 20 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+                //AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 10 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                //AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 20 Man Mode", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             }
             else
             {
