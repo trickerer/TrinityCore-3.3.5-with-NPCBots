@@ -692,10 +692,13 @@ public:
 				if (me->GetEntry() == NPC_BOSS_MEDMODE)
 				{
 					me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 				else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 				{
 					me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 				else
 				{
@@ -767,8 +770,6 @@ public:
 		   if (FellFireballCD <= uiDiff)
 		   {
 			    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
-				if (!target)
-					Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 				if (target)
 					DoCast(target, SPELL_FELL_FIREBALL);
 
@@ -799,6 +800,7 @@ public:
 					pullcheck = urand(1, 4);
 				else
 					pullcheck = urand(1, 6);
+                
 			   Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 			   if (target && pullcheck < 2)
 			   {
@@ -839,11 +841,22 @@ public:
 						DoCast(target, SPELL_ROOT); // root
 						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
 					}
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
+					if (target)
+					{
+						DoCast(target, SPELL_ROOT); // root
+						me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
+					}
 			   }
 			   
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
 			   {
 					Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
+					if (target)
+					{
+						DoCast(target, SPELL_FELL_FIREBALL);
+					}
+                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
 					if (target)
 					{
 						DoCast(target, SPELL_FELL_FIREBALL);
