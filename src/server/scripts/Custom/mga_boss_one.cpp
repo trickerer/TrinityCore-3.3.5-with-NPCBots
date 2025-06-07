@@ -144,6 +144,12 @@ public:
             summon->AI()->AttackStart(me->GetVictim());
         }
         
+        void EnterCombat(Unit* Who)
+        {
+            me->m_CombatDistance = 100.0f;
+            AttackStart(Who);
+        }
+        
         void MoveInLineOfSight(Unit* who)
         {
             if (me->IsWithinDistInMap(who, 200.0f) && who->GetTypeId() == TYPEID_PLAYER)
