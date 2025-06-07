@@ -33,6 +33,9 @@
 #include "InstanceScript.h"
 #include "ThreatManager.h"
 #include "DBCStores.h"
+#include "ObjectAccessor.h"
+#include "TemporarySummon.h"
+#include "CreatureAIImpl.h"
 
 using namespace std::chrono;
 
