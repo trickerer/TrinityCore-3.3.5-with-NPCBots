@@ -466,6 +466,7 @@ public:
             //me->DespawnOrUnsummon();
             TimerStarted = true;
             BossAI::EnterEvadeMode();
+            me->DespawnOrUnsummon();
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
@@ -563,7 +564,7 @@ public:
                     }
                     else
                     {
-                        me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                        //me->SummonCreature(NPC_GUARD, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(22000, 26000);
