@@ -99,6 +99,7 @@ enum Spells
 	SPELL_FEL_LIGHTING					= 66528,
 	SPELL_SLIME_POOL_EFFECT				= 66882,
     SPELL_SLIME_POOL_EFFECT2			= 38718,
+    SPELL_SLIME_POOL_EFFECT3			= 66881,
 	SPELL_DEATH_COIL					= 71490,
 	SPELL_FELL_FIREBALL					= 66532,
 	SPELL_BONE_STORM					= 69076,
@@ -388,7 +389,7 @@ public:
                 if (me->GetEntry() == NPC_GUARD_MEDMODE)
                     DoCast(me, SPELL_SLIME_POOL_EFFECT);
                 else if (me->GetEntry() == NPC_GUARD_HARDMODE)
-                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT3);
                 else
                     DoCast(me, SPELL_SLIME_POOL_EFFECT2);
             }
