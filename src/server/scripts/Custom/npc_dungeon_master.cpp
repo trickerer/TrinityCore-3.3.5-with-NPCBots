@@ -120,7 +120,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2000)
             {
                 CloseGossipMenuFor(player);
-                player->TeleportTo(1, -9954.209961f, 128.259995f, -20.832676f, 1.664262f);
+                player->TeleportTo(1, -9954.717773f, 119.794716f, -20.832258, 6.137083f);
                 player->SetPvP(false);
                 return false;
             }
