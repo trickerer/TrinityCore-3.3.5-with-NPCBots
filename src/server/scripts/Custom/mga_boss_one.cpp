@@ -471,6 +471,7 @@ public:
 			me->SetFaction(14);
             DespawnTimer = 120000; // 120 seconds until despawn
             TimerStarted = true;
+            me->Yell("Who Dares Challenge Me?? Come and Die!!", LANG_UNIVERSAL, NULL); 
             
 			
         }
