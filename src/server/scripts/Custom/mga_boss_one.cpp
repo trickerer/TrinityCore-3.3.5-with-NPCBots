@@ -705,11 +705,13 @@ public:
 					me->SummonCreature(NPC_GUARD, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
 				}
 			   me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
-			   //GuardSpwanCD = urand(26000, 36000);
+			   
 			   if (me->GetEntry() == NPC_BOSS_MEDMODE)
 					GuardSpwanCD = urand(16000, 18000);
-			   if (me->GetEntry() == NPC_BOSS_HARDMODE)
+			   else if (me->GetEntry() == NPC_BOSS_HARDMODE)
 			        GuardSpwanCD = urand(12000, 16000);
+                else
+                    GuardSpwanCD = urand(26000, 36000);
 				if (!PauseDone)
 				   GuardSpwanCD = urand(26000, 36000);
 		   }
