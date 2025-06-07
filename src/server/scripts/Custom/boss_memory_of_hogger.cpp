@@ -313,7 +313,7 @@ public:
             BossAI::JustEngagedWith(who);
         }
 
-        void EnterEvadeMode() //override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             BossAI::EnterEvadeMode();
             phaseTwo = false;
