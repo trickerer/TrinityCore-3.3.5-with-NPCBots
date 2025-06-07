@@ -577,6 +577,7 @@ public:
                     DoCast(who, SPELL_ROOT); // root
                     me->GetThreatManager().AddThreat(who, 10.0f);
                     DoCast(me, SPELL_SHIELD);
+                    me->StopMoving();
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                     MGAImmune = true;
@@ -977,6 +978,7 @@ public:
                me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
                DoCast(me, SPELL_SHIELD);
                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+               me->StopMoving();
                //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                DoStartNoMovement(me->GetVictim());
                
