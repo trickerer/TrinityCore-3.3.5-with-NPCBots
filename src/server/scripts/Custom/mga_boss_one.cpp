@@ -175,7 +175,7 @@ public:
 
 				if (BlindSpell <= uiDiff)
 				{
-					//DoCast(me, SPELL_RADIANCE );
+					DoCast(me, SPELL_RADIANCE );
 					Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true);
 					if (target)
 						DoCast(target, SPELL_MANA_BURN);
@@ -545,7 +545,7 @@ public:
                     DoCast(who, SPELL_ROOT); // root
                     me->GetThreatManager().AddThreat(who, 10.0f);
                     DoCast(me, SPELL_SHIELD);
-                    me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                     MGAImmune = true;
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -674,7 +674,7 @@ public:
 				PauseDone = true;
 				MGAImmune = false;
 				me->RemoveAura(SPELL_SHIELD);
-				me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE + UNIT_FLAG_NON_ATTACKABLE);
+				me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 				me->GetMotionMaster()->MoveChase(me->GetVictim());
 				AttackStart(me->GetVictim());
 				DoStartMovement(me->GetVictim());
@@ -739,7 +739,7 @@ public:
 				{
 					MGAImmune = false;
 					me->RemoveAura(SPELL_SHIELD);
-					me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+					me->RemoveUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 					me->GetMotionMaster()->MoveChase(me->GetVictim());
 					me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
 					DoStartMovement(me->GetVictim());
@@ -906,7 +906,7 @@ public:
 			   me->PlayDirectSound(6918) ; // HumanFemaleLaugh01.wav
 			   me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
 			   DoCast(me, SPELL_SHIELD);
-			   me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+			   me->SetUnitFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 			   //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
 			   DoStartNoMovement(me->GetVictim());
 			   ImmuneTimer = 30000;
