@@ -460,7 +460,7 @@ public:
             WorldDatabase.Execute(_QUERY1_);
             me->Yell("You have Failed!! Do Not Test Me!!", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
-            me->DisappearAndDie();
+            TimerStarted = true;
             /*
 			SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
 			me->DisappearAndDie();
