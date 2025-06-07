@@ -780,11 +780,11 @@ public:
                     DoStartMovement(me->GetVictim());
                     AttackStart(me->GetVictim());
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                        ImmuneDuration = 13000;
-                    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                         ImmuneDuration = 15000;
+                    else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                        ImmuneDuration = 18000;
                     else
-                        ImmuneDuration = 20000;
+                        ImmuneDuration = 10000;
                 }
                 else ImmuneDuration -= uiDiff;
                 
@@ -983,7 +983,7 @@ public:
                 else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     ImmuneTimer = 25000;
                 else
-                    ImmuneTimer = 15000;
+                    ImmuneTimer = 12000;
            }
            else ImmuneTimer  -= uiDiff;
            
