@@ -390,11 +390,11 @@ public:
             {
                 casted = true;
                 if (me->GetEntry() == NPC_GUARD_MEDMODE)
-                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
-                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
-                    DoCast(me, SPELL_SLIME_POOL_EFFECT3);
-                else
                     DoCast(me, SPELL_SLIME_POOL_EFFECT2);
+                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT);
+                else
+                    DoCast(me, SPELL_SLIME_POOL_EFFECT3);
             }
         }
     };
@@ -575,6 +575,7 @@ public:
                     DoCast(who, SPELL_ROOT); // root
                     me->GetThreatManager().AddThreat(who, 10.0f);
                     DoCast(me, SPELL_SHIELD);
+                    me->AddAura(SPELL_ROOT, me)->SetDuration(10000);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     //me->GetMotionMaster()->MovePoint(1, me->GetPositionX(),me->GetPositionY(),me->GetPositionZ()+15);
                     MGAImmune = true;
@@ -979,11 +980,20 @@ public:
                DoStartNoMovement(me->GetVictim());
                
                 if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                {
                     ImmuneTimer = 35000;
+                    me->AddAura(SPELL_ROOT, me)->SetDuration(35000);
+                }
                 else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                {
                     ImmuneTimer = 25000;
+                    me->AddAura(SPELL_ROOT, me)->SetDuration(23000);
+                }
                 else
+                {
                     ImmuneTimer = 12000;
+                    me->AddAura(SPELL_ROOT, me)->SetDuration(12000);
+                }
            }
            else ImmuneTimer  -= uiDiff;
            
