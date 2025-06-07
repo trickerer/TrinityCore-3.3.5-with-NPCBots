@@ -32,6 +32,7 @@
 #include "WorldSession.h"
 #include "InstanceScript.h"
 #include "ThreatManager.h"
+#include "DBCStores.h"
 
 using namespace std::chrono;
 
