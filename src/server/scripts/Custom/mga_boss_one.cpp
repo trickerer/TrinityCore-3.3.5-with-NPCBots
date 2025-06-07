@@ -842,8 +842,16 @@ public:
 					DoCast(me, SPELL_FROST_SLOW );
 					DoStartNoMovement(me->GetVictim());
 					me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
-					me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
-					DoCast(me, SPELL_ICY_GRIP );
+					if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                    {
+                        me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
+                        DoCast(me, SPELL_ICY_GRIP );
+                    }
+                    if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                    {
+                        me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
+                        DoCast(me, SPELL_ICY_GRIP );
+                    }
 					me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
 			   }
 			   else
