@@ -618,22 +618,17 @@ public:
             //me->SetFaction(14);
         }
 
-        void EnterCombat(Unit* Who)
+        /*void EnterCombat(Unit* Who)
         {
-            DoPlaySoundToSet(me, 1015); // Optional aggro sound
+            
             me->m_CombatDistance = 100.0f;
             AttackStart(Who);
-        }
-        
-        void DamageTaken(Unit* attacker, uint32& damage) //override
-        {
-            //NOTHING TODO
-        }
-        
+        }*/
+
         void JustEngagedWith(Unit* who) override
         {
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
-            
+            DoPlaySoundToSet(me, 1015); // Optional aggro sound
             Player* player = nullptr;
             if (who->GetTypeId() == TYPEID_PLAYER)
                 player = who->ToPlayer();
@@ -658,6 +653,11 @@ public:
                 }
             }
             BossAI::JustEngagedWith(who);
+        }
+        
+        void DamageTaken(Unit* attacker, uint32& damage) //override
+        {
+            //NOTHING TODO
         }
         
         /*void MoveInLineOfSight(Unit* who) override
