@@ -613,6 +613,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true); 
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED , true);
+            me->SetFaction(14);
         }
 
         void EnterCombat(Unit* Who)
@@ -630,19 +631,6 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
-            // Apply freeze/slow/movement-impairing immunities
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SLOW_ATTACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true); 
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED , true);
         }
         
         void MoveInLineOfSight(Unit* who)
@@ -653,6 +641,7 @@ public:
                 {
                     if (target->GetTypeId() == TYPEID_PLAYER)
                     {
+                        me->SetFaction(14);
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->GetThreatManager().AddThreat(target, 100.0f);
