@@ -597,6 +597,7 @@ public:
 
         void Reset() override
         {
+            _Reset();
             ScreamTimer = 10000;
             SlamTimer = 15000;
             BiteTimer = 5000;
