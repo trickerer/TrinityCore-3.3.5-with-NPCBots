@@ -39,11 +39,7 @@ public:
         {
             player->DestroyItemCount(461146, 1, true);
             
-            WorldPacket data(SMSG_NEW_TAXI_PATH, 8 + 4 * TAXI_MASK_SIZE);
-            data << player->GetPackGUID();
-            for (uint8 i = 0; i < TAXI_MASK_SIZE; ++i)
-                data << uint32(player->m_taxi.m_taximask[i]); // Direct access
-            player->SendDirectMessage(&data);
+            player->GetSession()->SendTaxiStatus(player->GetGUID());
             
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
