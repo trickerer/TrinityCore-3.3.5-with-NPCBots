@@ -5,7 +5,6 @@
 #include "World.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
-#include "CharacterDatabaseStatements.h"
 
 //#define CHAR_UPD_TAXI_MASK "UPDATE characters SET taximask = ? WHERE guid = ?"
 
@@ -51,10 +50,8 @@ public:
             
             uint64 taxiMask = uint64(player->m_taxi.m_taximask[0]) | (uint64(player->m_taxi.m_taximask[1]) << 32);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_TAXI_MASK);
-            stmt->setUInt64(0, taxiMask);
-            stmt->setUInt64(1, player->GetGUID().GetRawValue());
-            CharacterDatabase.Execute(stmt);
+            std::string query = StringFormat("UPDATE characters SET taximask = '{}' WHERE guid = '{}'", taxiMask, player->GetGUID().GetCounter());
+            CharacterDatabase.Execute(query);
     
             //player->SaveToDB();
 
