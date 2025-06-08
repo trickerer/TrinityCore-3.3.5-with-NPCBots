@@ -636,17 +636,25 @@ public:
         
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->GetVictim() && who->IsTargetableForAttack() && me->IsHostileTo(who) && me->IsWithinDistInMap(who, 20.0f))
+            if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
-                if (who->GetTypeId() == TYPEID_PLAYER)
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                 {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetInCombatWith(who);
-                    who->SetInCombatWith(me);
-                    AttackStart(who);
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        me->SetFaction(14);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->GetThreatManager().AddThreat(target, 100.0f);
+                        me->SetInCombatWith(target);
+                        target->SetInCombatWith(me);
+                        AttackStart(target);
+                        EnterCombat(who);
+                    }
                 }
             }
+            
+            
         }
         
         void JustDied(Unit* killer) override
