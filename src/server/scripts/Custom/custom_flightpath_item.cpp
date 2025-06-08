@@ -5,8 +5,6 @@
 #include "World.h"
 #include "Chat.h"
 
-#define TAXI_MASK_SIZE 8
-
 class item_learn_flightpaths : public ItemScript
 {
 public:
