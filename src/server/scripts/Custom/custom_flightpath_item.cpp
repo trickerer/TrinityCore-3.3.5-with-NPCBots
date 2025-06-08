@@ -4,6 +4,9 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Chat.h"
+#include "DatabaseEnv.h"
+
+#define CHAR_UPD_TAXI_MASK "UPDATE characters SET taximask = ? WHERE guid = ?"
 
 class item_learn_flightpaths : public ItemScript
 {
@@ -45,15 +48,14 @@ public:
 
             player->SetTaxiCheater(true);
             
-            uint64 guid = player->GetGUID().GetRawValue();
-            uint64 taxiMask = player->m_taxi.GetTaxiMaskRaw(); // you might need to create a getter returning raw mask as uint64
+            uint64 taxiMask = uint64(player->m_taxi.m_taximask[0]) | (uint64(player->m_taxi.m_taximask[1]) << 32);
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_TAXI_MASK);
             stmt->setUInt64(0, taxiMask);
-            stmt->setUInt64(1, guid);
+            stmt->setUInt64(1, player->GetGUID().GetRawValue());
             CharacterDatabase.Execute(stmt);
     
-            player->SaveToDB();
+            //player->SaveToDB();
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
