@@ -601,9 +601,11 @@ public:
             BiteTimer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void EnterCombat(Unit* Who)
         {
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
+            me->m_CombatDistance = 100.0f;
+            AttackStart(Who);
         }
 
         void UpdateAI(uint32 diff) override
