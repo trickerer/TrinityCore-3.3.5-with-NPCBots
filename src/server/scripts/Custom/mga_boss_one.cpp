@@ -433,9 +433,9 @@ public:
             if (!casted)
             {
                 casted = true;
-                if (me->GetEntry() == NPC_GUARD_MEDMODE)
+                if (me->GetEntry() == NPC_SLIME_MEDMODE)
                     DoCast(me, SPELL_SLIME_POOL_EFFECT2);
-                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                else if (me->GetEntry() == NPC_SLIME_MEDMODE)
                     DoCast(me, SPELL_SLIME_POOL_EFFECT3);
                 else
                     DoCast(me, SPELL_SLIME_POOL_EFFECT);
