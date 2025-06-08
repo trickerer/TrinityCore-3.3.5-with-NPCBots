@@ -4,21 +4,15 @@
 #include "WorldSession.h"
 #include "World.h"
 #include "Chat.h"
-#include "DatabaseEnv.h"
-
-using Trinity::StringFormat;
 
 class item_learn_flightpaths : public ItemScript
 {
 public:
     item_learn_flightpaths() : ItemScript("item_learn_flightpaths") {}
 
-    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const&)
+    bool OnUse(Player* player, Item* item, SpellCastTargets const&) override
     {
         uint32 count = 0;
-
-        // Build taxi mask manually from known nodes
-        uint64 taxiMask = 0;
 
         for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
@@ -26,51 +20,25 @@ public:
             if (!node)
                 continue;
 
-            // Check faction
+            // Faction filtering
             if (player->GetTeam() == ALLIANCE && node->MountCreatureID[0] == 0)
                 continue;
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            // Skip if player already knows node
             if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
                 continue;
 
-            // Mark as known and notify client
-            if (player->m_taxi.SetTaximaskNode(node->ID))
-            {
-                player->GetSession()->SendDiscoverNewTaxiNode(node->ID);
-                ++count;
-            }
-        }
-
-        // Now build the taxiMask from known nodes again (bitmask)
-        // We must do this because we can't access private m_taximask directly
-
-        for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
-        {
-            if (player->m_taxi.IsTaximaskNodeKnown(i))
-            {
-                if (i < 199)
-                    taxiMask |= (uint64(1) << i);
-                else
-                {
-                    // If you have more than 64 nodes, you need a second mask, or handle differently
-                    // For now, only first 64 taxi nodes handled
-                }
-            }
+            player->m_taxi.SetTaximaskNode(node->ID);
+            ++count;
         }
 
         if (count > 0)
         {
             player->DestroyItemCount(461146, 1, true);
-            player->SetTaxiCheater(true);
-
-            std::string query = Trinity::StringFormat("UPDATE characters SET taximask = '{}' WHERE guid = '{}'", taxiMask, player->GetGUID());
-            CharacterDatabase.Execute(query.c_str());
-
-            player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
+            player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths. ", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
+            player->SaveToDB();
         }
         else
         {
