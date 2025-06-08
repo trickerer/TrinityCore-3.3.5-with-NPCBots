@@ -6,6 +6,8 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 
+using Trinity::StringFormat;
+
 class item_learn_flightpaths : public ItemScript
 {
 public:
@@ -64,7 +66,7 @@ public:
             player->DestroyItemCount(461146, 1, true);
             player->SetTaxiCheater(true);
 
-            std::string query = StringFormat("UPDATE characters SET taximask = '%llu' WHERE guid = '%u'", taxiMask, player->GetGUID().GetCounter());
+            std::string query = Trinity::StringFormat("UPDATE characters SET taximask = '%llu' WHERE guid = '%u'", taxiMask, player->GetGUID().GetCounter());
             CharacterDatabase.Execute(query.c_str());
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
