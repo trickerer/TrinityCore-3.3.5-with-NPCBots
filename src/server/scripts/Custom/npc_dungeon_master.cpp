@@ -54,8 +54,8 @@ public:
             if(player->GetLevel() >= 77)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Stormwind Vault", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery WIP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts Dungeon WIP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Forgotten Scarlet Monastery *WIP*", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Karazhan Crypts Dungeon *WIP*", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             }
             else
             {

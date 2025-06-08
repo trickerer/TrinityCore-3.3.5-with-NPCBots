@@ -633,6 +633,7 @@ public:
                         //me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(16000, 20000);
                         SlimePoolCD = 8000;
+                        me->SummonCreature(NPC_SLIME_MEDMODE, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
                     else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
@@ -643,6 +644,7 @@ public:
                         //me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(12000, 16000);
                         SlimePoolCD = 12000;
+                        me->SummonCreature(NPC_SLIME_MEDMODE, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
                     else
                     {
@@ -651,8 +653,9 @@ public:
                         //me->Say("SUMMON GUARDS EASY!", LANG_UNIVERSAL, NULL);
                         GuardSpwanCD = urand(32000, 36000);
                         SlimePoolCD = 18000;
+                        me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
-                    me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
+                    
                     me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
                 }
@@ -891,7 +894,12 @@ public:
                if (target && pullcheck < 2)
                {
                     DoCast(target, SPELL_ROOT); // root
-                    me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
+                    if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                        me->SummonCreature(NPC_SLIME_MEDMODE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
+                    if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                        me->SummonCreature(NPC_SLIME_MEDMODE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
+                    else
+                        me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
                     me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
                }
                else if (pullcheck > 1 && pullcheck < 3 && !DoPull)
