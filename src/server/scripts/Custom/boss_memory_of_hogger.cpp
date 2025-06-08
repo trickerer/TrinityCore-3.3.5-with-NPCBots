@@ -51,6 +51,7 @@ enum NPCs
 enum Data
 {
     DATA_MEMORY_OF_HOGGER = 0,
+    WIFE_OF_HOGGER = 0,
 };
 
 enum Yells
@@ -588,7 +589,7 @@ public:
 
     struct npc_grildaAI : public BossAI
     {
-        npc_grildaAI(Creature* creature) : BossAI(creature) { }
+        npc_grildaAI(Creature* creature) : BossAI(creature, WIFE_OF_HOGGER) {}
 
         uint32 ScreamTimer;
         uint32 SlamTimer;
