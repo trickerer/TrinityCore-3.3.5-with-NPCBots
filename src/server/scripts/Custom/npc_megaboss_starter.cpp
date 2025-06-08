@@ -70,7 +70,7 @@ public:
             }
             
 
-            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Send Me Home!", GOSSIP_SENDER_MAIN, 8000);
+            AddGossipItemFor(player, GOSSIP_ICON_DOT, "Send Me Home!", GOSSIP_SENDER_MAIN + 8000);
             AddGossipItemFor(player, GOSSIP_ICON_TALK, "Bye.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
             player->TalkedToCreature(me->GetEntry(), me->GetGUID());
             SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
