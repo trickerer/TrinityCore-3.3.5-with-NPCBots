@@ -634,27 +634,19 @@ public:
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
         }
         
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
-            if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
+            if (!me->GetVictim() && who->IsTargetableForAttack() && me->IsHostileTo(who) && me->IsWithinDistInMap(who, 20.0f))
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
+                if (who->GetTypeId() == TYPEID_PLAYER)
                 {
-                    if (target->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        me->SetFaction(14);
-                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->GetThreatManager().AddThreat(target, 100.0f);
-                        me->SetInCombatWith(target);
-                        target->SetInCombatWith(me);
-                        AttackStart(target);
-                        EnterCombat(who);
-                    }
+                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetInCombatWith(who);
+                    who->SetInCombatWith(me);
+                    AttackStart(who);
                 }
             }
-            
-            
         }
         
         void JustDied(Unit* killer) override
