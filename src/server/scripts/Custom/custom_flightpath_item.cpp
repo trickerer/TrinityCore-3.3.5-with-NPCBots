@@ -36,10 +36,11 @@ public:
         if (count > 0)
         {
             player->DestroyItemCount(461146, 1, true);
-            WorldPacket data(SMSG_NEW_TAXI_PATH, 8 + 72);
+            
+            WorldPacket data(SMSG_NEW_TAXI_PATH, 8 + 4 * TAXI_MASK_SIZE);
             data << player->GetPackGUID();
-            for (uint8 i = 0; i < TaxiMaskSize; ++i)
-                data << uint32(player->m_taxi.GetTaximask()[i]);
+            for (uint8 i = 0; i < TAXI_MASK_SIZE; ++i)
+                data << uint32(player->GetTaxiMask()[i]);
             player->SendDirectMessage(&data);
             
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
