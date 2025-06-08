@@ -599,14 +599,53 @@ public:
             ScreamTimer = 10000;
             SlamTimer = 15000;
             BiteTimer = 5000;
+            // Apply freeze/slow/movement-impairing immunities
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SLOW_ATTACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true); 
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED , true);
         }
 
         void EnterCombat(Unit* Who)
         {
-            me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
             me->m_CombatDistance = 100.0f;
             AttackStart(Who);
         }
+        void JustEngagedWith(Unit* who) override
+        {
+            me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
+        }
+        
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (me->IsWithinDistInMap(who, 10.0f) && who->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
+                {
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->GetThreatManager().AddThreat(target, 100.0f);
+                        me->SetInCombatWith(target);
+                        target->SetInCombatWith(me);
+                        AttackStart(target);
+                        EnterCombat(who);
+                    }
+                }
+            }
+            
+            
+        }
+        
 
         void UpdateAI(uint32 diff) override
         {
