@@ -66,7 +66,7 @@ public:
             player->DestroyItemCount(461146, 1, true);
             player->SetTaxiCheater(true);
 
-            std::string query = Trinity::StringFormat("UPDATE characters SET taximask = '{}' WHERE guid = '{}'", taxiMask, player->GetGUID().GetCounter());
+            std::string query = Trinity::StringFormat("UPDATE characters SET taximask = '{}' WHERE guid = '{}'", taxiMask, player->GetGUID());
             CharacterDatabase.Execute(query.c_str());
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
