@@ -620,7 +620,7 @@ public:
 
         void EnterCombat(Unit* Who)
         {
-            
+            DoPlaySoundToSet(me, 1015); // Optional aggro sound
             me->m_CombatDistance = 100.0f;
             AttackStart(Who);
         }
@@ -633,9 +633,34 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
+            
+            Player* player = nullptr;
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                player = who->ToPlayer();
+            else if (who->GetTypeId() == TYPEID_UNIT) // Maybe it's a pet or summoned unit
+                player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (player)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                    {
+                        Player* member = itr->GetSource();
+                        if (member && member->IsInMap(me))
+                        {
+                            me->SetInCombatWith(member);
+                            member->SetInCombatWith(me);
+                            who->SetInCombatWith(me);
+                            me->GetThreatManager().AddThreat(member, 1.0f);
+                        }
+                    }
+                }
+            }
+            BossAI::JustEngagedWith(who);
         }
         
-        void MoveInLineOfSight(Unit* who) override
+        /*void MoveInLineOfSight(Unit* who) override
         {
             if (me->IsWithinDistInMap(who, 40.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -654,7 +679,7 @@ public:
                     }
                 }
             }  
-        }
+        }*/
         
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
