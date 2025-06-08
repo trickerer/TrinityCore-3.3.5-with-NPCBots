@@ -586,9 +586,9 @@ class npc_grilda : public CreatureScript
 public:
     npc_grilda() : CreatureScript("npc_grilda") { }
 
-    struct npc_grildaAI : public ScriptedAI
+    struct npc_grildaAI : public BossAI
     {
-        npc_grildaAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_grildaAI(Creature* creature) : BossAI(creature) { }
 
         uint32 ScreamTimer;
         uint32 SlamTimer;
@@ -644,6 +644,21 @@ public:
             }
             
             
+        }
+        
+        void JustDied(Unit* killer) override
+        {
+            me->Yell("Hogger my husband, Avenge Me!", LANG_UNIVERSAL, NULL);
+
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                Player* player = itr->GetSource();
+                if (player)
+                    player->BindToInstance();
+            }
+
+            BossAI::JustDied(killer);
         }
         
 
