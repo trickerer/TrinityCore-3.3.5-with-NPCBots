@@ -36,7 +36,7 @@ public:
         if (count > 0)
         {
             player->DestroyItemCount(461146, 1, true);
-            
+            player->SetTaxiCheater(true);
             player->GetSession()->SendTaxiStatus(player->GetGUID());
             
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
