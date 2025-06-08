@@ -22,9 +22,9 @@ enum Spells
     SPELL_BERSERK           = 37023, 
     SPELL_UNSTABLE_RIFT     = 36463,
     //WIFE
-    SPELL_SCREAM = 32052,     // AOE fear
-    SPELL_GROUND_SLAM = 33500,// Knockdown
-    SPELL_BITE = 58463,       // Direct damage bite
+    SPELL_SCREAM            = 17928,     // AOE fear
+    SPELL_GROUND_SLAM       = 61241,// Knockdown
+    SPELL_BITE              = 52474,       // Direct damage bite
 };
 
 
@@ -626,7 +626,7 @@ public:
         
         void MoveInLineOfSight(Unit* who)
         {
-            if (me->IsWithinDistInMap(who, 10.0f) && who->GetTypeId() == TYPEID_PLAYER)
+            if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                 {
