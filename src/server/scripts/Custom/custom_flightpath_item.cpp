@@ -41,6 +41,9 @@ public:
             
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
+            
+            player->m_taxi.SaveTaxiNodes();
+            
             player->SaveToDB();
         }
         else
