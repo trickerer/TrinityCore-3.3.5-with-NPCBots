@@ -585,7 +585,7 @@ public:
 class npc_grilda : public CreatureScript
 {
 public:
-    npc_grilda() : CreatureScript("npc_grilda") { }
+    npc_grilda() : CreatureScript("npc_grilda") {}
 
     struct npc_grildaAI : public BossAI
     {
@@ -652,9 +652,13 @@ public:
                         EnterCombat(who);
                     }
                 }
-            }
-            
-            
+            }  
+        }
+        
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            BossAI::EnterEvadeMode();
+            me->Yell("You Think Im Easy Try my Husband!", LANG_UNIVERSAL);
         }
         
         void JustDied(Unit* killer) override
