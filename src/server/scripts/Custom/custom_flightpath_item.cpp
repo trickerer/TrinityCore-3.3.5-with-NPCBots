@@ -37,8 +37,8 @@ public:
         {
             player->DestroyItemCount(461146, 1, true);
             player->SetTaxiCheater(true);
-            player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths. ", count);
-            ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
+            player->GetSession()->SendAreaTriggerMessage("You have temp learned %u flight paths. ", count);
+            ChatHandler(player->GetSession()).PSendSysMessage("Temp learned %u flight paths.", count);
             player->SaveToDB();
         }
         else
