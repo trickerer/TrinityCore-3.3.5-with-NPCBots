@@ -613,6 +613,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true); 
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED , true);
+            me->SetReactState(REACT_AGGRESSIVE);
             me->SetFaction(14);
         }
 
