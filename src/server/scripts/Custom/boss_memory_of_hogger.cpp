@@ -575,9 +575,75 @@ public:
     }
 };
 
+class npc_grilda : public CreatureScript
+{
+public:
+    npc_grilda() : CreatureScript("npc_grilda") { }
+
+    struct npc_grildaAI : public ScriptedAI
+    {
+        npc_grildaAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 ScreamTimer;
+        uint32 SlamTimer;
+        uint32 BiteTimer;
+
+        void Reset() override
+        {
+            ScreamTimer = 10000;
+            SlamTimer = 15000;
+            BiteTimer = 5000;
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            Talk("YOU DARE DISTURB ME! Im cooking for my husband!"); // Optional text if you add a Yell
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (ScreamTimer <= diff)
+            {
+                DoCastAOE(SPELL_SCREAM);
+                ScreamTimer = 20000;
+            }
+            else
+                ScreamTimer -= diff;
+
+            if (SlamTimer <= diff)
+            {
+                DoCastVictim(SPELL_GROUND_SLAM);
+                SlamTimer = 15000;
+            }
+            else
+                SlamTimer -= diff;
+
+            if (BiteTimer <= diff)
+            {
+                DoCastVictim(SPELL_BITE);
+                BiteTimer = 7000;
+            }
+            else
+                BiteTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_grildaAI(creature);
+    }
+};
+
+
 void AddSC_boss_memory_of_hogger()
 {
     new boss_memory_of_hogger();
+    new npc_grilda();
     new npc_memory_gnoll_add();
     new npc_riverpaw_hideflayer();
     new npc_riverpaw_pack_warder();
