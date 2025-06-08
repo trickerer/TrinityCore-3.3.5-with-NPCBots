@@ -6,8 +6,6 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 
-//#define CHAR_UPD_TAXI_MASK "UPDATE characters SET taximask = ? WHERE guid = ?"
-
 class item_learn_flightpaths : public ItemScript
 {
 public:
@@ -17,23 +15,26 @@ public:
     {
         uint32 count = 0;
 
+        // Build taxi mask manually from known nodes
+        uint64 taxiMask = 0;
+
         for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
             if (!node)
                 continue;
 
-            // Check faction: MountCreatureID[0] = Alliance, [1] = Horde
+            // Check faction
             if (player->GetTeam() == ALLIANCE && node->MountCreatureID[0] == 0)
                 continue;
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            // Skip if player already knows this node
+            // Skip if player already knows node
             if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
                 continue;
 
-            // Mark as known in server mask & update client
+            // Mark as known and notify client
             if (player->m_taxi.SetTaximaskNode(node->ID))
             {
                 player->GetSession()->SendDiscoverNewTaxiNode(node->ID);
@@ -41,19 +42,30 @@ public:
             }
         }
 
+        // Now build the taxiMask from known nodes again (bitmask)
+        // We must do this because we can't access private m_taximask directly
+
+        for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
+        {
+            if (player->m_taxi.IsTaximaskNodeKnown(i))
+            {
+                if (i < 199)
+                    taxiMask |= (uint64(1) << i);
+                else
+                {
+                    // If you have more than 64 nodes, you need a second mask, or handle differently
+                    // For now, only first 64 taxi nodes handled
+                }
+            }
+        }
+
         if (count > 0)
         {
-            // Destroy 1 of your item (change ID if needed)
             player->DestroyItemCount(461146, 1, true);
-
             player->SetTaxiCheater(true);
-            
-            uint64 taxiMask = uint64(player->m_taxi.m_taximask[0]) | (uint64(player->m_taxi.m_taximask[1]) << 32);
 
-            std::string query = StringFormat("UPDATE characters SET taximask = '{}' WHERE guid = '{}'", taxiMask, player->GetGUID().GetCounter());
+            std::string query = StringFormat("UPDATE characters SET taximask = '%llu' WHERE guid = '%u'", taxiMask, player->GetGUID().GetCounter());
             CharacterDatabase.Execute(query);
-    
-            //player->SaveToDB();
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
