@@ -51,7 +51,7 @@ enum NPCs
 enum Data
 {
     DATA_MEMORY_OF_HOGGER = 0,
-    WIFE_OF_HOGGER = 0,
+    WIFE_OF_HOGGER = 1,
 };
 
 enum Yells
@@ -636,7 +636,7 @@ public:
         
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->IsWithinDistInMap(who, 20.0f) && who->GetTypeId() == TYPEID_PLAYER)
+            if (me->IsWithinDistInMap(who, 40.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true))
                 {
@@ -658,7 +658,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             BossAI::EnterEvadeMode();
-            me->Yell("You Think Im Easy Try my Husband!", LANG_UNIVERSAL);
+            me->Yell("And you think you can take my husband? LOL!", LANG_UNIVERSAL);
         }
         
         void JustDied(Unit* killer) override
