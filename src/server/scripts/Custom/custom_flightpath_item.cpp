@@ -44,7 +44,15 @@ public:
             player->DestroyItemCount(461146, 1, true);
 
             player->SetTaxiCheater(true);
-            player->m_taxi.SaveTaxiNodes();
+            
+            uint64 guid = player->GetGUID().GetRawValue();
+            uint64 taxiMask = player->m_taxi.GetTaxiMaskRaw(); // you might need to create a getter returning raw mask as uint64
+
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_TAXI_MASK);
+            stmt->setUInt64(0, taxiMask);
+            stmt->setUInt64(1, guid);
+            CharacterDatabase.Execute(stmt);
+    
             player->SaveToDB();
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
