@@ -21,7 +21,13 @@ enum Spells
     SPELL_ECHO_SLAM         = 53399,
     SPELL_BERSERK           = 37023, 
     SPELL_UNSTABLE_RIFT     = 36463,
+    //WIFE
+    SPELL_SCREAM = 32052,     // AOE fear
+    SPELL_GROUND_SLAM = 33500,// Knockdown
+    SPELL_BITE = 58463,       // Direct damage bite
 };
+
+
 
 enum Events
 {
