@@ -617,12 +617,32 @@ public:
 
         void EnterCombat(Unit* Who)
         {
+            
             me->m_CombatDistance = 100.0f;
             AttackStart(Who);
         }
+        
+        void DamageTaken(Unit* attacker, uint32& damage) //override
+        {
+            //NOTHING TODO
+        }
+        
         void JustEngagedWith(Unit* who) override
         {
             me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
+            // Apply freeze/slow/movement-impairing immunities
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SLOW_ATTACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_BANISH, true); 
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED , true);
         }
         
         void MoveInLineOfSight(Unit* who)
