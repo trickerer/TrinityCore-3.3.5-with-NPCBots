@@ -65,7 +65,7 @@ public:
             player->SetTaxiCheater(true);
 
             std::string query = StringFormat("UPDATE characters SET taximask = '%llu' WHERE guid = '%u'", taxiMask, player->GetGUID().GetCounter());
-            CharacterDatabase.Execute(query);
+            CharacterDatabase.Execute(query.c_str());
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
