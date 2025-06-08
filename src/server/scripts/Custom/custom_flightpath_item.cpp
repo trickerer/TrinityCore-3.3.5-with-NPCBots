@@ -44,6 +44,7 @@ public:
             player->DestroyItemCount(461146, 1, true);
 
             player->SetTaxiCheater(true);
+            player->m_taxi.SaveTaxiNodes();
             player->SaveToDB();
 
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
