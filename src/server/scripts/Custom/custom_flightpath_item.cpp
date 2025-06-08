@@ -26,8 +26,8 @@ public:
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
-                continue;
+            //if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
+            //    continue;
 
             player->m_taxi.SetTaximaskNode(node->ID);
             ++count;
@@ -36,6 +36,7 @@ public:
         if (count > 0)
         {
             player->DestroyItemCount(461146, 1, true);
+            player->SendLearnedTaxiNodes();
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
             player->SaveToDB();
