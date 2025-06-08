@@ -10,7 +10,7 @@ class item_learn_flightpaths : public ItemScript
 public:
     item_learn_flightpaths() : ItemScript("item_learn_flightpaths") {}
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const&) override
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const&)
     {
         uint32 count = 0;
 
@@ -20,37 +20,38 @@ public:
             if (!node)
                 continue;
 
-            // Faction filtering
+            // Check faction: MountCreatureID[0] = Alliance, [1] = Horde
             if (player->GetTeam() == ALLIANCE && node->MountCreatureID[0] == 0)
                 continue;
             if (player->GetTeam() == HORDE && node->MountCreatureID[1] == 0)
                 continue;
 
-            //if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
-            //    continue;
+            // Skip if player already knows this node
+            if (player->m_taxi.IsTaximaskNodeKnown(node->ID))
+                continue;
 
-            player->m_taxi.SetTaximaskNode(node->ID);
-            ++count;
+            // Mark as known in server mask & update client
+            if (player->m_taxi.SetTaximaskNode(node->ID))
+            {
+                player->GetSession()->SendDiscoverNewTaxiNode(node->ID);
+                ++count;
+            }
         }
 
         if (count > 0)
         {
+            // Destroy 1 of your item (change ID if needed)
             player->DestroyItemCount(461146, 1, true);
+
             player->SetTaxiCheater(true);
-            player->GetSession()->SendTaxiStatus(player->GetGUID());
-            
+            player->SaveToDB();
+
             player->GetSession()->SendAreaTriggerMessage("You have learned %u flight paths.", count);
             ChatHandler(player->GetSession()).PSendSysMessage("Learned %u flight paths.", count);
-            
-            player->m_taxi.SaveTaxiNodes();
-            
-            player->SaveToDB();
-            return true;
         }
         else
         {
             player->GetSession()->SendAreaTriggerMessage("You already know all available flight paths.");
-            return false;
         }
 
         return true;
