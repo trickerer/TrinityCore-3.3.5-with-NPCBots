@@ -5,8 +5,9 @@
 #include "World.h"
 #include "Chat.h"
 #include "DatabaseEnv.h"
+#include "CharacterDatabaseStatements.h"
 
-#define CHAR_UPD_TAXI_MASK "UPDATE characters SET taximask = ? WHERE guid = ?"
+//#define CHAR_UPD_TAXI_MASK "UPDATE characters SET taximask = ? WHERE guid = ?"
 
 class item_learn_flightpaths : public ItemScript
 {
