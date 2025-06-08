@@ -45,10 +45,12 @@ public:
             player->m_taxi.SaveTaxiNodes();
             
             player->SaveToDB();
+            return true;
         }
         else
         {
             player->GetSession()->SendAreaTriggerMessage("You already know all available flight paths.");
+            return false;
         }
 
         return true;
