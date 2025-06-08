@@ -603,7 +603,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            Talk("YOU DARE DISTURB ME! Im cooking for my husband!"); // Optional text if you add a Yell
+            me->Yell("YOU DARE DISTURB ME! Im cooking for my husband!", LANG_UNIVERSAL, NULL);
         }
 
         void UpdateAI(uint32 diff) override
