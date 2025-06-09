@@ -60,7 +60,7 @@ public:
         // Position calculation
         float spawnX = x + distance * std::cos(orientation);
         float spawnY = y + distance * std::sin(orientation);
-        Position pos(spawnX, spawnY, z, orientation);
+        Position pos(spawnX, spawnY, z+2, orientation);
 
         // Summon the creature
         Creature* summon = player->GetMap()->SummonCreature(
