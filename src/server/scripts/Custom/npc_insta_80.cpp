@@ -510,7 +510,7 @@ public:
 
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, BlackSmithSPell);
-                player->SetSkill(BlackSmithSkill, 1, 450, 450);
+                player->SetSkill(BlackSmithSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, BlackSmithSkill);
                 me->Say("Your Blacksmithing is now at max " + player->GetName()+" , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -522,7 +522,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, LeatherWorkingSpell);
-                player->SetSkill(LeatherWorkingSKill, 1, 450, 450);
+                player->SetSkill(LeatherWorkingSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, LeatherWorkingSKill);
                 me->Say("Your leather working is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -534,7 +534,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, AlchemySPell);
-                player->SetSkill(AlchemySkill, 1, 450, 450);
+                player->SetSkill(AlchemySkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, AlchemySkill);
                 me->Say("Your Alchemy skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -546,7 +546,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, HerbalismSpell);
-                player->SetSkill(HerbalismSkill, 1, 450, 450);
+                player->SetSkill(HerbalismSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, HerbalismSkill);
                 me->Say("Your Herbalism skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -558,7 +558,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, MiningSpell);
-                player->SetSkill(MiningSKill, 1, 450, 450);
+                player->SetSkill(MiningSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, MiningSKill);
                 me->Say("Your Mining skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -570,7 +570,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, TailoringSpell);
-                player->SetSkill(TailoringSKill, 1, 450, 450);
+                player->SetSkill(TailoringSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, TailoringSKill);
                 me->Say("Your Tailoring skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -582,7 +582,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, EngSPell);
-                player->SetSkill(EngSkill, 1, 450, 450);
+                player->SetSkill(EngSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, EngSkill);
                 me->Say("Your Engineering skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -594,7 +594,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, EnchanterSpell);
-                player->SetSkill(EnchanterSkill, 1, 450, 450);
+                player->SetSkill(EnchanterSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, EnchanterSkill);
                 me->Say("Your Enchanting skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -606,7 +606,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, SkinningSPell);
-                player->SetSkill(SKinningSkill, 1, 450, 450);
+                player->SetSkill(SKinningSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, SKinningSkill);
                 me->Say("Your Skinning skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -618,7 +618,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, JewelSpell);
-                player->SetSkill(JewelSKill, 1, 450, 450);
+                player->SetSkill(JewelSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, JewelSKill);
                 player->SetSkill(MiningSKill, 0, 0, 0);  // WHY DID WE LEARN MINING???????
                 me->Say("Your Jewelcrafting skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
@@ -631,7 +631,7 @@ public:
             {
                 UpdateInsta80CharData(player, 2);
                 player->CastSpell(player, InscriptSpell);
-                player->SetSkill(InscriptSKill, 1, 450, 450);
+                player->SetSkill(InscriptSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, InscriptSKill);
                 me->Say("Your Jewelcrafting skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -648,7 +648,7 @@ public:
 
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, BlackSmithSPell);
-                player->SetSkill(BlackSmithSkill, 1, 450, 450);
+                player->SetSkill(BlackSmithSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, BlackSmithSkill);
                 me->Say("Your Blacksmithing is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -660,7 +660,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, LeatherWorkingSpell);
-                player->SetSkill(LeatherWorkingSKill, 1, 450, 450);
+                player->SetSkill(LeatherWorkingSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, LeatherWorkingSKill);
                 me->Say("Your leather working is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -672,7 +672,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, AlchemySPell);
-                player->SetSkill(AlchemySkill, 1, 450, 450);
+                player->SetSkill(AlchemySkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, AlchemySkill);
                 me->Say("Your Alchemy skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -684,7 +684,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, HerbalismSpell);
-                player->SetSkill(HerbalismSkill, 1, 450, 450);
+                player->SetSkill(HerbalismSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, HerbalismSkill);
                 me->Say("Your Herbalism skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -696,7 +696,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, MiningSpell);
-                player->SetSkill(MiningSKill, 1, 450, 450);
+                player->SetSkill(MiningSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, MiningSKill);
                 me->Say("Your Mining skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -708,7 +708,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, TailoringSpell);
-                player->SetSkill(TailoringSKill, 1, 450, 450);
+                player->SetSkill(TailoringSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, TailoringSKill);
                 me->Say("Your Tailoring skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -720,7 +720,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, EngSPell);
-                player->SetSkill(EngSkill, 1, 450, 450);
+                player->SetSkill(EngSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, EngSkill);
                 me->Say("Your Engineering skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -732,7 +732,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, EnchanterSpell);
-                player->SetSkill(EnchanterSkill, 1, 450, 450);
+                player->SetSkill(EnchanterSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, EnchanterSkill);
                 me->Say("Your Enchanting skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -744,7 +744,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, SkinningSPell);
-                player->SetSkill(SKinningSkill, 1, 450, 450);
+                player->SetSkill(SKinningSkill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, SKinningSkill);
                 me->Say("Your Skinning skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -756,7 +756,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, JewelSpell);
-                player->SetSkill(JewelSKill, 1, 450, 450);
+                player->SetSkill(JewelSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, JewelSKill);
                 player->SetSkill(MiningSKill, 0, 0, 0);  // WHY DID WE LEARN MINING???????
                 me->Say("Your Jewelcrafting skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
@@ -769,7 +769,7 @@ public:
             {
                 UpdateInsta80CharData(player, 3);
                 player->CastSpell(player, InscriptSpell);
-                player->SetSkill(InscriptSKill, 1, 450, 450);
+                player->SetSkill(InscriptSKill, 1, 350, 350);
                 HandleLearnSkillRecipesHelper(player, InscriptSKill);
                 me->Say("Your scribe skill is now at max " + player->GetName() + " , talk to me again to continue.", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
@@ -965,8 +965,8 @@ public:
                 player->SaveToDB();
                 mySleep(5);
 				DeleteInsta80CharData(player);
-                //player->SetSkill(162, 1, 450, 450);  //unarmed
-                //player->SetSkill(95, 1, 450, 450);  //Def
+                //player->SetSkill(162, 1, 350, 350);  //unarmed
+                //player->SetSkill(95, 1, 350, 350);  //Def
                 if (pclass2 == 4) // rouge
                 {
                     player->SetSkill(633, 1, 400, 400);  //lockoicking
@@ -1001,7 +1001,7 @@ public:
 
             if (action == GOSSIP_ACTION_INFO_DEF + 9997)
             {
-                me->Say(player->GetName()+" Via the website, online shop mgawow.online/shop", LANG_UNIVERSAL);
+                me->Say(player->GetName()+" via the website, the vote shop. If you want another online shop mgawow.online/shop", LANG_UNIVERSAL);
                 CloseGossipMenuFor(player);
                 return true;
             }
