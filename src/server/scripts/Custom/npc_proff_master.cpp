@@ -312,7 +312,7 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2001) // blacksmith
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
