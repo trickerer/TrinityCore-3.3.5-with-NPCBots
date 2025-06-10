@@ -312,7 +312,7 @@ public:
             case 1510:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 1))
+                if (player->HasItemCount(1815499, 1))
                 {
                     uint32 itemId = 30809;
                     ItemPosCountVec dest;
@@ -321,7 +321,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 1, true);
+                        player->DestroyItemCount(1815499, 1, true);
                         me->Say(tokentext14, LANG_UNIVERSAL);
                     }
                     else
@@ -337,7 +337,7 @@ public:
             case 1511:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if (player->HasItemCount(1815499, 10))
                 {
                     uint32 itemId = 30809;
                     ItemPosCountVec dest;
@@ -346,7 +346,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 10, true);
+                        player->DestroyItemCount(1815499, 10, true);
                         me->Say(tokentext14, LANG_UNIVERSAL);
                     }
                     else
@@ -362,7 +362,7 @@ public:
             case 1512:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 4))
+                if (player->HasItemCount(1815499, 4))
                 {
                     uint32 itemId = 29740;
                     ItemPosCountVec dest;
@@ -371,7 +371,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 4, true);
+                        player->DestroyItemCount(1815499, 4, true);
                         me->Say(tokentext14, LANG_UNIVERSAL);
                     }
                     else
@@ -387,7 +387,7 @@ public:
             case 1513:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 40))
+                if (player->HasItemCount(1815499, 40))
                 {
                     uint32 itemId = 29740;
                     ItemPosCountVec dest;
@@ -396,7 +396,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 40, true);
+                        player->DestroyItemCount(1815499, 40, true);
                         me->Say(tokentext14, LANG_UNIVERSAL);
                     }
                     else
@@ -412,7 +412,7 @@ public:
             case 1514:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 1))
+                if (player->HasItemCount(1815499, 1))
                 {
                     uint32 itemId = 30810;
                     ItemPosCountVec dest;
@@ -421,7 +421,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 1, true);
+                        player->DestroyItemCount(1815499, 1, true);
                         me->Say(tokentext16, LANG_UNIVERSAL);
                     }
                     else
@@ -437,7 +437,7 @@ public:
             case 1515:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if (player->HasItemCount(1815499, 10))
                 {
                     uint32 itemId = 30810;
                     ItemPosCountVec dest;
@@ -446,7 +446,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 10, true);
+                        player->DestroyItemCount(1815499, 10, true);
                         me->Say(tokentext16, LANG_UNIVERSAL);
                     }
                     else
@@ -462,7 +462,7 @@ public:
             case 1516:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 4))
+                if (player->HasItemCount(1815499, 4))
                 {
                     uint32 itemId = 29739;
                     ItemPosCountVec dest;
@@ -471,7 +471,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 4, true);
+                        player->DestroyItemCount(1815499, 4, true);
                         me->Say(tokentext16, LANG_UNIVERSAL);
                     }
                     else
@@ -487,7 +487,7 @@ public:
             case 1517:
             {
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 40))
+                if (player->HasItemCount(1815499, 40))
                 {
                     uint32 itemId = 29739;
                     ItemPosCountVec dest;
@@ -496,7 +496,7 @@ public:
                     if (msg == EQUIP_ERR_OK)
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
-                        player->DestroyItemCount(18154, 40, true);
+                        player->DestroyItemCount(1815499, 40, true);
                         me->Say(tokentext16, LANG_UNIVERSAL);
                     }
                     else

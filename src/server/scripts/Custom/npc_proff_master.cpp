@@ -19,10 +19,11 @@
 
 enum SpellsAndItemIDsAndCost
 {
-    MAINPROFF = 3,  // token cost
-    SECPROFF = 2,   // token cost
+    MAINPROFF = 2,  // token cost MGA TOKEN
+    SECPROFF = 5,   // token cost MINI TOKEN
 
-    ITEMCOSTID = 18154,  //MGA Mini Token
+    ITEMCOSTID = 1815499,  //MGA Mini Token
+    ITEMCOSTID2 = 21140,  //MGA Token
 
     FirstAidSkill = 129,
     FirstAidSPell = 65292,
@@ -153,8 +154,8 @@ public:
 
             WorldSession* session = player->GetSession();
             // CHEDCK IF FREE SKILL SLOT
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "Main Professions Cost 3 Mini Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "Secondary Professions Cost 2 Mini Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "Main Professions Cost 2 MGA Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "Secondary Professions Cost 5 Mini Tokens", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "--", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "Main Professions", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
             if (freeProfs < 1)
@@ -314,7 +315,7 @@ public:
                 if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, BlackSmithSPell);
                     player->SetSkill(BlackSmithSkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, BlackSmithSkill);
@@ -332,10 +333,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2002) // leather working
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, LeatherWorkingSpell);
                     player->SetSkill(LeatherWorkingSKill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, LeatherWorkingSKill);
@@ -353,10 +354,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2003) // ALCH
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, AlchemySPell);
                     player->SetSkill(AlchemySkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, AlchemySkill);
@@ -374,10 +375,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2004) // HERB
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, HerbalismSpell);
                     player->SetSkill(HerbalismSkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, HerbalismSkill);
@@ -395,10 +396,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2005) // mining
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, MiningSpell);
                     player->SetSkill(MiningSKill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, MiningSKill);
@@ -416,10 +417,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2006) // tailor
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, TailoringSpell);
                     player->SetSkill(TailoringSKill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, TailoringSKill);
@@ -437,10 +438,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2007) // eng
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, EngSPell);
                     player->SetSkill(EngSkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, EngSkill);
@@ -458,10 +459,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2008) // enchanter
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, EnchanterSpell);
                     player->SetSkill(EnchanterSkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, EnchanterSkill);
@@ -479,10 +480,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2009) // skinner
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, SkinningSPell);
                     player->SetSkill(SKinningSkill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, SKinningSkill);
@@ -500,10 +501,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2010) // jewel
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, JewelSpell);
                     player->SetSkill(JewelSKill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, JewelSKill);
@@ -523,10 +524,10 @@ public:
             if (action == GOSSIP_ACTION_INFO_DEF + 2011) // scribe
             {
                 //CHECK FOR TOKEN
-                if (player->HasItemCount(ITEMCOSTID, MAINPROFF))
+                if (player->HasItemCount(ITEMCOSTID2, MAINPROFF))
                 {
                     //LEARN PROFF
-                    player->DestroyItemCount(ITEMCOSTID, MAINPROFF, true);
+                    player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, InscriptSpell);
                     player->SetSkill(InscriptSKill, 1, 450, 450);
                     HandleLearnSkillRecipesHelper(player, InscriptSKill);

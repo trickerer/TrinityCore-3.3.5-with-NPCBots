@@ -122,7 +122,7 @@ public:
             {
             case 1001: // Give item if dont alrdy have it
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 50))
+                if (player->HasItemCount(1815499, 50))
                 {
                     uint32 itemId = 21140;
                     ItemPosCountVec dest;
@@ -132,7 +132,7 @@ public:
                     {
                         Item* item = player->StoreNewItem(dest, itemId, 1, true);
                         player->SendNewItem(item, 1, true, false);
-                        player->DestroyItemCount(18154, 50, true);
+                        player->DestroyItemCount(1815499, 50, true);
                         me->Say(tokentext1, LANG_UNIVERSAL);
                     }
                     else
@@ -269,7 +269,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->GetHonorPoints() > 4999)
                 {
-                    uint32 itemId = 18154;
+                    uint32 itemId = 1815499;
                     ItemPosCountVec dest;
 
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
@@ -314,7 +314,7 @@ public:
                 break;
             case 1013:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if (player->HasItemCount(1815499, 10))
                 {
                     if (player->HasItemCount(90001, 1))
                     {
@@ -333,7 +333,7 @@ public:
                         {
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
-                            player->DestroyItemCount(18154, 10, true);
+                            player->DestroyItemCount(1815499, 10, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
@@ -351,7 +351,7 @@ public:
                 break;
             case 1014:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if (player->HasItemCount(1815499, 10))
                 {
                     if (player->HasItemCount(90002, 1))
                     {
@@ -370,7 +370,7 @@ public:
                         {
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
-                            player->DestroyItemCount(18154, 10, true);
+                            player->DestroyItemCount(1815499, 10, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
@@ -383,7 +383,7 @@ public:
                 break;
                 case 1015:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(18154, 10))
+                if (player->HasItemCount(1815499, 10))
                 {
                     if (player->HasItemCount(90003, 1))
                     {
@@ -402,7 +402,7 @@ public:
                         {
                             Item* item = player->StoreNewItem(dest, itemId, 1, true);
                             player->SendNewItem(item, 1, true, false);
-                            player->DestroyItemCount(18154, 10, true);
+                            player->DestroyItemCount(1815499, 10, true);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
