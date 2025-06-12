@@ -229,7 +229,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
     
     
-    if (type == CHAT_MSG_ADDON)
+    if ((type == CHAT_MSG_WHISPER) && (lang == LANG_ADDON))
     {
         std::string prefix;
         std::string message;
