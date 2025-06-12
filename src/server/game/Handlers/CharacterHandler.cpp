@@ -741,6 +741,16 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     });
 }
 
+bool HasAddon(Player* player)
+{
+    uint32 guid = player->GetGUID().GetCounter();
+    QueryResult result = CharacterDatabase.PQuery("SELECT has_addon FROM addon_status WHERE guid = %u", guid);
+    if (!result)
+        return false;
+    Field* fields = result->Fetch();
+    return fields[0].GetUInt8() != 0;
+}
+
 void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
 {
     ObjectGuid playerGuid = holder.GetGuid();
@@ -1034,8 +1044,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
     
     pCurrChar->GetSession()->SendPacket(&data);
-
-
+    
+    if (hasHdAddon)
+        player->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
+    else
+        player->GetSession()->SendNotification("You're using the standard client. Download the HD version from mgawow.online!");
 
 }
 
