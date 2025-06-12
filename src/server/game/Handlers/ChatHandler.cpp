@@ -219,6 +219,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
     }
     TC_LOG_INFO("custom", "TEST CODE IS GOING TO RUN!: %s", GetPlayer()->GetName().c_str());
+    TC_LOG_INFO("custom", "Lang received: %u", lang);
     if (lang == LANG_ADDON)
     {
         TC_LOG_INFO("custom", "ADDON SENT MESSAGE: %s", GetPlayer()->GetName().c_str());
