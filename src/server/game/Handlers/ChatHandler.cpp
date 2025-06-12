@@ -231,7 +231,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     
     std::string prefix;
     recvData >> prefix >> msg;
-    if ((type == CHAT_MSG_WHISPER) && (lang == LANG_ADDON))
+    if (lang == LANG_ADDON)
     {
         // Existing warden Lua check
         if (_warden && _warden->ProcessLuaCheckResponse(msg))
