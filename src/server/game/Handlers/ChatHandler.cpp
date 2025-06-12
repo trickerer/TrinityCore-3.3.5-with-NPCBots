@@ -63,6 +63,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     recvData >> lang;
     recvData >> msg;
     recvData >> channel;
+    recvData >> to;
     
 
     if (type >= MAX_CHAT_MSG_TYPE)
@@ -231,7 +232,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    recvData >> type >> lang >> channel >> to >> msg;
+    
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
         // Parse prefix and message from the addon msg string
