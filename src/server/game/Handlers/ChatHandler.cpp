@@ -234,7 +234,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             std::string query = "INSERT INTO addon_status (guid, has_addon) VALUES (" + std::to_string(guid) + ", 1) "
                     "ON DUPLICATE KEY UPDATE has_addon = VALUES(has_addon), last_seen = CURRENT_TIMESTAMP";
 
-            CharacterDatabase.DirectExecute(query);
+            CharacterDatabase.DirectExecute(query.c_str());
             return;  // block further processing if needed
         }
     }
