@@ -62,7 +62,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     recvData >> lang;
     //MGAHD ADDON
     std::string prefix;
-    std::string msg;
     recvData >> prefix >> msg;
 
     if (type >= MAX_CHAT_MSG_TYPE)
