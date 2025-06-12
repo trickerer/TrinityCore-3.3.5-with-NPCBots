@@ -229,7 +229,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
     
     
-    std::string prefix, message, channel;
+    std::string prefix
     recvData >> prefix >> message >> channel;
 
     if (prefix == "MGAHD" && message == "true")
