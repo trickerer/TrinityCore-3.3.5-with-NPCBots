@@ -228,20 +228,28 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    recvData >> type >> lang;
+        std::string to, msg;
 
-    if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
-    {
-        std::string prefix, message;
-        recvData >> prefix >> message;
+        recvData >> to >> type >> lang >> msg;
 
-        if (prefix == "MGAHD" && message == "true")
+        // Only intercept addon whispers
+        if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
         {
-            std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
-            SendNotification(feedback.c_str());
-            //sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
+            std::istringstream iss(msg);
+            std::string prefix, message;
+            iss >> prefix >> message;  // parse prefix and message from the chat message string
+
+            if (prefix == "MGAHD" && message == "true")
+            {
+                std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
+                SendNotification(feedback.c_str());
+                // Log if you want
+                // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
+
+                // Return here if you want to block further processing of this message
+                return;
+            }
         }
-    }
     
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
