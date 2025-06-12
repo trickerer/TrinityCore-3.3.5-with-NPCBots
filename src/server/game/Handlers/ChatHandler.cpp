@@ -218,16 +218,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
     }
-
-    if (msg.size() > 255)
-        return;
-
-    // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
-    if ((type == CHAT_MSG_GUILD) && (lang == LANG_ADDON))
-    {
-        if (_warden && _warden->ProcessLuaCheckResponse(msg))
-            return;
-    }
     
     if (lang == LANG_ADDON)
     {
@@ -244,6 +234,16 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
             return;  // block further processing if needed
         }
+    }
+
+    if (msg.size() > 255)
+        return;
+
+    // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
+    if ((type == CHAT_MSG_GUILD) && (lang == LANG_ADDON))
+    {
+        if (_warden && _warden->ProcessLuaCheckResponse(msg))
+            return;
     }
     
     // no chat commands in AFK/DND autoreply, and it can be empty
