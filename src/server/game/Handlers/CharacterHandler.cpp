@@ -1031,7 +1031,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
     data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
     data << m_name.c_str();            // Channel name ("world")
-    data << "MGAWoW";  // Player GUID for invite
+    data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
     
     pCurrChar->GetSession()->SendPacket(&data);
 
