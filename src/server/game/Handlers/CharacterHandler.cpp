@@ -77,17 +77,6 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
         bool Initialize();
 };
 
-bool hasHdAddon = false;
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HD_ADDON_STATUS);
-    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
-
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-    {
-        Field* fields = result->Fetch();
-        hasHdAddon = fields[0].GetBool();
-    }
-}
 
 bool LoginQueryHolder::Initialize()
 {
@@ -1045,6 +1034,18 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
     
     pCurrChar->GetSession()->SendPacket(&data);
+    
+    bool hasHdAddon = false;
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HD_ADDON_STATUS);
+        stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
+
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            Field* fields = result->Fetch();
+            hasHdAddon = fields[0].GetBool();
+        }
+    }
     
     if (hasHdAddon)
         pCurrChar->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
