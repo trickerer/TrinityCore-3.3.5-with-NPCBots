@@ -1046,9 +1046,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     pCurrChar->GetSession()->SendPacket(&data);
     
     if (hasHdAddon)
-        player->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
+        pCurrChar->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
     else
-        player->GetSession()->SendNotification("You're using the standard client. Download the HD version from mgawow.online!");
+        pCurrChar->GetSession()->SendNotification("You're using the standard client. Download the HD version from mgawow.online!");
 
 }
 
