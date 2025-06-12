@@ -1037,10 +1037,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     
     bool hasHdAddon = false;
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HD_ADDON_STATUS);
-        stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
+        uint32 guid = GetPlayer()->GetGUID().GetCounter();
 
-        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        // Hardcoded SQL query
+        std::string query = "SELECT has_addon FROM addon_status WHERE guid = " + std::to_string(guid);
+        if (PreparedQueryResult result = CharacterDatabase.Query(query.c_str()))
         {
             Field* fields = result->Fetch();
             hasHdAddon = fields[0].GetBool();
