@@ -238,8 +238,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (prefix == "MGAHD" && message == "true")
         {
-            std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
-            GetPlayer()->GetSession()->SendNotification(feedback.c_str());
+            //std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
+            //GetPlayer()->GetSession()->SendNotification(feedback.c_str());
             // Optionally log:
             // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
             return;  // block further processing if needed
