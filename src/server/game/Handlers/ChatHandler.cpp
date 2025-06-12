@@ -228,13 +228,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    std::string prefix, message;
-    recvData >> prefix >> message >> channel;
+    std::string prefix, message, target;
+
+    recvData >> prefix >> message >> target;
 
     if (prefix == "MGAHD" && message == "true")
     {
         SendNotification("Received MGAHD addon message!");
-        // sLog->outInfo(LOG_FILTER_CHAT, "Addon: %s - %s", prefix.c_str(), message.c_str());
     }
 
     // no chat commands in AFK/DND autoreply, and it can be empty
