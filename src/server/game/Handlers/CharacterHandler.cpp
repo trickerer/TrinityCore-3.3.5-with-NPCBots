@@ -1046,7 +1046,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             hasHdAddon = fields[0].GetBool();
         }
     }
-    
+    sleep(5);
     if (hasHdAddon)
         pCurrChar->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
     else
