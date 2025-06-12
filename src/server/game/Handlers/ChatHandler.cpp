@@ -60,6 +60,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     recvData >> type;
     recvData >> lang;
+    recvData >> channel >> to >> msg;
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
@@ -227,8 +228,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (_warden && _warden->ProcessLuaCheckResponse(msg))
             return;
     }
-    
-    recvData >> type >> lang >> channel >> to >> msg;
 
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
