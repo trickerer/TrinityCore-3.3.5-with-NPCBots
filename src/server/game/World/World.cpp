@@ -173,23 +173,6 @@ World* World::instance()
     static World instance;
     return &instance;
 }
-
-void WorldSession::HandleAddonMessage(WorldPacket& recvData)
-{
-    std::string prefix, message, target;
-
-    recvData >> prefix >> message >> target;
-
-    if (prefix == "MGAHD" && message == "true")
-    {
-        SendNotification("Received MGAHD addon message!");
-    }
-    else
-    {
-        SendNotification("NO HD CLIENT!");
-    }    
-}
-
 /// Find a player in a specified zone
 Player* World::FindPlayerInZone(uint32 zone)
 {

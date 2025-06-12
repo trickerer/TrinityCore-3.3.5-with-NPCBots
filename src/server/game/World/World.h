@@ -769,7 +769,6 @@ class TC_GAME_API World
         void TriggerGuidAlert();
         bool IsGuidWarning() { return _guidWarn; }
         bool IsGuidAlert() { return _guidAlert; }
-        void HandleAddonMessage(WorldPacket& recvData);
 
     protected:
         void _UpdateGameTime();
