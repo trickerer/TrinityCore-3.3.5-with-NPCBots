@@ -241,8 +241,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             SendNotification(feedback.c_str());
             //sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
         }
-
-        return; // addon message handled, no further processing
     }
     
     // no chat commands in AFK/DND autoreply, and it can be empty
