@@ -228,8 +228,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-
-    //recvData >> to >> channel >> type >> lang >> msg;
+    std::string channel, to, msg;
+    recvData >> type >> lang >> channel >> to >> msg;
 
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
