@@ -60,7 +60,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     recvData >> type;
     recvData >> lang;
-    recvData >> to >> msg;
+    recvData >> msg;
     
 
     if (type >= MAX_CHAT_MSG_TYPE)
