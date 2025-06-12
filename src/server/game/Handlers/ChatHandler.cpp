@@ -80,27 +80,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     Player* sender = GetPlayer();
 
     //TC_LOG_DEBUG("CHAT: packet received. type {}, lang {}", type, lang);
-    
-    if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
-    {
-        // Parse prefix and message from the addon msg string
-        std::istringstream iss(msg);
-        std::string prefix, message;
-        iss >> prefix >> message;
-
-        if (prefix == "MGAHD" && message == "true")
-        {
-            std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
-            // Assuming SendNotification takes printf style, use format:
-            SendNotification("%s", feedback.c_str());
-
-            // Optionally log too
-            // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
-
-            // Return if you want to block further processing
-            return;
-        }
-    }
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
@@ -248,6 +227,27 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     {
         if (_warden && _warden->ProcessLuaCheckResponse(msg))
             return;
+    }
+    
+    if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
+    {
+        // Parse prefix and message from the addon msg string
+        std::istringstream iss(msg);
+        std::string prefix, message;
+        iss >> prefix >> message;
+
+        if (prefix == "MGAHD" && message == "true")
+        {
+            std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
+            // Assuming SendNotification takes printf style, use format:
+            SendNotification("%s", feedback.c_str());
+
+            // Optionally log too
+            // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
+
+            // Return if you want to block further processing
+            return;
+        }
     }
     
     // no chat commands in AFK/DND autoreply, and it can be empty
