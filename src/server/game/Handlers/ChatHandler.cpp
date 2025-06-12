@@ -229,7 +229,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
+    if (lang == LANG_ADDON)
     {
         TC_LOG_INFO("custom", "ADDON SENT MESSAGE: %s", GetPlayer()->GetName().c_str());
         std::istringstream iss(msg);
