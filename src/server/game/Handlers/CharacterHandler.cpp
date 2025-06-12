@@ -1034,9 +1034,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
     
     pCurrChar->GetSession()->SendPacket(&data);
-    sleep(1);
+    
     bool hasHdAddon = false;
     {
+        sleep(3);
         uint32 guid = GetPlayer()->GetGUID().GetCounter();
 
         std::string query = "SELECT has_addon FROM addon_status WHERE guid = " + std::to_string(guid);
