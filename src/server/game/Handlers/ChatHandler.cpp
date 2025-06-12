@@ -236,6 +236,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     {
         SendNotification("Received MGAHD addon message!");
     }
+    else
+    {
+        SendNotification("NO HD CLIENT!");
+    }
 
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
