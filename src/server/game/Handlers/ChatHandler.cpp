@@ -257,6 +257,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         else
         {
             _player->GetSession()->SendNotification("You are NOT using the HD client!");
+            return; // prevent further handling
         }
     }
 
