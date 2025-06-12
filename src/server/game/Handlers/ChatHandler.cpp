@@ -218,17 +218,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             msg = recvData.ReadCString(lang != LANG_ADDON);
             break;
     }
-    TC_LOG_INFO("custom", "TEST CODE IS GOING TO RUN!: %s", GetPlayer()->GetName().c_str());
-    TC_LOG_INFO("custom", "Lang received: %u", lang);
+    //TC_LOG_INFO("custom", "TEST CODE IS GOING TO RUN!: %s", GetPlayer()->GetName().c_str());
+    //TC_LOG_INFO("custom", "Lang received: %u", lang);
     if (lang == LANG_ADDON)
     {
-        TC_LOG_INFO("custom", "ADDON SENT MESSAGE: %s", GetPlayer()->GetName().c_str());
+        //TC_LOG_INFO("custom", "ADDON SENT MESSAGE: %s", GetPlayer()->GetName().c_str());
         std::istringstream iss(msg);
         std::string prefix, message;
         iss >> prefix >> message;
 
         if (prefix == "MGAHD" && message == "true")
         {
+            TC_LOG_INFO("custom", "IT WORKED!!";
             //std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
             //GetPlayer()->GetSession()->SendNotification(feedback.c_str());
             // Optionally log:
