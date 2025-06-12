@@ -239,7 +239,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
             SendNotification(feedback.c_str());
-            sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
+            //sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
         }
 
         return; // addon message handled, no further processing
