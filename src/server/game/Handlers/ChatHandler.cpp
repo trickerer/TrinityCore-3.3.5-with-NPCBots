@@ -229,7 +229,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    recvData >> channel >> to >> msg;
+    recvData >> to >> msg;
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
         // Parse prefix and message from the addon msg string
