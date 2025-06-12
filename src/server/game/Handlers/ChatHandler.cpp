@@ -228,7 +228,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    uint32 type, lang;
     recvData >> type >> lang;
 
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
