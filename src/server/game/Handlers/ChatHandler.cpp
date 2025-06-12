@@ -228,7 +228,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    
+    /*
     std::string prefix;
     recvData >> prefix >> msg;
     if ((type == CHAT_MSG_WHISPER) && (lang == LANG_ADDON))
@@ -254,12 +254,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             return; // prevent further handling
         }
-        else
-        {
-            _player->GetSession()->SendNotification("You are NOT using the HD client!");
-            return; // prevent further handling
-        }
-    }
+    }*/
 
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
