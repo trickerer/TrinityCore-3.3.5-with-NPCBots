@@ -44,8 +44,6 @@
 #include "WorldPacket.h"
 #include <algorithm>
 
-#define CHAR_UPSERT_ADDON_STATUS "INSERT INTO addon_status (guid, has_addon) VALUES (?, ?) ON DUPLICATE KEY UPDATE has_addon = VALUES(has_addon), last_seen = CURRENT_TIMESTAMP"
-
 inline bool isNasty(uint8 c)
 {
     if (c == '\t')
@@ -233,10 +231,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             TC_LOG_INFO("custom", "IT WORKED!");
             uint32 guid = GetPlayer()->GetGUID();
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPSERT_ADDON_STATUS);
-            stmt->setUInt32(0, guid);
-            stmt->setUInt8(1, 1);
-            CharacterDatabase.Execute(stmt)
+            std::string query = "INSERT INTO addon_status (guid, has_addon) VALUES (" + std::to_string(guid) + ", 1) "
+                    "ON DUPLICATE KEY UPDATE has_addon = VALUES(has_addon), last_seen = CURRENT_TIMESTAMP";
+
+            CharacterDatabase.DirectExecute(query);
             return;  // block further processing if needed
         }
     }
