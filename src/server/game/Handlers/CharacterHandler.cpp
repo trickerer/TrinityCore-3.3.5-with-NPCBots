@@ -1034,7 +1034,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
     
     pCurrChar->GetSession()->SendPacket(&data);
-    
+    sleep(1);
     bool hasHdAddon = false;
     {
         uint32 guid = GetPlayer()->GetGUID().GetCounter();
@@ -1046,7 +1046,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             hasHdAddon = fields[0].GetBool();
         }
     }
-    sleep(1);
+    
     if (hasHdAddon)
         pCurrChar->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
     else
