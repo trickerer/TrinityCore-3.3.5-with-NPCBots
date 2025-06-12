@@ -1037,7 +1037,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     
     bool hasHdAddon = false;
     {
-        sleep(3);
         uint32 guid = GetPlayer()->GetGUID().GetCounter();
 
         std::string query = "SELECT has_addon FROM addon_status WHERE guid = " + std::to_string(guid);
@@ -1049,10 +1048,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
     
     if (hasHdAddon)
-        pCurrChar->GetSession()->SendNotification("MGAWoW HD Client detected. Enjoy enhanced visuals!");
+    {
+        pCurrChar->GetSession()->SendNotification("MGAWoW HD! FTW!");
+    }
     else
-        pCurrChar->GetSession()->SendNotification("You're using the standard client. Download the HD version from mgawow.online!");
-
+    {
+        pCurrChar->GetSession()->SendNotification("It seems you are not usiong our client or need to update! If you have recently updated relog! See Breaking news or visit - https://mgawow.online/how-to-update-client/");
+        pCurrChar->GetSession()->SendAreaTriggerMessage("It seems you are not usiong our client or need to update! If you have recently updated relog! See Breaking news or visit - https://mgawow.online/how-to-update-client/");
+        ChatHandler(pCurrChar->GetSession()).PSendSysMessage("It seems you are not usiong our client or need to update! If you have recently updated relog! See Breaking news or visit - https://mgawow.online/how-to-update-client/");
+    }
 }
 
 void WorldSession::SendFeatureSystemStatus()
