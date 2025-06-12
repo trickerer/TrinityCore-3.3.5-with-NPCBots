@@ -1028,7 +1028,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     // TODO ONLY ASK IF NOT IN CHANNEL
 
     std::string m_name = "world";  // in-game channel name
-    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + "MGAWoW" + 1);
     data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
     data << m_name.c_str();            // Channel name ("world")
     data << uint64(pCurrChar->GetGUID());  // Player GUID for invite
