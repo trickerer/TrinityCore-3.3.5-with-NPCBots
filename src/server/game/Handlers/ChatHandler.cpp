@@ -229,29 +229,20 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
     
     
-    std::string prefix;
-    recvData >> prefix >> msg;
-    if (lang == LANG_ADDON)
+    if (type == CHAT_MSG_ADDON)
     {
-        // Existing warden Lua check
-        if (_warden && _warden->ProcessLuaCheckResponse(msg))
-            return;
+        std::string prefix;
+        std::string message;
+        recvData >> prefix >> message;
 
-        // === CUSTOM HD CLIENT DETECTION ===
-        if (msg == "true" && prefix == "MGAHD")
+        if (prefix == "MGAHD")
         {
-            TC_LOG_INFO("custom", "Player %s is using the HD client", GetPlayerName().c_str());
-
-            // Example: set a player flag (define your own later if needed)
-            //_player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
-
-            // Optional DB persist
-            //CharacterDatabase.PExecute(
-            //    "UPDATE characters SET is_hd_client = 1 WHERE guid = %u",
-            //    _player->GetGUID().GetCounter()
-            //);
-            _player->GetSession()->SendNotification("You are using the HD client!");
+            // Print to console or send chat message back to player
+            std::string feedback = "Addon message received: " + message;
+            SendNotification(feedback); // Send notification in-game
+            //sLog->outInfo(LOG_FILTER_CHAT, "Received MGAHD addon message: %s", message.c_str());
         }
+        return; // addon message handled, no further processing
     }
 
     // no chat commands in AFK/DND autoreply, and it can be empty
