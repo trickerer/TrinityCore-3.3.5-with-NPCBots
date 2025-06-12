@@ -231,7 +231,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
-        // Parse prefix and message from the addon msg string
         std::istringstream iss(msg);
         std::string prefix, message;
         iss >> prefix >> message;
@@ -239,14 +238,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (prefix == "MGAHD" && message == "true")
         {
             std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
-            // Assuming SendNotification takes printf style, use format:
             SendNotification("%s", feedback.c_str());
-
-            // Optionally log too
+            // Optionally log:
             // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
-
-            // Return if you want to block further processing
-            return;
+            return;  // block further processing if needed
         }
     }
     
