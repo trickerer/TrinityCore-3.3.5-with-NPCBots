@@ -57,10 +57,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     uint32 type;
     uint32 lang;
+    std::string to, channel, msg;
 
     recvData >> type;
     recvData >> lang;
     recvData >> msg;
+    recvData >> channel;
     
 
     if (type >= MAX_CHAT_MSG_TYPE)
@@ -191,7 +193,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    std::string to, channel, msg;
     switch (type)
     {
         case CHAT_MSG_SAY:
