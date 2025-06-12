@@ -741,14 +741,16 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     });
 }
 
-bool HasAddon(Player* player)
+bool hasHdAddon = false;
 {
-    uint32 guid = player->GetGUID().GetCounter();
-    QueryResult result = CharacterDatabase.PQuery("SELECT has_addon FROM addon_status WHERE guid = %u", guid);
-    if (!result)
-        return false;
-    Field* fields = result->Fetch();
-    return fields[0].GetUInt8() != 0;
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HD_ADDON_STATUS);
+    stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
+
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        Field* fields = result->Fetch();
+        hasHdAddon = fields[0].GetBool();
+    }
 }
 
 void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
