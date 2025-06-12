@@ -228,19 +228,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
-    std::string prefix, message, target;
-
-    recvData >> prefix >> message >> target;
-
-    if (prefix == "MGAHD" && message == "true")
-    {
-        SendNotification("Received MGAHD addon message!");
-    }
-    else
-    {
-        SendNotification("NO HD CLIENT!");
-    }
-
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
     {
