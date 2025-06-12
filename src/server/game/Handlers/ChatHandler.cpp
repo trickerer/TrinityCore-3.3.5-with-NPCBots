@@ -231,6 +231,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     
     if (type == CHAT_MSG_WHISPER && lang == LANG_ADDON)
     {
+        player->Say("ADDON SENT MESSAGE!", LANG_UNIVERSAL);
         std::istringstream iss(msg);
         std::string prefix, message;
         iss >> prefix >> message;
