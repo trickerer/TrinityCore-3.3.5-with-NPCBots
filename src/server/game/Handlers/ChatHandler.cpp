@@ -238,8 +238,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (prefix == "MGAHD")
         {
             // Print to console or send chat message back to player
-            std::string feedback = "Addon message received: " + message;
-            SendNotification(feedback); // Send notification in-game
+            std::string feedback = "Addon message received!";
+            SendNotification(feedback.c_str()); 
             //sLog->outInfo(LOG_FILTER_CHAT, "Received MGAHD addon message: %s", message.c_str());
         }
         return; // addon message handled, no further processing
