@@ -44,6 +44,8 @@
 #include "WorldPacket.h"
 #include <algorithm>
 
+#define CHAR_UPSERT_ADDON_STATUS "INSERT INTO addon_status (guid, has_addon) VALUES (?, ?) ON DUPLICATE KEY UPDATE has_addon = VALUES(has_addon), last_seen = CURRENT_TIMESTAMP"
+
 inline bool isNasty(uint8 c)
 {
     if (c == '\t')
@@ -230,10 +232,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (prefix == "MGAHD" && message == "true")
         {
             TC_LOG_INFO("custom", "IT WORKED!");
-            //std::string feedback = "Received MGAHD addon message from " + GetPlayer()->GetName();
-            //GetPlayer()->GetSession()->SendNotification(feedback.c_str());
-            // Optionally log:
-            // sLog->outInfo(LOG_FILTER_GENERAL, "%s", feedback.c_str());
+            uint32 guid = GetPlayer()->GetGUID();
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPSERT_ADDON_STATUS);
+            stmt->setUInt32(0, guid);
+            stmt->setUInt8(1, 1);
+            CharacterDatabase.Execute(stmt)
             return;  // block further processing if needed
         }
     }
