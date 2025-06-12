@@ -60,9 +60,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     recvData >> type;
     recvData >> lang;
-    //MGAHD ADDON
-    std::string prefix;
-    recvData >> prefix >> msg;
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
@@ -231,6 +228,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             return;
     }
     
+    
+    std::string prefix;
+    recvData >> prefix >> msg;
     if ((type == CHAT_MSG_WHISPER) && (lang == LANG_ADDON))
     {
         // Existing warden Lua check
