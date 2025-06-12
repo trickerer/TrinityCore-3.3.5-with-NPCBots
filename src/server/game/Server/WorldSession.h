@@ -667,6 +667,7 @@ class TC_GAME_API WorldSession
         // Packets cooldown
         time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
         void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
+        void HandleAddonMessage(WorldPacket& recvData);
 
     public:                                                 // opcodes handlers
 
