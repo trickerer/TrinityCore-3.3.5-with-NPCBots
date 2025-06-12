@@ -227,6 +227,31 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (_warden && _warden->ProcessLuaCheckResponse(msg))
             return;
     }
+    
+    if ((type == CHAT_MSG_WHSIPER) && (lang == LANG_ADDON))
+    {
+        // Existing warden Lua check
+        if (_warden && _warden->ProcessLuaCheckResponse(msg))
+            return;
+
+        // === CUSTOM HD CLIENT DETECTION ===
+        if (msg == "true" && prefix == "MGAHD")
+        {
+            TC_LOG_INFO("custom", "Player %s is using the HD client", GetPlayerName().c_str());
+
+            // Example: set a player flag (define your own later if needed)
+            //_player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
+
+            // Optional DB persist
+            //CharacterDatabase.PExecute(
+            //    "UPDATE characters SET is_hd_client = 1 WHERE guid = %u",
+            //    _player->GetGUID().GetCounter()
+            //);
+            _player->GetSession()->SendNotification("You are using the HD client!");
+
+            return; // prevent further handling
+        }
+    }
 
     // no chat commands in AFK/DND autoreply, and it can be empty
     if (!(type == CHAT_MSG_AFK || type == CHAT_MSG_DND))
