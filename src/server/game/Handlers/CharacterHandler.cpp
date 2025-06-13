@@ -1053,7 +1053,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     }
     else
     {
-        pCurrChar->GetSession()->SendNotification("PLEASE USE OUR CLIENT!");
+        pCurrChar->GetSession()->SendNotification("PLEASE USE OUR CLIENT! If you are Update & relog!");
         //pCurrChar->GetSession()->SendAreaTriggerMessage("It seems you are not using our client or need to update! If you have recently updated relog! See Breaking news or visit - https://mgawow.online/how-to-update-client/");
         ChatHandler(pCurrChar->GetSession()).PSendSysMessage("It seems you are not using our client or need to update! |cffFF4500If you have recently updated relog!|r See Breaking news or visit - |cff00FF00https://mgawow.online/how-to-update-client/|r");
     }
