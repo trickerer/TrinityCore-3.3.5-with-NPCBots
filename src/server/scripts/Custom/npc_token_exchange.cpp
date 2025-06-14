@@ -557,7 +557,7 @@ public:
                 }
                 else
                 {
-                    me->Yell("You are missing a MGA Mini Token!", LANG_UNIVERSAL); 
+                    me->Yell("You are missing a MGA Mini Token or two!", LANG_UNIVERSAL); 
                 }
                 break;
             }
