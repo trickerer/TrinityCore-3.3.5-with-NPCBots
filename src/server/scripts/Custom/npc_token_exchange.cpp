@@ -37,6 +37,7 @@
 #define GOSSIP_HELLO_TSWAP16  "Exchange 5 MGA Tokens For VIP Item"
 #define GOSSIP_HELLO_TSWAP17  "Exchange 450K gold For VIP Item"
 #define GOSSIP_HELLO_TSWAP18  "I see you are a VIP, Learn All FLight Paths!"
+#define GOSSIP_HELLO_TSWAP19  "Exchange XP Token for 20% XP for current level"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
@@ -101,7 +102,7 @@ public:
                 
 			//AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP5, GOSSIP_SENDER_MAIN, 1005);
 
-		
+		    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP19, GOSSIP_SENDER_MAIN, 1019);
 			
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, GOSSIP_HELLO_TSWAP9, GOSSIP_SENDER_MAIN, 1009);
 			
@@ -498,6 +499,19 @@ public:
                         player->SendNewItem(item, 1, true, false);
                         me->Say(tokentext8, LANG_UNIVERSAL); // Success
                     }
+                }
+                break;
+                case 1019:
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(XP_VOUCHER_ITEM_ID, 1)) {
+                    uint8 level = player->getLevel();
+                    uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
+                    float xpPercent = 0.20f;
+                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
+
+                    player->GiveXP(xpToGive, nullptr);
+                    player->DestroyItemCount(XP_VOUCHER_ITEM_ID, 1, true);
+                    ChatHandler(player->GetSession()).PSendSysMessage("You gained %u XP!", xpToGive);
                 }
                 break;
             }
