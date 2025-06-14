@@ -519,7 +519,7 @@ public:
                 }
                 else
                 {
-                    me->Yell("You are missing a MGA XP Token!", LANG_UNIVERSAL);
+                    me->Yell("You are missing a MGA XP Token!", LANG_UNIVERSAL); 
                 }
                 break;
             }
