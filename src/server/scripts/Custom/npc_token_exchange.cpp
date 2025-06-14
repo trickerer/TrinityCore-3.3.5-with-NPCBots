@@ -514,7 +514,7 @@ public:
                     float xpPercent = 0.20f;
                     float rate = sWorld->getRate(RATE_XP_KILL); 
                     float restedBonus = player->GetRestBonus(); 
-                    float heirloomBonus = player->GetTotalAuraModifier(SPELL_AURA_MOD_XP_QUEST); 
+                    float heirloomBonus = player->GetTotalAuraModifier(SPELL_AURA_MOD_XP_QUEST_PCT); 
                     
                     float totalMultiplier = (rate * restedBonus) * (1.0f + heirloomBonus);
                     uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent * totalMultiplier);
