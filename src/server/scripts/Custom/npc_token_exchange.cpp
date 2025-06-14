@@ -41,6 +41,7 @@
 #define GOSSIP_HELLO_TSWAP17  "Exchange 450K gold For VIP Item"
 #define GOSSIP_HELLO_TSWAP18  "I see you are a VIP, Learn All FLight Paths!"
 #define GOSSIP_HELLO_TSWAP19  "Exchange XP Token for 20% XP for current level"
+#define GOSSIP_HELLO_TSWAP20  "Exchange 5 Mini Tokens for an XP Token"
 #define GOSSIP_HELLO_TSWAP9  "Farewell!"
 #define GOSSIP_HELLO_NOTVIP  "I Can only make MGA Super VIP Emblem's for VIPs!"
 
@@ -105,7 +106,8 @@ public:
                 
 			//AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP5, GOSSIP_SENDER_MAIN, 1005);
 
-		    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP19, GOSSIP_SENDER_MAIN, 1019);
+		    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP19, GOSSIP_SENDER_MAIN, 1020);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GOSSIP_HELLO_TSWAP19, GOSSIP_SENDER_MAIN, 1019);
 			
 			AddGossipItemFor(player, GOSSIP_ICON_TALK, GOSSIP_HELLO_TSWAP9, GOSSIP_SENDER_MAIN, 1009);
 			
@@ -532,10 +534,29 @@ public:
                     uint32 xpGained = (afterXP >= beforeXP) ? (afterXP - beforeXP) : baseXP; // fallback if level up
                     player->DestroyItemCount(989891, 1, true);
                     player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", xpGained);
-            }
+                }   
                 else
                 {
                     me->Yell("You are missing a MGA XP Token!", LANG_UNIVERSAL); 
+                }
+                break;
+                case 1020:
+                CloseGossipMenuFor(player);
+                if (player->HasItemCount(1815499, 2))
+                {
+                    uint32 itemId = 989891;
+                    ItemPosCountVec dest;
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        Item* item = player->StoreNewItem(dest, 1815499, 2, true);
+                        player->SendNewItem(item, 1, true, false);
+                        me->Say(tokentext8, LANG_UNIVERSAL); // Success
+                    }
+                }
+                else
+                {
+                    me->Yell("You are missing a MGA Mini Token!", LANG_UNIVERSAL); 
                 }
                 break;
             }
