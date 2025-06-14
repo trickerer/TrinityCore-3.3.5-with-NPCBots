@@ -507,19 +507,27 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(989891, 1)) {
                     uint8 level = player->GetLevel();
-                    uint32 multiplayer = 1;
+
+                    if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) {
+                        player->GetSession()->SendAreaTriggerMessage("You are at max level.");
+                        return;
+                    }
+
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
-                    if (player->GetRestBonus())
-                        multiplayer = 2;
                     float xpPercent = 0.20f;
+                    uint32 baseXP = static_cast<uint32>(xpForNextLevel * xpPercent);
 
-                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
-                    
-                    xpToGive = xpToGive / multiplayer;
+                    // Get remaining rested XP the player can use
+                    uint32 restedBonus = player->GetRestBonus();
 
-                    player->GiveXP(xpToGive, nullptr);
+                    // Apply rested XP, but not more than half the base XP (as per WoW mechanics)
+                    uint32 bonusXP = std::min(restedBonus, baseXP);
+
+                    uint32 totalXP = baseXP + bonusXP;
+
+                    player->GiveXP(totalXP, nullptr);
                     player->DestroyItemCount(989891, 1, true);
-                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", xpToGive);
+                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", totalXP);
                 }
                 else
                 {
