@@ -453,8 +453,7 @@ public:
                 break;
                 case 1017:
                 CloseGossipMenuFor(player);
-                const uint32 cost = 4000000000; // 400,000g
-                if (player->GetMoney() >= cost)
+                if (player->GetMoney() >= 4000000000)
                 {
                     if (!player->HasItemCount(461145, 1))
                     {
@@ -462,7 +461,7 @@ public:
                         if (Item* item = player->StoreNewItem(dest, itemId, 1, true))
                         {
                             player->SendNewItem(item, 1, true, false);
-                            player->ModifyMoney(-cost);
+                            player->ModifyMoney(-4000000000);
                             me->Say(tokentext8, LANG_UNIVERSAL);
                         }
                     }
