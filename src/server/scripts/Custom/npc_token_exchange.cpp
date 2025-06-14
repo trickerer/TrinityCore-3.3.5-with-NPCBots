@@ -519,10 +519,20 @@ public:
                     float xpPercent = 0.20f;
                     uint32 baseXP = static_cast<uint32>(xpForNextLevel * xpPercent);
 
+                    // Get XP before
+                    uint32 beforeXP = player->GetUInt32Value(PLAYER_XP);
+
+                    // Award XP (rested XP is automatically added here)
                     player->GiveXP(baseXP, nullptr);
+
+                    // Get XP after
+                    uint32 afterXP = player->GetUInt32Value(PLAYER_XP);
+
+                    // Show actual XP gained
+                    uint32 xpGained = (afterXP >= beforeXP) ? (afterXP - beforeXP) : baseXP; // fallback if level up
                     player->DestroyItemCount(989891, 1, true);
-                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", baseXP);
-                }
+                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", xpGained);
+            }
                 else
                 {
                     me->Yell("You are missing a MGA XP Token!", LANG_UNIVERSAL); 
