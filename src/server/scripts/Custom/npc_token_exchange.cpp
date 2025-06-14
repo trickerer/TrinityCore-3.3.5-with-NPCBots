@@ -515,7 +515,7 @@ public:
 
                     player->GiveXP(xpToGive, nullptr);
                     player->DestroyItemCount(989891, 1, true);
-                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", xpToGive);
+                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!+ Rest Bonus if any!", xpToGive);
                 }
                 else
                 {
