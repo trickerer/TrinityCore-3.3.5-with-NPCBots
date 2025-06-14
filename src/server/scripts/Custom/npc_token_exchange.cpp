@@ -506,7 +506,8 @@ public:
                 break;
                 case 1019:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(989891, 1)) {
+                if (player->HasItemCount(989891, 1)) 
+                {
                     uint8 level = player->GetLevel();
 
                     if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) {
@@ -518,17 +519,9 @@ public:
                     float xpPercent = 0.20f;
                     uint32 baseXP = static_cast<uint32>(xpForNextLevel * xpPercent);
 
-                    // Get remaining rested XP the player can use
-                    uint32 restedBonus = player->GetRestBonus();
-
-                    // Apply rested XP, but not more than half the base XP (as per WoW mechanics)
-                    uint32 bonusXP = std::min(restedBonus, baseXP);
-
-                    uint32 totalXP = baseXP + bonusXP;
-
-                    player->GiveXP(totalXP, nullptr);
+                    player->GiveXP(baseXP, nullptr);
                     player->DestroyItemCount(989891, 1, true);
-                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", totalXP);
+                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", baseXP);
                 }
                 else
                 {
