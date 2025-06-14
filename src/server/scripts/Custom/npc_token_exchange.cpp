@@ -549,8 +549,9 @@ public:
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                     if (msg == EQUIP_ERR_OK)
                     {
-                        Item* item = player->StoreNewItem(dest, 1815499, 2, true);
+                        Item* item = player->StoreNewItem(dest, itemId, 2, true);
                         player->SendNewItem(item, 1, true, false);
+                        player->DestroyItemCount(1815499, 2, true);
                         me->Say(tokentext8, LANG_UNIVERSAL); // Success
                     }
                 }
