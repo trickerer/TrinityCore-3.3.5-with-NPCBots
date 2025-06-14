@@ -38,7 +38,7 @@
 #define GOSSIP_HELLO_TSWAP14  "Summon Mailbox item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP15  "Summon Guild Vault item. (cost 10 mini tokens)"
 #define GOSSIP_HELLO_TSWAP16  "Exchange 5 MGA Tokens For VIP Item"
-#define GOSSIP_HELLO_TSWAP17  "Exchange 450K gold For VIP Item"
+#define GOSSIP_HELLO_TSWAP17  "Exchange 400K gold For VIP Item"
 #define GOSSIP_HELLO_TSWAP18  "I see you are a VIP, Learn All FLight Paths!"
 #define GOSSIP_HELLO_TSWAP19  "Exchange XP Token for 20% XP for current level"
 #define GOSSIP_HELLO_TSWAP20  "Exchange 5 Mini Tokens for an XP Token"
@@ -453,7 +453,7 @@ public:
                 break;
                 case 1017:
                 CloseGossipMenuFor(player);
-                if (player->GetMoney() >= 4500000000)
+                if (player->GetMoney() >= 4000000000)
                 {
                     if (player->HasItemCount(461145, 1))
                     {
@@ -475,7 +475,7 @@ public:
                             player->ModifyMoney(-1000000000);
                             player->ModifyMoney(-1000000000);
                             player->ModifyMoney(-1000000000);
-                            player->ModifyMoney(-1500000000);
+                            player->ModifyMoney(-1000000000);
                             me->Say(tokentext8, LANG_UNIVERSAL); // Success
                         }
                         else
