@@ -8,6 +8,7 @@
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"
+#include "Chat.h"
 #include <sstream>
 #include <string>
 
