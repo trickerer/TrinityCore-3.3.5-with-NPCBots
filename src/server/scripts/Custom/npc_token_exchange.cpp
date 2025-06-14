@@ -9,6 +9,7 @@
 #include "WorldSession.h"
 #include "ObjectMgr.h"
 #include "Chat.h"
+#include "World.h"
 #include <sstream>
 #include <string>
 
