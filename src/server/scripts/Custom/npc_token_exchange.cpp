@@ -507,7 +507,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(989891, 1)) {
                     uint8 level = player->GetLevel();
-                    unit32 multiplayer = 1;
+                    uint32 multiplayer = 1;
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
                     if (player->GetRestBonus())
                         multiplayer = 2;
