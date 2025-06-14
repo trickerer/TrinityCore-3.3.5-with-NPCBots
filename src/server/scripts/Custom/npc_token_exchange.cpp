@@ -507,11 +507,10 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->HasItemCount(989891, 1)) {
                     uint8 level = player->GetLevel();
+                    unit32 multiplayer = 1;
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
                     if (player->GetRestBonus())
-                        unit32 multiplayer = 2;
-                    else
-                        multiplayer = 1;
+                        multiplayer = 2;
                     float xpPercent = 0.20f;
 
                     uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent * multiplayer);
