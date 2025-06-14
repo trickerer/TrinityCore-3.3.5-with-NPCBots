@@ -510,13 +510,16 @@ public:
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
                     float restedBonus = player->GetRestBonus(); 
                     float xpPercent = 0.20f;
-                    
-                    
+
                     uint32 xpToGive = static_cast<uint32>((xpForNextLevel+restedBonus) * xpPercent);
 
                     player->GiveXP(xpToGive, nullptr);
                     player->DestroyItemCount(989891, 1, true);
                     ChatHandler(player->GetSession()).PSendSysMessage("You gained %u XP!", xpToGive);
+                }
+                else
+                {
+                    me->Yell(tokentext2, LANG_UNIVERSAL);
                 }
                 break;
             }
