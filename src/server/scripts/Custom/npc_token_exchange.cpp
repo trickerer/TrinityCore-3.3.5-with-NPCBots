@@ -509,11 +509,9 @@ public:
                     uint8 level = player->GetLevel();
                     uint32 multiplayer = 1;
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
-                    if (player->GetRestBonus())
-                        multiplayer = 2;
                     float xpPercent = 0.20f;
 
-                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent * multiplayer);
+                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
 
                     player->GiveXP(xpToGive, nullptr);
                     player->DestroyItemCount(989891, 1, true);
