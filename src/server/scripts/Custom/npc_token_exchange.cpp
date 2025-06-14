@@ -455,6 +455,7 @@ public:
                 CloseGossipMenuFor(player);
                 if (player->GetMoney() >= 4000000000)
                 {
+                    uint32 itemId = 461145;
                     if (!player->HasItemCount(461145, 1))
                     {
                         // Give item
