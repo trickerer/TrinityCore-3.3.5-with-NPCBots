@@ -461,7 +461,10 @@ public:
                         if (Item* item = player->StoreNewItem(dest, itemId, 1, true))
                         {
                             player->SendNewItem(item, 1, true, false);
-                            player->ModifyMoney(-4000000000);
+                            player->ModifyMoney(-1000000000);
+                            player->ModifyMoney(-1000000000);
+                            player->ModifyMoney(-1000000000);
+                            player->ModifyMoney(-1000000000);
                             me->Say(tokentext8, LANG_UNIVERSAL);
                         }
                     }
