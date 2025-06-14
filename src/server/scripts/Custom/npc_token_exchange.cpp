@@ -513,7 +513,9 @@ public:
                         multiplayer = 2;
                     float xpPercent = 0.20f;
 
-                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent / multiplayer);
+                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
+                    
+                    xpToGive = xpToGive / multiplayer;
 
                     player->GiveXP(xpToGive, nullptr);
                     player->DestroyItemCount(989891, 1, true);
