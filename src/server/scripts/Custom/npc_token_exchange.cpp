@@ -9,6 +9,8 @@
 #include "WorldSession.h"
 #include "ObjectMgr.h"
 #include "Chat.h"
+#include "World.h"
+#include "SpellAuraDefines.h"
 #include <sstream>
 #include <string>
 
@@ -505,15 +507,21 @@ public:
                 break;
                 case 1019:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(989891, 1)) {
+                if (player->HasItemCount(989891, 1)) 
+                {
                     uint8 level = player->GetLevel();
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
                     float xpPercent = 0.20f;
-                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
+                    float rate = sWorld->getRate(RATE_XP_KILL); 
+                    float restedBonus = player->GetRestBonus(); 
+                    float heirloomBonus = player->GetTotalAuraModifier(SPELL_AURA_MOD_XP_QUEST); 
+                    
+                    float totalMultiplier = (rate * restedBonus) * (1.0f + heirloomBonus);
+                    uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent * totalMultiplier);
 
                     player->GiveXP(xpToGive, nullptr);
                     player->DestroyItemCount(989891, 1, true);
-                    ChatHandler(player->GetSession()).PSendSysMessage("You gained %u XP!", xpToGive);
+                    player->GetSession()->SendAreaTriggerMessage("You gained %u XP!", xpToGive);
                 }
                 break;
             }
