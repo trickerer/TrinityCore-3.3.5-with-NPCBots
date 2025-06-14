@@ -7,6 +7,7 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
+#include "ObjectMgr.h"
 #include <sstream>
 #include <string>
 
@@ -503,14 +504,14 @@ public:
                 break;
                 case 1019:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(XP_VOUCHER_ITEM_ID, 1)) {
-                    uint8 level = player->getLevel();
+                if (player->HasItemCount(989891, 1)) {
+                    uint8 level = player->GetLevel();
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
                     float xpPercent = 0.20f;
                     uint32 xpToGive = static_cast<uint32>(xpForNextLevel * xpPercent);
 
                     player->GiveXP(xpToGive, nullptr);
-                    player->DestroyItemCount(XP_VOUCHER_ITEM_ID, 1, true);
+                    player->DestroyItemCount(989891, 1, true);
                     ChatHandler(player->GetSession()).PSendSysMessage("You gained %u XP!", xpToGive);
                 }
                 break;
