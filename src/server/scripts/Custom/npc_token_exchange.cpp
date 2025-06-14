@@ -511,7 +511,7 @@ public:
 
                     if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)) {
                         player->GetSession()->SendAreaTriggerMessage("You are at max level.");
-                        return;
+                        return true;
                     }
 
                     uint32 xpForNextLevel = sObjectMgr->GetXPForLevel(level);
