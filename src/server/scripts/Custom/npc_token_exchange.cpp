@@ -542,16 +542,16 @@ public:
                 break;
                 case 1020:
                 CloseGossipMenuFor(player);
-                if (player->HasItemCount(1815499, 2))
+                if (player->HasItemCount(1815499, 5))
                 {
                     uint32 itemId = 989891;
                     ItemPosCountVec dest;
                     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
                     if (msg == EQUIP_ERR_OK)
                     {
-                        Item* item = player->StoreNewItem(dest, itemId, 2, true);
+                        Item* item = player->StoreNewItem(dest, itemId, 1, true);
                         player->SendNewItem(item, 1, true, false);
-                        player->DestroyItemCount(1815499, 2, true);
+                        player->DestroyItemCount(1815499, 5, true);
                         me->Say(tokentext8, LANG_UNIVERSAL); // Success
                     }
                 }
