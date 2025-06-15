@@ -298,6 +298,13 @@ void Channel::LeaveChannel(Player* player, bool send)
     }
 
     LeaveNotify(guid);
+    
+    if (GetName() == "world")
+    {
+        CharacterDatabase.PExecute(
+            "REPLACE INTO world_channel_flags (guid, in_world_channel) VALUES ({}, 0)",
+            player->GetGUID().GetCounter());
+    }
 
     if (!IsConstant())
     {
