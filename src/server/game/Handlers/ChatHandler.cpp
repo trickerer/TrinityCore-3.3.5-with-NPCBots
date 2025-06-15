@@ -354,7 +354,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
             //Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
             Player* receiver = nullptr;
-            for (const auto& pair : sObjectAccessor->GetPlayers())
+            for (const auto& pair : ObjectAccessor->GetPlayers())
             {
                 Player* plr = pair.second;
                 if (plr && !plr->GetName().empty() &&
