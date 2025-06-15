@@ -1031,7 +1031,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //char buffer[64];
     //sprintf(buffer, "GUID: %u", guid);
     //pCurrChar->Say(buffer, LANG_UNIVERSAL);
-    QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = '{}'", guid);
+    QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = %u", guid);
     
     if (!result || !result->Fetch()[0].GetBool())
     {
