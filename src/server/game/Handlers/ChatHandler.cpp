@@ -346,13 +346,24 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
         case CHAT_MSG_WHISPER:
         {
-            Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
-            if (!normalizePlayerName(to))
-            {
-                SendPlayerNotFoundNotice(to);
-                break;
-            }
+            //if (!normalizePlayerName(to))
+            //{
+            //    SendPlayerNotFoundNotice(to);
+            //    break;
+            //}
 
+            //Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
+            Player* receiver = nullptr;
+            for (const auto& pair : sObjectAccessor->GetPlayers())
+            {
+                Player* plr = pair.second;
+                if (plr && !plr->GetName().empty() &&
+                    strcasecmp(plr->GetName().c_str(), to.c_str()) == 0) // Case-insensitive match
+                {
+                    receiver = plr;
+                    break;
+                }
+            }
             if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
                 SendPlayerNotFoundNotice(to);
