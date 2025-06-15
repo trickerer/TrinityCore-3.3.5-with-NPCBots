@@ -229,7 +229,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (prefix == "MGAHD" && message == "true")
         {
-            TC_LOG_INFO("custom", "IT WORKED!");
+            //TC_LOG_INFO("custom", "IT WORKED!");
             uint32 guid = GetPlayer()->GetGUID();
             std::string query = "INSERT INTO addon_status (guid, has_addon) VALUES (" + std::to_string(guid) + ", 1) "
                     "ON DUPLICATE KEY UPDATE has_addon = VALUES(has_addon), last_seen = CURRENT_TIMESTAMP";
