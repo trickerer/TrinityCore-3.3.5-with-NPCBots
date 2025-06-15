@@ -299,7 +299,7 @@ void Channel::LeaveChannel(Player* player, bool send)
 
     LeaveNotify(guid);
     
-    if (player->GetSession() && !player->GetSession()->isLoggingOut())
+    if (player->GetSession() && !player->GetSession()->isLogingOut())
     {
         if (GetName() == "world")
         {
