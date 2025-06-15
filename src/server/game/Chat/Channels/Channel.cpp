@@ -259,7 +259,8 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
             if (GetName() == "world")
             {
-                SetOwner(3154, !newChannel && !_isOwnerInvisible);
+                ObjectGuid worldOwnerGuid = ObjectGuid::Create<HighGuid::Player>(3154);
+                SetOwner(worldOwnerGuid);
                 pinfo.SetModerator(true);
             }
             else
