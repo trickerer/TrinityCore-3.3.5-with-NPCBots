@@ -1026,8 +1026,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-    QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = {}", pCurrChar->GetGUID());
-    pCurrChar->Say("GUID: %u", LANG_UNIVERSAL, pCurrChar->GetGUID());
+    uint32 guid = pCurrChar->GetGUID().GetCounter();
+    QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = {}", guid);
+    pCurrChar->Say("GUID: %u", LANG_UNIVERSAL, guid);
     if (!result || !result->Fetch()[0].GetBool())
     {
         std::string m_name = "world";  // in-game channel name
