@@ -1026,14 +1026,17 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     //}
     //MGAWoW Auto Invite to world channel
     // TODO ONLY ASK IF NOT IN CHANNEL
-
-    std::string m_name = "world";  // in-game channel name
-    data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
-    data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
-    data << m_name.c_str();            // Channel name ("world")
-    data << uint64(3154);  // Player GUID for invite from DB
-    
-    pCurrChar->GetSession()->SendPacket(&data);
+    QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = {}", player->GetGUID().GetCounter());
+    if (!result || !result->Fetch()[0].GetBool())
+    {
+        std::string m_name = "world";  // in-game channel name
+        data.Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
+        data << uint8(CHAT_INVITE_NOTICE);  // Inviting message
+        data << m_name.c_str();            // Channel name ("world")
+        data << uint64(3154);  // Player GUID for invite from DB
+        
+        pCurrChar->GetSession()->SendPacket(&data);
+    }
     
     bool hasHdAddon = false;
     {
