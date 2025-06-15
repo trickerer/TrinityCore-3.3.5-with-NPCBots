@@ -244,7 +244,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     {
         CharacterDatabase.PExecute(
             "REPLACE INTO world_channel_flags (guid, in_world_channel) VALUES ({}, 1)",
-            player->GetGUID());
+            player->GetGUID()).GetCounter();
     }
 
     // Custom channel handling
