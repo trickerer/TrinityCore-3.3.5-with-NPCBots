@@ -257,8 +257,16 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         {
             _isOwnerInvisible = pinfo.IsInvisible();
 
-            SetOwner(guid, !newChannel && !_isOwnerInvisible);
-            pinfo.SetModerator(true);
+            if (GetName() == "world")
+            {
+                SetOwner(3154, !newChannel && !_isOwnerInvisible);
+                pinfo.SetModerator(true);
+            }
+            else
+            {
+                SetOwner(guid, !newChannel && !_isOwnerInvisible);
+                pinfo.SetModerator(true);
+            }
         }
     }
 }
