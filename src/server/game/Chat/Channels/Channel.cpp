@@ -240,10 +240,12 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
     JoinNotify(guid);
     
-    if (_name == "world")
-    {
-        CharacterDatabase.Execute("REPLACE INTO world_channel_flags (guid, in_world_channel) VALUES ('{}', 1)", player->GetGUID());
-    }
+    if (m_name == "world")
+{
+    CharacterDatabase.PExecute(
+        "REPLACE INTO world_channel_flags (guid, in_world_channel) VALUES ({}, 1)",
+        player->GetGUID());
+}
 
     // Custom channel handling
     if (!IsConstant())
