@@ -327,7 +327,10 @@ void Channel::LeaveChannel(Player* player, bool send)
             ObjectGuid newOwner = itr->first;
             itr->second.SetModerator(true);
 
-            SetOwner(newOwner);
+            if (GetName() == "world")
+                SetOwner(3154);
+            else
+                SetOwner(newOwner);
 
             // if the new owner is invisible gm, set flag to automatically choose a new owner
             if (itr->second.IsInvisible())
