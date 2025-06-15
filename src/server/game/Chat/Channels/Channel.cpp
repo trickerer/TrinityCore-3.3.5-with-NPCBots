@@ -328,7 +328,7 @@ void Channel::LeaveChannel(Player* player, bool send)
             itr->second.SetModerator(true);
 
             if (GetName() == "world")
-                SetOwner(ObjectGuid(3154));
+                SetOwner(ObjectGuid(HIGHGUID_PLAYER, 3154));
             else
                 SetOwner(newOwner);
 
