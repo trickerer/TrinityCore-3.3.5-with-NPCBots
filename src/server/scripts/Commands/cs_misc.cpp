@@ -160,7 +160,7 @@ public:
             return false;
         }
 
-        Creature* target = player->GetSelectedCreature();
+        Creature* target = player->GetSelectedUnit();
         if (!target)
         {
             handler->SendSysMessage("You must select an NPCBot.");
