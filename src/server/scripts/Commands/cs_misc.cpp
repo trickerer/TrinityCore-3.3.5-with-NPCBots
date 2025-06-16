@@ -207,7 +207,6 @@ public:
             handler->SendSysMessage("Usage: .sendworld <message>");
             return false;
         }
-    }
 
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
 
