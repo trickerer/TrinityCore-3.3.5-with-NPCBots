@@ -147,7 +147,7 @@ public:
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
             { "getdiscordcode",   HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
             { "sendworld",        HandleSendWorldCommand,        rbac::RBAC_PERM_COMMAND_SENDWORLD,        Console::Yes },
-            { "npcbotrename",     HandleNPCBotRename,            rbac::RBAC_PERM_COMMAND_NPCBOTRENAME,     Console::No },
+            { "mgabotrename",     HandleNPCBotRename,            rbac::RBAC_PERM_COMMAND_NPCBOTRENAME,     Console::No },
         };
         return commandTable;
     }
@@ -158,27 +158,27 @@ public:
 
         if (!args || !*args)
         {
-            handler->SendSysMessage("Usage: .npcbotrename <name>");
+            handler->SendSysMessage("Usage: .mgabotrename <name> or .mgabotr <name>");
             return false;
         }
 
         Creature* target = handler->getSelectedCreature();
         if (!target)
         {
-            handler->SendSysMessage("You must select an NPCBot.");
+            handler->SendSysMessage("You must select an MGA Bot.");
             return false;
         }
 
         if (!target->IsNPCBot())
         {
-            handler->SendSysMessage("The selected creature is not an NPCBot.");
+            handler->SendSysMessage("The selected creature is not an MGA Bot.");
             return false;
         }
 
         Creature* bot = player->GetBotMgr()->GetBot(target->GetGUID());
         if (!bot)
         {
-            handler->SendSysMessage("You do not own this NPCBot.");
+            handler->SendSysMessage("You do not own this MGA Bot.");
             return false;
         }
 
@@ -187,6 +187,15 @@ public:
         {
             handler->SendSysMessage("Name is too long. Maximum 20 characters.");
             return false;
+        }
+        
+        for (char c : newName)
+        {
+            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_')
+            {
+                handler->SendSysMessage("Name contains invalid characters. Only letters, numbers, and underscores are allowed.");
+                return false;
+            }
         }
 
         // Escape for DB safely
