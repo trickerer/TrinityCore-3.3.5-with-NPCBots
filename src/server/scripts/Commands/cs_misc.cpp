@@ -56,6 +56,7 @@
 #include "ObjectGuid.h"
 #include "ObjectDefines.h"
 #include "Common.h"
+#include "botmgr.h"
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -173,10 +174,8 @@ public:
             return false;
         }
 
-        ObjectGuid botOwnerGuid = target->GetOwnerGUID();
-
-        // Check if this bot is owned by the player
-        if (botOwnerGuid != player->GetGUID())
+        Player* owner = handler->GetSession()->GetPlayer();
+        if (!owner->GetBotMgr()->GetBot(target->GetGUID()))
         {
             handler->SendSysMessage("You do not own this NPCBot.");
             return false;
@@ -196,7 +195,7 @@ public:
             safeName.c_str(), target->GetGUID().GetCounter());
 
         // Update in-game name if possible (depends on your NPCBot system)
-        target->SetName(newName); // Only works if you’ve patched your Creature class to support name changes
+       // target->SetName(newName); // Only works if you’ve patched your Creature class to support name changes
 
         // Force update for nearby players
         target->SetObjectScale(target->GetObjectScale());
