@@ -200,8 +200,8 @@ public:
 
         // Update bot in memory
         bot->SetName(newName);
-        bot->SendRemoveFromMap();
-        bot->SendAddToMap();
+        bot->SetVisible(false);
+        bot->SetVisible(true);
         bot->SetObjectScale(bot->GetObjectScale());
 
         handler->SendSysMessage("NPCBot renamed successfully.");
