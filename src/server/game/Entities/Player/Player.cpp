@@ -3625,8 +3625,14 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
     if (spellInfo && spellInfo->IsPrimaryProfessionFirstRank())
     {
-        uint32 freeProfs = GetFreePrimaryProfessionPoints()+1;
-        if (freeProfs <= sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL))
+        uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+
+        // If player has item 461145, allow up to 4
+        if (HasItemCount(461145, 1))
+            maxProfs = std::max(maxProfs, 4u);
+
+        uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
+        if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
     }
 
@@ -22686,8 +22692,6 @@ void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
 void Player::InitPrimaryProfessions()
 {
     SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
-    if (HasItemCount(461145, 1))
-        SetFreePrimaryProfessions(4);
 }
 
 bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
