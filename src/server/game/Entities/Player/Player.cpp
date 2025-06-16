@@ -22687,7 +22687,7 @@ void Player::InitPrimaryProfessions()
 {
     SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
     if (HasItemCount(461145, 1))
-        SetFreePrimaryProfessions=4;
+        SetFreePrimaryProfessions(4);
 }
 
 bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
