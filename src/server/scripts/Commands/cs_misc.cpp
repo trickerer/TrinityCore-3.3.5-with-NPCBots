@@ -160,8 +160,7 @@ public:
             return false;
         }
 
-        Unit* unit = player->GetSelectedUnit();
-        Creature* target = unit && unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature() : nullptr;
+        Creature const* target = handler->getSelectedCreature();
         if (!target)
         {
             handler->SendSysMessage("You must select an NPCBot.");
