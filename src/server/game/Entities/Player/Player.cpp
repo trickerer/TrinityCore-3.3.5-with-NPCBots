@@ -3625,8 +3625,14 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
     if (spellInfo && spellInfo->IsPrimaryProfessionFirstRank())
     {
-        uint32 freeProfs = GetFreePrimaryProfessionPoints()+1;
-        if (freeProfs <= sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL))
+        uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+
+        // Check for special item (ID 461145) to allow up to 4 professions
+        if (HasItemCount(461145, 1))
+            maxProfs = std::max(maxProfs, 4u); // Ensures at least 4 if item is present
+
+        uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
+        if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
     }
 
