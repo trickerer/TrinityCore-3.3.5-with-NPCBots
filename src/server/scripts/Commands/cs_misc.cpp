@@ -173,7 +173,10 @@ public:
             return false;
         }
 
-        if (!target->IsOwnedBy(player)) // <-- Ensure this is implemented in your bot code
+        ObjectGuid botOwnerGuid = target->GetOwnerGUID();
+
+        // Check if this bot is owned by the player
+        if (botOwnerGuid != player->GetGUID())
         {
             handler->SendSysMessage("You do not own this NPCBot.");
             return false;
