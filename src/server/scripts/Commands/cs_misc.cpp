@@ -192,7 +192,7 @@ public:
         std::string safeName = newName;
         CharacterDatabase.EscapeString(safeName); 
         CharacterDatabase.PExecute(
-        "INSERT INTO creature_template_npcbot_appearance (entry, name) VALUES ({}, '{}') "
+        "INSERT INTO creature_template_npcbot_appearance (entry, `name*`) VALUES ({}, '{}') "
         "ON DUPLICATE KEY UPDATE `name*` = '{}'",
         bot->GetEntry(), safeName.c_str(), safeName.c_str());
         
