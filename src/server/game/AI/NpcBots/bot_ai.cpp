@@ -10599,7 +10599,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     if (item->GetCount() > 1)
                     {
                         item->SetCount(item->GetCount() - 1);
-                        player->SendInventoryChangeUpdate(item, true);  // or SendUpdateItem(item);
+                        player->SendUpdateItem(item);
                     }
                     else
                     {
