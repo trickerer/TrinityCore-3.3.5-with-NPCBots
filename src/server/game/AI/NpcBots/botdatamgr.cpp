@@ -938,20 +938,24 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     ABORT();
                 }
                 // Heirloom item scaling fix
-                for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+                if (bot->IsPlayerBot()) // Make sure this is valid in your bot system
                 {
-                    Item* item = bot->GetEquippedItemBySlot(slot); // ✅ Works for Creature/NPCBots
-                    if (!item)
-                        continue;
-
-                    ItemTemplate const* itemProto = item->GetTemplate();
-                    if (!itemProto)
-                        continue;
-
-                    if (itemProto->Quality == ITEM_QUALITY_HEIRLOOM && itemProto->ScalingStatDistribution > 0)
+                    Player* botPlayer = bot->ToPlayer();
+                    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
                     {
-                        item->SetUInt32Value(ITEM_FIELD_ITEM_LEVEL, bot->GetLevel()); // ✅ Force item level
-                        item->SetState(ITEM_CHANGED); // ✅ No Player needed for NPC
+                        Item* item = botPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, slot); // fallback
+                        if (!item)
+                            continue;
+
+                        ItemTemplate const* itemProto = item->GetTemplate();
+                        if (!itemProto)
+                            continue;
+
+                        if (itemProto->Quality == ITEM_QUALITY_HEIRLOOM && itemProto->ScalingStatDistribution > 0)
+                        {
+                            item->SetUInt32Value(ITEM_FIELD_ITEM_LEVEL, botPlayer->GetLevel());
+                            item->SetState(ITEM_CHANGED, botPlayer);
+                        }
                     }
                 }
 
