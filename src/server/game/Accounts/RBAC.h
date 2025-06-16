@@ -755,6 +755,7 @@ enum RBACPermissions
     
     RBAC_PERM_COMMAND_GETDISCORDCODE                        = 50000,
     RBAC_PERM_COMMAND_SENDWORLD                             = 50001,
+    RBAC_PERM_COMMAND_NPCBOTRENAME                          = 50002,
     
     //NPCBot
     RBAC_PERM_COMMAND_NPCBOT                                 = 70001,

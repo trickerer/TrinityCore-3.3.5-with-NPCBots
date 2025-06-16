@@ -145,10 +145,20 @@ public:
             { "mailbox",          HandleMailBoxCommand,          rbac::RBAC_PERM_COMMAND_MAILBOX,          Console::No },
             { "getdiscordcode",   HandleGetDiscordCodeCommand,   rbac::RBAC_PERM_COMMAND_GETDISCORDCODE,   Console::No },
             { "sendworld",        HandleSendWorldCommand,        rbac::RBAC_PERM_COMMAND_SENDWORLD,        Console::Yes },
+            { "npcbotrename",     HandleNPCBotRename,            rbac::RBAC_PERM_COMMAND_NPCBOTRENAME,     Console::No },
         };
         return commandTable;
     }
 
+    static bool HandleNPCBotRename(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage("Usage: .npcbotrename <name>");
+            return false;
+        }
+        
+    }
     static bool HandleSendWorldCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
@@ -156,6 +166,7 @@ public:
             handler->SendSysMessage("Usage: .sendworld <message>");
             return false;
         }
+    }
 
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
 
