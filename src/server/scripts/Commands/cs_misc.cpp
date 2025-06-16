@@ -160,13 +160,6 @@ public:
             return false;
         }
 
-        Creature* target = player->GetSelectedCreature();
-        if (!target)
-        {
-            handler->SendSysMessage("You must select an NPCBot.");
-            return false;
-        }
-
         if (!target->IsNPCBot()) // <-- Ensure this is implemented in your bot code
         {
             handler->SendSysMessage("The selected creature is not an NPCBot.");
