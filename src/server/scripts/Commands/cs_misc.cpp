@@ -202,9 +202,9 @@ public:
         bot->SetName(newName);
         bot->SetObjectScale(bot->GetObjectScale());
         UpdateData updateData;
-        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr); // nullptr means update all nearby players
+        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr); // nullptr = send to all players nearby
 
-        bot->SendMessageToSet(updateData.GetPacket(), true);
+        bot->SendMessageToSet(&updateData, true); // Send the UpdateData pointer directly
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
