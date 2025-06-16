@@ -593,11 +593,11 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     if (GetPlayer()->m_trade)
         return;
     
-    if (GetPlayer()->GetTotalPlayedTime() < 10800)
-    {
-        GetPlayer()->GetSession()->SendNotification("You must have played at least 3 hours to initiate trades."); // same here
-        return;
-    }
+    //if (GetPlayer()->GetTotalPlayedTime() < 10800)
+    //{
+    //    GetPlayer()->GetSession()->SendNotification("You must have played at least 3 hours to initiate trades."); // same here
+    //    return;
+    //}
 
     TradeStatusInfo info;
     if (!GetPlayer()->IsAlive())
