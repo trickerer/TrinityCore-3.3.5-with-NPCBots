@@ -3385,19 +3385,10 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     SetUsedTalentCount(GetUsedTalentCount() + talentCost);
 
     // update free primary prof.points (if any, can be none in case GM .learn prof. learning)
-    if (spellInfo->IsPrimaryProfessionFirstRank())
+    if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
     {
-        uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
-
-        if (HasItemCount(461145, 1))
-            maxProfs = std::max(4u, maxProfs);
-
-        uint32 usedProfs = GetPrimaryProfessionCount();
-
-        if (usedProfs < maxProfs)
-            SetFreePrimaryProfessions(maxProfs - usedProfs - 1); // reserve next slot
-        else
-            return; // can't learn more
+        if (spellInfo->IsPrimaryProfessionFirstRank())
+            SetFreePrimaryProfessions(freeProfs-1);
     }
 
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
@@ -3637,7 +3628,6 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
         uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
 
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
-
         if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
     }
