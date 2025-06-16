@@ -212,8 +212,9 @@ public:
         WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetEntry());
 
 
-        handler->SendSysMessage("NPCBot renamed successfully.");
+        handler->SendSysMessage("MGA Bot renamed successfully.");
         handler->SendSysMessage("|cFFFF8847YOU MUST EXIT GAME AND CLEAR CACHE FOR THIS TO TAKE EFFECT!");
+        handler->GetSession()->SendAreaTriggerMessage("YOU MUST EXIT GAME AND CLEAR CACHE FOR THIS TO TAKE EFFECT!");
         return true;
     }
 
