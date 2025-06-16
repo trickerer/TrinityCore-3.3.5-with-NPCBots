@@ -197,7 +197,7 @@ public:
         // Update bot in memory
         bot->SetName(newName);
         bot->SendNameToClient();
-        bot->SetObjectScale(bot->GetObjectScale()); // Force visual update to reflect name change
+        bot->SetObjectScale(bot->GetObjectScale());
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
