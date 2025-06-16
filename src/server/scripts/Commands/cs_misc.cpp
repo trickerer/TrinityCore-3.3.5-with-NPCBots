@@ -160,7 +160,8 @@ public:
             return false;
         }
 
-        Creature* target = player->GetSelectedUnit();
+        Unit* unit = player->GetSelectedUnit();
+        Creature* target = unit && unit->GetTypeId() == TYPEID_UNIT ? unit->ToCreature() : nullptr;
         if (!target)
         {
             handler->SendSysMessage("You must select an NPCBot.");
@@ -190,8 +191,10 @@ public:
         }
 
         // Update DB
+        std::string safeName = newName;
+        CharacterDatabase.EscapeString(safeName);
         CharacterDatabase.PExecute("UPDATE npc_bot_data SET name = '{}' WHERE guid = {}",
-            CharacterDatabase.EscapeString(newName).c_str(), target->GetGUID().GetCounter());
+            safeName.c_str(), target->GetGUID().GetCounter());
 
         // Update in-game name if possible (depends on your NPCBot system)
         target->SetName(newName); // Only works if you’ve patched your Creature class to support name changes
