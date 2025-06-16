@@ -57,6 +57,7 @@
 #include "ObjectDefines.h"
 #include "Common.h"
 #include "botmgr.h"
+#include "UpdateData.h"
     
 static std::unordered_map<uint64, std::string> g_DiscordCodes;
 
@@ -200,10 +201,10 @@ public:
 
         bot->SetName(newName);
         bot->SetObjectScale(bot->GetObjectScale());
-        WorldPacket data;
-        bot->BuildValuesUpdateBlockForPlayer(&data, nullptr); // nullptr means send to all players nearby
+        UpdateData updateData;
+        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr); // nullptr means update all nearby players
 
-        bot->SendMessageToSet(&data, true);
+        bot->SendMessageToSet(updateData.GetPacket(), true);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
