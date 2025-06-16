@@ -204,9 +204,9 @@ public:
         UpdateData updateData;
         bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr);
 
-        WorldPacket* packet = updateData.BuildPacket();
-        bot->SendMessageToSet(packet, true);
-        delete packet;
+        WorldPacket packet;
+        updateData.BuildPacket(&packet);
+        bot->SendMessageToSet(&packet, true);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
