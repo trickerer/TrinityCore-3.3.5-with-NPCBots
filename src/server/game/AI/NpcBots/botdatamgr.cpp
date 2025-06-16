@@ -937,7 +937,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     BOT_LOG_FATAL("server.loading", "Cannot load npcbot {} from DB!", entry);
                     ABORT();
                 }
-                // Heirloom item scaling fix
+                // Heirloom item scaling fix TEST CODE
                 for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
                 {
                     uint32 itemEntry = bot->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot);
