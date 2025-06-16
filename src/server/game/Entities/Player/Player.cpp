@@ -3629,7 +3629,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
 
         // Check for special item (ID 461145) to allow up to 4 professions
         if (HasItemCount(461145, 1))
-            maxProfs = std::max(maxProfs, 4u); // Ensures at least 4 if item is present
+            maxProfs = 4; // Ensures at least 4 if item is present
 
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
         if (freeProfs <= maxProfs)
