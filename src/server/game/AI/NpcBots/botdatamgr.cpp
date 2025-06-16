@@ -938,9 +938,15 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     ABORT();
                 }
                 // Heirloom item scaling fix
+                #define ITEM_FIELD_ITEM_LEVEL 108
+
                 for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
                 {
-                    Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+                    Player* botPlayer = bot->ToPlayer();
+                    if (!botPlayer)
+                        continue;
+
+                    Item* item = botPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
                     if (!item)
                         continue;
 
@@ -951,7 +957,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     if (proto->Quality == ITEM_QUALITY_HEIRLOOM && proto->ScalingStatDistribution > 0)
                     {
                         item->SetUInt32Value(ITEM_FIELD_ITEM_LEVEL, bot->GetLevel());
-                        item->SetState(ITEM_CHANGED, nullptr); // nullptr is fine if no player context
+                        item->SetState(ITEM_CHANGED, nullptr); // Ensure DB update and visual refresh
                     }
                 }
 
