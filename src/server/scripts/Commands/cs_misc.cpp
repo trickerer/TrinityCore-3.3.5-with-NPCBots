@@ -152,13 +152,54 @@ public:
 
     static bool HandleNPCBotRename(ChatHandler* handler, char const* args)
     {
+        Player* player = handler->GetSession()->GetPlayer();
+
         if (!*args)
         {
             handler->SendSysMessage("Usage: .npcbotrename <name>");
             return false;
         }
-        
+
+        Creature* target = player->GetSelectedCreature();
+        if (!target)
+        {
+            handler->SendSysMessage("You must select an NPCBot.");
+            return false;
+        }
+
+        if (!target->IsNPCBot()) // <-- Ensure this is implemented in your bot code
+        {
+            handler->SendSysMessage("The selected creature is not an NPCBot.");
+            return false;
+        }
+
+        if (!target->IsOwnedBy(player)) // <-- Ensure this is implemented in your bot code
+        {
+            handler->SendSysMessage("You do not own this NPCBot.");
+            return false;
+        }
+
+        std::string newName = args;
+        if (newName.length() > 20)
+        {
+            handler->SendSysMessage("Name is too long. Maximum 20 characters.");
+            return false;
+        }
+
+        // Update DB
+        CharacterDatabase.PExecute("UPDATE npc_bot_data SET name = '{}' WHERE guid = {}",
+            CharacterDatabase.EscapeString(newName).c_str(), target->GetGUID().GetCounter());
+
+        // Update in-game name if possible (depends on your NPCBot system)
+        target->SetName(newName); // Only works if you’ve patched your Creature class to support name changes
+
+        // Force update for nearby players
+        target->SetObjectScale(target->GetObjectScale());
+
+        handler->SendSysMessage("NPCBot renamed successfully.");
+        return true;
     }
+
     static bool HandleSendWorldCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
