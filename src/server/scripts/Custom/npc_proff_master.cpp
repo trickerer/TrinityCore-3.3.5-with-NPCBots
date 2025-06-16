@@ -165,11 +165,8 @@ public:
             else
             {
                 // AD TOO MAIN PROFFS
-                if (freeProfs == 2)
+                if (freeProfs > 0)
                     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "You can learn " + proffcount + " main professions", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-                if (freeProfs == 1)
-                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "You can learn " + proffcount + " main profession", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
-
                 
                 if (!player->HasSkill(BlackSmithSkill))
                     AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Blacksmithing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001); //BS
