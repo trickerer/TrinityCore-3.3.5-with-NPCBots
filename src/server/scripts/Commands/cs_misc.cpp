@@ -155,27 +155,27 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        if (!*args)
+        if (!args || !*args)
         {
             handler->SendSysMessage("Usage: .npcbotrename <name>");
             return false;
         }
 
-        Creature const* target = handler->getSelectedCreature();
+        Creature* target = handler->getSelectedCreature();
         if (!target)
         {
             handler->SendSysMessage("You must select an NPCBot.");
             return false;
         }
 
-        if (!target->IsNPCBot()) // <-- Ensure this is implemented in your bot code
+        if (!target->IsNPCBot()) // Make sure this method is implemented in your bot system
         {
             handler->SendSysMessage("The selected creature is not an NPCBot.");
             return false;
         }
 
-        Player* owner = handler->GetSession()->GetPlayer();
-        if (!owner->GetBotMgr()->GetBot(target->GetGUID()))
+        Creature* bot = player->GetBotMgr()->GetBot(target->GetGUID());
+        if (!bot)
         {
             handler->SendSysMessage("You do not own this NPCBot.");
             return false;
@@ -188,17 +188,15 @@ public:
             return false;
         }
 
-        // Update DB
+        // Update database with safe string
         std::string safeName = newName;
         CharacterDatabase.EscapeString(safeName);
-        CharacterDatabase.PExecute("UPDATE npc_bot_data SET name = '{}' WHERE guid = {}",
-            safeName.c_str(), target->GetGUID().GetCounter());
+        CharacterDatabase.PExecute("UPDATE npc_bot_data SET name = {}' WHERE guid = {}",
+            safeName.c_str(), bot->GetGUID().GetCounter());
 
-        // Update in-game name if possible (depends on your NPCBot system)
-       // target->SetName(newName); // Only works if you’ve patched your Creature class to support name changes
-
-        // Force update for nearby players
-        target->SetObjectScale(target->GetObjectScale());
+        // Update bot in memory
+        bot->SetName(newName);
+        bot->SetObjectScale(bot->GetObjectScale()); // Force visual update to reflect name change
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
