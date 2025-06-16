@@ -10596,17 +10596,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     _castBotItemUseSpell(item, targets);
                     //DEL ITEM HERE
                     Item* modItem = const_cast<Item*>(item);
-                    uint32 newCount = modItem->GetCount() - 1;
-
-                    if (newCount > 0)
-                    {
-                        modItem->SetCount(newCount);
-                        player->SendItemUpdate(modItem);  // or whatever update method exists
-                    }
-                    else
-                    {
-                        player->DestroyItem(modItem->GetBagSlot(), modItem->GetSlot(), true);
-                    }
+                    player->DestroyItemCount(item->GetEntry(), 1, true);
                 }
             }
 
