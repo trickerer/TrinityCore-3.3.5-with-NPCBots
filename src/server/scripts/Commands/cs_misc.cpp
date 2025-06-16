@@ -202,6 +202,8 @@ public:
         bot->SetObjectScale(bot->GetObjectScale());
         bot->UpdateObjectVisibility();
         bot->SendUpdateToPlayer(player);
+        bot->DespawnOrUnsummon();
+        bot->Respawn();
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
