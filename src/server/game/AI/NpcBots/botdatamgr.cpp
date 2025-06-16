@@ -937,6 +937,23 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     BOT_LOG_FATAL("server.loading", "Cannot load npcbot {} from DB!", entry);
                     ABORT();
                 }
+                // Heirloom item scaling fix
+                for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+                {
+                    Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+                    if (!item)
+                        continue;
+
+                    ItemTemplate const* proto = item->GetTemplate();
+                    if (!proto)
+                        continue;
+
+                    if (proto->Quality == ITEM_QUALITY_HEIRLOOM && proto->ScalingStatDistribution > 0)
+                    {
+                        item->SetItemLevel(bot->getLevel());
+                        item->SetState(ITEM_CHANGED, bot); // Ensure DB update + visual refresh
+                    }
+                }
 
                 if (!bot->AIM_Initialize())
                 {
