@@ -169,7 +169,7 @@ public:
             return false;
         }
 
-        if (!target->IsNPCBot()) // Make sure this method is implemented in your bot system
+        if (!target->IsNPCBot())
         {
             handler->SendSysMessage("The selected creature is not an NPCBot.");
             return false;
@@ -189,30 +189,54 @@ public:
             return false;
         }
 
-        // Update database with safe string
+        // Escape for DB safely
         std::string safeName = newName;
-        CharacterDatabase.EscapeString(safeName); 
+        CharacterDatabase.EscapeString(safeName);
+
+        // Update bot appearance table
         CharacterDatabase.PExecute(
-        "INSERT INTO creature_template_npcbot_appearance (entry, `name*`) VALUES ({}, '{}') "
-        "ON DUPLICATE KEY UPDATE `name*` = '{}'",
-        bot->GetEntry(), safeName.c_str(), safeName.c_str());
-        
+            "INSERT INTO creature_template_npcbot_appearance (entry, `name*`) VALUES ({}, '{}') "
+            "ON DUPLICATE KEY UPDATE `name*` = '{}'",
+            bot->GetEntry(), safeName.c_str(), safeName.c_str());
+
+        // Update main creature_template table
         WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetEntry());
 
+        // Update cached CreatureTemplate in memory
         CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(bot->GetEntry());
         if (cinfo)
         {
             CreatureTemplate* mutableCinfo = const_cast<CreatureTemplate*>(cinfo);
             mutableCinfo->Name = newName;
+            // Optionally clear other localized names:
+            mutableCinfo->Name2 = "";
+            mutableCinfo->Name3 = "";
+            mutableCinfo->Name4 = "";
         }
+
+        // Update bot instance
         bot->SetName(newName);
-        bot->RemoveFromWorld();
-        bot->AddToWorld();
-        bot->Respawn();
+
+        // Force client update by despawning and respawning the bot
+        bot->SendObjectDeSpawnAnim();   // Optional: play despawn animation on client
+
+        bot->RemoveFromWorld();         // Remove from world
+        bot->Respawn();                 // Respawn adds back to world and loads from DB template
+
+        // Set the name again after respawn to make sure in-memory name is updated
+        bot->SetName(newName);
+
+        // Optional: Send update packet to nearby players
+        UpdateData updateData;
+        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr);
+        WorldPacket packet;
+        updateData.BuildPacket(&packet);
+        bot->SendMessageToSet(&packet, true);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
     }
+
 
     static bool HandleSendWorldCommand(ChatHandler* handler, char const* args)
     {
