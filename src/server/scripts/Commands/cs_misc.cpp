@@ -213,8 +213,8 @@ public:
 
 
         handler->SendSysMessage("MGA Bot renamed successfully.");
-        handler->SendSysMessage("|cFFFF8847YOU MUST EXIT GAME AND CLEAR CACHE FOR THIS TO TAKE EFFECT!");
-        handler->GetSession()->SendAreaTriggerMessage("YOU MUST EXIT GAME AND CLEAR CACHE FOR THIS TO TAKE EFFECT!");
+        handler->SendSysMessage("|cFFFF8847YOU MUST EXIT GAME AND CLEAR GAME CACHE FOR THIS TO TAKE EFFECT!");
+        handler->GetSession()->SendAreaTriggerMessage("YOU MUST EXIT GAME AND CLEAR GAME CACHE FOR THIS TO TAKE EFFECT!");
         return true;
     }
 
