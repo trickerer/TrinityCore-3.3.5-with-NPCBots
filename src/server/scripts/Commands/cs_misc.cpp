@@ -201,7 +201,7 @@ public:
         bot->SetName(newName);
         bot->SetObjectScale(bot->GetObjectScale());
         bot->UpdateObjectVisibility();
-        bot->SendUpdateToPlayers();
+        bot->SendUpdateToPlayer();
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
