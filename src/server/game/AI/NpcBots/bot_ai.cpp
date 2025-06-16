@@ -10595,14 +10595,19 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     targets.SetUnitTarget(me);
                     _castBotItemUseSpell(item, targets);
                     //DEL ITEM HERE
-                    Item* item = nullptr;
                     if (item->GetCount() > 1)
                     {
-                        item->SetCount(item->GetCount() - 1);
-                        player->SendUpdateItem(item);
+                        // Decrease item count by 1
+                        // Note: You need to cast away const if your item pointer is const
+                        Item* modItem = const_cast<Item*>(item);
+                        modItem->SetCount(modItem->GetCount() - 1);
+
+                        // Notify client of the update
+                        player->SendUpdateInventory(modItem->GetBagSlot(), modItem->GetSlot(), true);
                     }
                     else
                     {
+                        // Destroy the item if count is 1
                         player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
                     }
                 }
