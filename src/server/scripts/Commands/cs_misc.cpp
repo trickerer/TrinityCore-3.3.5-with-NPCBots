@@ -192,7 +192,7 @@ public:
         std::string safeName = newName;
         CharacterDatabase.EscapeString(safeName);
         //CharacterDatabase.PExecute("UPDATE `creature_template_npcbot_appearance` SET `name*` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetGUID().GetCounter());
-        WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetGUID().GetCounter());
+        WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetGUID());
 
         // Update bot in memory
         bot->SetName(newName);
