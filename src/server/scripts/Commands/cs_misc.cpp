@@ -199,14 +199,16 @@ public:
         
         WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetEntry());
 
+        CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(bot->GetEntry());
+        if (cinfo)
+        {
+            CreatureTemplate* mutableCinfo = const_cast<CreatureTemplate*>(cinfo);
+            mutableCinfo->Name = newName;
+        }
         bot->SetName(newName);
-        bot->SetObjectScale(bot->GetObjectScale());
-        UpdateData updateData;
-        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr);
-
-        WorldPacket packet;
-        updateData.BuildPacket(&packet);
-        bot->SendMessageToSet(&packet, true);
+        bot->RemoveFromWorld();
+        bot->AddToWorld();
+        bot->Respawn();
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
