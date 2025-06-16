@@ -69,9 +69,9 @@ void WorldSession::HandleSendMail(WorldPackets::Mail::SendMail& sendMail)
 
     Player* player = _player;
     
-    if (_player->GetTotalPlayedTime() < 10800)
+    if (_player->GetTotalPlayedTime() < 3600)  // 3600 seconds = 1 hour
     {
-        SendNotification("You must have at least 3 hours of playtime to send mail.");
+        SendNotification("You must have at least 1 hour of playtime to send mail.");
         return;
     }
 
