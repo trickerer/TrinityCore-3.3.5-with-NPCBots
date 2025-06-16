@@ -198,12 +198,10 @@ public:
         
         WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetEntry());
 
-        bot->SendMonsterMove(bot); 
-
         bot->SetName(newName);
         bot->SetObjectScale(bot->GetObjectScale());
-
         bot->UpdateObjectVisibility();
+        bot->SendUpdateToPlayer(nullptr);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
