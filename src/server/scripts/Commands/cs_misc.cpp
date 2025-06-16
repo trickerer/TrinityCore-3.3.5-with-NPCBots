@@ -200,10 +200,10 @@ public:
 
         bot->SetName(newName);
         bot->SetObjectScale(bot->GetObjectScale());
-        bot->UpdateObjectVisibility();
-        bot->SendUpdateToPlayer(player);
-        bot->DespawnOrUnsummon();
-        bot->Respawn();
+        WorldPacket data;
+        bot->BuildValuesUpdateBlockForPlayer(&data, nullptr); // nullptr means send to all players nearby
+
+        bot->SendMessageToSet(&data, true);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
         return true;
