@@ -208,17 +208,11 @@ public:
         {
             CreatureTemplate* mutableCinfo = const_cast<CreatureTemplate*>(cinfo);
             mutableCinfo->Name = newName;
-            // Optionally clear other localized names:
-            mutableCinfo->Name2 = "";
-            mutableCinfo->Name3 = "";
-            mutableCinfo->Name4 = "";
         }
 
         // Update bot instance
         bot->SetName(newName);
 
-        // Force client update by despawning and respawning the bot
-        bot->SendObjectDeSpawnAnim();   // Optional: play despawn animation on client
 
         bot->RemoveFromWorld();         // Remove from world
         bot->Respawn();                 // Respawn adds back to world and loads from DB template
