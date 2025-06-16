@@ -202,32 +202,9 @@ public:
         // Update main creature_template table
         WorldDatabase.PExecute("UPDATE `creature_template` SET `name` = '{}' WHERE entry = {}", safeName.c_str(), bot->GetEntry());
 
-        // Update cached CreatureTemplate in memory
-        CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(bot->GetEntry());
-        if (cinfo)
-        {
-            CreatureTemplate* mutableCinfo = const_cast<CreatureTemplate*>(cinfo);
-            mutableCinfo->Name = newName;
-        }
-
-        // Update bot instance
-        bot->SetName(newName);
-
-
-        bot->RemoveFromWorld();         // Remove from world
-        bot->Respawn();                 // Respawn adds back to world and loads from DB template
-
-        // Set the name again after respawn to make sure in-memory name is updated
-        bot->SetName(newName);
-
-        // Optional: Send update packet to nearby players
-        UpdateData updateData;
-        bot->BuildValuesUpdateBlockForPlayer(&updateData, nullptr);
-        WorldPacket packet;
-        updateData.BuildPacket(&packet);
-        bot->SendMessageToSet(&packet, true);
 
         handler->SendSysMessage("NPCBot renamed successfully.");
+        handler->SendSysMessage("|cFFFF8847YOU MUST EXIT GAME AND CLEAR CACHE FOR THIS TO TAKE EFFECT!");
         return true;
     }
 
