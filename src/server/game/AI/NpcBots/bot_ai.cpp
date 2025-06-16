@@ -10595,7 +10595,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     targets.SetUnitTarget(me);
                     _castBotItemUseSpell(item, targets);
                     //DEL ITEM
-                    player->DestroyItemCount(Item, 1, true);
+                    player->DestroyItemCount(item, 1, true);
                 }
             }
 
