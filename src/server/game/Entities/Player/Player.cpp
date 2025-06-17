@@ -3387,6 +3387,9 @@ bool Player::AddSpell(uint32 spellId, bool active, bool learning, bool dependent
     // update free primary prof.points (if any, can be none in case GM .learn prof. learning)
     if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
     {
+        if (HasItemCount(461145, 1))
+            maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2); 
+        
         if (spellInfo->IsPrimaryProfessionFirstRank())
             SetFreePrimaryProfessions(freeProfs-1);
     }
