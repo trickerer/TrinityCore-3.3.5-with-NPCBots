@@ -73,14 +73,7 @@ public:
             uint32 ttcheck;
             ttcheck = (tseconds - 43200); // 12 hours
 			QueryResult result2;
-			if (player->IsGameMaster())
-            {
-                result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid` > 0");
-            }
-            else
-            {
-                result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` > '{}' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
-            }
+			result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='{}' AND `time` > '{}' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
             
             //result2 = WorldDatabase.PQuery("SELECT * FROM `vote_tp` WHERE `guid`='%d' AND `time` >'%d' LIMIT 1", player->GetSession()->GetAccountId(), ttcheck);
            
@@ -96,7 +89,7 @@ public:
             else
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TPNO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
-				player->Whisper("For me to talk to you, you must complete a simple task for me. Go to the website and vote (mgawow.online/vote), do this and I will be happy to talk to you more.", LANG_UNIVERSAL, player);
+				//player->Whisper("For me to talk to you, you must complete a simple task for me. Go to the website and vote (mgawow.online/vote), do this and I will be happy to talk to you more.", LANG_UNIVERSAL, player);
                 player->GetSession()->SendNotification("Vote on the website first, then I will talk to you. mgawow.online/vote");
             }
 			
