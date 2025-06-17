@@ -148,8 +148,12 @@ public:
 
         bool OnGossipHello(Player* player) override
         {
-            uint32 freeProfs = player->RecalculateProfessionSlots()->GetFreePrimaryProfessionPoints();
-            std::string proffcount = std::to_string(freeProfs);
+            uint32 usedProfs = player->GetPrimaryProfessionCount();
+            uint32 maxProfs = player->HasItemCount(461145, 1)
+                ? sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2)
+                : sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+
+            uint32 freeProfs = maxProfs > usedProfs ? maxProfs - usedProfs : 0;
             player->SetFreePrimaryProfessions(freeProfs);
 
             WorldSession* session = player->GetSession();
