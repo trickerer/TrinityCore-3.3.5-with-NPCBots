@@ -22694,12 +22694,12 @@ uint32 Player::GetPrimaryProfessionCount() const
             continue;
 
         if (skillInfo->CategoryId == SKILL_CATEGORY_PROFESSION &&
-            (skillInfo->id == SKILL_ALCHEMY || skillInfo->id == SKILL_BLACKSMITHING ||
-             skillInfo->id == SKILL_ENCHANTING || skillInfo->id == SKILL_ENGINEERING ||
-             skillInfo->id == SKILL_HERBALISM || skillInfo->id == SKILL_INSCRIPTION ||
-             skillInfo->id == SKILL_JEWELCRAFTING || skillInfo->id == SKILL_LEATHERWORKING ||
-             skillInfo->id == SKILL_MINING || skillInfo->id == SKILL_SKINNING ||
-             skillInfo->id == SKILL_TAILORING))
+            (skillInfo->ID == SKILL_ALCHEMY || skillInfo->ID == SKILL_BLACKSMITHING ||
+             skillInfo->ID == SKILL_ENCHANTING || skillInfo->ID == SKILL_ENGINEERING ||
+             skillInfo->ID == SKILL_HERBALISM || skillInfo->ID == SKILL_INSCRIPTION ||
+             skillInfo->ID == SKILL_JEWELCRAFTING || skillInfo->ID == SKILL_LEATHERWORKING ||
+             skillInfo->ID == SKILL_MINING || skillInfo->ID == SKILL_SKINNING ||
+             skillInfo->ID == SKILL_TAILORING))
         {
             ++count;
         }
