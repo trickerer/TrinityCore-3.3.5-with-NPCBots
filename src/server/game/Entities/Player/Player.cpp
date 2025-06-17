@@ -22691,7 +22691,7 @@ void Player::InitPrimaryProfessions()
     if (HasItemCount(461145, 1))
         maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2); // e.g. 4
 
-    uint32 usedProfs = GetPrimaryProfessionCount();
+    uint32 usedProfs = GetFreePrimaryProfessionPoints();
     uint32 freeProfs = (usedProfs >= maxProfs) ? 0 : (maxProfs - usedProfs);
 
     SetFreePrimaryProfessions(freeProfs);
