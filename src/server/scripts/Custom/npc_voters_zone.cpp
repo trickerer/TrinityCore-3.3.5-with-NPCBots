@@ -15,7 +15,7 @@
 #define GOSSIP_OPTION_OPEN_BANK "Open Bank"
 #define GOSSIP_OPTION_OPEN_GBANK "Open Guild Bank"
 
-#define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours on this account, if you wish to use me please go and vote and I will send you to a Very Very nice location."
+#define GOSSIP_HELLO_TPNO  "You have not voted in the last 12 hours on this account, if you wish to use me please go and vote. Thank you. - mgawow.online/vote"
 
 /*
 5 ways to notify player
