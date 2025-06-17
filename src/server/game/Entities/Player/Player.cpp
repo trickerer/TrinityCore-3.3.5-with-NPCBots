@@ -22689,11 +22689,11 @@ uint32 Player::GetPrimaryProfessionCount() const
 
     for (Player::SkillStatusMap::const_iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end(); ++itr)
     {
-        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(itr->first);
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(pair.first);
         if (!skillInfo)
             continue;
 
-        if (skillInfo->CategoryId == SKILL_CATEGORY_PROFESSION &&
+        if (skillInfo->CategoryID == SKILL_CATEGORY_PROFESSION &&
             (skillInfo->ID == SKILL_ALCHEMY || skillInfo->ID == SKILL_BLACKSMITHING ||
              skillInfo->ID == SKILL_ENCHANTING || skillInfo->ID == SKILL_ENGINEERING ||
              skillInfo->ID == SKILL_HERBALISM || skillInfo->ID == SKILL_INSCRIPTION ||
