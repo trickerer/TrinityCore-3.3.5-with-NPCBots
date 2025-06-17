@@ -170,8 +170,8 @@ public:
             else
             {
                 // AD TOO MAIN PROFFS
-                if (freeProfs > 0)
-                    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, "You can learn " + proffcount + " main professions", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
+                std::string msg = "You can learn " + std::to_string(freeProfs) + " out of " + std::to_string(maxProfs) + " main professions.";
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 
                 if (!player->HasSkill(BlackSmithSkill))
                     AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Blacksmithing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2001); //BS
