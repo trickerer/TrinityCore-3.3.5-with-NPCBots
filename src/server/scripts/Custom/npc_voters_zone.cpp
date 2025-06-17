@@ -51,10 +51,10 @@ public:
     {
         npc_voters_zoneAI(Creature* creature) : ScriptedAI(creature) { }
 		
-        void WhisperTo(Player* player, char const* message)
-        {
-            me->Whisper(message, LANG_UNIVERSAL, player);
-        }
+        //void WhisperTo(Player* player, char const* message)
+        //{
+        //    me->Whisper(message, LANG_UNIVERSAL, player);
+        //}
 
         bool OnGossipHello(Player* player) override
         {
