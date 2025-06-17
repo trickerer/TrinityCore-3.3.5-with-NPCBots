@@ -148,7 +148,7 @@ public:
 
         bool OnGossipHello(Player* player) override
         {
-            uint32 freeProfs = player->GetFreePrimaryProfessionPoints();
+            uint32 freeProfs = player->RecalculateProfessionSlots();
             std::string proffcount = std::to_string(freeProfs);
             player->SetFreePrimaryProfessions(freeProfs);
 
