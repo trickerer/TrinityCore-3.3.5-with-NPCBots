@@ -22683,12 +22683,21 @@ void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
         UpdateObjectVisibility();
 }
 
+void Player::RecalculateProfessionSlots()
+{
+    uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+    if (HasItemCount(461145, 1))
+        maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2);
+
+    uint32 usedProfs = GetPrimaryProfessionCount();
+    uint32 freeProfs = (usedProfs >= maxProfs) ? 0 : (maxProfs - usedProfs);
+
+    SetFreePrimaryProfessions(freeProfs);
+}
+
 void Player::InitPrimaryProfessions()
 {
-    if (Player->HasItemCount(461145, 1))
-        SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2));
-    else
-        SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
+    SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
 }
 
 bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
