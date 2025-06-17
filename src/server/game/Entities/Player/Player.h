@@ -1540,6 +1540,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
         void InitPrimaryProfessions();
         void RecalculateProfessionSlots();
+        uint32 GetPrimaryProfessionCount() const;
 
         PlayerSpellMap const& GetSpellMap() const { return m_spells; }
         PlayerSpellMap      & GetSpellMap()       { return m_spells; }
