@@ -1005,6 +1005,7 @@ void World::LoadConfigSettings(bool reload)
     }
 
     m_int_configs[CONFIG_MAX_PRIMARY_TRADE_SKILL] = sConfigMgr->GetIntDefault("MaxPrimaryTradeSkill", 2);
+    m_int_configs[CONFIG_MAX_PRIMARY_TRADE_SKILL2] = sConfigMgr->GetIntDefault("MaxPrimaryTradeSkill2", 4);
     m_int_configs[CONFIG_MIN_PETITION_SIGNS] = sConfigMgr->GetIntDefault("MinPetitionSigns", 9);
     if (m_int_configs[CONFIG_MIN_PETITION_SIGNS] > 9)
     {
