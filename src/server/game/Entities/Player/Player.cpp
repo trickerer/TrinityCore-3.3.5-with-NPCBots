@@ -3632,7 +3632,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
         
         if (HasItemCount(461145, 1))
-            freeProfs = GetFreePrimaryProfessionPoints() - 1;
+            freeProfs = GetFreePrimaryProfessionPoints() + 2;
         
         if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
