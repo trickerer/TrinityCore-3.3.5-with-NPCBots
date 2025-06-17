@@ -22687,11 +22687,9 @@ void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 void Player::InitPrimaryProfessions()
 {
-    uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+    SetFreePrimaryProfessions(sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL));
     if (HasItemCount(461145, 1))
-        maxProfs = std::max(maxProfs, 4u);
-
-    SetFreePrimaryProfessions(maxProfs);
+        SetFreePrimaryProfessions = SetFreePrimaryProfessions+2;
 }
 
 bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)

@@ -314,9 +314,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, BlackSmithSPell);
-                    player->SetSkill(BlackSmithSkill, 1, 450, 450);
+                    player->SetSkill(BlackSmithSkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, BlackSmithSkill);
-                    me->Say("Your Blacksmithing is now at max " + player->GetName(), LANG_UNIVERSAL);   
+                    me->Say("Your Blacksmithing is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);   
                 }
                 else
                 {
@@ -335,9 +335,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, LeatherWorkingSpell);
-                    player->SetSkill(LeatherWorkingSKill, 1, 450, 450);
+                    player->SetSkill(LeatherWorkingSKill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, LeatherWorkingSKill);
-                    me->Say("Your leather working is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your leather working is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -356,9 +356,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, AlchemySPell);
-                    player->SetSkill(AlchemySkill, 1, 450, 450);
+                    player->SetSkill(AlchemySkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, AlchemySkill);
-                    me->Say("Your Alchemy skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Alchemy skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -377,9 +377,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, HerbalismSpell);
-                    player->SetSkill(HerbalismSkill, 1, 450, 450);
+                    player->SetSkill(HerbalismSkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, HerbalismSkill);
-                    me->Say("Your Herbalism skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Herbalism skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -398,9 +398,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, MiningSpell);
-                    player->SetSkill(MiningSKill, 1, 450, 450);
+                    player->SetSkill(MiningSKill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, MiningSKill);
-                    me->Say("Your Mining skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Mining skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -419,9 +419,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, TailoringSpell);
-                    player->SetSkill(TailoringSKill, 1, 450, 450);
+                    player->SetSkill(TailoringSKill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, TailoringSKill);
-                    me->Say("Your Tailoring skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Tailoring skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -440,9 +440,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, EngSPell);
-                    player->SetSkill(EngSkill, 1, 450, 450);
+                    player->SetSkill(EngSkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, EngSkill);
-                    me->Say("Your Engineering skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Engineering skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -461,9 +461,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, EnchanterSpell);
-                    player->SetSkill(EnchanterSkill, 1, 450, 450);
+                    player->SetSkill(EnchanterSkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, EnchanterSkill);
-                    me->Say("Your Enchanting skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Enchanting skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -482,9 +482,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, SkinningSPell);
-                    player->SetSkill(SKinningSkill, 1, 450, 450);
+                    player->SetSkill(SKinningSkill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, SKinningSkill);
-                    me->Say("Your Skinning skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Skinning skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
@@ -503,10 +503,10 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, JewelSpell);
-                    player->SetSkill(JewelSKill, 1, 450, 450);
+                    player->SetSkill(JewelSKill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, JewelSKill);
                     player->SetSkill(MiningSKill, 0, 0, 0);  // WHY DID WE LEARN MINING???????
-                    me->Say("Your Jewelcrafting skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Jewelcrafting skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                     
                 }
                 else
@@ -526,9 +526,9 @@ public:
                     //LEARN PROFF
                     player->DestroyItemCount(ITEMCOSTID2, MAINPROFF, true);
                     player->CastSpell(player, InscriptSpell);
-                    player->SetSkill(InscriptSKill, 1, 450, 450);
+                    player->SetSkill(InscriptSKill, 1, 300, 350);
                     HandleLearnSkillRecipesHelper(player, InscriptSKill);
-                    me->Say("Your Jewelcrafting skill is now at max " + player->GetName(), LANG_UNIVERSAL);
+                    me->Say("Your Jewelcrafting skill is now at 300/350 " + player->GetName(), LANG_UNIVERSAL);
                 }
                 else
                 {
