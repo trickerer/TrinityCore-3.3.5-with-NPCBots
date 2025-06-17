@@ -22683,6 +22683,26 @@ void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
         UpdateObjectVisibility();
 }
 
+uint32 Player::GetPrimaryProfessionCount() const
+{
+    uint32 count = 0;
+
+    for (auto const& skill : m_skills)
+    {
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(skill.first);
+        if (!skillInfo)
+            continue;
+
+        if (skillInfo->categoryId == SKILL_CATEGORY_PROFESSION_PRIMARY &&
+            GetSkillValue(skill.first) > 0)
+        {
+            ++count;
+        }
+    }
+
+    return count;
+}
+
 void Player::RecalculateProfessionSlots()
 {
     uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
