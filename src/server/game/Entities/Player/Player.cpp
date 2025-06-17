@@ -3632,7 +3632,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
         
         if (HasItemCount(461145, 1))
-            freeProfs = GetFreePrimaryProfessionPoints() + 2;
+            freeProfs = GetFreePrimaryProfessionPoints() - 1;
         
         if (freeProfs <= maxProfs)
             SetFreePrimaryProfessions(freeProfs);
@@ -22694,13 +22694,6 @@ void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
 void Player::InitPrimaryProfessions()
 {
     uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
-    if (HasItemCount(461145, 1))
-        maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2); // e.g. 4
-
-    uint32 usedProfs = GetFreePrimaryProfessionPoints();
-    uint32 freeProfs = (usedProfs >= maxProfs) ? 0 : (maxProfs - usedProfs);
-
-    SetFreePrimaryProfessions(freeProfs);
 }
 
 bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
