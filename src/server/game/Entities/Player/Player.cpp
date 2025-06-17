@@ -22687,7 +22687,7 @@ uint32 Player::GetPrimaryProfessionCount() const
 {
     uint32 count = 0;
 
-    for (Player::SkillStatusMap::const_iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end(); ++itr)
+    for (auto const& pair : mSkillStatus)
     {
         SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(pair.first);
         if (!skillInfo)
