@@ -3626,7 +3626,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (spellInfo && spellInfo->IsPrimaryProfessionFirstRank())
     {
         uint32 maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
-        if (HasItemCount(461145, 1))
+        if (player->HasItemCount(461145, 1))
             maxProfs = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL2);
 
         uint32 freeProfs = GetFreePrimaryProfessionPoints() + 1;
