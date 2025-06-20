@@ -62,7 +62,7 @@ public:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 5 Man Mode (easy)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 10 Man Mode (medium)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
-                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 20 Man Mode (hard)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Start 25 Man Mode (hard)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1002);
             }
             else
             {
