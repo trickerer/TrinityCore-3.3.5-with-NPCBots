@@ -101,7 +101,10 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        SendDiscordMessageWorld(messageStream.str());
+        uint32 guid = player->GetGUID().GetCounter();
+        QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = {}", guid);
+        if (result)
+            SendDiscordMessageWorld(messageStream.str());
     }
 
 private:
