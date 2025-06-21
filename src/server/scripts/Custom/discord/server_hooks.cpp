@@ -21,6 +21,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "server_shutdown.h"
+#include "DatabaseEnv.h"
 #include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 
