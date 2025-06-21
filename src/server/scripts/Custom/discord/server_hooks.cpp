@@ -49,7 +49,7 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        SendDiscordMessageWorld(messageStream.str());
+        //SendDiscordMessageWorld(messageStream.str());
     }
 
     void OnShutdown() override
