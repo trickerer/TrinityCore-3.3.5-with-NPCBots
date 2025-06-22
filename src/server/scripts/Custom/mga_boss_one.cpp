@@ -572,7 +572,9 @@ public:
 
             // Channel message
             Player* player = killer ? killer->ToPlayer() : nullptr;
-            if (player && ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
+            ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+
+            if (player && channelMgr)
             {
                 if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
