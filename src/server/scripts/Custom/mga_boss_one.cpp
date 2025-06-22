@@ -40,6 +40,7 @@
 #include "ObjectMgr.h"
 #include "ChannelMgr.h"
 #include "Channel.h"
+#include "Log.h"
 
 using namespace std::chrono;
 
