@@ -532,7 +532,7 @@ public:
             DoPull = false;
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetFaction(14);
-            DespawnTimer = 180000; // 120 seconds until despawn
+            DespawnTimer = 190000;
             TimerStarted = true; 
         }
         
@@ -578,17 +578,17 @@ public:
                 default: chestId = 9999997; break;
             }
 
-            Position pos(me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f);
+            Position pos(me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ(), 0.0f);
             QuaternionData rot; // default = no rotation
-
-            if (GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(60)))
-            {
-                TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
-            }
-            else
-            {
-                TC_LOG_ERROR("custom", "Failed to spawn chest %u!", chestId);
-            }
+            GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600))
+            //if (GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600)))
+            //{
+                //TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
+            //}
+            //else
+            //{
+                //TC_LOG_ERROR("custom", "Failed to spawn chest %u!", chestId);
+            //}
 
             // Channel message
             Player* player = killer ? killer->ToPlayer() : nullptr;
