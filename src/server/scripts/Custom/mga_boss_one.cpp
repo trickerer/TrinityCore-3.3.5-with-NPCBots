@@ -532,7 +532,7 @@ public:
             DoPull = false;
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetFaction(14);
-            DespawnTimer = 190000;
+            DespawnTimer = 180000;
             TimerStarted = true; 
         }
         
