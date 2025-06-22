@@ -38,6 +38,8 @@
 #include "TemporarySummon.h"
 #include "CreatureAIImpl.h"
 #include "ObjectMgr.h"
+#include "ChannelMgr.h"
+#include "Channel.h"
 
 using namespace std::chrono;
 
@@ -527,7 +529,7 @@ public:
             DoPull = false;
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetFaction(14);
-            DespawnTimer = 120000; // 120 seconds until despawn
+            DespawnTimer = 180000; // 120 seconds until despawn
             TimerStarted = true; 
         }
         
@@ -547,7 +549,6 @@ public:
             me->Yell("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....", LANG_UNIVERSAL);
             ScriptedAI::EnterEvadeMode();
             //me->DespawnOrUnsummon();
-            TimerStarted = true;
             BossAI::EnterEvadeMode();
             me->DespawnOrUnsummon();
             /*
@@ -598,11 +599,24 @@ public:
             WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
             //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
             if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
+                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
             else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
+                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
             else
-                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
+                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
+            
+            if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
+            {
+                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                {
+                    if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 25 Man Mode!", LANG_UNIVERSAL);
+                    else if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 10 Man Mode!", LANG_UNIVERSAL);
+                    else
+                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 5 Man Mode!", LANG_UNIVERSAL);
+                }
+            }
         }
         
         void KilledUnit(Unit* victim)
@@ -723,7 +737,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            /*if (TimerStarted)
+            if (TimerStarted && HasStarted = false)
             {
                 if (DespawnTimer <= uiDiff)
                 {
@@ -738,7 +752,7 @@ public:
                 }
                 else
                     DespawnTimer -= uiDiff;
-            }*/
+            }
             
             if (!UpdateVictim())
                 return;
