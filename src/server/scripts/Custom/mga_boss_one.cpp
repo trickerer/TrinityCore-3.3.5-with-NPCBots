@@ -609,12 +609,22 @@ public:
             {
                 if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
-                    if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                        channel->SayAsFake(me->GetGUID(), "MGA Mega Boss has been defeated in 25 Man Mode!", LANG_UNIVERSAL);
-                    else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                        channel->SayAsFake(me->GetGUID(), "MGA Mega Boss has been defeated in 10 Man Mode!", LANG_UNIVERSAL);
-                    else
-                        channel->SayAsFake(me->GetGUID(), "MGA Mega Boss has been defeated in 5 Man Mode!", LANG_UNIVERSAL);
+                    std::string message;
+
+                    switch (me->GetEntry())
+                    {
+                        case NPC_BOSS_HARDMODE:
+                            message = "MGA Mega Boss has been defeated in 25 Man Mode!";
+                            break;
+                        case NPC_BOSS_MEDMODE:
+                            message = "MGA Mega Boss has been defeated in 10 Man Mode!";
+                            break;
+                        default:
+                            message = "MGA Mega Boss has been defeated in 5 Man Mode!";
+                            break;
+                    }
+
+                    channel->SayAsFake(Player, me->GetName(), message, LANG_UNIVERSAL);
                 }
             }
         }
