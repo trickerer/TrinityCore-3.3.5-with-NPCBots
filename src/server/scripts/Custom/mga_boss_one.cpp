@@ -607,8 +607,8 @@ public:
             
             if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
             {
-                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
-                {
+                //if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                //{
                     std::string message;
 
                     switch (me->GetEntry())
@@ -625,7 +625,7 @@ public:
                     }
 
                     channel->SayAsFake(player, me->GetName(), message, LANG_UNIVERSAL);
-                }
+                //}
             }
         }
         
