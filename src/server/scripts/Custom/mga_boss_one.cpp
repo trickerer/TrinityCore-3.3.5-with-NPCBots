@@ -624,7 +624,7 @@ public:
                             break;
                     }
 
-                    channel->SayAsFake(player, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(Player, me->GetName(), message, LANG_UNIVERSAL);
                 //}
             }
         }
