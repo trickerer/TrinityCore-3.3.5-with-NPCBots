@@ -572,6 +572,12 @@ public:
             //      me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
             //  }
             //}
+            if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                me->SummonGameObject(9999998, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
+            else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                me->SummonGameObject(9999999, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
+            else
+                me->SummonGameObject(9999997, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
             
             /**std::string title ="Mega Boss Event";
             std::string msg ="The Mega Boss has been DOWNED!!!, well done! | #mgawow ";
