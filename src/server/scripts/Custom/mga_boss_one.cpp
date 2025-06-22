@@ -770,7 +770,7 @@ public:
                             }
 
                             // Send as the boss itself
-                            channel->Say(message, LANG_UNIVERSAL, me->GetGUID());
+                            channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                         }
                     }
                     return;
