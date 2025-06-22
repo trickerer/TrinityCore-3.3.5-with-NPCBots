@@ -572,12 +572,12 @@ public:
             //      me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
             //  }
             //}
-            if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                me->SummonGameObject(9999998, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
-            else if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                me->SummonGameObject(9999999, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
-            else
-                me->SummonGameObject(9999997, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
+            //if (me->GetEntry() == NPC_BOSS_MEDMODE)
+            //    me->SummonGameObject(9999998, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
+            //else if (me->GetEntry() == NPC_BOSS_HARDMODE)
+            //    me->SummonGameObject(9999999, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
+            //else
+            //    me->SummonGameObject(9999997, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
             
             /**std::string title ="Mega Boss Event";
             std::string msg ="The Mega Boss has been DOWNED!!!, well done! | #mgawow ";
@@ -585,12 +585,12 @@ public:
             WorldDatabase.PExecute("INSERT INTO `rss_feed` (`title`, `msg`,`url`) VALUES ('%s','%s','%s')", title.c_str(), msg.c_str(), url.c_str());
             WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
             //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
-            //if (me->GetEntry() == NPC_BOSS_HARDMODE)
-            //    me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
-            //else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-            //    me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
-            //else
-            //    me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 0s);
+            if (me->GetEntry() == NPC_BOSS_HARDMODE)
+                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
+            else if (me->GetEntry() == NPC_BOSS_MEDMODE)
+                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
+            else
+                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ(), 0.f), QuaternionData(), 1h);
         }
         
         void KilledUnit(Unit* victim)
