@@ -199,7 +199,7 @@ public:
             if (uiExplodeTimer <= uiDiff)
             {
                 DoCast(me, SPELL_IMMOLATE, true);
-                me->Say("Burn in my unholy fire, burn baby burn!!!", LANG_UNIVERSAL, NULL);
+                //me->Say("Burn in my unholy fire, burn baby burn!!!", LANG_UNIVERSAL, NULL);
                 uiExplodeTimer = 12000;
                 HasPopped = true;
             }
@@ -207,7 +207,7 @@ public:
             
             if (uiDespawnTimer <= uiDiff && HasPopped)
             {
-                me->Say("No my time here is over, sorry Window Maker", LANG_UNIVERSAL, NULL);
+                //me->Say("No my time here is over, sorry Window Maker", LANG_UNIVERSAL, NULL);
                 me->PlayDirectSound(9818) ; // FelBoarDeathA.wav
                 EnterEvadeMode();
             }
@@ -334,13 +334,16 @@ public:
                
             if (uiSpell1CD <= uiDiff)
             {
-                if (me->GetEntry() == NPC_GUARD_HARDMODE)
-                    DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
-                else if (me->GetEntry() == NPC_GUARD_HARDMODE)
-                    DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
-                else
-                    DoCast(me, SPELL_FROSTBOLT_VOLLEY_EASY ,true);
-                uiSpell1CD = urand(7000, 12000);
+                if (!creature->IsNonMeleeSpellCast(false))
+                {
+                    if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                        DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
+                    else if (me->GetEntry() == NPC_GUARD_HARDMODE)
+                        DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
+                    else
+                        DoCast(me, SPELL_FROSTBOLT_VOLLEY_EASY ,true);
+                    uiSpell1CD = urand(7000, 12000);
+                }
             }
             else uiSpell1CD -= uiDiff;
             
@@ -663,7 +666,7 @@ public:
                         me->SummonCreature(NPC_SLIME, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
                     
-                    me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
+                    //me->Yell("Minions Attack The Intruders", LANG_UNIVERSAL, NULL);
                     DoStartNoMovement(who);
                 }
                 Player* player = nullptr;
@@ -767,7 +770,7 @@ public:
                 AttackStart(me->GetVictim());
                 DoStartMovement(me->GetVictim());
                 SlimePoolCD = urand(12000, 14000);
-                me->Yell("Minions Assist Me Now, Kill them all!!!!", LANG_UNIVERSAL, NULL);
+                //me->Yell("Minions Assist Me Now, Kill them all!!!!", LANG_UNIVERSAL, NULL);
                 me->PlayDirectSound(15724) ; // UR_XT002_Aggro01.wav
                 
             }else BossPauseTimer -= uiDiff;
@@ -834,7 +837,7 @@ public:
                     me->RemoveAura(SPELL_SHIELD);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
+                    //me->Yell("No No No my Bubble, Damn Cool Downs....", LANG_UNIVERSAL, NULL);
                     DoStartMovement(me->GetVictim());
                     AttackStart(me->GetVictim());
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
@@ -849,7 +852,7 @@ public:
                 return;
             }
                         
-            if (CleaveCD <= uiDiff)
+            if (CleaveCD <= uiDiff && MGAImmune == false)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveCD = urand(4000, 6000);
@@ -907,9 +910,9 @@ public:
                         me->SummonCreature(NPC_SLIME_MEDMODE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
                     else
                         me->SummonCreature(NPC_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
-                    me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
+                    //me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
                }
-               else if (pullcheck > 1 && pullcheck < 3 && !DoPull)
+               else if (pullcheck > 1 && pullcheck < 3 && !DoPull && MGAImmune == false)
                {
                     DoPull = true;
                     DoCast(me, SPELL_FROST_SLOW );
@@ -917,15 +920,15 @@ public:
                     me->SummonCreature(NPC_SLIME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
                     if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     {
-                        me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
+                        //me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
                         DoCast(me, SPELL_ICY_GRIP );
                     }
                     if (me->GetEntry() == NPC_BOSS_MEDMODE)
                     {
-                        me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
+                        //me->Say("Get Over Here!", LANG_UNIVERSAL, NULL);
                         DoCast(me, SPELL_ICY_GRIP );
                     }
-                    me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
+                    //me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL);
                }
                else
                {
@@ -939,7 +942,7 @@ public:
                         DoCast(me->GetVictim(), SPELL_ROOT); // root
                         me->SummonCreature(NPC_SLIME, me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(29000));
                     }
-                    me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
+                    //me->Yell("Die In AoE you NOOBS!", LANG_UNIVERSAL, NULL); 
                }
                
                if (me->GetEntry() == NPC_BOSS_HARDMODE)
@@ -970,7 +973,7 @@ public:
            }
            else SlimePoolCD -= uiDiff;
            
-           if (IcyGripCD <= uiDiff)
+           if (IcyGripCD <= uiDiff && MGAImmune == false)
            {
                 DoCast(me, SPELL_ICY_GRIP );
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -983,7 +986,7 @@ public:
            }
            else IcyGripCD -= uiDiff;
 
-           if (NABSTORMCD <= uiDiff)
+           if (NABSTORMCD <= uiDiff && MGAImmune == false)
            {
                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true);
                if (target)
@@ -993,7 +996,7 @@ public:
                    me->GetMotionMaster()->MoveChase(target);
                }
                DoCast(me, SPELL_BONE_STORM);
-               me->Yell("NAB STORM!!!!!", LANG_UNIVERSAL, NULL);
+               //me->Yell("NAB STORM!!!!!", LANG_UNIVERSAL, NULL);
                
                 if (me->GetEntry() == NPC_BOSS_HARDMODE)
                     NABSTORMCD = urand(15000, 20000);
@@ -1035,7 +1038,7 @@ public:
            {
                MGAImmune = true;
                me->PlayDirectSound(6918) ; // HumanFemaleLaugh01.wav
-               me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
+               //me->Yell("HAHAHAHA BUBBLE!!!!!", LANG_UNIVERSAL, NULL);
                DoCast(me, SPELL_SHIELD);
                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                me->StopMoving();
