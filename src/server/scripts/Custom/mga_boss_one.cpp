@@ -196,15 +196,17 @@ public:
                 uiAttackTimer = 3500;
             } else uiAttackTimer -= uiDiff;
 
-            if (uiExplodeTimer <= uiDiff)
+            if (!me->IsNonMeleeSpellCast(false))
             {
-                DoCast(me, SPELL_IMMOLATE, true);
-                //me->Say("Burn in my unholy fire, burn baby burn!!!", LANG_UNIVERSAL, NULL);
-                uiExplodeTimer = 12000;
-                HasPopped = true;
-            }
+                if (uiExplodeTimer <= uiDiff)
+                {
+                    DoCast(me, SPELL_IMMOLATE, true);
+                    //me->Say("Burn in my unholy fire, burn baby burn!!!", LANG_UNIVERSAL, NULL);
+                    uiExplodeTimer = 12000;
+                    HasPopped = true;
+                }
             else uiExplodeTimer -= uiDiff;
-            
+            }
             if (uiDespawnTimer <= uiDiff && HasPopped)
             {
                 //me->Say("No my time here is over, sorry Window Maker", LANG_UNIVERSAL, NULL);
@@ -214,7 +216,8 @@ public:
             else uiDespawnTimer -= uiDiff;
             
 
-
+            if (!me->IsNonMeleeSpellCast(false))
+            {
                 if (BlindSpell <= uiDiff)
                 {
                     DoCast(me, SPELL_RADIANCE );
@@ -225,7 +228,7 @@ public:
                     BlindSpell = urand(14000, 18000);
                 }   
                 else BlindSpell -= uiDiff;
-
+            }
             DoMeleeAttackIfReady();
         }
     };
@@ -347,20 +350,25 @@ public:
             }
             else uiSpell1CD -= uiDiff;
             
-            if (uiSpell2CD <= uiDiff)
+            if (!me->IsNonMeleeSpellCast(false))
             {
-                DoCast(me, SPELL_FROSTBOLT_VOLLEY2);
-                uiSpell2CD = urand(10000, 14000);
+                if (uiSpell2CD <= uiDiff)
+                {
+                    DoCast(me, SPELL_FROSTBOLT_VOLLEY2);
+                    uiSpell2CD = urand(10000, 14000);
+                }
+                else uiSpell2CD -= uiDiff;
             }
-            else uiSpell2CD -= uiDiff;
             
-            if (uiSpell3CD <= uiDiff)
+            if (!me->IsNonMeleeSpellCast(false))
             {
-                DoCast(me, SPELL_FROSTNOVA );
-                uiSpell3CD = urand(15000, 17000);
+                if (uiSpell3CD <= uiDiff)
+                {
+                    DoCast(me, SPELL_FROSTNOVA );
+                    uiSpell3CD = urand(15000, 17000);
+                }
+                else uiSpell3CD -= uiDiff;
             }
-            else uiSpell3CD -= uiDiff;
-            
             if (uiSwpadd <= uiDiff)
             {
                 if (me->GetEntry() == NPC_GUARD_MEDMODE)
@@ -382,7 +390,8 @@ public:
             }
             else uiSwpadd -= uiDiff;
             
-
+            if (!me->IsNonMeleeSpellCast(false))
+            {
                 if (FearCD <= uiDiff)
                 {
                     //Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me));
@@ -400,7 +409,7 @@ public:
                     FearCD  = urand(38000, 40000);
                 }
                 else FearCD -= uiDiff;
-            
+            }
             DoMeleeAttackIfReady();
         }
     };
