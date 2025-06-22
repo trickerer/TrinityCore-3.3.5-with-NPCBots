@@ -745,9 +745,35 @@ public:
 
                     // Your SQL + message logic
                     WorldDatabase.Execute(_QUERY1_);
+                    //EnterEvadeMode();
                     me->Yell("YOU COWARDS... RUN THEN!", LANG_UNIVERSAL);
                     me->DespawnOrUnsummon();
-                    //EnterEvadeMode();
+                    
+                    ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+
+                    if (player && channelMgr)
+                    {
+                        if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                        {
+                            std::string message;
+
+                            switch (me->GetEntry())
+                            {
+                                case NPC_BOSS_HARDMODE:
+                                    message = "MGA Mega Boss has been defeated in 25 Man Mode!";
+                                    break;
+                                case NPC_BOSS_MEDMODE:
+                                    message = "MGA Mega Boss has been defeated in 10 Man Mode!";
+                                    break;
+                                default:
+                                    message = "MGA Mega Boss has been defeated in 5 Man Mode!";
+                                    break;
+                            }
+
+                            channel->SayAsFake(me->GetGUID(), me->GetName(), message, LANG_UNIVERSAL);
+                        }
+                    }
+                    
                     return;
                 }
                 else
