@@ -599,15 +599,15 @@ public:
             WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
             //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
             if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
+                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
             else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
+                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
             else
-                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 15m);
+                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
             
             if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
             {
-                if (Channel* channel = channelMgr->GetChannel(0, "world", Player, false, nullptr))
+                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
                     std::string message;
 
@@ -624,7 +624,7 @@ public:
                             break;
                     }
 
-                    channel->SayAsFake(Player, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(player, me->GetName(), message, LANG_UNIVERSAL);
                 }
             }
         }
