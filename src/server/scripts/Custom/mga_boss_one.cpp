@@ -746,32 +746,6 @@ public:
                     WorldDatabase.Execute(_QUERY1_);
                     me->Yell("YOU COWARDS... RUN THEN!", LANG_UNIVERSAL);
                     me->DespawnOrUnsummon();
-                    // Channel message
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 2000, true);
-                    ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-
-                    if (target && channelMgr)
-                    {
-                        if (Channel* channel = channelMgr->GetChannel(0, "world", target, false, nullptr))
-                        {
-                            std::string message;
-
-                            switch (me->GetEntry())
-                            {
-                                case NPC_BOSS_HARDMODE:
-                                    message = "The cowards ran!! In 25 Man Mode!";
-                                    break;
-                                case NPC_BOSS_MEDMODE:
-                                    message = "The cowards ran!! In 10 Man Mode!";
-                                    break;
-                                default:
-                                    message = "The cowards ran!! In 5 Man Mode!";
-                                    break;
-                            }
-
-                            channel->SayAsFake(target, me->GetName(), message, LANG_UNIVERSAL);
-                        }
-                    }
                     //EnterEvadeMode();
                     return;
                 }
