@@ -607,7 +607,7 @@ public:
             
             if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
             {
-                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                if (Channel* channel = channelMgr->GetChannel(0, "world", Player, false, nullptr))
                 {
                     std::string message;
 
