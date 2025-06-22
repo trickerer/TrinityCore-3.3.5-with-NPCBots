@@ -750,30 +750,29 @@ public:
                     me->DespawnOrUnsummon();
                     
                     ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
-
-                    if (player && channelMgr)
+                    if (channelMgr)
                     {
-                        if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                        if (Channel* channel = channelMgr->GetChannel(0, "world", nullptr, false, nullptr))
                         {
                             std::string message;
 
                             switch (me->GetEntry())
                             {
                                 case NPC_BOSS_HARDMODE:
-                                    message = "MGA Mega Boss has been defeated in 25 Man Mode!";
+                                    message = "MGA Mega Boss has fled after no players engaged in 25 Man Mode!";
                                     break;
                                 case NPC_BOSS_MEDMODE:
-                                    message = "MGA Mega Boss has been defeated in 10 Man Mode!";
+                                    message = "MGA Mega Boss has fled after no players engaged in 10 Man Mode!";
                                     break;
                                 default:
-                                    message = "MGA Mega Boss has been defeated in 5 Man Mode!";
+                                    message = "MGA Mega Boss has fled after no players engaged in 5 Man Mode!";
                                     break;
                             }
 
+                            // Send as the boss itself
                             channel->SayAsFake(me->GetGUID(), me->GetName(), message, LANG_UNIVERSAL);
                         }
                     }
-                    
                     return;
                 }
                 else
