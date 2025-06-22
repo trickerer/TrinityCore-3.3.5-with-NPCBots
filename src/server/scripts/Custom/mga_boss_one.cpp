@@ -576,7 +576,7 @@ public:
                 default: chestId = 9999997; break;
             }
 
-            if (GameObject* chest = me->SummonGameObject(chestId, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f, 0, 0, 0, 0, 60000))
+            if (GameObject* chest = me->SummonGameObject(chestId, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f, 60000))
             {
                 TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
             }
