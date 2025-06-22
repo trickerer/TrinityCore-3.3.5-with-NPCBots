@@ -580,7 +580,7 @@ public:
 
             Position pos(me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ(), 0.0f);
             QuaternionData rot; // default = no rotation
-            GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600))
+            GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600));
             //if (GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600)))
             //{
                 //TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
