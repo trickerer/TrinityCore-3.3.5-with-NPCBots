@@ -567,8 +567,22 @@ public:
             me->Yell("THIS CAN NOT BE!!!!", LANG_UNIVERSAL);
 
             // Summon chest
-            uint32 chestId = NPC_BOSS_HARDMODE ? 9999999 : NPC_BOSS_MEDMODE ? 9999998 : 9999997;
-            me->SummonGameObject(chestId, Position(me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ() + 1, 0.f), QuaternionData(), 1h);
+            uint32 chestId;
+            switch (me->GetEntry())
+            {
+                case NPC_BOSS_HARDMODE: chestId = 9999999; break;
+                case NPC_BOSS_MEDMODE: chestId = 9999998; break;
+                default: chestId = 9999997; break;
+            }
+
+            if (GameObject* chest = me->SummonGameObject(chestId, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f, 0, 0, 0, 0, 60000))
+            {
+                TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
+            }
+            else
+            {
+                TC_LOG_ERROR("custom", "Failed to spawn chest %u!", chestId);
+            }
 
             // Channel message
             Player* player = killer ? killer->ToPlayer() : nullptr;
