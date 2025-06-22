@@ -584,7 +584,7 @@ public:
 
             if (chest)
             {
-                chest->SetPhaseMask(me->GetPhaseMask(), true);           
+                //chest->SetPhaseMask(me->GetPhaseMask(), true);           
                 chest->SetOwnerGUID(ObjectGuid::Empty);                   
                 chest->SetLootState(GO_READY);                            
                 //TC_LOG_INFO("custom", "Chest %u spawned and initialized.", chestId);
