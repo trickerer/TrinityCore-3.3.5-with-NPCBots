@@ -578,7 +578,7 @@ public:
                 default: chestId = 9999997; break;
             }
 
-            Position pos(me->GetPositionX() + 15, me->GetPositionY() + 15, me->GetPositionZ() + 0.5f, 0.0f);
+            Position pos(me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1f, 0.0f);
             QuaternionData rot; // No rotation
             GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600), GO_SUMMON_TIMED_DESPAWN);
 
