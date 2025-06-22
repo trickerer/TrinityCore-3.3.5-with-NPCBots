@@ -610,11 +610,11 @@ public:
                 if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
                     if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 25 Man Mode!", LANG_UNIVERSAL);
+                        channel->SayAsFake(player->GetGUID(), "MGA Mega Boss has been defeated in 25 Man Mode!", LANG_UNIVERSAL);
                     else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 10 Man Mode!", LANG_UNIVERSAL);
+                        channel->SayAsFake(player->GetGUID(), "MGA Mega Boss has been defeated in 10 Man Mode!", LANG_UNIVERSAL);
                     else
-                        channel->Say(player->GetGUID(), "MGA Mega Boss has been defeated in 5 Man Mode!", LANG_UNIVERSAL);
+                        channel->SayAsFake(player->GetGUID(), "MGA Mega Boss has been defeated in 5 Man Mode!", LANG_UNIVERSAL);
                 }
             }
         }
@@ -737,7 +737,7 @@ public:
 
         void UpdateAI(const uint32 uiDiff)
         {
-            if (TimerStarted && HasStarted = false)
+            if (TimerStarted && !HasStarted)
             {
                 if (DespawnTimer <= uiDiff)
                 {
