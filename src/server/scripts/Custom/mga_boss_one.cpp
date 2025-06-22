@@ -561,53 +561,20 @@ public:
             WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* killer) override
         {
             WorldDatabase.PExecute(_QUERY1_);
-            me->Yell("THIS CAN NOT BE!!!!", LANG_UNIVERSAL, NULL);
-            //if (me->GetEntry() == NPC_BOSS_HARDMODE)
-            //  SendMSGToAll("Has been downed in 25+ Man Mode.  Well Done!");
-            //else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-            //  SendMSGToAll("Has been downed in 15-25 Man Mode.  Well Done!");
-            //else
-            //  SendMSGToAll("Has been downed in 10-15 Man Mode.  Well Done!");
-                
-            //QueryResult result;
-            //result = WorldDatabase.PQuery("SELECT * FROM `bonus_rewards` WHERE `active` = '1' AND `name` = 'megaboss' LIMIT 1");
-            //if(result)
-            //{
-            //  Field *fields = result->Fetch();
-            //  uint32 bitem = fields[2].GetInt32();
-            //  uint32 bcount = fields[3].GetInt32();
-            //  if (bitem > 1 && bcount > 0)
-            //  {
-                    //SPAWN A CHEST WITH EXTRA LOOTS
-            //      me->SummonGameObject(bitem, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 0, 0, 30000000);
-            //  }
-            //}
-            //if (me->GetEntry() == NPC_BOSS_MEDMODE)
-            //    me->SummonGameObject(9999998, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
-            //else if (me->GetEntry() == NPC_BOSS_HARDMODE)
-            //    me->SummonGameObject(9999999, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
-            //else
-            //    me->SummonGameObject(9999997, me->GetPositionX()+25, me->GetPositionY()+25, me->GetPositionZ(), 0, 0, 0, 30000000);
-            
-            /**std::string title ="Mega Boss Event";
-            std::string msg ="The Mega Boss has been DOWNED!!!, well done! | #mgawow ";
-            std::string url ="http://wrath.mgawow.co.uk/activity";
-            WorldDatabase.PExecute("INSERT INTO `rss_feed` (`title`, `msg`,`url`) VALUES ('%s','%s','%s')", title.c_str(), msg.c_str(), url.c_str());
-            WorldDatabase.PExecute("UPDATE `rss_feed` SET `update`='1' WHERE `update`='0'");*/
-            //me->SummonGameObject(9999999, me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ(), 0.0f, 0, 0);
-            if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                me->SummonGameObject(9999999, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
-            else if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                me->SummonGameObject(9999998, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
-            else
-                me->SummonGameObject(9999997, Position(me->GetPositionX() + 25,  me->GetPositionY() + 25,  me->GetPositionZ()+1, 0.f), QuaternionData(), 1h);
-            
-            if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
+            me->Yell("THIS CAN NOT BE!!!!", LANG_UNIVERSAL);
+
+            // Summon chest
+            uint32 chestId = NPC_BOSS_HARDMODE ? 9999999 : NPC_BOSS_MEDMODE ? 9999998 : 9999997;
+            me->SummonGameObject(chestId, Position(me->GetPositionX() + 25, me->GetPositionY() + 25, me->GetPositionZ() + 1, 0.f), QuaternionData(), 1h);
+
+            // Channel message
+            Player* player = killer ? killer->ToPlayer() : nullptr;
+            if (player && ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
             {
-                if (Channel* channel = channelMgr->GetChannel(0, "world", Player, false, nullptr))
+                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
                     std::string message;
 
@@ -624,7 +591,7 @@ public:
                             break;
                     }
 
-                    channel->SayAsFake(Player, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(player, me->GetName(), message, LANG_UNIVERSAL);
                 }
             }
         }
