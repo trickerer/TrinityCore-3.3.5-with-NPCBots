@@ -759,13 +759,13 @@ public:
                             switch (me->GetEntry())
                             {
                                 case NPC_BOSS_HARDMODE:
-                                    message = "MGA Mega Boss has fled after no players engaged in 25 Man Mode!";
+                                    message = "MGA Mega Boss has gone home after no players engaged in 25 Man Mode! COWARDS!!";
                                     break;
                                 case NPC_BOSS_MEDMODE:
-                                    message = "MGA Mega Boss has fled after no players engaged in 10 Man Mode!";
+                                    message = "MGA Mega Boss has gone home after no players engaged in 10 Man Mode! COWARDS!!";
                                     break;
                                 default:
-                                    message = "MGA Mega Boss has fled after no players engaged in 5 Man Mode!";
+                                    message = "MGA Mega Boss has gone home after no players engaged in 5 Man Mode! COWARDS!!";
                                     break;
                             }
 
