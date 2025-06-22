@@ -41,6 +41,8 @@
 #include "ChannelMgr.h"
 #include "Channel.h"
 #include "Log.h"
+#include "Common.h" 
+#include "GameObject.h"
 
 using namespace std::chrono;
 
@@ -576,7 +578,10 @@ public:
                 default: chestId = 9999997; break;
             }
 
-            if (GameObject* chest = me->SummonGameObject(chestId, me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f, 60000))
+            Position pos(me->GetPositionX() + 5, me->GetPositionY() + 5, me->GetPositionZ() + 1, 0.0f);
+            QuaternionData rot; // default = no rotation
+
+            if (GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(60)))
             {
                 TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
             }
