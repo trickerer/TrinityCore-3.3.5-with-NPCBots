@@ -578,17 +578,17 @@ public:
                 default: chestId = 9999997; break;
             }
 
-            Position pos(me->GetPositionX() + 15, me->GetPositionY() + 15, me->GetPositionZ()+0.5, 0.0f);
-            QuaternionData rot; // default = no rotation
-            GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600));
-            //if (GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600)))
-            //{
-                //TC_LOG_INFO("custom", "Chest %u spawned successfully.", chestId);
-            //}
-            //else
-            //{
-                //TC_LOG_ERROR("custom", "Failed to spawn chest %u!", chestId);
-            //}
+            Position pos(me->GetPositionX() + 15, me->GetPositionY() + 15, me->GetPositionZ() + 0.5f, 0.0f);
+            QuaternionData rot; // No rotation
+            GameObject* chest = me->SummonGameObject(chestId, pos, rot, Seconds(3600), GO_SUMMON_TIMED_DESPAWN);
+
+            if (chest)
+            {
+                chest->SetPhaseMask(me->GetPhaseMask(), true);           
+                chest->SetOwnerGUID(ObjectGuid::Empty);                   
+                chest->SetLootState(GO_READY);                            
+                //TC_LOG_INFO("custom", "Chest %u spawned and initialized.", chestId);
+            }
 
             // Channel message
             Player* player = killer ? killer->ToPlayer() : nullptr;
