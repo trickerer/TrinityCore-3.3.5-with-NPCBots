@@ -334,7 +334,7 @@ public:
                
             if (uiSpell1CD <= uiDiff)
             {
-                if (!creature->IsNonMeleeSpellCast(false))
+                if (!me->IsNonMeleeSpellCast(false))
                 {
                     if (me->GetEntry() == NPC_GUARD_HARDMODE)
                         DoCast(me, SPELL_FROSTBOLT_VOLLEY ,true);
