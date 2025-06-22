@@ -570,6 +570,7 @@ public:
             me->Yell("THIS CAN NOT BE!!!!", LANG_UNIVERSAL);
 
             // Summon chest
+            /*
             uint32 chestId;
             switch (me->GetEntry())
             {
@@ -589,7 +590,7 @@ public:
                 chest->SetLootState(GO_READY);                            
                 //TC_LOG_INFO("custom", "Chest %u spawned and initialized.", chestId);
             }
-
+            */
             // Channel message
             Player* player = killer ? killer->ToPlayer() : nullptr;
             ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
