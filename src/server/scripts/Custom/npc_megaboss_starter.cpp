@@ -87,7 +87,7 @@ public:
             {
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
-                me->SummonCreature(NPC_BOSS_5MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(180000));
+                me->SummonCreature(NPC_BOSS_5MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(190000));
                 if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
                 {
                     if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
@@ -101,7 +101,7 @@ public:
             {
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
-                me->SummonCreature(NPC_BOSS_10MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(180000));
+                me->SummonCreature(NPC_BOSS_10MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(190000));
                 ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
                 if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
                 {
@@ -116,7 +116,7 @@ public:
             {
                 CloseGossipMenuFor(player);
                 WorldDatabase.PExecute(_QUERY1_);
-                me->SummonCreature(NPC_BOSS_25MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(180000));
+                me->SummonCreature(NPC_BOSS_25MAN, -9719.334961, 62.957691, -20.552540, 2.947528, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(190000));
                 ChannelMgr* cMgr = ChannelMgr::forTeam(TEAM_NEUTRAL); 
                 if (ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL))
                 {
