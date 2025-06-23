@@ -115,14 +115,11 @@ private:
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
-        
-        const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
-                          ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
-                          : "👤 ";
-        const std::string status = loggingIn ? "🟢 Join World Channel" : "🛑 Left World Channel";
+
+        const std::string status2 = loggingIn ? "🟢 Join World Channel" : "🛑 Left World Channel";
 
         std::ostringstream messageStream;
-        messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+        messageStream << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
         
         SendDiscordMessageWorld(messageStream.str());
     }
