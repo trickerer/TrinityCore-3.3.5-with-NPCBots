@@ -117,6 +117,11 @@ private:
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         if (!loggingIn)
         {
+            const std::string name = player->GetName();
+            const uint8 level = player->GetLevel();
+            const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
+                              ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+                              : "👤 ";
             const std::string status2 = "🛑 Left World Channel";
 
             std::ostringstream messageStream2;
