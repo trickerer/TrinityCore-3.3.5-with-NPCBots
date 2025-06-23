@@ -504,8 +504,8 @@ public:
         bool DoneSwam;
         bool DoPull;
 
-        void Reset()
-        {
+        void Reset() override
+        { 
             //me->SetReactState(REACT_PASSIVE);
             CleaveCD = 2500; //done
             flightningCD = 5000; //done
@@ -541,7 +541,7 @@ public:
             me->Yell("Who Dares Challenge Me?? Come and Die!!", LANG_UNIVERSAL, NULL);
         }
         
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->AI()->AttackStart(me->GetVictim());
         }
