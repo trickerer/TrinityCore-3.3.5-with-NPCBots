@@ -592,11 +592,11 @@ public:
             }
             */
             // Channel message
-            Player* player = killer ? killer->ToPlayer() : nullptr;
+            //Player* player = killer ? killer->ToPlayer() : nullptr;
             ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
 
-            if (player && channelMgr)
-            {
+            //if (player && channelMgr)
+            //{
                 if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
                 {
                     std::string message;
@@ -614,9 +614,9 @@ public:
                             break;
                     }
 
-                    channel->SayAsFake(player, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
-            }
+            //}
         }
         
         void KilledUnit(Unit* victim)
