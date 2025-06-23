@@ -577,7 +577,7 @@ public:
                     }
 
                     channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
-                    SendDiscordMessageWorld(message.str());
+                    SendDiscordMessageWorld(message);
                     //channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
             //}
@@ -642,7 +642,7 @@ public:
                     }
 
                     channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
-                    SendDiscordMessageWorld(message.str());
+                    SendDiscordMessageWorld(message);
                     //channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
             //}
