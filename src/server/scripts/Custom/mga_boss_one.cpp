@@ -554,6 +554,31 @@ public:
             //me->DespawnOrUnsummon();
             BossAI::EnterEvadeMode();
             me->DespawnOrUnsummon();
+            ChannelMgr* channelMgr = ChannelMgr::forTeam(TEAM_NEUTRAL);
+
+            //if (player && channelMgr)
+            //{
+                if (Channel* channel = channelMgr->GetChannel(0, "world", nullptr, false, nullptr))
+                {
+                    std::string message;
+
+                    switch (me->GetEntry())
+                    {
+                        case NPC_BOSS_HARDMODE:
+                            message = "Resistance is Futile, I Am immortal, come back when your ready to try again noobs.... 25 Man Mode!";
+                            break;
+                        case NPC_BOSS_MEDMODE:
+                            message = "Resistance is Futile, I Am immortal, come back when your ready to try again noobs.... 10 Man Mode!";
+                            break;
+                        default:
+                            message = "Resistance is Futile, I Am immortal, come back when your ready to try again noobs.... in 5 Man Mode!";
+                            break;
+                    }
+
+                    //channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                }
+            //}
             /*
             SendMSGToAll("Resistance is Futile, I Am immortal, come back when your ready to try again noobs....");
             me->DisappearAndDie();
@@ -614,7 +639,8 @@ public:
                             break;
                     }
 
-                    channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    //channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
             //}
         }
