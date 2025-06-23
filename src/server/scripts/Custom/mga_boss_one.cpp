@@ -43,6 +43,7 @@
 #include "Log.h"
 #include "Common.h" 
 #include "GameObject.h"
+#include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 using namespace std::chrono;
 
@@ -575,8 +576,9 @@ public:
                             break;
                     }
 
-                    //channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
-                    channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    SendDiscordMessageWorld(message.str());
+                    //channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
             //}
             /*
@@ -639,8 +641,9 @@ public:
                             break;
                     }
 
-                    //channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
-                    channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    channel->SayAsFake(nullptr, me->GetName(), message, LANG_UNIVERSAL);
+                    SendDiscordMessageWorld(message.str());
+                    //channel->Say(nullptr, me->GetName(), message, LANG_UNIVERSAL);
                 }
             //}
         }
