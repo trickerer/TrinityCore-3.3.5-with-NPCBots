@@ -597,7 +597,7 @@ public:
 
             //if (player && channelMgr)
             //{
-                if (Channel* channel = channelMgr->GetChannel(0, "world", player, false, nullptr))
+                if (Channel* channel = channelMgr->GetChannel(0, "world", nullptr, false, nullptr))
                 {
                     std::string message;
 
