@@ -1043,6 +1043,19 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         
         pCurrChar->GetSession()->SendPacket(&data);
     }
+    else
+    {
+        const std::string name = pCurrChar->GetName();
+        const uint8 level = pCurrChar->GetLevel();
+        const std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER 
+                          ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+        const std::string status2 = "🟢 Join World Channel";
+
+        std::ostringstream messageStream2;
+        messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+        
+        SendDiscordMessageWorld(messageStream2.str());
+    }
     
     bool hasHdAddon = false;
     {

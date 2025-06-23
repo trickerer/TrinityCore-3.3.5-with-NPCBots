@@ -115,13 +115,15 @@ private:
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        if (!loggingIn)
+        {
+            const std::string status2 = "🛑 Left World Channel";
 
-        const std::string status2 = loggingIn ? "🟢 Join World Channel" : "🛑 Left World Channel";
-
-        std::ostringstream messageStream2;
-        messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
-        
-        SendDiscordMessageWorld(messageStream2.str());
+            std::ostringstream messageStream2;
+            messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+            
+            SendDiscordMessageWorld(messageStream2.str());
+        }
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
