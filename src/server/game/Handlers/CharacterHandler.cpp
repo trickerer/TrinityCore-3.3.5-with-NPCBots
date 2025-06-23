@@ -60,6 +60,7 @@
 #include "SpellMgr.h"
 #include "SpellInfo.h"
 #include "SpellDefines.h"
+#include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 
 bool IsPlayerInChannel(Player* player, const std::string& channelName);
@@ -1047,8 +1048,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         std::string name = pCurrChar->GetName();
         uint8 level = pCurrChar->GetLevel();
-        std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER 
-                          ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+        std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
         std::string status2 = "🟢 Join World Channel";
 
         std::ostringstream messageStream2;
