@@ -619,7 +619,7 @@ public:
             //}
         }
         
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
             {
@@ -628,7 +628,7 @@ public:
             }
         }
         
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->IsWithinDistInMap(who, 20.0f))
             {
@@ -735,7 +735,7 @@ public:
             AttackStart(Who);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(const uint32 uiDiff) override
         {
             if (TimerStarted && !HasStarted)
             {
