@@ -1048,7 +1048,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     {
         const std::string name = pCurrChar->GetName();
         const uint8 level = pCurrChar->GetLevel();
-        const std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ");
+        const std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER
+                ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+                : "";
         const std::string status2 = "🟢 Join World Channel";
 
         std::ostringstream messageStream2;
