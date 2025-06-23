@@ -118,10 +118,10 @@ private:
 
         const std::string status2 = loggingIn ? "🟢 Join World Channel" : "🛑 Left World Channel";
 
-        std::ostringstream messageStream;
-        messageStream << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+        std::ostringstream messageStream2;
+        messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
         
-        SendDiscordMessageWorld(messageStream.str());
+        SendDiscordMessageWorld(messageStream2.str());
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
