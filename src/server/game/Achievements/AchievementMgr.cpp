@@ -1527,6 +1527,9 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (m_player->IsGameMaster() || m_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
     
+    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
+        return;
+    
     std::string name = GetPlayer()->GetName();
     std::string achievementName = GetLocalizedAchievementName(achievement->ID);
 
@@ -1537,8 +1540,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
         SendDiscordMessage(messageStream.str());
 
-    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
-        return;
+    //if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
+    //    return;
 
     //TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}", achievement->ID, m_player->GetName(), m_player->GetGUID().ToString());
 
