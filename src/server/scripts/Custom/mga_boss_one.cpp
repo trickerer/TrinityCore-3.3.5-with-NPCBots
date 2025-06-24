@@ -381,6 +381,7 @@ public:
                 {
                     me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                     me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                 }
                 else if (me->GetEntry() == NPC_GUARD_HARDMODE)
                 {
@@ -390,7 +391,10 @@ public:
                     me->SummonCreature(MINI_ADD, me->GetPositionX()-5, me->GetPositionY()-5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                 }
                 else
+                {
                     me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(MINI_ADD, me->GetPositionX()+5, me->GetPositionY()+5, me->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                }
                     
                 uiSwpadd = urand(60000, 65000);
             }

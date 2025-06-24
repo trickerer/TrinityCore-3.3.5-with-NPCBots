@@ -1051,7 +1051,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
             const std::string gmTag = pCurrChar->GetSession()->GetSecurity() > SEC_PLAYER
                 ? (pCurrChar->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
                 : "";
-            const std::string status2 = "🟢 Join World Channel";
+            const std::string status2 = "🟢 Joined World Channel";
 
             std::ostringstream messageStream2;
             messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
