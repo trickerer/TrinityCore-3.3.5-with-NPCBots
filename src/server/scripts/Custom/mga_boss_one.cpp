@@ -697,7 +697,7 @@ public:
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()+5, who->GetPositionY()+5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_MEDMODE, who->GetPositionX()-5, who->GetPositionY()-5, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         //me->Say("SUMMON GUARDS MEDIUM!", LANG_UNIVERSAL, NULL);
-                        GuardSpwanCD = urand(16000, 20000);
+                        GuardSpwanCD = urand(25000, 35000);
                         SlimePoolCD = 8000;
                         me->SummonCreature(NPC_SLIME_MEDMODE, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
@@ -708,7 +708,7 @@ public:
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()+10, who->GetPositionY()+10, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         me->SummonCreature(NPC_GUARD_HARDMODE, who->GetPositionX()-10, who->GetPositionY()-10, who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                         //me->Say("SUMMON GUARDS HARD!", LANG_UNIVERSAL, NULL);
-                        GuardSpwanCD = urand(12000, 16000);
+                        GuardSpwanCD = urand(16000, 25000);
                         SlimePoolCD = 12000;
                         me->SummonCreature(NPC_SLIME_MEDMODE, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN, milliseconds(30000));
                     }
