@@ -864,10 +864,12 @@ public:
                 {
                     me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                     me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
-                    me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    //me->SummonCreature(NPC_GUARD_MEDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                 }
                 else if (me->GetEntry() == NPC_BOSS_HARDMODE)
                 {
+                    me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
+                    me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                     me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                     me->SummonCreature(NPC_GUARD_HARDMODE, me->GetVictim()->GetPositionX()-2, me->GetVictim()->GetPositionY()+2, me->GetVictim()->GetPositionZ(), 0.f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, milliseconds(2000));
                 }
@@ -878,13 +880,13 @@ public:
                 me->PlayDirectSound(9101) ; // SUCCUBUS_KILL01.wav
                
                 if (me->GetEntry() == NPC_BOSS_MEDMODE)
-                    GuardSpwanCD = urand(16000, 18000);
+                    GuardSpwanCD = urand(25000, 35000);
                 else if (me->GetEntry() == NPC_BOSS_HARDMODE)
-                    GuardSpwanCD = urand(12000, 16000);
+                    GuardSpwanCD = urand(18000, 20000);
                 else
                     GuardSpwanCD = urand(26000, 36000);
-                if (!PauseDone)
-                   GuardSpwanCD = urand(26000, 36000);
+                //if (!PauseDone)
+                //   GuardSpwanCD = urand(26000, 36000);
             }
             else GuardSpwanCD -= uiDiff;
 
