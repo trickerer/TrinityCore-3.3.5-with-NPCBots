@@ -10,21 +10,21 @@ public:
 
     struct instance_stormwind_vault_InstanceMapScript : public InstanceScript
     {
-        instance_stormwind_vault_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_stormwind_vault_InstanceMapScript(InstanceMap* map) : InstanceScript(map) { }
 
-        void Initialize() override
+        void Initialize()
         {
-            // Init data
+            // Initialization logic if needed
         }
 
         void OnPlayerEnter(Player* player) override
         {
-            // Optional: do something when a player enters
+            // Optional logic
         }
 
         void Update(uint32 /*diff*/) override
         {
-            // Optional: logic
+            // Optional logic
         }
     };
 
