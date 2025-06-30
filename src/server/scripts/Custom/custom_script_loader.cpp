@@ -45,6 +45,7 @@ void AddSC_boss_memory_of_hogger();
 void AddSC_item_learn_flightpaths();
 void AddSC_mga_boss();
 void AddSC_npc_megaboss_starter();
+void AddSC_instance_stormwind_vault();
 
 void AddCustomScripts()
 {
@@ -72,4 +73,5 @@ void AddCustomScripts()
     AddSC_item_learn_flightpaths();
     AddSC_mga_boss();
     AddSC_npc_megaboss_starter();
+    AddSC_instance_stormwind_vault();
 }
