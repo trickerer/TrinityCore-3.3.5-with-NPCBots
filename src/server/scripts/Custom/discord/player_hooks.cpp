@@ -114,7 +114,7 @@ private:
         std::ostringstream messageStream;
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
-        SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        /*SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         if (!loggingIn)
         {
             const std::string name = player->GetName();
@@ -128,7 +128,7 @@ private:
             messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
             
             SendDiscordMessageWorld(messageStream2.str());
-        }
+        }*/
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
