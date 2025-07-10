@@ -25,6 +25,7 @@
 #include "server_shutdown.h"
 #include "DBCStores.h"
 #include "AchievementMgr.h"
+#include "DatabaseEnv.h"
 #include "../../scripts/Custom/discord/DiscordWebhookMgr.h"
 
 static std::unordered_set<uint64> LoggedInGuids;
