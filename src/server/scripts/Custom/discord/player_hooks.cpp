@@ -114,21 +114,26 @@ private:
         std::ostringstream messageStream;
         messageStream << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
-        /*SendDiscordWebhookAsync(webhookUrl, messageStream.str());
+        SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         if (!loggingIn)
         {
-            const std::string name = player->GetName();
-            const uint8 level = player->GetLevel();
-            const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
-                              ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
-                              : "👤 ";
-            const std::string status2 = "🛑 Left World Channel";
+            uint32 guid = player->GetGUID().GetCounter();
+            QueryResult result = CharacterDatabase.PQuery("SELECT in_world_channel FROM world_channel_flags WHERE guid = {}", guid);
+            if (result)
+            {
+                const std::string name = player->GetName();
+                const uint8 level = player->GetLevel();
+                const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
+                                  ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
+                                  : "👤 ";
+                const std::string status2 = "🛑 Left World Channel";
 
-            std::ostringstream messageStream2;
-            messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
-            
-            SendDiscordMessageWorld(messageStream2.str());
-        }*/
+                std::ostringstream messageStream2;
+                messageStream2 << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+                
+                SendDiscordMessageWorld(messageStream2.str());
+            }
+        }
     }
 
     static std::string GetLocalizedAchievementName(uint32 id)
