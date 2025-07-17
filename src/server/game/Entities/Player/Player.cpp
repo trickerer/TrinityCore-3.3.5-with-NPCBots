@@ -25368,7 +25368,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     if (talentInfo->TierID > maxAllowedTier)
     {
-        ChatHandler(this).PSendSysMessage("This talent is not available in the current expansion phase.");
+        ChatHandler(GetSession()).PSendSysMessage("This talent is not available in the current expansion phase.");
         return false;
     }
 
