@@ -107,6 +107,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
+#include "Config.h"
 
 //npcbot
 #include "botmgr.h"
@@ -25353,6 +25354,23 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     if (!talentInfo)
         return false;
+    
+    // --- CUSTOM TALENT ROW LIMIT BASED ON EXPANSION PHASE CONFIG ---
+    uint32 limitPhase = sConfigMgr->GetIntDefault("LimitTalentsToExpansion", 0);
+    uint32 maxAllowedTier = 9; // Default: WotLK, no restriction
+
+    switch (limitPhase)
+    {
+        case 1: maxAllowedTier = 6; break; // Vanilla: Tiers 0–6
+        case 2: maxAllowedTier = 8; break; // TBC: Tiers 0–8
+        case 3: maxAllowedTier = 9; break; // WotLK: Tiers 0–9
+    }
+
+    if (talentInfo->TierID > maxAllowedTier)
+    {
+        ChatHandler(this).PSendSysMessage("This talent is not available in the current expansion phase.");
+        return false;
+    }
 
     TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TabID);
 
