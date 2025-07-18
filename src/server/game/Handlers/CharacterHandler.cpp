@@ -296,32 +296,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
              >> createInfo->FacialHair
              >> createInfo->OutfitId;
              
-    // Block Blood Elf and Draenei for Expansion < 2 (i.e., Vanilla)
-    if (sWorld->getIntConfig(CONFIG_EXPANSION) < 2)
-    {
-        if (createInfo->Race == RACE_BLOODELF || createInfo->Race == RACE_DRAENEI)
-        {
-            TC_LOG_ERROR("network", "Blood Elf and Draenei creation is disabled for current expansion.");
-            WorldPacket data(SMSG_CHAR_CREATE, 1);
-            data << uint8(CHAR_CREATE_EXPANSION); // 21: Expansion restriction
-            SendPacket(&data);
-            return;
-        }
-    }
-
-    // Block Death Knight for Expansion < 3 (i.e., before WotLK)
-    if (sWorld->getIntConfig(CONFIG_EXPANSION) < 3)
-    {
-        if (createInfo->Class == CLASS_DEATH_KNIGHT)
-        {
-            TC_LOG_ERROR("network", "Death Knight creation is disabled for current expansion.");
-            WorldPacket data(SMSG_CHAR_CREATE, 1);
-            data << uint8(CHAR_CREATE_EXPANSION); // 21: Expansion restriction
-            SendPacket(&data);
-            return;
-        }
-    }
-
     if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_TEAMMASK))
     {
         if (uint32 mask = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED))
