@@ -303,7 +303,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         {
             TC_LOG_ERROR("network", "Blood Elf and Draenei creation is disabled for current expansion.");
             WorldPacket data(SMSG_CHAR_CREATE, 1);
-            data << uint8(CHAR_CREATE_RACE_CLASS_RESTRICTION);
+            data << uint8(CHAR_CREATE_EXPANSION); // 21: Expansion restriction
             SendPacket(&data);
             return;
         }
@@ -316,7 +316,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         {
             TC_LOG_ERROR("network", "Death Knight creation is disabled for current expansion.");
             WorldPacket data(SMSG_CHAR_CREATE, 1);
-            data << uint8(CHAR_CREATE_UNAVAILABLE_CLASS);
+            data << uint8(CHAR_CREATE_EXPANSION); // 21: Expansion restriction
             SendPacket(&data);
             return;
         }
