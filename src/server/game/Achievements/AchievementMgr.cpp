@@ -1540,8 +1540,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
         SendDiscordMessage(messageStream.str());
 
-    //if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
-    //    return;
+    if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
+        return;
 
     //TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}", achievement->ID, m_player->GetName(), m_player->GetGUID().ToString());
 
