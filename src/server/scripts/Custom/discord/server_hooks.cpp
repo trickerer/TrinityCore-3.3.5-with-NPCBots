@@ -90,7 +90,7 @@ public:
             TC_LOG_ERROR("server.hooks", "No webhook URL configured!");
             return;
         }
-
+        const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
         const std::string name = player->GetName();
         const std::string gmTag = player->GetSession()->GetSecurity() > SEC_PLAYER 
                           ? (player->GetSession()->GetSecurity() > 3 ? "🧪 " : "⚙️ ")
@@ -98,7 +98,7 @@ public:
         const std::string status = loggingIn ? "🟢 Logged In" : "🛑 Logged Out";
 
         std::ostringstream messageStream;
-        messageStream << gmTag << status << " `" << name << "`";
+        messageStream << gmTag << realmName << status << " `" << name << "`";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
@@ -121,9 +121,11 @@ private:
             if (path.empty())
                 path = "/";
 
-            Poco::JSON::Object json;
-            json.set("content", message);
+            const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
+            Poco::JSON::Object json;
+            json.set("content", "[" + realmName + "] " + message);  // Prefix realm name to message
+            
             const std::string avatarUrl = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
             if (!avatarUrl.empty())
                 json.set("avatar_url", avatarUrl);

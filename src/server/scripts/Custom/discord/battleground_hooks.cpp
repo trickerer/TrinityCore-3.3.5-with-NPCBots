@@ -48,6 +48,7 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
             return; // or skip webhook logic
 
         std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
+        std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
         
         Poco::URI uri(webhookUrl);
         std::string path = uri.getPathAndQuery();
@@ -73,9 +74,10 @@ void SendBattlegroundDiscordWebhook(const std::string& webhookUrl, const std::st
 
         Poco::JSON::Object::Ptr json = new Poco::JSON::Object();
         std::stringstream content;
-        content << "⚔️ **" << battlegroundName << " Started!**\n"
+        content << "🌍 **[" << realmName << "]**\n"
+                << "⚔️ **" << battlegroundName << " Started!**\n"
                 << "📊 **Bracket:** " << bracket << "\n"
-                << "👥 **Players:** " << alliancePlayers+fakeplayers << " Alliance vs " << hordePlayers+fakeplayers << " Horde";
+                << "👥 **Players:** " << alliancePlayers + fakeplayers << " Alliance vs " << hordePlayers + fakeplayers << " Horde";
 
         json->set("content", content.str());
         

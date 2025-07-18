@@ -76,6 +76,7 @@ void SendDiscordMessage(const std::string& message)
     
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
     std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
+    std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
     if (webhookUrl.empty())
     {
@@ -101,7 +102,7 @@ void SendDiscordMessage(const std::string& message)
         }
 
         // Construct JSON payload
-        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
+        std::string payload = "{\"content\": \"[" + realmName + "] " + escapedMessage + "\"";
         if (!avatarUrl.empty())
             payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
         payload += "}";
@@ -132,6 +133,7 @@ void SendDiscordMessageWorld(const std::string& message)
     
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook2.URL", "");
     std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook2.AvatarURL", "");
+    std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
 
     if (webhookUrl.empty())
     {
@@ -157,7 +159,7 @@ void SendDiscordMessageWorld(const std::string& message)
         }
 
         // Construct JSON payload
-        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
+        std::string payload = "{\"content\": \"[" + realmName + "] " + escapedMessage + "\"";
         if (!avatarUrl.empty())
             payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
         payload += "}";
