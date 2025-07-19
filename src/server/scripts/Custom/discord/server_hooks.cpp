@@ -125,7 +125,7 @@ private:
             const std::string realmName = "";
 
             Poco::JSON::Object json;
-            json.set("content", "[" + realmName + "] " + message);  // Prefix realm name to message
+            json.set("content", "" + realmName + " " + message);  // Prefix realm name to message
             
             const std::string avatarUrl = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
             if (!avatarUrl.empty())
