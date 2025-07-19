@@ -50,7 +50,8 @@ public:
             return;
         }
 
-        const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        //const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        const std::string realmName = "";
         const std::string name = player->GetName();
         const std::string achievementName = GetLocalizedAchievementName(achievement->ID);
 
@@ -59,7 +60,7 @@ public:
             : "👤 ";
 
         std::ostringstream messageStream;
-        messageStream << "🌍 [" << realmName << "] "  // Realm name prefix
+        messageStream << "🌍 "  // Realm name prefix
                       << gmTag << "🏆 Achievement Earned by `" << name << "`: **" << achievementName << "**";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
@@ -88,8 +89,9 @@ public:
             const std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook.URL", "");
             if (!webhookUrl.empty())
             {
-                const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
-                const std::string message = "🌍 [" + realmName + "] 👢 All online players have been logged out..";
+                //const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+                const std::string realmName = "";
+                const std::string message = "🌍 👢 All online players have been logged out..";
                 SendDiscordWebhookAsync(webhookUrl, message);
             }
             return;
@@ -109,7 +111,8 @@ private:
             return;
         }
 
-        const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        //const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+        const std::string realmName = "";
 
         const std::string name = player->GetName();
         const uint8 level = player->GetLevel();
@@ -119,7 +122,7 @@ private:
         const std::string status = loggingIn ? "🟢 Logged In" : "🛑 Logged Out";
 
         std::ostringstream messageStream;
-        messageStream << "🌍 [" << realmName << "] " << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
+        messageStream << "🌍 " << gmTag << status << " `" << name << "` (Level " << static_cast<int>(level) << ")";
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
 
         if (!loggingIn)
@@ -131,7 +134,7 @@ private:
                 const std::string status2 = "🛑 Left World Channel";
 
                 std::ostringstream messageStream2;
-                messageStream2 << "🌍 [" << realmName << "] "
+                messageStream2 << "🌍 "
                                << gmTag << status2 << " `" << name << "` (Level " << static_cast<int>(level) << ")";
 
                 SendDiscordMessageWorld(messageStream2.str());
@@ -171,7 +174,7 @@ private:
             Poco::JSON::Object json;
 
             // Add realm name to the message
-            std::string fullMessage = realmName + " : " + message;
+            std::string fullMessage = realmName + "" + message;
             json.set("content", fullMessage);
 
             if (!avatarUrl.empty())
