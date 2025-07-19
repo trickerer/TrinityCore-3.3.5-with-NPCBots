@@ -102,7 +102,7 @@ void SendDiscordMessage(const std::string& message)
         }
 
         // Construct JSON payload
-        std::string payload = "{\"content\": \"[" + realmName + "] " + escapedMessage + "\"";
+        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
         if (!avatarUrl.empty())
             payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
         payload += "}";
@@ -159,7 +159,7 @@ void SendDiscordMessageWorld(const std::string& message)
         }
 
         // Construct JSON payload
-        std::string payload = "{\"content\": \"[" + realmName + "] " + escapedMessage + "\"";
+        std::string payload = "{\"content\": " + escapedMessage + "\"";
         if (!avatarUrl.empty())
             payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
         payload += "}";
