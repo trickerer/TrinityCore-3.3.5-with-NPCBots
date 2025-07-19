@@ -50,7 +50,7 @@ public:
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
-        //SendDiscordMessageWorld(messageStream.str());
+        SendDiscordMessageWorld(messageStream.str());
     }
 
     void OnShutdown() override
@@ -121,7 +121,8 @@ private:
             if (path.empty())
                 path = "/";
 
-            const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+            //const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+            const std::string realmName = "";
 
             Poco::JSON::Object json;
             json.set("content", "[" + realmName + "] " + message);  // Prefix realm name to message

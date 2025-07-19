@@ -165,7 +165,8 @@ private:
                 path = "/";
 
             const std::string avatarUrl = sConfigMgr->GetStringDefault("Webhook.AvatarURL", "");
-            const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+            //const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
+            const std::string realmName = "";
 
             Poco::JSON::Object json;
 
