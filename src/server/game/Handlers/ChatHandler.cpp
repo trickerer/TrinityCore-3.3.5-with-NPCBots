@@ -346,11 +346,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         }
         case CHAT_MSG_WHISPER:
         {
-            //if (!normalizePlayerName(to))
-            //{
-            //    SendPlayerNotFoundNotice(to);
-            //    break;
-            //}
+            if (!normalizePlayerName(to))
+            {
+                SendPlayerNotFoundNotice(to);
+                break;
+            }
 
             //Player* receiver = ObjectAccessor::FindConnectedPlayerByName(to);
             Player* receiver = nullptr;
