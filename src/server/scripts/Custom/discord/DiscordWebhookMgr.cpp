@@ -130,7 +130,7 @@ void SendDiscordMessageWorld(const std::string& message)
 {
     if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", true))
         return;
-    
+
     std::string webhookUrl = sConfigMgr->GetStringDefault("Webhook2.URL", "");
     std::string avatarUrl  = sConfigMgr->GetStringDefault("Webhook2.AvatarURL", "");
     std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
@@ -158,8 +158,8 @@ void SendDiscordMessageWorld(const std::string& message)
             pos += 2;
         }
 
-        // Construct JSON payload
-        std::string payload = "{\"content\": " + escapedMessage + "\"";
+        // Construct JSON payload correctly
+        std::string payload = "{\"content\": \"" + escapedMessage + "\"";
         if (!avatarUrl.empty())
             payload += ", \"avatar_url\": \"" + avatarUrl + "\"";
         payload += "}";
