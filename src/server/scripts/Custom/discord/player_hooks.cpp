@@ -171,7 +171,7 @@ private:
             Poco::JSON::Object json;
 
             // Add realm name to the message
-            std::string fullMessage = "" + realmName + " " + message;
+            std::string fullMessage = realmName + " : " + message;
             json.set("content", fullMessage);
 
             if (!avatarUrl.empty())
