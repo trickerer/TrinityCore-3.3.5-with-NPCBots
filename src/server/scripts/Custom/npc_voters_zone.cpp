@@ -45,17 +45,19 @@ enum Npc
 class npc_voters_zone : public CreatureScript
 {
 public:
-    npc_voters_zone() : CreatureScript("npc_voters_zone") { }
+    npc_voters_zone() : CreatureScript("npc_voters_zone") { realmId = sConfigMgr->GetIntDefault("RealmID", 1); }
 
     struct npc_voters_zoneAI : public ScriptedAI
     {
         npc_voters_zoneAI(Creature* creature) : ScriptedAI(creature) { }
-		
+        
         //void WhisperTo(Player* player, char const* message)
         //{
         //    me->Whisper(message, LANG_UNIVERSAL, player);
         //}
-
+        uint32 realmId;
+        
+        
         bool OnGossipHello(Player* player) override
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
@@ -81,7 +83,8 @@ public:
             {
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000);
 				AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1003);
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
+                if (realmId != 3)
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_OPTION_OPEN_BANK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1005);
                 //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_2, " ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999);
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO_TP3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
                 
@@ -151,7 +154,10 @@ public:
 				CloseGossipMenuFor(player);
 				if (player->GetClass() == CLASS_DEATH_KNIGHT && player->GetLevel() < 80)
 					player->SetPhaseMask(PHASEMASK_NORMAL, false);
-				player->TeleportTo(571, 5817.41f, 601.99f, 570.55f, 3.13f);        // dala sewer arena (visual copy)
+                if (realmId == 3)
+                    player->TeleportTo(0, -7352.24f, -642.621f, 294.55f, 0.43f);        // Blackchar Cave
+                else
+                    player->TeleportTo(571, 5817.41f, 601.99f, 570.55f, 3.13f);        // dala sewer arena (visual copy)
 				player->SetPvP(false);
 				return true;
 			}
