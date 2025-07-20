@@ -46,6 +46,7 @@ void AddSC_item_learn_flightpaths();
 void AddSC_mga_boss();
 void AddSC_npc_megaboss_starter();
 void AddSC_instance_stormwind_vault();
+void AddSC_spell_xp_boost_aura();
 
 void AddCustomScripts()
 {
@@ -74,4 +75,5 @@ void AddCustomScripts()
     AddSC_mga_boss();
     AddSC_npc_megaboss_starter();
     AddSC_instance_stormwind_vault();
+    AddSC_spell_xp_boost_aura();
 }

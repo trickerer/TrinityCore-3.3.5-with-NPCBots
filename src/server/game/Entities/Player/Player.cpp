@@ -2533,6 +2533,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
         bonus_xp = 2 * xp; // xp + bonus_xp must add up to 3 * xp for RaF; calculation for quests done client-side
     else
         bonus_xp = victim ? GetXPRestBonus(xp) : 0; // XP resting bonus
+    
+    if (HasAura(90000)) // 90000 is your custom spell ID
+        xp *= 2; // Double XP
 
     SendLogXPGain(xp, victim, bonus_xp, recruitAFriend, group_rate);
 
@@ -15213,6 +15216,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     XP *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
+    
+    if (HasAura(90000))
+        XP *= 2;
 
     if (!IsMaxLevel())
         GiveXP(XP, nullptr);
