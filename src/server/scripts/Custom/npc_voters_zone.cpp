@@ -45,11 +45,15 @@ enum Npc
 class npc_voters_zone : public CreatureScript
 {
 public:
-    npc_voters_zone() : CreatureScript("npc_voters_zone") { realmId = sConfigMgr->GetIntDefault("RealmID", 1); }
+    npc_voters_zone() : CreatureScript("npc_voters_zone") { }
 
     struct npc_voters_zoneAI : public ScriptedAI
     {
-        npc_voters_zoneAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_voters_zoneAI(Creature* creature) : ScriptedAI(creature) {
+            
+            realmId = sConfigMgr->GetIntDefault("RealmID", 1);
+            
+        }
         
         //void WhisperTo(Player* player, char const* message)
         //{
