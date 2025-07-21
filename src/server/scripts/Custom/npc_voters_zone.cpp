@@ -6,6 +6,7 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
+#include "Config.h"
 
 #define GOSSIP_HELLO_TP1  "Send me to the MGA Voters Area!"
 #define GOSSIP_HELLO_TP3  "Nevermind - Bye!"
