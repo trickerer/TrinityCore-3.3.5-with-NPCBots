@@ -7,6 +7,7 @@
 #include "WorldDatabase.h"
 #include "DatabaseEnv.h"
 #include "WorldSession.h"
+#include "Config.h"
 #include <sstream>
 #include <string>
 
