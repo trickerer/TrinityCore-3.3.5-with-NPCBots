@@ -10,6 +10,7 @@
 #include "ObjectMgr.h"
 #include "Chat.h"
 #include "World.h"
+#include "Config.h"
 #include <sstream>
 #include <string>
 
