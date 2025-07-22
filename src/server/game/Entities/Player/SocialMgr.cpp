@@ -224,8 +224,8 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid const& friendGUID, Frie
         return;
 
     // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-    if (target->GetTeam() != player->GetTeam() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
-        return;
+    //if (target->GetTeam() != player->GetTeam() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+    //    return;
 
     if (target->IsVisibleGloballyFor(player))
     {

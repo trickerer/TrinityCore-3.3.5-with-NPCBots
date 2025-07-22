@@ -251,8 +251,8 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     for (WhoListPlayerInfo const& target : whoList)
     {
         // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-        if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
-            continue;
+        //if (target.GetTeam() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+        //    continue;
 
         // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
         if (!HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && target.GetSecurity() > AccountTypes(gmLevelInWhoList))
