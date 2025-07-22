@@ -70,7 +70,7 @@ public:
             
             realmId = sConfigMgr->GetIntDefault("RealmID", 1);
         }
-
+        uint32 realmId;
         void WhisperTo(Player* player, char const* message)
         {
             me->Whisper(message, LANG_UNIVERSAL, player);

@@ -93,7 +93,7 @@ public:
             me->Whisper(message, LANG_UNIVERSAL, player);
         }
 
-		
+		uint32 realmId;
         bool UpdateVoteTPData(Player* player, uint32 newwtime)
         {
             WorldDatabase.PExecute("UPDATE `vote_tp` SET `tptime`='{}' WHERE `guid`='{}'", newwtime, player->GetSession()->GetAccountId());
