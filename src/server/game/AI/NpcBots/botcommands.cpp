@@ -4786,6 +4786,13 @@ public:
         Player* owner = handler->GetSession()->GetPlayer();
         Unit* u = owner->GetSelectedUnit();
 
+        if (owner->IsInCombat())
+        {
+            handler->PSendSysMessage("You cannot revive npcbots while in combat.");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         if (!u)
         {
             handler->SendSysMessage(".npcbot revive");
@@ -4797,15 +4804,7 @@ public:
         // Check if selected unit is a player
         if (Player* master = u->ToPlayer())
         {
-            // Block if player is in combat
-            if (master->IsInCombat())
-            {
-                handler->PSendSysMessage("Cannot revive npcbots because the player is in combat.");
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-
-            // Check if player has any npcbots
+            // Check if selected player has any npcbots
             if (!master->HaveBot())
             {
                 handler->PSendSysMessage("%s has no npcbots!", master->GetName());
@@ -4813,7 +4812,7 @@ public:
                 return false;
             }
 
-            // Revive all bots for player
+            // Revive all bots for selected player
             master->GetBotMgr()->ReviveAllBots();
             handler->SendSysMessage("Npcbots revived");
             return true;
@@ -4836,7 +4835,6 @@ public:
             }
         }
 
-        // If not a valid player or bot
         handler->SendSysMessage("You must select a player or npcbot");
         handler->SetSentErrorMessage(true);
         return false;
