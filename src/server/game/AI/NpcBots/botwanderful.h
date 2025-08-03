@@ -3,6 +3,7 @@
 
 #include "Position.h"
 
+#include <algorithm>
 #include <functional>
 #include <list>
 #include <mutex>
