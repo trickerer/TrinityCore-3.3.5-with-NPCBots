@@ -46,7 +46,7 @@ public:
 
         const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
         std::stringstream messageStream;
-        messageStream << "✅ **Server is online**";
+        messageStream << "✅ **Realm is online**";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
@@ -69,7 +69,7 @@ public:
 
         const std::string realmName = sConfigMgr->GetStringDefault("WorldServer.RealmName", "Unknown Realm");
         std::stringstream messageStream;
-        messageStream << "🛑 **Server is restarting, 2 mins downtime..**";
+        messageStream << "🛑 **Realm is restarting, 2 mins downtime..**";
 
         SendDiscordWebhookAsync(webhookUrl, messageStream.str());
         // SEND TO WORLD CHAT
