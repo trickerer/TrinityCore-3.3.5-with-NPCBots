@@ -25380,16 +25380,17 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
     
     // --- CUSTOM TALENT ROW LIMIT BASED ON EXPANSION PHASE CONFIG ---
     uint32 limitPhase = sConfigMgr->GetIntDefault("LimitTalentsToExpansion", 0);
-    uint32 maxAllowedTier = 9; // Default: WotLK, no restriction
+    int32 maxAllowedTier = -1; // -1 means no restriction
 
     switch (limitPhase)
     {
         case 1: maxAllowedTier = 6; break; // Vanilla: Tiers 0–6
         case 2: maxAllowedTier = 8; break; // TBC: Tiers 0–8
         case 3: maxAllowedTier = 9; break; // WotLK: Tiers 0–9
+        default: maxAllowedTier = -1; break; // 0 = No restriction
     }
 
-    if (talentInfo->TierID > maxAllowedTier)
+    if (maxAllowedTier >= 0 && talentInfo->TierID > maxAllowedTier)
     {
         ChatHandler(GetSession()).PSendSysMessage("This talent is not available in the current expansion phase.");
         return false;
