@@ -2282,13 +2282,13 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 
 WorldSafeLocsEntry const* Battleground::GetClosestGraveyard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
+    return sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam(), player);
 }
 
 //npcbot
 WorldSafeLocsEntry const* Battleground::GetClosestGraveyardForBot(WorldLocation const& curPos, uint32 team) const
 {
-    return sObjectMgr->GetClosestGraveyard(curPos.GetPositionX(), curPos.GetPositionY(), curPos.GetPositionZ(), curPos.GetMapId(), team);
+    return sObjectMgr->GetClosestGraveyard(curPos.GetPositionX(), curPos.GetPositionY(), curPos.GetPositionZ(), curPos.GetMapId(), team, nullptr);
 }
 //end npcbot
 
