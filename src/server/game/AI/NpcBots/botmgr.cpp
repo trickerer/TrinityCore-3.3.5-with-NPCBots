@@ -302,7 +302,7 @@ void BotMgr::LoadData()
 void BotMgr::Initialize()
 {
     LoadConfig();
-    BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ VER_FILEVERSION_STR }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
+    BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ TRINITY_FILEVERSION_STR }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
 
     BotDataMgr::LoadNpcBots();
     BotDataMgr::LoadWanderMap();
