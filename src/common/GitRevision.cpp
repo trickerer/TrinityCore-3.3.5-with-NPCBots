@@ -81,7 +81,7 @@ char const* GitRevision::GetFullDatabase()
 
 char const* GitRevision::GetFullVersion()
 {
-    return "TrinityCore rev. " TRINITY_PRODUCTVERSION_STR
+    return "MGAWoW rev. " TRINITY_PRODUCTVERSION_STR
         " (" TRINITY_BUILD_HOST_SYSTEM ", " TRINITY_BUILD_PROCESSOR  ", " TRINITY_BUILD_TYPE ", " TRINITY_LINKAGE_TYPE_STR ")";
 }
 
