@@ -3101,8 +3101,8 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
         auto const* ft2 = sFactionTemplateStore.LookupEntry(unitTarget->GetFaction());
         auto const* fe1 = ft1 ? sFactionStore.LookupEntry(ft1->Faction) : nullptr;
         auto const* fe2 = ft2 ? sFactionStore.LookupEntry(ft2->Faction) : nullptr;
-        if ((IsNPCBotOrPet() && fe2 && fe2->CanHaveReputation() && ReputationMgr::ReputationToRank(BotDataMgr::GetBotBaseReputation(unit->ToCreature(), fe2)) >= REP_NEUTRAL) ||
-            (target->IsNPCBotOrPet() && fe1 && fe1->CanHaveReputation() && ReputationMgr::ReputationToRank(BotDataMgr::GetBotBaseReputation(unitTarget->ToCreature(), fe1)) >= REP_NEUTRAL))
+        if ((IsNPCBotOrPet() && fe2 && fe2->CanHaveReputation() && ReputationMgr::ReputationToRank(fe2, BotDataMgr::GetBotBaseReputation(unit->ToCreature(), fe2)) >= REP_NEUTRAL) ||
+            (target->IsNPCBotOrPet() && fe1 && fe1->CanHaveReputation() && ReputationMgr::ReputationToRank(fe1, BotDataMgr::GetBotBaseReputation(unitTarget->ToCreature(), fe1)) >= REP_NEUTRAL))
             return false;
     }
     //end npcbot
@@ -3159,7 +3159,7 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
                 if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionTemplate->Faction))
                         if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
-                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
+                            if (!repState->Flags.HasFlag(ReputationFlags::AtWar))
                                 return false;
 
             }
