@@ -20945,6 +20945,9 @@ void bot_ai::ChooseVehicleForEncounter(uint32 &creEntry, uint32 &vehEntry) const
         case CREATURE_ICC_MUTATED_ABOMINATION8:
             //no abomination bots
             break;
+        case CREATURE_GEARGRINDERS_JUMPBOT:
+            //no jumpbot bots
+            break;
         default:
             if (VehicleSeatEntry const* seat = mVeh->GetSeatForPassenger(master))
             {
