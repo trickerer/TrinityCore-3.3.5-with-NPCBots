@@ -4218,7 +4218,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         }
 
         // Icecrown Citadel - The Lich King
-        if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupLichKing) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && !IsTank())
+        if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupLichKing) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && HasRole(BOT_ROLE_RANGED) && !IsTank())
         {
             static const std::array IceSphereIds = { CREATURE_ICC_ICE_SPHERE1, CREATURE_ICC_ICE_SPHERE2, CREATURE_ICC_ICE_SPHERE3, CREATURE_ICC_ICE_SPHERE4 };
             static const std::array ValkyrShadowguardIds = { CREATURE_ICC_VALKYR_LK1, CREATURE_ICC_VALKYR_LK2, CREATURE_ICC_VALKYR_LK3, CREATURE_ICC_VALKYR_LK4 };
@@ -7970,7 +7970,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
                 message2 << LocalizedNpcText(player, BOT_TEXT_HIREOPTION_DEFAULT);
             }
 
-            message1 << "\n(" << BotMgr::GetNpcBotCostStr(player->GetLevel(), _botclass) << ")";
+            if (BotMgr::GetNpcBotCostRent(player->GetLevel(), _botclass))
+                message1 << "\n(" << BotMgr::GetNpcBotCostStr(player->GetLevel(), _botclass) << ")";
 
             if (!reason)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TAXI, message2.str(), GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + 0, message1.str(), cost, false);
@@ -17960,12 +17961,13 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _updateTimerEx2 = urand(2000, 4000);
 
         //Rent Collecting
-        if (_rentTimer >= RENT_COLLECT_TIMER && BotMgr::GetNpcBotCostRent() && !HasBotCommandState(BOT_COMMAND_UNBIND) && !IAmFree())
+        uint32 rent_cost = BotMgr::GetNpcBotCostRent(master->GetLevel(), GetBotClass());
+        if (_rentTimer >= RENT_COLLECT_TIMER && rent_cost && !HasBotCommandState(BOT_COMMAND_UNBIND) && !IAmFree())
         {
             uint32 rent_money = 0;
             while (_rentTimer >= RENT_COLLECT_TIMER)
             {
-                rent_money += uint32(uint64(BotMgr::GetNpcBotCostRent()) * (RENT_COLLECT_TIMER / 1000) / (RENT_TIMER / 1000));
+                rent_money += uint32(uint64(rent_cost) * (RENT_COLLECT_TIMER / 1000) / (RENT_TIMER / 1000));
                 _rentTimer -= RENT_COLLECT_TIMER;
             }
 
@@ -18746,7 +18748,7 @@ void bot_ai::CommonTimers(uint32 diff)
         UpdateReviveTimer(diff);
     else
     {
-        if (BotMgr::GetNpcBotCostRent() && me->IsInWorld() && !HasBotCommandState(BOT_COMMAND_UNBIND))
+        if (BotMgr::GetNpcBotCostRent(me->GetLevel(), GetBotClass()) && me->IsInWorld() && !HasBotCommandState(BOT_COMMAND_UNBIND))
             _rentTimer += diff;
     }
 
@@ -20945,6 +20947,9 @@ void bot_ai::ChooseVehicleForEncounter(uint32 &creEntry, uint32 &vehEntry) const
         case CREATURE_ICC_MUTATED_ABOMINATION7:
         case CREATURE_ICC_MUTATED_ABOMINATION8:
             //no abomination bots
+            break;
+        case CREATURE_GEARGRINDERS_JUMPBOT:
+            //no jumpbot bots
             break;
         default:
             if (VehicleSeatEntry const* seat = mVeh->GetSeatForPassenger(master))
