@@ -303,7 +303,7 @@ uint8 Aura::BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 available
 
 Aura* Aura::TryRefreshStackOrCreate(AuraCreateInfo& createInfo, bool updateEffectMask)
 {
-    ASSERT_NODEBUGINFO(createInfo.Caster || createInfo.CasterGUID);
+    ASSERT_NODEBUGINFO(createInfo.Caster || !createInfo.CasterGUID.IsEmpty());
 
     if (createInfo.IsRefresh)
         *createInfo.IsRefresh = false;
@@ -357,7 +357,7 @@ Aura* Aura::TryCreate(AuraCreateInfo& createInfo)
 Aura* Aura::Create(AuraCreateInfo& createInfo)
 {
     // try to get caster of aura
-    if (createInfo.CasterGUID)
+    if (!createInfo.CasterGUID.IsEmpty())
     {
         // world gameobjects can't own auras and they send empty casterguid
         // checked on sniffs with spell 22247
@@ -568,7 +568,7 @@ void Aura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication* auraApp)
     {
         if (m_spellInfo->IsCooldownStartedOnEvent())
         {
-            Item* castItem = m_castItemGuid ? caster->ToPlayer()->GetItemByGuid(m_castItemGuid) : nullptr;
+            Item* castItem = !m_castItemGuid.IsEmpty() ? caster->ToPlayer()->GetItemByGuid(m_castItemGuid) : nullptr;
             caster->GetSpellHistory()->StartCooldown(m_spellInfo, castItem ? castItem->GetEntry() : 0, nullptr, true);
         }
     }
@@ -590,7 +590,7 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
     if (itr == m_applications.end())
     {
         TC_LOG_ERROR("spells", "Aura::_UnapplyForTarget, target: {}, caster: {}, spell:{} was not found in owners application map!",
-        target->GetGUID().ToString(), caster ? caster->GetGUID().ToString() : "0", auraApp->GetBase()->GetSpellInfo()->Id);
+            target->GetGUID().ToString(), caster ? caster->GetGUID().ToString() : "Empty", auraApp->GetBase()->GetSpellInfo()->Id);
         ABORT();
     }
 
@@ -1148,7 +1148,7 @@ bool Aura::CanBeSaved() const
         return false;
 
     // don't save permanent auras triggered by items, they'll be recasted on login if necessary
-    if (GetCastItemGUID() && IsPermanent())
+    if (!GetCastItemGUID().IsEmpty() && IsPermanent())
         return false;
 
     return true;
@@ -1992,7 +1992,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         // don't allow passive area auras to stack
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
-        if (GetCastItemGUID() && existingAura->GetCastItemGUID())
+        if (!GetCastItemGUID().IsEmpty() && !existingAura->GetCastItemGUID().IsEmpty())
             if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
                 return true;
         // same spell with same caster should not stack

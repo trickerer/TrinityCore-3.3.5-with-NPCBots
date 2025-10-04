@@ -2189,7 +2189,7 @@ public:
         {
             for (uint8 i = 0; i != MAX_WOLVES; ++i)
             {
-                if (_wolves[i])
+                if (!_wolves[i].IsEmpty())
                 {
                     if (Unit* wo = ObjectAccessor::GetUnit(*me, _wolves[i]))
                         wo->ToTempSummon()->UnSummon();
@@ -2285,7 +2285,7 @@ public:
 
             //Unsummon current totem
             ObjectGuid curTotemGUID = _totems[slot].first;
-            if (curTotemGUID)
+            if (!curTotemGUID.IsEmpty())
             {
                 Unit* curTotem = ObjectAccessor::GetUnit(*me, curTotemGUID);
                 if (curTotem)

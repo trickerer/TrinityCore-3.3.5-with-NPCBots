@@ -515,8 +515,8 @@ public:
                     if (damage_returned)
                     {
                         WorldPacket data(SMSG_SPELLDAMAGESHIELD, 8 + 8 + 4 + 4 + 4 + 4 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint64(u->GetGUID());
+                        data << me->GetGUID();
+                        data << u->GetGUID();
                         data << uint32(damageSpellInfo->Id);
                         data << uint32(damage_returned);
                         data << uint32(std::max<int32>(int32(damage_returned) - int32(u->GetHealth()), 0));

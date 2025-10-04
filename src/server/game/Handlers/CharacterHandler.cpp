@@ -629,6 +629,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
     recvData >> guid;
+
     // Initiating
     uint32 initAccountId = GetAccountId();
 
@@ -784,7 +785,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
         pCurrChar->SetGuildRank(0);
     }
 
-    if (pCurrChar->GetGuildId() != 0)
+    if (pCurrChar->GetGuildId())
     {
         if (Guild* guild = sGuildMgr->GetGuildById(pCurrChar->GetGuildId()))
             guild->SendLoginInfo(this);
@@ -1148,9 +1149,8 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
 
     Field* fields = result->Fetch();
 
-    ObjectGuid::LowType guidLow = fields[0].GetUInt32();
-    std::string oldName = fields[1].GetString();
-    uint16 atLoginFlags = fields[2].GetUInt16();
+    std::string oldName = fields[0].GetString();
+    uint16 atLoginFlags = fields[1].GetUInt16();
 
     if (!(atLoginFlags & AT_LOGIN_RENAME))
     {
@@ -1167,14 +1167,14 @@ void WorldSession::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo>
 
     stmt->setString(0, renameInfo->Name);
     stmt->setUInt16(1, atLoginFlags);
-    stmt->setUInt32(2, guidLow);
+    stmt->setUInt32(2, renameInfo->Guid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 
     // Removed declined name from db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_DECLINED_NAME);
 
-    stmt->setUInt32(0, guidLow);
+    stmt->setUInt32(0, renameInfo->Guid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 
@@ -1437,7 +1437,8 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     }
 
     // character with this name already exist
-    if (ObjectGuid newGuid = sCharacterCache->GetCharacterGuidByName(customizeInfo->Name))
+    ObjectGuid newGuid = sCharacterCache->GetCharacterGuidByName(customizeInfo->Name);
+    if (!newGuid.IsEmpty())
     {
         if (newGuid != customizeInfo->Guid)
         {

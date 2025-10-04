@@ -239,7 +239,7 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
     ASSERT(target);
 
     WorldPacket data(SMSG_DESTROY_OBJECT, 8 + 1);
-    data << uint64(GetGUID());
+    data << GetGUID();
     //! If the following bool is true, the client will call "void CGUnit_C::OnDeath()" for this object.
     //! OnDeath() does for eg trigger death animation and interrupts certain spells/missiles/auras/sounds...
     data << uint8(onDeath ? 1 : 0);
@@ -626,7 +626,7 @@ void Object::SetUInt64Value(uint16 index, uint64 value)
 bool Object::AddGuidValue(uint16 index, ObjectGuid value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
-    if (value && !*((ObjectGuid*)&(m_uint32Values[index])))
+    if (!value.IsEmpty() && ((ObjectGuid*)&(m_uint32Values[index]))->IsEmpty())
     {
         *((ObjectGuid*)&(m_uint32Values[index])) = value;
         _changesMask.SetBit(index);
@@ -643,7 +643,7 @@ bool Object::AddGuidValue(uint16 index, ObjectGuid value)
 bool Object::RemoveGuidValue(uint16 index, ObjectGuid value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
-    if (value && *((ObjectGuid*)&(m_uint32Values[index])) == value)
+    if (!value.IsEmpty() && *((ObjectGuid*)&(m_uint32Values[index])) == value)
     {
         m_uint32Values[index] = 0;
         m_uint32Values[index + 1] = 0;
@@ -1111,7 +1111,7 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
     Position const* thisOrTransport = this;
     Position const* objOrObjTransport = obj;
 
-    if (GetTransport() && obj->GetTransport() && obj->GetTransport()->GetGUID().GetCounter() == GetTransport()->GetGUID().GetCounter())
+    if (GetTransport() && obj->GetTransport() && obj->GetTransport()->GetGUID() == GetTransport()->GetGUID())
     {
         thisOrTransport = &m_movementInfo.transport.pos;
         objOrObjTransport = &obj->m_movementInfo.transport.pos;
@@ -1823,7 +1823,7 @@ void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skippe
 void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << uint64(guid);
+    data << guid;
     SendMessageToSet(&data, true);
 }
 
@@ -2208,7 +2208,8 @@ Player* WorldObject::SelectNearestPlayer(float distance) const
 
 ObjectGuid WorldObject::GetCharmerOrOwnerOrOwnGUID() const
 {
-    if (ObjectGuid guid = GetCharmerOrOwnerGUID())
+    ObjectGuid guid = GetCharmerOrOwnerGUID();
+    if (!guid.IsEmpty())
         return guid;
     return GetGUID();
 }
@@ -2708,11 +2709,11 @@ void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo miss
 {
     WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
     data << uint32(spellID);
-    data << uint64(GetGUID());
+    data << GetGUID();
     data << uint8(0);                                       // can be 0 or 1
     data << uint32(1);                                      // target count
     // for (i = 0; i < target count; ++i)
-    data << uint64(target->GetGUID());                      // target GUID
+    data << target->GetGUID();                              // target GUID
     data << uint8(missInfo);
     // end loop
     SendMessageToSet(&data, true);
@@ -3103,9 +3104,9 @@ bool WorldObject::IsValidAttackTarget(WorldObject const* target, SpellInfo const
     //npcbot: allow bots and their summons to ignore this rule
     if (unit && unitTarget && (unit->IsNPCBotOrPet() || unitTarget->IsNPCBotOrPet()))
     {}
-    else if (unit && unit->GetOwnerGUID() && unit->GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(unit->GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
+    else if (unit && !unit->GetOwnerGUID().IsEmpty() && unit->GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(unit->GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
     {}
-    else if (unitTarget && unitTarget->GetOwnerGUID() && unitTarget->GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(unitTarget->GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
+    else if (unitTarget && !unitTarget->GetOwnerGUID().IsEmpty() && unitTarget->GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(unitTarget->GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
     {}
     else
     //end npcbot
@@ -3700,11 +3701,13 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!player->HaveAtClient(this))
             continue;
 
-        if (Unit const* unit = ToUnit(); unit && unit->GetCharmerGUID() == player->GetGUID()) /// @todo this is for puppet
-            continue;
+        if (Unit const* unit = ToUnit())
+        {
+            if (unit->GetCharmerGUID() == player->GetGUID()) /// @todo this is for puppet
+                continue;
 
-        if (GetTypeId() == TYPEID_UNIT)
-            DestroyForPlayer(player, ToUnit()->IsDuringRemoveFromWorld() && ToCreature()->isDead()); // at remove from world (destroy) show kill animation
+            DestroyForPlayer(player, unit->IsDuringRemoveFromWorld() && unit->isDead()); // at remove from world (destroy) show kill animation
+        }
         else
             DestroyForPlayer(player);
 

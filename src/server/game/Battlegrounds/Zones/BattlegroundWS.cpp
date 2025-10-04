@@ -248,7 +248,7 @@ void BattlegroundWS::AddPlayer(Player* player)
     bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     Battleground::AddPlayer(player);
     if (!isInBattleground)
-        PlayerScores[player->GetGUID().GetCounter()] = new BattlegroundWGScore(player->GetGUID());
+        PlayerScores[player->GetGUID()] = new BattlegroundWGScore(player->GetGUID());
 }
 
 //npcbot
@@ -257,7 +257,7 @@ void BattlegroundWS::AddBot(Creature* bot)
     bool const isInBattleground = IsPlayerInBattleground(bot->GetGUID());
     Battleground::AddBot(bot);
     if (!isInBattleground)
-        BotScores[bot->GetEntry()] = new BattlegroundWGScore(bot->GetGUID());
+        BotScores[bot->GetGUID()] = new BattlegroundWGScore(bot->GetGUID());
 }
 //end npcbot
 

@@ -1831,7 +1831,7 @@ public:
         queryTemp.CreatureID = ci->Entry;
         queryTemp.Allow = true;
         queryTemp.Stats.Name = locName;
-        queryTemp.Stats.NameAlt = locTitle;
+        queryTemp.Stats.Title = locTitle;
         queryTemp.Stats.CursorName = ci->IconName;
         queryTemp.Stats.Flags = ci->type_flags;
         queryTemp.Stats.CreatureType = ci->type;
@@ -2209,7 +2209,7 @@ public:
             return true;
         }
 
-        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        Unit* target = !target_guid.IsEmpty() ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
         if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
         {
             handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
@@ -2416,7 +2416,7 @@ public:
             return true;
         }
 
-        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        Unit* target = !target_guid.IsEmpty() ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
         if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
         {
             handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
@@ -4449,7 +4449,7 @@ public:
         if (!master_name.empty())
             normalizePlayerName(master_name);
         ObjectGuid cached_guid = !master_name.empty() ? sCharacterCache->GetCharacterGuidByName(master_name) : ObjectGuid::Empty;
-        ObjectGuid master_guid = cached_guid ? cached_guid :
+        ObjectGuid master_guid = !cached_guid.IsEmpty() ? cached_guid :
             (player_lg_name && player_lg_name->holds_alternative<uint32>()) ? ObjectGuid::Create<HighGuid::Player>(player_lg_name->get<uint32>()) :
             player && player->GetTarget().IsPlayer() ? player->GetTarget() : ObjectGuid::Empty;
 

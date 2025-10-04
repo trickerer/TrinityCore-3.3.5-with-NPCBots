@@ -409,12 +409,12 @@ class spell_sha_earthbind_totem : public AuraScript
             return;
 
         //npcbot: workaround for bots
-        if (ObjectGuid creatorGuid = GetCaster()->GetCreatorGUID())
-            if (!creatorGuid.IsPlayer())
-                if (Creature const* bot = ObjectAccessor::GetCreature(*GetCaster(), creatorGuid))
-                    if (AuraEffect const* aur = bot->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
-                        if (roll_chance_i(aur->GetBaseAmount()))
-                            GetTarget()->CastSpell(nullptr, SPELL_SHAMAN_TOTEM_EARTHEN_POWER, true);
+        ObjectGuid creatorGuid = GetCaster()->GetCreatorGUID();
+        if (!creatorGuid.IsEmpty() && !creatorGuid.IsPlayer())
+            if (Creature const* bot = ObjectAccessor::GetCreature(*GetCaster(), creatorGuid))
+                if (AuraEffect const* aur = bot->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2289, 0))
+                    if (roll_chance_i(aur->GetBaseAmount()))
+                        GetTarget()->CastSpell(nullptr, SPELL_SHAMAN_TOTEM_EARTHEN_POWER, true);
         //end npcbot
 
         if (Player* owner = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())

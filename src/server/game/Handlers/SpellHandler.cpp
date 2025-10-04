@@ -619,7 +619,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         if (it != outfits.end())
         {
             WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
-            data << uint64(guid);
+            data << guid;
             data << uint32(unit->GetNativeDisplayId()); // displayId
             data << uint8(it->second.race);             // race
             data << uint8(it->second.gender);           // gender
@@ -653,7 +653,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
             NpcBotAppearanceData const* appearData = BotDataMgr::SelectNpcBotAppearance(bot->GetEntry());
 
             WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
-            data << uint64(guid);
+            data << guid;
             data << uint32(bot->GetDisplayId());                                       // displayId
             data << uint8(bot->GetRace());                                             // race
             data << uint8(appearData ? appearData->gender : (uint8)bot->GetGender());  // gender
@@ -723,7 +723,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         return;
 
     WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
-    data << uint64(guid);
+    data << guid;
     data << uint32(creator->GetDisplayId());
     data << uint8(creator->GetRace());
     data << uint8(creator->GetGender());
@@ -821,7 +821,7 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     spell->RecalculateDelayMomentForDst();
 
     WorldPacket data(SMSG_SET_PROJECTILE_POSITION, 21);
-    data << uint64(casterGuid);
+    data << casterGuid;
     data << uint8(castCount);
     data << float(x);
     data << float(y);

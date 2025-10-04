@@ -302,12 +302,13 @@ public:
         if (GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(spawnId))
         {
             Player const* const player = handler->GetSession()->GetPlayer();
-            if (ObjectGuid ownerGuid = object->GetOwnerGUID())
+            ObjectGuid ownerGuid = object->GetOwnerGUID();
+            if (!ownerGuid.IsEmpty())
             {
                 Unit* owner = ObjectAccessor::GetUnit(*player, ownerGuid);
                 if (!owner || !ownerGuid.IsPlayer())
                 {
-                    handler->PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, ownerGuid.GetCounter(), spawnId);
+                    handler->PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, *spawnId, ownerGuid.ToString().c_str());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }

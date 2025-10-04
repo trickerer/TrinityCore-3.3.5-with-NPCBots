@@ -260,7 +260,6 @@ Item::Item()
     mb_in_trade = false;
     m_lastPlayedTimeUpdate = GameTime::GetGameTime();
 
-    m_refundRecipient = 0;
     m_paidMoney = 0;
     m_paidExtendedCost = 0;
 }
@@ -274,7 +273,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemId, Player const* owne
 
     if (owner)
     {
-        SetGuidValue(ITEM_FIELD_OWNER, owner->GetGUID());
+        SetOwnerGUID(owner->GetGUID());
         SetGuidValue(ITEM_FIELD_CONTAINED, owner->GetGUID());
     }
 
@@ -327,7 +326,6 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
     if (!isInTransaction)
         trans = CharacterDatabase.BeginTransaction();
 
-    ObjectGuid::LowType guid = GetGUID().GetCounter();
     switch (uState)
     {
         case ITEM_NEW:
@@ -362,7 +360,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
             stmt->setUInt16(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
             stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
             stmt->setString(++index, m_text);
-            stmt->setUInt32(++index, guid);
+            stmt->setUInt32(++index, GetGUID().GetCounter());
 
             trans->Append(stmt);
 
@@ -370,7 +368,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
                 stmt->setUInt32(0, GetOwnerGUID().GetCounter());
-                stmt->setUInt32(1, guid);
+                stmt->setUInt32(1, GetGUID().GetCounter());
                 trans->Append(stmt);
             }
             break;
@@ -378,13 +376,13 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
         case ITEM_REMOVED:
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-            stmt->setUInt32(0, guid);
+            stmt->setUInt32(0, GetGUID().GetCounter());
             trans->Append(stmt);
 
             if (IsWrapped())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, GetGUID().GetCounter());
                 trans->Append(stmt);
             }
 
@@ -429,7 +427,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     }
 
     // set owner (not if item is only loaded for gbank/auction/mail
-    if (owner_guid)
+    if (!owner_guid.IsEmpty())
         SetOwnerGUID(owner_guid);
 
     bool need_save = false;                                 // need explicit save data at load fixes
@@ -1019,7 +1017,7 @@ bool Item::IsLimitedToAnotherMapOrZone(uint32 cur_mapId, uint32 cur_zoneId) cons
 void Item::SendUpdateSockets()
 {
     WorldPacket data(SMSG_SOCKET_GEMS_RESULT, 8+4+4+4+4);
-    data << uint64(GetGUID());
+    data << GetGUID();
     for (uint32 i = SOCK_ENCHANTMENT_SLOT; i <= BONUS_ENCHANTMENT_SLOT; ++i)
         data << uint32(GetEnchantmentId(EnchantmentSlot(i)));
 
@@ -1036,7 +1034,7 @@ void Item::SendTimeUpdate(Player* owner)
         return;
 
     WorldPacket data(SMSG_ITEM_TIME_UPDATE, (8+4));
-    data << uint64(GetGUID());
+    data << GetGUID();
     data << uint32(duration);
     owner->SendDirectMessage(&data);
 }
@@ -1139,7 +1137,7 @@ void Item::SaveRefundDataToDB()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_REFUND_INSTANCE);
     stmt->setUInt32(0, GetGUID().GetCounter());
-    stmt->setUInt32(1, GetRefundRecipient());
+    stmt->setUInt32(1, GetRefundRecipient().GetCounter());
     stmt->setUInt32(2, GetPaidMoney());
     stmt->setUInt16(3, uint16(GetPaidExtendedCost()));
     trans->Append(stmt);
@@ -1168,7 +1166,7 @@ void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, Character
     if (changestate)
         SetState(ITEM_CHANGED, owner);
 
-    SetRefundRecipient(0);
+    SetRefundRecipient(ObjectGuid::Empty);
     SetPaidMoney(0);
     SetPaidExtendedCost(0);
     DeleteRefundDataFromDB(trans);

@@ -788,7 +788,7 @@ public:
         {
             TerminateEvent();
 
-            if (IsTempBot() && _summonerGUID)
+            if (IsTempBot() && !_summonerGUID.IsEmpty())
                 if (Unit* bot = ObjectAccessor::GetUnit(*me, _summonerGUID))
                     if (bot->IsNPCBot())
                         bot->ToCreature()->OnBotDespawn(me);

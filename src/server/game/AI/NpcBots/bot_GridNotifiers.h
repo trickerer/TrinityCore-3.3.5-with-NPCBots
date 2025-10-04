@@ -296,7 +296,7 @@ class AffectedTargetCheck
         {
             if (!u->IsAlive())
                 return false;
-            if (caster && u->HasUnitFlag(UNIT_FLAG_UNINTERACTIBLE))
+            if (!caster.IsEmpty() && u->HasUnitFlag(UNIT_FLAG_UNINTERACTIBLE))
                 return false;
             if (!checker->IsWithinDistInMap(u, m_range))
                 return false;
@@ -314,7 +314,7 @@ class AffectedTargetCheck
             {
                 AuraApplication const* auraApp = itr->second;
                 if (itr->first == spell)
-                    if (caster == 0 || auraApp->GetBase()->GetCasterGUID() == caster)
+                    if (caster.IsEmpty() || auraApp->GetBase()->GetCasterGUID() == caster)
                         return true;
             }
             return false;
