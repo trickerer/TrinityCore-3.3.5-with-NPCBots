@@ -190,7 +190,7 @@ bool Group::Create(Player* leader)
     ObjectGuid leaderGuid = leader->GetGUID();
     ObjectGuid::LowType lowguid = sGroupMgr->GenerateGroupId();
 
-    m_guid = ObjectGuid(HighGuid::Group, lowguid);
+    m_guid = ObjectGuid(HighGuid::Group, sGroupMgr->GenerateGroupId());
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
     leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
@@ -2809,11 +2809,6 @@ ObjectGuid Group::GetLeaderGUID() const
 ObjectGuid Group::GetGUID() const
 {
     return m_guid;
-}
-
-ObjectGuid::LowType Group::GetLowGUID() const
-{
-    return m_guid.GetCounter();
 }
 
 char const* Group::GetLeaderName() const
