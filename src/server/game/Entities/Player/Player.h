@@ -2443,7 +2443,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         SkillStatusMap mSkillStatus;
 
-        uint32 m_GuildIdInvited;
+        ObjectGuid::LowType m_GuildIdInvited;
         uint32 m_ArenaTeamIdInvited;
 
         PlayerMails m_mail;
