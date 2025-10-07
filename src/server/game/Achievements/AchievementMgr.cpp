@@ -1543,7 +1543,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (achievement->Flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
-    //TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}", achievement->ID, m_player->GetName(), m_player->GetGUID().ToString());
+    //TC_LOG_INFO("achievement", "AchievementMgr::CompletedAchievement({}). Player: {} {}", achievement->ID, m_player->GetGUID().ToString(), m_player->GetName());
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
