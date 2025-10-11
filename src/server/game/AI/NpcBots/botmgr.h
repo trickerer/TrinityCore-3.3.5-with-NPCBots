@@ -108,8 +108,12 @@ class TC_GAME_API BotMgr
         using delayed_teleport_mutex_type = std::mutex;
         using delayed_teleport_lock_type = std::unique_lock<delayed_teleport_mutex_type>;
 
-        BotMgr(Player* const master);
+        explicit BotMgr(Player* const master);
         ~BotMgr();
+        BotMgr(BotMgr const&) = delete;
+        BotMgr(BotMgr&&) = delete;
+        BotMgr& operator=(BotMgr const&) = delete;
+        BotMgr& operator=(BotMgr&&) = delete;
 
         Player* GetOwner() const { return _owner; }
 

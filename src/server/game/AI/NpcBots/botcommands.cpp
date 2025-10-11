@@ -2892,7 +2892,7 @@ public:
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+        static auto return_success = [=](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Marked send point %u for %u bot(s)", *point_id, name_or_count.get<uint32>());
             else
@@ -2953,7 +2953,7 @@ public:
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+        static auto return_success = [=](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Moving %u bot(s) to point %u...", name_or_count.get<uint32>(), *point_id);
             else
@@ -3931,7 +3931,7 @@ public:
 
     static bool HandleNpcBotSpawnedCommandImpl(ChatHandler* handler, Optional<std::string> area_str, Optional<std::string> class_str, Optional<uint32> level_min, Optional<uint32> level_max, bool is_free)
     {
-        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
@@ -4027,7 +4027,7 @@ public:
             if ((1 << bclass) & ALL_BOT_CLASSES_MASK)
                 GetBotClassNameAndColor(bclass, dummy, bot_class_names[bclass]);
 
-        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
