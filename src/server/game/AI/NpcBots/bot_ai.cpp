@@ -480,7 +480,7 @@ void bot_ai::CheckOwnerExpiry()
     if (_botData->owner == 0)
         return;
 
-    ObjectGuid ownerGuid = ObjectGuid(HighGuid::Player, 0, _botData->owner);
+    ObjectGuid ownerGuid = ObjectGuid::Create<HighGuid::Player>(_botData->owner);
     time_t timeNow = time(0);
     time_t expireTime = time_t(BotMgr::GetOwnershipExpireTime());
     time_t baseTimeStamp;
@@ -4061,7 +4061,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     {
         if (_orders.front()._type == BOT_ORDER_PULL)
         {
-            ObjectGuid orderTargetGuid = ObjectGuid(_orders.front().params.pullParams.targetGuid);
+            ObjectGuid orderTargetGuid = _orders.front().params.pullParams.targetGuid;
             if (Unit* orderTarget = mytar && mytar->GetGUID() == orderTargetGuid ? mytar : ObjectAccessor::GetUnit(*me, orderTargetGuid))
             {
                 if (CanBotAttack(orderTarget))
@@ -10783,7 +10783,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         std::ostringstream ostr;
                         std::string name;
                         ostr << LocalizedNpcText(player, BOT_TEXT_HIREDENY_MY_MASTER_IS_);
-                        if (sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, _ownerGuid), name))
+                        if (sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(_ownerGuid), name))
                             ostr << name;
                         else
                             ostr << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) + " (" << _ownerGuid << ')';
@@ -11377,7 +11377,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 << ", spec: " << uint32(_spec) << '(' << LocalizedNpcText(player, TextForSpec(_spec)) << ')'
                 << ", faction: " << me->GetFaction()
                 << "). owner: ";
-            if (_ownerGuid && sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, _ownerGuid), name))
+            if (_ownerGuid && sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(_ownerGuid), name))
                 ostr << name << " (" << _ownerGuid << ')';
             else
                 ostr << "none";
@@ -16966,8 +16966,8 @@ void bot_ai::_ProcessOrders()
 
             SetBotCommandState(BOT_COMMAND_ISSUED_ORDER);
 
-            if (order.params.pullParams.targetGuid)
-                target = ObjectAccessor::GetUnit(*me, ObjectGuid(order.params.pullParams.targetGuid));
+            if (!order.params.pullParams.targetGuid.IsEmpty())
+                target = ObjectAccessor::GetUnit(*me, order.params.pullParams.targetGuid);
             else
             {
                 BOT_LOG_ERROR("scripts", "bot_ai:_ProcessOrders: invalid pullParams.targetGuid {}!", order.params.pullParams.targetGuid);
@@ -17009,7 +17009,7 @@ bool bot_ai::IsLastOrder(BotOrderTypes order_type, uint32 param1, ObjectGuid gui
                         return true;
                     break;
                 case BOT_ORDER_PULL:
-                    if (!guidparam1 || order.params.pullParams.targetGuid == guidparam1.GetRawValue())
+                    if (!guidparam1 || order.params.pullParams.targetGuid == guidparam1)
                         return true;
                     break;
                 default:

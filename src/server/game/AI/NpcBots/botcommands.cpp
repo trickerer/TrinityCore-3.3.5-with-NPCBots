@@ -2217,7 +2217,7 @@ public:
         }
 
         bot_ai::BotOrder order(BOT_ORDER_PULL);
-        order.params.pullParams.targetGuid = target_guid.GetRawValue();
+        order.params.pullParams.targetGuid = target_guid;
 
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
@@ -2425,7 +2425,7 @@ public:
 
         bot_ai::BotOrder order(BOT_ORDER_SPELLCAST);
         order.params.spellCastParams.baseSpell = base_spell;
-        order.params.spellCastParams.targetGuid = target_guid.GetRawValue();
+        order.params.spellCastParams.targetGuid = target_guid;
 
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
@@ -3229,7 +3229,7 @@ public:
 
         bool found = true;
         if (guidlow)
-            found = sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, 0, guidlow), characterName);
+            found = sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(guidlow), characterName);
         else
             guidlow = sCharacterCache->GetCharacterGuidByName(characterName).GetCounter();
 
@@ -3421,7 +3421,7 @@ public:
         {
             ObjectGuid receiver =
                 botowner ? botowner->GetGUID() :
-                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid::Create<HighGuid::Player>(bot->GetBotAI()->GetBotOwnerGuid()) :
                 chr ? chr->GetGUID() : ObjectGuid::Empty;
 
             if (!botowner && chr && receiver != chr->GetGUID() && !sCharacterCache->HasCharacterCacheEntry(receiver))

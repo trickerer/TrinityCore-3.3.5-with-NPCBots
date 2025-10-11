@@ -805,21 +805,18 @@ class bot_ai : public CreatureAI
             {
                 struct
                 {
-                    uint64 targetGuid;
+                    ObjectGuid targetGuid;
                     uint32 baseSpell;
                 } spellCastParams;
 
                 struct
                 {
-                    uint64 targetGuid;
+                    ObjectGuid targetGuid;
                 } pullParams;
 
             } params;
 
-            explicit BotOrder(BotOrderTypes order_type, uint32 timeout_sec = 10) : _type(order_type), _timeout(time(0) + timeout_sec)
-            {
-                memset((char*)(&params), 0, sizeof(params));
-            }
+            explicit BotOrder(BotOrderTypes order_type, uint32 timeout_sec = 10) : params{}, _type(order_type), _timeout(time(0) + timeout_sec) {}
             BotOrder(BotOrder&&) noexcept = default;
 
             BotOrder(BotOrder const&) = delete;
