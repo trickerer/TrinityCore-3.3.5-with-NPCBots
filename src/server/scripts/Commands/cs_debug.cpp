@@ -192,7 +192,7 @@ public:
             return false;
         }
 
-        if (player->GetTarget())
+        if (!player->GetTarget().IsEmpty())
             unit->PlayDistanceSound(soundId, player);
         else
             unit->PlayDirectSound(soundId, player);
@@ -421,15 +421,15 @@ public:
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
-                data << uint64(obj->GetGUID());
+                data << obj->GetGUID();
             }
             else if (type == "myguid")
             {
-                data << uint64(player->GetGUID());
+                data << player->GetGUID();
             }
             else if (type == "itsguid")
             {
-                data << uint64(unit->GetGUID());
+                data << unit->GetGUID();
             }
             else if (type == "itspos")
             {
@@ -1055,7 +1055,7 @@ public:
 
     static bool HandleDebugGetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(guid));
 
         if (!i)
             return false;
@@ -1072,7 +1072,7 @@ public:
 
     static bool HandleDebugSetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index, uint32 value)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(guid));
 
         if (!i)
             return false;
@@ -1087,7 +1087,7 @@ public:
 
     static bool HandleDebugItemExpireCommand(ChatHandler* handler, ObjectGuid::LowType guid)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(guid));
 
         if (!i)
             return false;
@@ -1157,19 +1157,19 @@ public:
 
         if (index >= target->GetValuesCount())
         {
-            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, target->GetGUID().GetCounter(), target->GetValuesCount());
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, target->GetGUID().ToString().c_str(), target->GetValuesCount());
             return false;
         }
 
         if (value.holds_alternative<uint32>())
         {
             target->SetUInt32Value(index, value.get<uint32>());
-            handler->PSendSysMessage(LANG_SET_UINT_FIELD, target->GetGUID().GetCounter(), index, value.get<uint32>());
+            handler->PSendSysMessage(LANG_SET_UINT_FIELD, target->GetGUID().ToString().c_str(), index, value.get<uint32>());
         }
         else if (value.holds_alternative<float>())
         {
             target->SetFloatValue(index, value.get<float>());
-            handler->PSendSysMessage(LANG_SET_FLOAT_FIELD, target->GetGUID().GetCounter(), index, value.get<float>());
+            handler->PSendSysMessage(LANG_SET_FLOAT_FIELD, target->GetGUID().ToString().c_str(), index, value.get<float>());
         }
 
         return true;
@@ -1189,19 +1189,19 @@ public:
 
         if (index >= target->GetValuesCount())
         {
-            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, guid.GetCounter(), target->GetValuesCount());
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, guid.ToString().c_str(), target->GetValuesCount());
             return false;
         }
 
         if (isInt)
         {
             uint32 value = target->GetUInt32Value(index);
-            handler->PSendSysMessage(LANG_GET_UINT_FIELD, guid.GetCounter(), index, value);
+            handler->PSendSysMessage(LANG_GET_UINT_FIELD, guid.ToString().c_str(), index, value);
         }
         else
         {
             float value = target->GetFloatValue(index);
-            handler->PSendSysMessage(LANG_GET_FLOAT_FIELD, guid.GetCounter(), index, value);
+            handler->PSendSysMessage(LANG_GET_FLOAT_FIELD, guid.ToString().c_str(), index, value);
         }
 
         return true;
@@ -1211,7 +1211,7 @@ public:
     {
         if (index >= handler->GetPlayer()->GetValuesCount())
         {
-            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, handler->GetPlayer()->GetGUID().GetCounter(), handler->GetPlayer()->GetValuesCount());
+            handler->PSendSysMessage(LANG_TOO_BIG_INDEX, index, handler->GetPlayer()->GetGUID().ToString().c_str(), handler->GetPlayer()->GetValuesCount());
             return false;
         }
 
@@ -1251,13 +1251,13 @@ public:
         {
             value = unit->GetUInt32Value(index);
 
-            handler->PSendSysMessage(LANG_UPDATE, unit->GetGUID().GetCounter(), index, *value);
+            handler->PSendSysMessage(LANG_UPDATE, unit->GetGUID().ToString().c_str(), index, *value);
             return true;
         }
 
         unit->SetUInt32Value(index, *value);
 
-        handler->PSendSysMessage(LANG_UPDATE_CHANGE, unit->GetGUID().GetCounter(), index, *value);
+        handler->PSendSysMessage(LANG_UPDATE_CHANGE, unit->GetGUID().ToString().c_str(), index, *value);
         return true;
     }
 

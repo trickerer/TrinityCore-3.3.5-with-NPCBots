@@ -365,23 +365,11 @@ private:
         bot_template.InitializeQueryData();
 
         uint8 bot_spec = bot_ai::SelectSpecForClass(bot_class);
-        NpcBotData* bot_data = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class, bot_spec), bot_faction, bot_spec);
-        _botsData[next_bot_id] = bot_data;
-        NpcBotExtras* bot_extras = new NpcBotExtras();
-        bot_extras->bclass = bot_class;
-        bot_extras->race = orig_extras->race;
-        _botsExtras[next_bot_id] = bot_extras;
+        _botsData[next_bot_id] = new NpcBotData(bot_ai::DefaultRolesForClass(bot_class, bot_spec), bot_faction, bot_spec);
+        _botsExtras[next_bot_id] = new NpcBotExtras{ .race = orig_extras->race, .bclass = bot_class };
         if (NpcBotAppearanceData const* orig_apdata = BotDataMgr::SelectNpcBotAppearance(orig_entry))
-        {
-            NpcBotAppearanceData* bot_apdata = new NpcBotAppearanceData();
-            bot_apdata->face = orig_apdata->face;
-            bot_apdata->features = orig_apdata->features;
-            bot_apdata->gender = orig_apdata->gender;
-            bot_apdata->hair = orig_apdata->hair;
-            bot_apdata->haircolor = orig_apdata->haircolor;
-            bot_apdata->skin = orig_apdata->skin;
-            _botsAppearanceData[next_bot_id] = bot_apdata;
-        }
+            _botsAppearanceData[next_bot_id] = new NpcBotAppearanceData(*orig_apdata);
+
         int8 beqId = 1;
         _botsWanderCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_entry, beqId);
 
@@ -518,6 +506,8 @@ public:
         }
         else
         {
+            ASSERT(bracketEntry);
+
             bracketPcts[bracketEntry->MinLevel / 10] = 100u;
             switch (team)
             {
@@ -547,7 +537,7 @@ public:
                     if (int32(botTeam) != team)
                         continue;
 
-                    if (bracketEntry && BotDataMgr::GetMinLevelForBotClass(kv.first) > bracketEntry->MaxLevel)
+                    if (BotDataMgr::GetMinLevelForBotClass(kv.first) > bracketEntry->MaxLevel)
                         continue;
 
                     teamSpareBotIdsPerClass.push_back({kv.first, spareBotId});

@@ -72,10 +72,13 @@ void TransportMgr::LoadTransportTemplates()
 
         if (goInfo->moTransport.taxiPathId >= sTaxiPathNodesByPath.size())
         {
-            TC_LOG_ERROR("sql.sql", "Transport {} (name: {}) has an invalid path specified in `gameobject_template`.`data0` ({}) field, skipped.", entry, goInfo->name, goInfo->moTransport.taxiPathId);
+            TC_LOG_ERROR("sql.sql", "Transport {} (name: {}) has an invalid path specified in `gameobject_template`.`Data0` ({}) field, skipped.", entry, goInfo->name, goInfo->moTransport.taxiPathId);
             continue;
         }
         
+        if (!goInfo->moTransport.taxiPathId)
+            continue;
+
         if (!goInfo->moTransport.taxiPathId)
             continue;
 

@@ -59,6 +59,10 @@ Notes:
 Methods may have null arg1 (Unit*):
 DamageTaken(Unit*, ), JustDied(Unit*, ), OwnerAttackedBy(Unit*, ), HealReceived(Unit*, )
 Possibly others
+Performance impact factors:
+ - Containers for selection
+ - GetDistance() instead of IsWithinDist() (extra sqrt)
+ - std::ostringstream::str() instead of std::ostringstream::view()
 */
 
 #ifdef _MSC_VER
@@ -480,7 +484,7 @@ void bot_ai::CheckOwnerExpiry()
     if (_botData->owner == 0)
         return;
 
-    ObjectGuid ownerGuid = ObjectGuid(HighGuid::Player, 0, _botData->owner);
+    ObjectGuid ownerGuid = ObjectGuid::Create<HighGuid::Player>(_botData->owner);
     time_t timeNow = time(0);
     time_t expireTime = time_t(BotMgr::GetOwnershipExpireTime());
     time_t baseTimeStamp;
@@ -536,7 +540,10 @@ void bot_ai::CheckOwnerExpiry()
                     }
                 }
                 if (item_idx >= BOT_INVENTORY_SIZE)
+                {
                     BOT_LOG_ERROR("npcbots", "bot_ai::CheckOwnerExpiry(): item id {} guid {} not found in bot's inventory!\n{}", itemId, itemGuidLow, me->GetGUID().ToString());
+                    continue;
+                }
 
                 items.push_back(_equips[item_idx]);
                 _removeEquipment(item_idx);
@@ -585,7 +592,7 @@ void bot_ai::CheckOwnerExpiry()
 
 void bot_ai::InitUnitFlags()
 {
-    if (BotMgr::DisplayEquipment() == true && CanDisplayNonWeaponEquipmentChanges())
+    if (BotMgr::DisplayEquipment() && CanDisplayNonWeaponEquipmentChanges())
     {
         (const_cast<CreatureTemplate*>(me->GetCreatureTemplate()))->unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE;
         me->ReplaceAllUnitFlags2(UnitFlags2(me->GetCreatureTemplate()->unit_flags2));
@@ -1255,7 +1262,7 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos, float* 
             return;
     }
 
-    Vehicle* veh = me->GetVehicle();
+    Vehicle const* veh = me->GetVehicle();
     VehicleSeatEntry const* seat = veh ? veh->GetSeatForPassenger(me) : nullptr;
     bool canControl = seat ? (seat->Flags & VEHICLE_SEAT_FLAG_CAN_CONTROL) : false;
     Unit* mover = canControl ? veh->GetBase() : !veh ? me : nullptr;
@@ -1573,7 +1580,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         {
             if (BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i])
             {
-                if (ObjectGuid guid = pGroup->GetTargetIcons()[i])
+                if (ObjectGuid guid = pGroup->GetTargetIcons()[i]; !guid.IsEmpty())
                 {
                     if (Unit* unit = ObjectAccessor::GetUnit(*me, guid))
                     {
@@ -1814,7 +1821,7 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
 {
     if (!cureSpell) return;
     if (GC_Timer > diff) return;
-    if (me->IsMounted())
+    if (me->IsMounted()) return;
     if (IsTank() && me->GetVictim() && me->GetMap()->IsRaid()) return;
     if (IsCasting()) return;
 
@@ -3655,15 +3662,14 @@ bool bot_ai::IsInBotParty(Unit const* unit) const
         for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if ((BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i]) &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags() | BotMgr::GetRangedDPSTargetIconFlags()) & GroupIconsFlags[i]))
-                if (ObjectGuid guid = gr->GetTargetIcons()[i])
-                    if (guid == unit->GetGUID())
-                        return true;
+                if (unit->GetGUID() == gr->GetTargetIcons()[i])
+                    return true;
     }
 
     //Player-controlled creature case
     if (Creature const* cre = unit->ToCreature())
     {
-        ObjectGuid ownerGuid = unit->GetOwnerGUID() ? unit->GetOwnerGUID() : unit->GetCreator() ? unit->GetCreator()->GetGUID() : ObjectGuid::Empty;
+        ObjectGuid ownerGuid = !unit->GetOwnerGUID().IsEmpty() ? unit->GetOwnerGUID() : unit->GetCreator() ? unit->GetCreator()->GetGUID() : ObjectGuid::Empty;
         if (!ownerGuid && unit->IsVehicle())
             ownerGuid = unit->GetCharmerGUID();
         //controlled by master
@@ -3672,12 +3678,12 @@ bool bot_ai::IsInBotParty(Unit const* unit) const
         //npcbot/npcbot's pet case
         if (cre->GetBotOwner() == master)
             return true;
-        if (ownerGuid && master->GetBotMgr()->GetBot(ownerGuid))
+        if (!ownerGuid.IsEmpty() && master->GetBotMgr()->GetBot(ownerGuid))
             return true;
         //controlled by group member
         //pets, minions, guardians etc.
         //bot pets too
-        if (ownerGuid)
+        if (!ownerGuid.IsEmpty())
             if (Group const* gr = master->GetGroup())
                 if (gr->IsMember(ownerGuid))
                     return true;
@@ -3711,9 +3717,8 @@ bool bot_ai::IsInBotParty(ObjectGuid guid) const
         for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if ((BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i]) &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
-                if (ObjectGuid gguid = gr->GetTargetIcons()[i])
-                    if (gguid == guid)
-                        return true;
+                if (guid == gr->GetTargetIcons()[i])
+                    return true;
 
         for (GroupReference const* ref = gr->GetFirstMember(); ref != nullptr; ref = ref->next())
         {
@@ -3937,7 +3942,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
         {
             if (BotMgr::GetOffTankTargetIconFlags() & GroupIconsFlags[i])
             {
-                if (ObjectGuid guid = gr->GetTargetIcons()[i])
+                if (ObjectGuid guid = gr->GetTargetIcons()[i]; !guid.IsEmpty())
                 {
                     if (mytar && mytar->GetGUID() == guid && mytar->GetVictim() == veh)
                         return mytar;
@@ -3967,7 +3972,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     {
         for (int8 i = TARGET_ICONS_COUNT - 1; i >= 0; --i)
         {
-            if (ObjectGuid guid = gr->GetTargetIcons()[i])
+            if (ObjectGuid guid = gr->GetTargetIcons()[i]; !guid.IsEmpty())
             {
                 if ((HasRole(BOT_ROLE_RANGED)|| HasVehicleRoleOverride(BOT_ROLE_RANGED)) &&
                     (BotMgr::GetRangedDPSTargetIconFlags() & GroupIconsFlags[i]))
@@ -4063,7 +4068,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     {
         if (_orders.front()._type == BOT_ORDER_PULL)
         {
-            ObjectGuid orderTargetGuid = ObjectGuid(_orders.front().params.pullParams.targetGuid);
+            ObjectGuid orderTargetGuid = _orders.front().params.pullParams.targetGuid;
             if (Unit* orderTarget = mytar && mytar->GetGUID() == orderTargetGuid ? mytar : ObjectAccessor::GetUnit(*me, orderTargetGuid))
             {
                 if (CanBotAttack(orderTarget))
@@ -4267,7 +4272,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     {
         if (_primaryIconTank >= 0 && BotMgr::GetOffTankTargetIconFlags() & (1u << _primaryIconTank))
         {
-            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank])
+            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank]; !guid.IsEmpty())
             {
                 if (mytar && mytar->GetGUID() == guid)
                     return { mytar, mytar };
@@ -4291,7 +4296,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             if (BotMgr::GetOffTankTargetIconFlags() & GroupIconsFlags[i])
             {
-                if (ObjectGuid guid = gr->GetTargetIcons()[i])
+                if (ObjectGuid guid = gr->GetTargetIcons()[i]; !guid.IsEmpty())
                 {
                     if (mytar && mytar->GetGUID() == guid && mytar->GetVictim() == me)
                     {
@@ -4329,7 +4334,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     {
         if (_primaryIconTank >= 0 && BotMgr::GetTankTargetIconFlags() & (1u << _primaryIconTank))
         {
-            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank])
+            if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconTank]; !guid.IsEmpty())
             {
                 if (mytar && mytar->GetGUID() == guid)
                     return { mytar, mytar };
@@ -4353,7 +4358,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             if (BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
             {
-                if (ObjectGuid guid = gr->GetTargetIcons()[i])
+                if (ObjectGuid guid = gr->GetTargetIcons()[i]; !guid.IsEmpty())
                 {
                     if (mytar && mytar->GetGUID() == guid && mytar->GetVictim() == me)
                     {
@@ -4396,7 +4401,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                 iconMask |= BotMgr::GetRangedDPSTargetIconFlags();
             if (iconMask & (1u << _primaryIconDamage))
             {
-                if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconDamage])
+                if (ObjectGuid guid = gr->GetTargetIcons()[_primaryIconDamage]; !guid.IsEmpty())
                 {
                     if (mytar && mytar->GetGUID() == guid)
                         return { mytar, mytar };
@@ -4418,7 +4423,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
             if (i == _primaryIconDamage)
                 continue;
 
-            if (ObjectGuid guid = gr->GetTargetIcons()[i])
+            if (ObjectGuid guid = gr->GetTargetIcons()[i]; !guid.IsEmpty())
             {
                 if (HasRole(BOT_ROLE_RANGED) && (BotMgr::GetRangedDPSTargetIconFlags() & GroupIconsFlags[i]))
                 {
@@ -10786,7 +10791,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         std::ostringstream ostr;
                         std::string name;
                         ostr << LocalizedNpcText(player, BOT_TEXT_HIREDENY_MY_MASTER_IS_);
-                        if (sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, _ownerGuid), name))
+                        if (sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(_ownerGuid), name))
                             ostr << name;
                         else
                             ostr << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) + " (" << _ownerGuid << ')';
@@ -11097,7 +11102,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     {
                         bool prio = i == _primaryIconTank;
                         ObjectGuid guid = gr->GetTargetIcons()[i];
-                        if (guid && BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
+                        if (!guid.IsEmpty() && BotMgr::GetTankTargetIconFlags() & GroupIconsFlags[i])
                             AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i)), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
                     }
                     AddGossipItemFor(player, (_primaryIconTank == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK, uint32(GOSSIP_ACTION_INFO_DEF - 1));
@@ -11110,7 +11115,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         uint32 iconMask = BotMgr::GetDPSTargetIconFlags();
                         if (HasRole(BOT_ROLE_RANGED))
                             iconMask |= BotMgr::GetRangedDPSTargetIconFlags();
-                        if (guid && iconMask & GroupIconsFlags[i])
+                        if (!guid.IsEmpty() && iconMask & GroupIconsFlags[i])
                             AddGossipItemFor(player, prio ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, player->GetBotMgr()->GetTargetIconString(uint8(i)), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF) + uint32(i));
                     }
                     AddGossipItemFor(player, (_primaryIconDamage == -1) ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_NONE2), GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS, uint32(GOSSIP_ACTION_INFO_DEF - 1));
@@ -11380,7 +11385,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 << ", spec: " << uint32(_spec) << '(' << LocalizedNpcText(player, TextForSpec(_spec)) << ')'
                 << ", faction: " << me->GetFaction()
                 << "). owner: ";
-            if (_ownerGuid && sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, _ownerGuid), name))
+            if (_ownerGuid && sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(_ownerGuid), name))
                 ostr << name << " (" << _ownerGuid << ')';
             else
                 ostr << "none";
@@ -11791,7 +11796,7 @@ void bot_ai::OnOwnerVehicleDamagedBy(Unit* attacker)
         return;
 
     Creature* veh = me->GetVehicleCreatureBase();
-    if (!veh || (veh->GetTarget() && HasBotCommandState(BOT_COMMAND_ATTACK)) || !veh->IsValidAttackTarget(attacker))
+    if (!veh || (!veh->GetTarget().IsEmpty() && HasBotCommandState(BOT_COMMAND_ATTACK)) || !veh->IsValidAttackTarget(attacker))
         return;
 
     veh->SetTarget(attacker->GetGUID());
@@ -12328,7 +12333,7 @@ void bot_ai::_autoLootCreature(Creature* creature)
         creature->loot.loot_type = LOOT_CORPSE;
 
     Player* receiver = pLooters.size() == 1 ? *pLooters.begin() :
-        creature->loot.roundRobinPlayer ? ObjectAccessor::GetPlayer(*creature, creature->loot.roundRobinPlayer) : nullptr;
+        !creature->loot.roundRobinPlayer.IsEmpty() ? ObjectAccessor::GetPlayer(*creature, creature->loot.roundRobinPlayer) : nullptr;
 
     if (!receiver)
     {
@@ -13087,7 +13092,7 @@ BotEquipResult bot_ai::_unequip(uint8 slot, ObjectGuid receiver, bool store_to_b
     _removeEquipment(slot);
 
     //hand old weapon to master
-    if (receiver && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != itemId))
+    if (!receiver.IsEmpty() && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != itemId))
     {
         if (receiver == master->GetGUID())
         {
@@ -13183,12 +13188,12 @@ BotEquipResult bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver, bo
 
     BotLogger::Log(NPCBOT_LOG_EQUIP, me, uint32(slot), uint32(itemGuid.GetCounter()), uint32(newItemId), uint32(receiver.GetCounter()));
 
-    if (receiver && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != newItemId))
+    if (!receiver.IsEmpty() && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != newItemId))
     {
         ASSERT(receiver == master->GetGUID());
 
         //cheating
-        if ((newItem->GetOwnerGUID() && newItem->GetOwnerGUID() != master->GetGUID()) ||
+        if ((!newItem->GetOwnerGUID().IsEmpty() && newItem->GetOwnerGUID() != master->GetGUID()) ||
             (from_bank ? !BotDataMgr::WithdrawBotBankItem(receiver, itemGuid.GetCounter()) : !master->HasItemCount(newItemId, 1)))
         {
             BOT_LOG_ERROR("entities.player",
@@ -16619,7 +16624,7 @@ void bot_ai::OnBotOwnerSpellGo(Spell const* spell, bool ok)
                 targets.SetSpeed(spell->m_targets.GetSpeed());
             if (spell->m_targets.GetElevation() != 0)
                 targets.SetElevation(spell->m_targets.GetElevation());
-            if (spell->m_targets.GetUnitTargetGUID())
+            if (!spell->m_targets.GetUnitTargetGUID().IsEmpty())
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*veh->GetBase(), spell->m_targets.GetUnitTargetGUID()))
                 {
@@ -16933,7 +16938,7 @@ void bot_ai::_ProcessOrders()
                 target = me;
             else if (guid == master->GetGUID())
                 target = master;
-            else if (guid != 0)
+            else if (!guid.IsEmpty())
             {
                 if (!IAmFree())
                     target = master->GetBotMgr()->GetBot(guid);
@@ -16969,8 +16974,8 @@ void bot_ai::_ProcessOrders()
 
             SetBotCommandState(BOT_COMMAND_ISSUED_ORDER);
 
-            if (order.params.pullParams.targetGuid)
-                target = ObjectAccessor::GetUnit(*me, ObjectGuid(order.params.pullParams.targetGuid));
+            if (!order.params.pullParams.targetGuid.IsEmpty())
+                target = ObjectAccessor::GetUnit(*me, order.params.pullParams.targetGuid);
             else
             {
                 BOT_LOG_ERROR("scripts", "bot_ai:_ProcessOrders: invalid pullParams.targetGuid {}!", order.params.pullParams.targetGuid);
@@ -17012,7 +17017,7 @@ bool bot_ai::IsLastOrder(BotOrderTypes order_type, uint32 param1, ObjectGuid gui
                         return true;
                     break;
                 case BOT_ORDER_PULL:
-                    if (!guidparam1 || order.params.pullParams.targetGuid == guidparam1.GetRawValue())
+                    if (!guidparam1 || order.params.pullParams.targetGuid == guidparam1)
                         return true;
                     break;
                 default:
@@ -17303,7 +17308,7 @@ void bot_ai::DoEmeraldDrakeVehicleStrats(uint32 diff)
         else if (mmover->isMoving() && drake->GetDistance(mmover) >= 75.f && !mmover->HasInArc(float(M_PI) / 2, drake))
             interrupt = true;
         else if (Spell const* funnel = drake->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (ObjectGuid guid = funnel->m_targets.GetUnitTargetGUID())
+            if (ObjectGuid guid = funnel->m_targets.GetUnitTargetGUID(); !guid.IsEmpty())
                 if (Unit const* tar = ObjectAccessor::GetUnit(*drake, guid))
                     if (GetHealthPCT(tar) > 95)
                         interrupt = true;
@@ -17765,7 +17770,7 @@ bool bot_ai::CheckVehicleAttackTarget(BotVehicleStrats strat)
 
     if (!opponent)
     {
-        if (me->GetVehicleBase()->GetTarget())
+        if (!me->GetVehicleBase()->GetTarget().IsEmpty())
         {
             me->GetVehicleBase()->AttackStop();
             me->GetVehicleBase()->SetTarget(ObjectGuid::Empty);
@@ -18529,7 +18534,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             (IAmFree() || master->GetBotMgr()->GetBotAllowCombatPositioning()) &&
             (!mover->isMoving() || Rand() < 50) && !IsCasting(mover) && !IsShootingWand(mover))
         {
-            if (Unit* victim = CanBotAttackOnVehicle() ? me->GetVictim() : mover->GetTarget() ? ObjectAccessor::GetUnit(*mover, mover->GetTarget()) : nullptr)
+            if (Unit* victim = CanBotAttackOnVehicle() ? me->GetVictim() : !mover->GetTarget().IsEmpty() ? ObjectAccessor::GetUnit(*mover, mover->GetTarget()) : nullptr)
             {
                 _aoeSpots.clear();
                 if (IAmFree())
@@ -18630,7 +18635,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                             break;
                     }
                 }
-                if (GameObject* go = flag_guid ? bg->GetBgMap()->GetGameObject(flag_guid) : nullptr)
+                if (GameObject* go = !flag_guid.IsEmpty() ? bg->GetBgMap()->GetGameObject(flag_guid) : nullptr)
                 {
                     float fdist = me->GetDistance(go);
                     if (fdist < 30.f)
@@ -20437,7 +20442,7 @@ void bot_ai::OnWanderNodeReached()
                         if (c.State == BG_AV_States::POINT_NEUTRAL || c.Owner != bg->GetBotTeam(me->GetGUID()))
                         {
                             uint32 node_type = av->GetObjectThroughNodeForBot(counter);
-                            GameObject* go = bg->BgObjects[node_type] ? bg->GetBGObject(node_type) : nullptr;
+                            GameObject* go = !bg->BgObjects[node_type].IsEmpty() ? bg->GetBGObject(node_type) : nullptr;
                             if (go && me->IsWithinDistInMap(go, 10.0f))
                             {
                                 obj = go;

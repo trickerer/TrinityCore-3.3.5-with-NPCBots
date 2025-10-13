@@ -759,7 +759,7 @@ public:
         typedef std::set<Creature*> Summons;
         Summons _minions;
 
-        bool _spell_preact;
+        bool _spell_preact{};
 
         float _manaPerDamageMult() const
         {

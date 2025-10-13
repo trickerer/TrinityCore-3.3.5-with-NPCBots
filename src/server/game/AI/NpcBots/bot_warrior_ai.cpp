@@ -1017,7 +1017,7 @@ public:
             vigiCheckTimer = urand(1500, 3000);
             uint32 VIGILANCE = GetSpell(VIGILANCE_1);
 
-            if (Unit* u = vigilanceTargetGuid ? ObjectAccessor::GetUnit(*me, vigilanceTargetGuid) : nullptr)
+            if (Unit* u = !vigilanceTargetGuid.IsEmpty() ? ObjectAccessor::GetUnit(*me, vigilanceTargetGuid) : nullptr)
             {
                 bool myVig = u->HasAura(VIGILANCE, me->GetGUID());
                 if (!IsTank() || !myVig)
@@ -1028,7 +1028,7 @@ public:
                 }
                 return;
             }
-            else if (vigilanceTargetGuid)
+            else if (!vigilanceTargetGuid.IsEmpty())
                 vigilanceTargetGuid = ObjectGuid::Empty;
 
             if (!IAmFree() && !IsTank())

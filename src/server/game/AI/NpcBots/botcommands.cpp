@@ -1831,7 +1831,7 @@ public:
         queryTemp.CreatureID = ci->Entry;
         queryTemp.Allow = true;
         queryTemp.Stats.Name = locName;
-        queryTemp.Stats.NameAlt = locTitle;
+        queryTemp.Stats.Title = locTitle;
         queryTemp.Stats.CursorName = ci->IconName;
         queryTemp.Stats.Flags = ci->type_flags;
         queryTemp.Stats.CreatureType = ci->type;
@@ -2209,7 +2209,7 @@ public:
             return true;
         }
 
-        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        Unit* target = !target_guid.IsEmpty() ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
         if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
         {
             handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
@@ -2217,7 +2217,7 @@ public:
         }
 
         bot_ai::BotOrder order(BOT_ORDER_PULL);
-        order.params.pullParams.targetGuid = target_guid.GetRawValue();
+        order.params.pullParams.targetGuid = target_guid;
 
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
@@ -2416,7 +2416,7 @@ public:
             return true;
         }
 
-        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        Unit* target = !target_guid.IsEmpty() ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
         if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
         {
             handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
@@ -2425,7 +2425,7 @@ public:
 
         bot_ai::BotOrder order(BOT_ORDER_SPELLCAST);
         order.params.spellCastParams.baseSpell = base_spell;
-        order.params.spellCastParams.targetGuid = target_guid.GetRawValue();
+        order.params.spellCastParams.targetGuid = target_guid;
 
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
@@ -2892,7 +2892,7 @@ public:
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+        static auto return_success = [=](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Marked send point %u for %u bot(s)", *point_id, name_or_count.get<uint32>());
             else
@@ -2953,7 +2953,7 @@ public:
             return false;
         };
 
-        static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
+        static auto return_success = [=](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
                 chandler->PSendSysMessage("Moving %u bot(s) to point %u...", name_or_count.get<uint32>(), *point_id);
             else
@@ -3229,7 +3229,7 @@ public:
 
         bool found = true;
         if (guidlow)
-            found = sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, 0, guidlow), characterName);
+            found = sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(guidlow), characterName);
         else
             guidlow = sCharacterCache->GetCharacterGuidByName(characterName).GetCounter();
 
@@ -3421,7 +3421,7 @@ public:
         {
             ObjectGuid receiver =
                 botowner ? botowner->GetGUID() :
-                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid::Create<HighGuid::Player>(bot->GetBotAI()->GetBotOwnerGuid()) :
                 chr ? chr->GetGUID() : ObjectGuid::Empty;
 
             if (!botowner && chr && receiver != chr->GetGUID() && !sCharacterCache->HasCharacterCacheEntry(receiver))
@@ -3931,7 +3931,7 @@ public:
 
     static bool HandleNpcBotSpawnedCommandImpl(ChatHandler* handler, Optional<std::string> area_str, Optional<std::string> class_str, Optional<uint32> level_min, Optional<uint32> level_max, bool is_free)
     {
-        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
@@ -4027,7 +4027,7 @@ public:
             if ((1 << bclass) & ALL_BOT_CLASSES_MASK)
                 GetBotClassNameAndColor(bclass, dummy, bot_class_names[bclass]);
 
-        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
@@ -4449,7 +4449,7 @@ public:
         if (!master_name.empty())
             normalizePlayerName(master_name);
         ObjectGuid cached_guid = !master_name.empty() ? sCharacterCache->GetCharacterGuidByName(master_name) : ObjectGuid::Empty;
-        ObjectGuid master_guid = cached_guid ? cached_guid :
+        ObjectGuid master_guid = !cached_guid.IsEmpty() ? cached_guid :
             (player_lg_name && player_lg_name->holds_alternative<uint32>()) ? ObjectGuid::Create<HighGuid::Player>(player_lg_name->get<uint32>()) :
             player && player->GetTarget().IsPlayer() ? player->GetTarget() : ObjectGuid::Empty;
 

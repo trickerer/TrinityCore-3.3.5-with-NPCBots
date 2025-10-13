@@ -236,7 +236,7 @@ void BattlegroundAB::AddPlayer(Player* player)
     bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     Battleground::AddPlayer(player);
     if (!isInBattleground)
-        PlayerScores[player->GetGUID().GetCounter()] = new BattlegroundABScore(player->GetGUID());
+        PlayerScores[player->GetGUID()] = new BattlegroundABScore(player->GetGUID());
 }
 
 //npcbot
@@ -245,7 +245,7 @@ void BattlegroundAB::AddBot(Creature* bot)
     bool const isInBattleground = IsPlayerInBattleground(bot->GetGUID());
     Battleground::AddBot(bot);
     if (!isInBattleground)
-        BotScores[bot->GetEntry()] = new BattlegroundABScore(bot->GetGUID());
+        BotScores[bot->GetGUID()] = new BattlegroundABScore(bot->GetGUID());
 }
 //end npcbot
 
@@ -796,7 +796,7 @@ void BattlegroundAB::Reset()
     }
 
     for (uint8 i = 0; i < BG_AB_ALL_NODES_COUNT + 5; ++i)//+5 for aura triggers
-        if (BgCreatures[i])
+        if (!BgCreatures[i].IsEmpty())
             DelCreature(i);
 }
 

@@ -358,7 +358,7 @@ void Map::ScriptsProcess()
         }
 
         WorldObject* target = nullptr;
-        if (step.targetGUID)
+        if (!step.targetGUID.IsEmpty())
         {
             switch (step.targetGUID.GetHigh())
             {

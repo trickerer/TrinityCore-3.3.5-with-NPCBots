@@ -57,7 +57,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
         return false;
     }
 
-    Object::_Create(guidlow, 0, HighGuid::Mo_Transport);
+    Object::_Create(ObjectGuid::Create<HighGuid::Mo_Transport>(guidlow));
 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
@@ -96,7 +96,7 @@ bool Transport::Create(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, 
     SetEntry(goinfo->entry);
     SetDisplayId(goinfo->displayId);
     SetGoState(!goinfo->moTransport.canBeStopped ? GO_STATE_READY : GO_STATE_ACTIVE);
-    SetGoType(GAMEOBJECT_TYPE_MO_TRANSPORT);
+    SetGoType(GAMEOBJECT_TYPE_MAP_OBJ_TRANSPORT);
     SetGoAnimProgress(animprogress);
     SetName(goinfo->name);
     SetLocalRotation(0.0f, 0.0f, 0.0f, 1.0f);

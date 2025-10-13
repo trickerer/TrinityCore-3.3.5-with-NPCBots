@@ -298,7 +298,8 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPackets::Battleg
     Creature const* hfcbot = nullptr;
     //end npcbot
 
-    if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
+    ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE);
+    if (!guid.IsEmpty())
     //npcbot
     {
     //end npcbot
@@ -314,7 +315,8 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPackets::Battleg
     }
         //end npcbot
 
-    if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_HORDE))
+    guid = bg->GetFlagPickerGUID(TEAM_HORDE);
+    if (!guid.IsEmpty())
     //npcbot
     {
     //end npcbot

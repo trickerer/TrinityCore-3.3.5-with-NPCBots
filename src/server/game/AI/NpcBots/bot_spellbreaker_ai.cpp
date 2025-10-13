@@ -348,7 +348,7 @@ public:
 
     private:
 
-        mutable bool _doCrit;
+        mutable bool _doCrit{};
 
         void ProcessSpellsteal(Unit* target)
         {
@@ -447,8 +447,8 @@ public:
                         if (!failCount)
                         {
                             // Failed to dispell
-                            dataFail << uint64(me->GetGUID());                  // Caster GUID
-                            dataFail << uint64(target->GetGUID());              // Victim GUID
+                            dataFail << me->GetGUID();                          // Caster GUID
+                            dataFail << target->GetGUID();                      // Victim GUID
                             dataFail << uint32(SPELLSTEAL_1);                   // dispel spell id
                         }
                         ++failCount;

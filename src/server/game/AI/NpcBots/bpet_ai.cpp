@@ -99,6 +99,7 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     _updateTimerMedium = 0;
     _updateTimerEx1 = urand(12000, 15000);
     checkAurasTimer = 0;
+    shouldUpdateStats = false;
 
     _wanderer = false;
 
@@ -107,6 +108,8 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     myType = 0;
     petOwner = nullptr;
     canUpdate = true;
+
+    opponent = nullptr;
 }
 bot_pet_ai::~bot_pet_ai()
 {
@@ -1438,27 +1441,26 @@ bool bot_pet_ai::IsInBotParty(Unit const* unit) const
         for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
             if (BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i] &&
                 !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
-                if (ObjectGuid guid = gr->GetTargetIcons()[i])
-                    if (guid == unit->GetGUID())
-                        return true;
+                if (gr->GetTargetIcons()[i] == unit->GetGUID())
+                    return true;
     }
 
     //Player-controlled creature case
     if (Creature const* cre = unit->ToCreature())
     {
-        ObjectGuid ownerGuid = unit->GetOwnerGUID() ? unit->GetOwnerGUID() : unit->GetCreator() ? unit->GetCreator()->GetGUID() : ObjectGuid::Empty;
+        ObjectGuid ownerGuid = !unit->GetOwnerGUID().IsEmpty() ? unit->GetOwnerGUID() : unit->GetCreator() ? unit->GetCreator()->GetGUID() : ObjectGuid::Empty;
         //controlled by master
         if (ownerGuid == petOwner->GetBotOwner()->GetGUID())
             return true;
         //npcbot/npcbot's pet case
         if (cre->GetBotOwner() == petOwner->GetBotOwner())
             return true;
-        if (ownerGuid && petOwner->GetBotOwner()->GetBotMgr()->GetBot(ownerGuid))
+        if (!ownerGuid.IsEmpty() && petOwner->GetBotOwner()->GetBotMgr()->GetBot(ownerGuid))
             return true;
         //controlled by group member
         //pets, minions, guardians etc.
         //bot pets too
-        if (ownerGuid)
+        if (!ownerGuid.IsEmpty())
             if (Group const* gr = petOwner->GetBotOwner()->GetGroup())
                 if (gr->IsMember(ownerGuid))
                     return true;

@@ -2591,7 +2591,7 @@ public:
         {
             for (uint8 i = 0; i != MAX_TREANTS; ++i)
             {
-                if (_treants[i])
+                if (!_treants[i].IsEmpty())
                 {
                     if (Unit* tr = ObjectAccessor::GetUnit(*me, _treants[i]))
                         tr->ToTempSummon()->UnSummon();
@@ -2605,7 +2605,7 @@ public:
         {
             for (uint8 i = 0; i != MAX_TREANTS; ++i)
             {
-                if (_treants[i])
+                if (!_treants[i].IsEmpty())
                     if (Unit* tr = ObjectAccessor::GetUnit(*me, _treants[i]))
                         tr->ToTempSummon()->UnSummon();
             }

@@ -60,7 +60,7 @@ void Arena::AddPlayer(Player* player)
     bool const isInBattleground = IsPlayerInBattleground(player->GetGUID());
     Battleground::AddPlayer(player);
     if (!isInBattleground)
-        PlayerScores[player->GetGUID().GetCounter()] = new ArenaScore(player->GetGUID(), player->GetBGTeam());
+        PlayerScores[player->GetGUID()] = new ArenaScore(player->GetGUID(), player->GetBGTeam());
 
     if (player->GetBGTeam() == ALLIANCE)        // gold
     {
@@ -91,7 +91,7 @@ void Arena::AddBot(Creature* bot)
     uint32 botteam = bot->GetBotOwner()->GetBGTeam();
 
     if (!isInBattleground)
-        BotScores[bot->GetEntry()] = new ArenaScore(bot->GetGUID(), botteam);
+        BotScores[bot->GetGUID()] = new ArenaScore(bot->GetGUID(), botteam);
 
     //No flags - handled by AI
 
@@ -287,7 +287,7 @@ void Arena::EndBattleground(uint32 winner)
 
                 if (sWorld->getBoolConfig(CONFIG_ARENA_LOG_EXTENDED_INFO))
                     for (auto const& score : PlayerScores)
-                        if (Player* player = ObjectAccessor::FindConnectedPlayer(ObjectGuid(HighGuid::Player, score.first)))
+                        if (Player* player = ObjectAccessor::FindConnectedPlayer(score.first))
                         {
                             TC_LOG_DEBUG("bg.arena", "Statistics match Type: {} for {} (GUID: {}, Team: {}, IP: {}): {}",
                                 GetArenaType(), player->GetName(), score.first, player->GetArenaTeamId(GetArenaType() == 5 ? 2 : GetArenaType() == 3),

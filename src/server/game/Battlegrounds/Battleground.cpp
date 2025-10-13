@@ -876,7 +876,7 @@ void Battleground::EndBattleground(uint32 winner)
         if (isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVPSTATS_PLAYER);
-            BattlegroundScoreMap::const_iterator score = PlayerScores.find(player->GetGUID().GetCounter());
+            BattlegroundScoreMap::const_iterator score = PlayerScores.find(player->GetGUID());
 
             stmt->setUInt32(0,  battlegroundId);
             stmt->setUInt32(1,  player->GetGUID().GetCounter());
@@ -962,7 +962,7 @@ void Battleground::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
         participant = true;
     }
 
-    BattlegroundScoreMap::iterator itr2 = PlayerScores.find(guid.GetCounter());
+    BattlegroundScoreMap::iterator itr2 = PlayerScores.find(guid);
     if (itr2 != PlayerScores.end())
     {
         delete itr2->second;                                // delete player's score
@@ -1087,7 +1087,7 @@ void Battleground::RemoveBotAtLeave(ObjectGuid guid)
     }
 
     // delete player score if exists
-    auto const& itr2 = BotScores.find(guid.GetEntry());
+    auto const& itr2 = BotScores.find(guid);
     if (itr2 != BotScores.end())
     {
         delete itr2->second;
@@ -1543,7 +1543,7 @@ void Battleground::BuildPvPLogDataPacket(WorldPackets::Battleground::PVPMatchSta
 
 bool Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
 {
-    BattlegroundScoreMap::const_iterator itr = PlayerScores.find(player->GetGUID().GetCounter());
+    BattlegroundScoreMap::const_iterator itr = PlayerScores.find(player->GetGUID());
     if (itr == PlayerScores.end()) // player not found...
         return false;
 
@@ -1558,7 +1558,7 @@ bool Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
 //npcbot
 bool Battleground::UpdateBotScore(Creature const* bot, uint32 type, uint32 value, bool /*doAddHonor*/)
 {
-    BattlegroundScoreMap::const_iterator itr = BotScores.find(bot->GetEntry());
+    BattlegroundScoreMap::const_iterator itr = BotScores.find(bot->GetGUID());
     if (itr == BotScores.end()) // bot not found...
         return false;
 
