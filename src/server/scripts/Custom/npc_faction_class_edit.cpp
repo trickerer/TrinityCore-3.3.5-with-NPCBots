@@ -59,7 +59,8 @@ public:
         bool OnGossipHello(Player* player) override
         {
             uint64 guid = player->GetGUID().GetRawValue();
-			std::string guidStr = std::to_string(guidLow);
+			uint32 guidLow = player->GetGUID().GetCounter();
+            std::string guidStr = std::to_string(guidLow);
 			me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             QueryResult result;
             result = WorldDatabase.PQuery("SELECT * FROM `char_edit` WHERE `charid`='{}' AND `status`='0' LIMIT 1", guidStr.c_str());
@@ -131,7 +132,8 @@ public:
                     }
 
                     uint64 guid = player->GetGUID().GetRawValue();
-					std::string guidStr = std::to_string(guidLow);
+					uint32 guidLow = player->GetGUID().GetCounter();
+                    std::string guidStr = std::to_string(guidLow);
 					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
                     //player->DestroyItemCount(21140, 0, true);
@@ -180,7 +182,8 @@ public:
                     //player->DestroyItemCount(21140, 0, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
 					uint64 guid = player->GetGUID().GetRawValue();
-					std::string guidStr = std::to_string(guidLow);
+					uint32 guidLow = player->GetGUID().GetCounter();
+                    std::string guidStr = std::to_string(guidLow);
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = {}", guidStr.c_str());
                     me->Say(nemhtext41, LANG_UNIVERSAL); // tell player to log out and back in
