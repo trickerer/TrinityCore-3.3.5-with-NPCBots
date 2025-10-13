@@ -123,7 +123,7 @@ public:
 					}
 					
 					uint32 glId = player->GetGuildId();
-                    uint32 target_guid = player->GetSession()->GetGUIDLow();
+                    uint64 target_guid = player->GetGUID().GetRawValue();
                     uint32 guild = player->GetGuildId();
 
                     if (guild > 0) {
