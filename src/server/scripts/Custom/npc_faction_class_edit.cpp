@@ -50,7 +50,7 @@ public:
 		
         bool UpdateReNameCharData(Player* player, int16 status)
         {
-            uint32 guidLow = player->GetGUID();
+            uint64 guid = player->GetGUID().GetRawValue();
 			std::string guidStr = std::to_string(guidLow);
 			WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, guidStr.c_str());
             return true;
@@ -58,7 +58,7 @@ public:
  
         bool OnGossipHello(Player* player) override
         {
-            uint32 guidLow = player->GetGUID();
+            uint64 guid = player->GetGUID().GetRawValue();
 			std::string guidStr = std::to_string(guidLow);
 			me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
             QueryResult result;
@@ -130,7 +130,7 @@ public:
                         player->SetInGuild(0);
                     }
 
-                    uint32 guidLow = player->GetGUID();
+                    uint64 guid = player->GetGUID().GetRawValue();
 					std::string guidStr = std::to_string(guidLow);
 					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
@@ -152,7 +152,7 @@ public:
                         player->SetInGuild(0);
                     }
 
-                    uint32 guidLow = player->GetGUID();
+                    uint64 guid = player->GetGUID().GetRawValue();
 					std::string guidStr = std::to_string(guidLow);
 					player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
                     UpdateReNameCharData(player, 1);
@@ -179,7 +179,7 @@ public:
 				UpdateReNameCharData(player, 1);
                     //player->DestroyItemCount(21140, 0, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
-					uint32 guidLow = player->GetGUID();
+					uint64 guid = player->GetGUID().GetRawValue();
 					std::string guidStr = std::to_string(guidLow);
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = {}", guidStr.c_str());
@@ -194,7 +194,7 @@ public:
                     UpdateReNameCharData(player, 1);
                     player->DestroyItemCount(21140, 0, true);
                     //PSendSysMessage(LANG_CUSTOMIZE_PLAYER, GetNameLink(player).c_str());
-					uint32 guidLow = player->GetGUID();
+					uint64 guid = player->GetGUID().GetRawValue();
 					std::string guidStr = std::to_string(guidLow);
                     player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
                     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '128' WHERE guid = {}", guidStr.c_str());
