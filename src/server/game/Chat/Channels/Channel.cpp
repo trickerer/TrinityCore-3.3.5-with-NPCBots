@@ -741,7 +741,7 @@ void Channel::SayAsFake(Player* sender, std::string const& senderName, std::stri
         LocaleConstant localeIdx = sWorld->GetAvailableDbcLocale(DEFAULT_LOCALE);
 
         // Create a dummy ObjectGuid for the fake sender
-        ObjectGuid fakeGuid = ObjectGuid::Create<HighGuid::Player>(0, 3181);
+        ObjectGuid fakeGuid = ObjectGuid::Create<HighGuid::Player>(3181);
 
         // Use the real sender's GUID if available for 'source' parameter to ChatHandler::BuildChatPacket
         // but send the fake sender name and fakeGuid in the packet
