@@ -311,7 +311,7 @@ struct std::hash<ObjectGuid>
 {
     size_t operator()(ObjectGuid const& key) const noexcept
     {
-    return std::hash<uint64>()(key.GetRawValue());
+        return std::hash<uint64>()(key.GetRawValue());
     }
 };
 
