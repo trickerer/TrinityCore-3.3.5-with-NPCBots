@@ -202,18 +202,18 @@ public:
 		bool DeleteInsta80CharData(Player* player)
         {
             WorldDatabase.PExecute("DELETE FROM `char_Insta80` WHERE `acct_id` = '{}'", player->GetSession()->GetAccountId());
-			WorldDatabase.PExecute("INSERT INTO `char_Insta80_done` (`char_id`, `acct_id`) VALUES ({}, {})", player->GetSession()->GetGUIDLow(), player->GetSession()->GetAccountId());
+			WorldDatabase.PExecute("INSERT INTO `char_Insta80_done` (`char_id`, `acct_id`) VALUES ({}, {})", player->GetGUID().GetCounter(), player->GetSession()->GetAccountId());
 			//WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetSession()->GetGUIDLow());
             return true;
         }
 		bool UpdateInsta80CharData(Player* player, int16 status)
         {
-            WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetSession()->GetGUIDLow());
+            WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID().GetCounter());
             return true;
         }
 		bool InsertInsta80CharData(Player* player, int16 acctid, int16 status)
         {
-            WorldDatabase.PExecute("INSERT INTO `char_Insta80` (`char_id`, `acct_id`, `status`) VALUES ({}, {}, {})", player->GetSession()->GetGUIDLow(), acctid, status);
+            WorldDatabase.PExecute("INSERT INTO `char_Insta80` (`char_id`, `acct_id`, `status`) VALUES ({}, {}, {})", player->GetGUID().GetCounter(), acctid, status);
             return true;
         }
 
@@ -410,7 +410,7 @@ public:
 
 
 			// FIRST PROFF
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 1 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 1 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
 
