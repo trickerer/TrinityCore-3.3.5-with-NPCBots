@@ -48,7 +48,7 @@ public:
 		
 		bool UpdateReNameCharData(Player* player, int16 status)
         {
-            uint32 guidLow = player->GetGUID();
+            uint32 guidLow = player->GetGUID().GetCounter();
 			std::string guidStr = std::to_string(guidLow);
 			WorldDatabase.PExecute("UPDATE `char_rename` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, guidStr.c_str());
             return true;
@@ -60,7 +60,7 @@ public:
 			
             WorldSession* session = player->GetSession();
 			
-			uint32 guidLow = player->GetGUID();
+			uint32 guidLow = player->GetGUID().GetCounter();
 			std::string guidStr = std::to_string(guidLow);
 			//WhisperTo(player, guidStr.c_str());
 			
