@@ -329,7 +329,7 @@ public:
                             uint8 count = 0;
 
                             WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
-                            data << uint64(creature->GetGUID());
+                            data << creature->GetGUID().GetRawValue();
 
                             size_t countPos = data.wpos();
                             data << uint8(count);
