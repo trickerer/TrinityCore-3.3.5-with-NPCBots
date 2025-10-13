@@ -29,7 +29,7 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
-        uint64 guid = player->GetGUID();
+        uint64 guid = player->GetGUID().GetRawValue();
 
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
@@ -94,7 +94,7 @@ public:
 
     bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
     {
-        uint64 guid = player->GetGUID();
+        uint64 guid = player->GetGUID().GetRawValue();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         uint32 delaytime = 1800;
@@ -159,7 +159,7 @@ public:
         //}
             
         
-        uint64 guid = player->GetGUID();
+        uint64 guid = player->GetGUID().GetRawValue();
         // Implement cooldown logic to prevent abuse (30 minutes cooldown)
         uint32 now = time(nullptr);
         uint32 delaytime = 1800;
@@ -220,7 +220,7 @@ public:
     void OnLogin(Player* player, bool /*firstLogin*/)
     {
         //player->Say("LOGGED IN", LANG_UNIVERSAL);
-        lastAuraCheckTime[player->GetGUID()] = time(nullptr);
+        lastAuraCheckTime[player->GetGUID().GetRawValue()] = time(nullptr);
         CheckAura(player);
     }
 
