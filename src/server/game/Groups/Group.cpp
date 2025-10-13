@@ -188,9 +188,8 @@ bool Group::Create(Creature* leader)
 bool Group::Create(Player* leader)
 {
     ObjectGuid leaderGuid = leader->GetGUID();
-    ObjectGuid::LowType lowguid = sGroupMgr->GenerateGroupId();
 
-    m_guid = ObjectGuid(HighGuid::Group, sGroupMgr->GenerateGroupId());
+    m_guid = ObjectGuid::Create<HighGuid::Group>(sGroupMgr->GenerateGroupId());
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
     leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
