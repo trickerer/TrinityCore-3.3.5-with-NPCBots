@@ -71,7 +71,7 @@ public:
         if (!sConfigMgr->GetBoolDefault("Webhook.Enabled", false))
             return;
 
-        uint64 guid = player->GetGUID();
+        uint64 guid = player->GetGUID().GetRawValue();
 
         if (!LoggedInGuids.insert(guid).second)
             return;
@@ -97,7 +97,7 @@ public:
             return;
         }
 
-        LoggedInGuids.erase(player->GetGUID());
+        LoggedInGuids.erase(player->GetGUID().GetRawValue());
         Notify(player, false);
     }
 
