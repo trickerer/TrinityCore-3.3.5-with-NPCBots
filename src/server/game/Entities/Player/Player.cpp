@@ -5866,7 +5866,7 @@ void Player::UpdateWeaponsSkillsToMaxSkillsForLevel()
         uint32 pskill = itr->first;
         if (IsProfessionOrRidingSkill(pskill))
             continue;
-      
+
         uint16 max = GetSkillMaxRankByPos(itr->second.pos);
 
         if (max > 1)
