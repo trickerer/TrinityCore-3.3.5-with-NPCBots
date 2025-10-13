@@ -973,7 +973,7 @@ struct npc_sindragosa_trash : public ScriptedAI
         if (!me->isDead())
         {
             if (me->GetEntry() == NPC_FROSTWING_WHELP)
-                _instance->SetData64(_frostwyrmId, me->GetSpawnId()); // this cannot be in Reset because reset also happens on evade
+                _instance->SetData64(_frostwyrmId, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
             Reset();
         }
     }

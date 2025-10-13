@@ -322,7 +322,7 @@ void Map::ScriptsProcess()
         ScriptAction const& step = iter->second;
 
         Object* source = nullptr;
-        if (step.sourceGUID)
+        if (!step.sourceGUID.IsEmpty())
         {
             switch (step.sourceGUID.GetHigh())
             {
@@ -339,7 +339,7 @@ void Map::ScriptsProcess()
                     break;
                 case HighGuid::Player:
                     source = GetPlayer(step.sourceGUID);
-                    break;          
+                    break;
                 case HighGuid::GameObject:
                 case HighGuid::Transport:
                     source = GetGameObject(step.sourceGUID);
@@ -826,7 +826,7 @@ void Map::ScriptsProcess()
                     {
                         return pair.second->IsAlive();
                     });
-                    
+
                     cTarget = creatureItr != creatureBounds.second ? creatureItr->second : creatureBounds.first->second;
                 }
 
