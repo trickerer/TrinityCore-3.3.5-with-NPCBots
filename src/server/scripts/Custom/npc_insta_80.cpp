@@ -203,7 +203,7 @@ public:
         {
             WorldDatabase.PExecute("DELETE FROM `char_Insta80` WHERE `acct_id` = '{}'", player->GetSession()->GetAccountId());
 			WorldDatabase.PExecute("INSERT INTO `char_Insta80_done` (`char_id`, `acct_id`) VALUES ({}, {})", player->GetGUID().GetCounter(), player->GetSession()->GetAccountId());
-			//WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetSession()->GetGUIDLow());
+			//WorldDatabase.PExecute("UPDATE `char_Insta80` SET `status`='{}' WHERE `char_id`='{}'", status, player->GetGUID().GetCounter();
             return true;
         }
 		bool UpdateInsta80CharData(Player* player, int16 status)
@@ -262,7 +262,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' LIMIT 1", player->GetGUID().GetCounter());
             if (!result)
             {
                 if (player->IsGameMaster())
@@ -287,7 +287,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 0 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 0 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_DOT, "I want to make > " + player->GetName() + " < a level 80.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1001);
@@ -299,7 +299,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 8 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 8 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "PvE & PvP Gear! + Bonus", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000);
@@ -309,7 +309,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 7 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 7 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Bags!!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8000);
@@ -319,7 +319,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 6 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 6 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Learn ALL my spell.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7000);
@@ -329,7 +329,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 5 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 5 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Level 80", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6000);
@@ -340,7 +340,7 @@ public:
             }
 
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 4 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 4 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Honor Points", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5000);
@@ -350,7 +350,7 @@ public:
                 return true;
             }
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 3 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 3 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Give me some Gold!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4000);
@@ -361,7 +361,7 @@ public:
             }
 
 
-            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 2 LIMIT 1", player->GetSession()->GetGUIDLow());
+            result = WorldDatabase.PQuery("SELECT * FROM `char_Insta80` WHERE `char_id`='{}' AND `status` = 2 LIMIT 1", player->GetGUID().GetCounter());
             if (result)
             {
                 uint32 freeProfs = player->GetFreePrimaryProfessionPoints();
