@@ -50,8 +50,8 @@ public:
 		
         bool UpdateReNameCharData(Player* player, int16 status)
         {
-            uint64 guid = player->GetGUID().GetRawValue();
-			std::string guidStr = std::to_string(guidLow);
+            //uint64 guid = player->GetGUID().GetRawValue();
+			std::string guidStr = std::to_string(player->GetGUID().GetRawValue());
 			WorldDatabase.PExecute("UPDATE `char_edit` SET `status`='{}' WHERE `charid`='{}' AND `status` = '0'", status, guidStr.c_str());
             return true;
         }
