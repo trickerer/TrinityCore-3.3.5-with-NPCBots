@@ -1193,24 +1193,6 @@ bool BotMgr::IsWanderingWorldBot(Creature const* bot)
 
 void BotMgr::Update(uint32 diff)
 {
-    while (!_delayedRemoveList.empty())
-    {
-        decltype(_delayedRemoveList)::iterator itr = _delayedRemoveList.begin();
-        RemoveBot(itr->first, itr->second);
-    }
-
-    //remove temp bots from bot map before updating it
-    while (!_removeList.empty())
-    {
-        std::list<ObjectGuid>::iterator itr = _removeList.begin();
-
-        BotMap::iterator bitr = _bots.find(*itr);
-        ASSERT(bitr != _bots.end());
-        _bots.erase(bitr);
-
-        _removeList.erase(itr);
-    }
-
     _dpstracker->Update(diff);
 
     if (!HaveBot())
@@ -1276,6 +1258,12 @@ void BotMgr::Update(uint32 diff)
     }
 
     _update_lock = false;
+
+    while (!_delayedRemoveList.empty())
+    {
+        decltype(_delayedRemoveList)::iterator itr = _delayedRemoveList.begin();
+        RemoveBot(itr->first, itr->second);
+    }
 
     if (_quickrecall)
     {
@@ -1775,7 +1763,9 @@ void BotMgr::CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype)
 
     ASSERT(bot->GetCreator() && bot->GetCreator()->GetGUID() == _owner->GetGUID());
 
-    RemoveBotFromBGQueue(bot);
+    if (!bot->IsTempBot())
+        RemoveBotFromBGQueue(bot);
+
     if (removetype != BOT_REMOVE_LOGOUT)
         RemoveBotFromGroup(bot);
 
@@ -1806,7 +1796,7 @@ void BotMgr::CleanupsBeforeBotDelete(Creature* bot)
     //bot->SetCreatorGUID(ObjectGuid::Empty);
 
     Map* map = bot->FindMap();
-    if (!map || map->IsDungeon())
+    if (!map || map->IsDungeon() || bot->IsTempBot())
         bot->RemoveFromWorld();
 }
 
@@ -1824,28 +1814,13 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
 
     Creature* bot = itr->second;
 
-    if (!bot->IsTempBot())
+    if (_update_lock)
     {
-        if (_update_lock)
-        {
-            _delayedRemoveList.emplace_back(guid, BotRemoveType(removetype));
-            return;
-        }
-        else if (!_delayedRemoveList.empty())
-            _delayedRemoveList.remove_if([=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
+        _delayedRemoveList.emplace_back(guid, BotRemoveType(removetype));
+        return;
     }
-
-    //trying to remove temp bot second time means removing all bots
-    //just erase from bots because already cleaned up
-    for (std::list<ObjectGuid>::iterator it = _removeList.begin(); it != _removeList.end(); ++it)
-    {
-        if (*it == guid)
-        {
-            _removeList.erase(it);
-            _bots.erase(itr);
-            return;
-        }
-    }
+    else if (!_delayedRemoveList.empty())
+        _delayedRemoveList.remove_if([=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
 
     CleanupsBeforeBotDelete(guid, removetype);
 
@@ -1856,14 +1831,10 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     //if (GetNpcBotsCount() <= 1 && !_owner->GetPetGUID() && _owner->m_Controlled.empty())
     //    _owner->SendRemoveControlBar();
 
-    if (bot->GetBotAI()->IsTempBot())
-    {
-        //bot->GetBotAI()->OnBotDespawn(bot); //send to self
-        _removeList.push_back(guid);
-        return;
-    }
-
     _bots.erase(itr);
+
+    if (bot->GetBotAI()->IsTempBot())
+        return;
 
     BotAIResetType resetType;
     switch (removetype)
