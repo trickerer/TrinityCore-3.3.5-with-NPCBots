@@ -5216,6 +5216,48 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
             spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
     }
+    // Ruins of Ahn'Qiraj (AQ20) — Sand Trap avoidance
+    else if (unit->GetMapId() == 509)
+    {
+        std::list<GameObject*> traps;
+        static constexpr uint32 GO_SAND_TRAP = 180647; // Sand Trap
+        Bcore::AllGameObjectsWithEntryInRange trapCheck(unit, GO_SAND_TRAP, 60.f);
+        Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> trapSearcher(unit, traps, trapCheck);
+        Cell::VisitObjects(unit, trapSearcher, 40.f);
+
+        float radius = 12.0f + DEFAULT_COMBAT_REACH * 1.2f;
+        for (GameObject* go : traps)
+            spots.emplace_back(*go, radius);
+    }
+    //Temple of Ahn'Qiraj (AQ40) — Mutating bugs exploding
+    else if (unit->GetMapId() == 531)
+    {
+        static const uint32 AURA_EXPLODE = 804;
+        static const std::array<uint32, 2> MutatingBugIds = { 15316u, 15317u };
+
+        std::list<Creature*> bugList;
+        auto bugCheck = [](Creature const* c)
+            {
+                if (!c || !c->IsAlive())
+                    return false;
+                uint32 e = c->GetEntry();
+                return e == MutatingBugIds[0] || e == MutatingBugIds[1];
+            };
+        Bcore::CreatureListSearcher bugSearcher(unit, bugList, bugCheck);
+        Cell::VisitObjects(unit, bugSearcher, 60.f);
+
+        SpellInfo const* explodeInfo = sSpellMgr->GetSpellInfo(AURA_EXPLODE);
+        float explodeRadius = explodeInfo ? explodeInfo->Effects[0].CalcRadius() : 18.0f;
+        float radius = explodeRadius + DEFAULT_COMBAT_REACH * 1.5f;
+
+        for (Creature* c : bugList)
+        {
+            if (!c->HasAura(AURA_EXPLODE))
+                continue;
+
+            spots.emplace_back(*c, radius);
+        }
+    }
     //Aucheai Crypts
     else if (unit->GetMapId() == 558)
     {
