@@ -5172,30 +5172,22 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
 {
     std::list<WorldObject*> doList;
     NearbyHostileAoEDynobjectCheck check(unit, 60.f);
-    Bcore::WorldObjectListSearcher<NearbyHostileAoEDynobjectCheck> searcher(unit, doList, check, GRID_MAP_TYPE_MASK_DYNAMICOBJECT);
-    //unit->VisitNearbyObject(60.f, searcher);
+    Bcore::WorldObjectListSearcher searcher(unit, doList, check, GRID_MAP_TYPE_MASK_DYNAMICOBJECT);
     Cell::VisitAllObjects(unit, searcher, 60.f);
 
-    //if (!doList.empty())
-    //    BOT_LOG_ERROR("scripts", "CalculateAoeSpots {} aoes around {}", uint32(doList.size()), unit->GetName());
-
     //filter and add to list
-    DynamicObject const* dObj;
     SpellInfo const* spellInfo;
-    for (std::list<WorldObject*>::const_iterator ci = doList.begin(); ci != doList.end(); ++ci)
+    for (WorldObject const* wObj : doList)
     {
-        dObj = (*ci)->ToDynObject();
+        DynamicObject const* dObj = wObj->ToDynObject();
         ASSERT_NODEBUGINFO(dObj);
         ASSERT_NODEBUGINFO(dObj->GetSpellId());
         spellInfo = sSpellMgr->GetSpellInfo(dObj->GetSpellId());
         if (IsPeriodicDynObjAOEDamage(spellInfo))
         {
-            //BOT_LOG_ERROR("scripts", "CalculateAoeSpots found {}'s aoe {} ({}) radius {} size {}",
-            //    dObj->GetCaster()->GetName(), spellInfo->SpellName[0], spellInfo->Id, dObj->GetRadius(), dObj->GetObjectSize());
-
             float radius = dObj->GetRadius() + DEFAULT_PLAYER_BOUNDING_RADIUS;
             radius += (unit->GetVehicle() ? unit->GetVehicleBase()->GetCombatReach() : DEFAULT_PLAYER_COMBAT_REACH) * 1.2f;
-            spots.push_back(AoeSpotsVec::value_type(*dObj, radius));
+            spots.emplace_back(*dObj, radius);
         }
     }
 
@@ -5209,53 +5201,50 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<GameObject*> gListMC;
         Bcore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);
-        Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> searcherMC(unit, gListMC, checkMC);
+        Bcore::GameObjectListSearcher searcherMC(unit, gListMC, checkMC);
         Cell::VisitAllObjects(unit, searcherMC, 60.f);
 
-        float radius = 15.0f + DEFAULT_PLAYER_COMBAT_REACH;
-        for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+        if (!gListMC.empty())
+        {
+            float radius = 15.0f + DEFAULT_PLAYER_COMBAT_REACH;
+            for (GameObject const* go : gListMC)
+                spots.emplace_back(*go, radius);
+        }
     }
-    // Ruins of Ahn'Qiraj (AQ20) — Sand Trap avoidance
+    // Ruins of Ahn'Qiraj (AQ20) - Sand Trap avoidance
     else if (unit->GetMapId() == 509)
     {
-        std::list<GameObject*> traps;
-        static constexpr uint32 GO_SAND_TRAP = 180647; // Sand Trap
+        static const uint32 GO_SAND_TRAP = 180647; // Sand Trap
+        std::list<GameObject*> sandTrapList;
         Bcore::AllGameObjectsWithEntryInRange trapCheck(unit, GO_SAND_TRAP, 60.f);
-        Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> trapSearcher(unit, traps, trapCheck);
-        Cell::VisitObjects(unit, trapSearcher, 40.f);
+        Bcore::GameObjectListSearcher trapSearcher(unit, sandTrapList, trapCheck);
+        Cell::VisitAllObjects(unit, trapSearcher, 40.f);
 
-        float radius = 12.0f + DEFAULT_COMBAT_REACH * 1.2f;
-        for (GameObject* go : traps)
-            spots.emplace_back(*go, radius);
+        if (!sandTrapList.empty())
+        {
+            float radius = 12.0f + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
+            for (GameObject const* go : sandTrapList)
+                spots.emplace_back(*go, radius);
+        }
     }
-    //Temple of Ahn'Qiraj (AQ40) — Mutating bugs exploding
+    //Temple of Ahn'Qiraj (AQ40) - Mutating bugs exploding
     else if (unit->GetMapId() == 531)
     {
         static const uint32 AURA_EXPLODE = 804;
         static const std::array<uint32, 2> MutatingBugIds = { 15316u, 15317u };
+        std::list<Creature*> cList;
+        auto bug_check = [](Creature const* c) {
+            return c && c->IsAlive() && std::ranges::find(MutatingBugIds, c->GetEntry()) != MutatingBugIds.cend() && c->HasAura(AURA_EXPLODE);
+        };
+        Bcore::CreatureListSearcher bugSearcher(unit, cList, bug_check);
+        Cell::VisitAllObjects(unit, bugSearcher, 60.f);
 
-        std::list<Creature*> bugList;
-        auto bugCheck = [](Creature const* c)
-            {
-                if (!c || !c->IsAlive())
-                    return false;
-                uint32 e = c->GetEntry();
-                return e == MutatingBugIds[0] || e == MutatingBugIds[1];
-            };
-        Bcore::CreatureListSearcher bugSearcher(unit, bugList, bugCheck);
-        Cell::VisitObjects(unit, bugSearcher, 60.f);
-
-        SpellInfo const* explodeInfo = sSpellMgr->GetSpellInfo(AURA_EXPLODE);
-        float explodeRadius = explodeInfo ? explodeInfo->Effects[0].CalcRadius() : 18.0f;
-        float radius = explodeRadius + DEFAULT_COMBAT_REACH * 1.5f;
-
-        for (Creature* c : bugList)
+        if (!cList.empty())
         {
-            if (!c->HasAura(AURA_EXPLODE))
-                continue;
-
-            spots.emplace_back(*c, radius);
+            float explodeRadius = sSpellMgr->AssertSpellInfo(AURA_EXPLODE)->GetEffect(EFFECT_0).CalcRadius();
+            float radius = explodeRadius + DEFAULT_PLAYER_COMBAT_REACH * 1.5f;
+            for (Creature const* c : cList)
+                spots.emplace_back(*c, radius);
         }
     }
     //Aucheai Crypts
@@ -5271,8 +5260,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (creature)
         {
             spellInfo = sSpellMgr->GetSpellInfo(32302); //Fiery Blast
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
-            spots.push_back(AoeSpotsVec::value_type(*creature, radius));
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
+            spots.emplace_back(*creature, radius);
         }
     }
     //The Eye of Eternity
@@ -5285,7 +5274,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         Cell::VisitAllObjects(unit->GetVehicleBase(), searcher2, 60.f);
 
         spellInfo = sSpellMgr->GetSpellInfo(57429); //Static Field damage
-        float radius = spellInfo->_effects[0].CalcRadius() + unit->GetVehicleBase()->GetCombatReach() * 1.2f;
+        float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + unit->GetVehicleBase()->GetCombatReach() * 1.2f;
         for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
             spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
     }
@@ -5302,8 +5291,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (!cList.empty())
         {
             spellInfo = sSpellMgr->GetSpellInfo(44198); //Burn damage (44197 -> 44198)
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 3.0f;
-            for (Creature* c : cList)
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 3.0f;
+            for (Creature const* c : cList)
                 spots.emplace_back(*c, radius);
         }
     }
@@ -5312,14 +5301,16 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<Creature*> cList;
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ZA_FIRE_BOMB, 40.f);
-        Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
-        //unit->VisitNearbyObject(40.f, searcher2);
+        Bcore::CreatureListSearcher searcher2(unit, cList, check2);
         Cell::VisitAllObjects(unit, searcher2, 40.f);
 
-        spellInfo = sSpellMgr->GetSpellInfo(42630); //Fire Bomb
-        float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
-        for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+        if (!cList.empty())
+        {
+            spellInfo = sSpellMgr->GetSpellInfo(42630); //Fire Bomb
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
+            for (Creature const* c : cList)
+                spots.emplace_back(*c, radius);
+        }
     }
     //Uthgarde Keep
     else if (unit->GetMapId() == 574)
@@ -5334,8 +5325,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (creature)
         {
             spellInfo = sSpellMgr->GetSpellInfo(42751); //Shadow Axe
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
-            spots.push_back(AoeSpotsVec::value_type(*creature, radius));
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
+            spots.emplace_back(*creature, radius);
         }
     }
     //Icecrown Citadel
@@ -5343,14 +5334,13 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<Creature*> cList;
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ICC_OOZE_PUDDLE, 50.f);
-        Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
-        //unit->VisitNearbyObject(50.f, searcher2);
+        Bcore::CreatureListSearcher searcher2(unit, cList, check2);
         Cell::VisitAllObjects(unit, searcher2, 50.f);
 
-        for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
+        for (Creature const* c : cList)
         {
-            float radius = (*ci)->GetObjectScale() * 2.5f + DEFAULT_PLAYER_COMBAT_REACH * 3.f; //grows
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+            float radius = c->GetObjectScale() * 2.5f + DEFAULT_PLAYER_COMBAT_REACH * 3.f; //grows
+            spots.emplace_back(*c, radius);
         }
     }
 
