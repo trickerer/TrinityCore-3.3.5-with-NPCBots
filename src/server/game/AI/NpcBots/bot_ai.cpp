@@ -75,71 +75,71 @@ static constexpr GossipOptionIcon BOT_ICON_OFF = GOSSIP_ICON_CHAT;
 static constexpr uint32 MAX_AMMO_LEVEL = 13;
 static constexpr uint8 AmmoDPSForLevel[MAX_AMMO_LEVEL][2] =
 {
-    {  1,  1 },
-    {  5,  2 },
-    { 10,  3 },
-    { 15,  4 },
-    { 25,  7 },
-    { 30,  8 },
-    { 37, 12 },
-    { 44, 15 },
-    { 52, 17 },
-    { 57, 26 },
-    { 62, 43 },
+    { 80, 91 },
     { 72, 67 },
-    { 80, 91 }
+    { 62, 43 },
+    { 57, 26 },
+    { 52, 17 },
+    { 44, 15 },
+    { 37, 12 },
+    { 30,  8 },
+    { 25,  7 },
+    { 15,  4 },
+    { 10,  3 },
+    {  5,  2 },
+    {  1,  1 }
 };
 static constexpr uint32 MAX_POTION_SPELLS = 8;
 static constexpr uint32 MAX_FEAST_SPELLS = 11;
 static constexpr uint32 ManaPotionSpells[MAX_POTION_SPELLS][2] =
 {
-    {  5,   437 },
-    { 14,   438 },
-    { 22,  2023 },
-    { 31, 11903 },
-    { 41, 17530 },
-    { 49, 17531 },
+    { 70, 43186 },
     { 55, 28499 },
-    { 70, 43186 }
+    { 49, 17531 },
+    { 41, 17530 },
+    { 31, 11903 },
+    { 22,  2023 },
+    { 14,   438 },
+    {  5,   437 }
 };
 static constexpr uint32 HealingPotionSpells[MAX_POTION_SPELLS][2] =
 {
-    {  1,   439 },
-    {  3,   440 },
-    { 12,   441 },
-    { 21,  2024 },
-    { 35,  4042 },
-    { 45, 17534 },
+    { 70, 43185 },
     { 55, 28495 },
-    { 70, 43185 }
+    { 45, 17534 },
+    { 35,  4042 },
+    { 21,  2024 },
+    { 12,   441 },
+    {  3,   440 },
+    {  1,   439 }
 };
 static constexpr uint32 DrinkSpells[MAX_FEAST_SPELLS][2] =
 {
-    {  1,   430 },
-    {  5,   431 },
-    { 15,   432 },
-    { 25,  1133 },
-    { 35,  1135 },
-    { 45,  1137 },
-    { 60, 34291 },
-    { 65, 27089 },
-    { 70, 43182 },
+    { 80, 57073 },
     { 75, 43183 },
-    { 80, 57073 }
+    { 70, 43182 },
+    { 65, 27089 },
+    { 60, 34291 },
+    { 45,  1137 },
+    { 35,  1135 },
+    { 25,  1133 },
+    { 15,   432 },
+    {  5,   431 },
+    {  1,   430 }
 };
 static constexpr uint32 EatSpells[MAX_FEAST_SPELLS][2] =
 {
-    {  1,   433 },
-    {  5,   434 },
-    { 15,   435 },
-    { 25,  1127 },
-    { 35,  1129 },
-    { 45,  1131 },
-    { 55, 27094 },
-    { 65, 35270 },
-    { 70, 43180 }, //req 65 but
+    { 80, 45548 },
     { 75, 45548 },
-    { 80, 45548 }
+    { 70, 43180 }, //req 65 but
+    { 65, 35270 },
+    { 55, 27094 },
+    { 45,  1131 },
+    { 35,  1129 },
+    { 25,  1127 },
+    { 15,   435 },
+    {  5,   434 },
+    {  1,   433 }
 };
 uint8 GroupIconsFlags[TARGET_ICONS_COUNT] =
 {
@@ -3342,8 +3342,7 @@ void bot_ai::SetStats(bool force)
             else if (mylevel >= 55 && GetSpec() == BOT_SPEC_PRIEST_SHADOW)
                 value += 0.2f * totalSpi;
             //Shadowy Insight (Glyph of Shadow)
-            if (mylevel >= 30 &&
-                me->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, SPELLFAMILY_GENERIC, 1499, 0))
+            if (me->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT, SPELLFAMILY_GENERIC, 1499, 0))
                 value += 0.3f * totalSpi;
         }
         if (_botclass == BOT_CLASS_SHAMAN && mylevel >= 50 && GetSpec() == BOT_SPEC_SHAMAN_ENHANCEMENT)
@@ -5172,30 +5171,22 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
 {
     std::list<WorldObject*> doList;
     NearbyHostileAoEDynobjectCheck check(unit, 60.f);
-    Bcore::WorldObjectListSearcher<NearbyHostileAoEDynobjectCheck> searcher(unit, doList, check, GRID_MAP_TYPE_MASK_DYNAMICOBJECT);
-    //unit->VisitNearbyObject(60.f, searcher);
+    Bcore::WorldObjectListSearcher searcher(unit, doList, check, GRID_MAP_TYPE_MASK_DYNAMICOBJECT);
     Cell::VisitAllObjects(unit, searcher, 60.f);
 
-    //if (!doList.empty())
-    //    BOT_LOG_ERROR("scripts", "CalculateAoeSpots {} aoes around {}", uint32(doList.size()), unit->GetName());
-
     //filter and add to list
-    DynamicObject const* dObj;
     SpellInfo const* spellInfo;
-    for (std::list<WorldObject*>::const_iterator ci = doList.begin(); ci != doList.end(); ++ci)
+    for (WorldObject const* wObj : doList)
     {
-        dObj = (*ci)->ToDynObject();
+        DynamicObject const* dObj = wObj->ToDynObject();
         ASSERT_NODEBUGINFO(dObj);
         ASSERT_NODEBUGINFO(dObj->GetSpellId());
         spellInfo = sSpellMgr->GetSpellInfo(dObj->GetSpellId());
         if (IsPeriodicDynObjAOEDamage(spellInfo))
         {
-            //BOT_LOG_ERROR("scripts", "CalculateAoeSpots found {}'s aoe {} ({}) radius {} size {}",
-            //    dObj->GetCaster()->GetName(), spellInfo->SpellName[0], spellInfo->Id, dObj->GetRadius(), dObj->GetObjectSize());
-
             float radius = dObj->GetRadius() + DEFAULT_PLAYER_BOUNDING_RADIUS;
             radius += (unit->GetVehicle() ? unit->GetVehicleBase()->GetCombatReach() : DEFAULT_PLAYER_COMBAT_REACH) * 1.2f;
-            spots.push_back(AoeSpotsVec::value_type(*dObj, radius));
+            spots.emplace_back(*dObj, radius);
         }
     }
 
@@ -5209,12 +5200,51 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<GameObject*> gListMC;
         Bcore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);
-        Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> searcherMC(unit, gListMC, checkMC);
+        Bcore::GameObjectListSearcher searcherMC(unit, gListMC, checkMC);
         Cell::VisitAllObjects(unit, searcherMC, 60.f);
 
-        float radius = 15.0f + DEFAULT_PLAYER_COMBAT_REACH;
-        for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+        if (!gListMC.empty())
+        {
+            float radius = 15.0f + DEFAULT_PLAYER_COMBAT_REACH;
+            for (GameObject const* go : gListMC)
+                spots.emplace_back(*go, radius);
+        }
+    }
+    // Ruins of Ahn'Qiraj (AQ20) - Sand Trap avoidance
+    else if (unit->GetMapId() == 509)
+    {
+        static const uint32 GO_SAND_TRAP = 180647; // Sand Trap
+        std::list<GameObject*> sandTrapList;
+        Bcore::AllGameObjectsWithEntryInRange trapCheck(unit, GO_SAND_TRAP, 60.f);
+        Bcore::GameObjectListSearcher trapSearcher(unit, sandTrapList, trapCheck);
+        Cell::VisitAllObjects(unit, trapSearcher, 40.f);
+
+        if (!sandTrapList.empty())
+        {
+            float radius = 12.0f + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
+            for (GameObject const* go : sandTrapList)
+                spots.emplace_back(*go, radius);
+        }
+    }
+    //Temple of Ahn'Qiraj (AQ40) - Mutating bugs exploding
+    else if (unit->GetMapId() == 531)
+    {
+        static const uint32 AURA_EXPLODE = 804;
+        static const std::array<uint32, 2> MutatingBugIds = { 15316u, 15317u };
+        std::list<Creature*> cList;
+        auto bug_check = [](Creature const* c) {
+            return c && c->IsAlive() && std::ranges::find(MutatingBugIds, c->GetEntry()) != MutatingBugIds.cend() && c->HasAura(AURA_EXPLODE);
+        };
+        Bcore::CreatureListSearcher bugSearcher(unit, cList, bug_check);
+        Cell::VisitAllObjects(unit, bugSearcher, 60.f);
+
+        if (!cList.empty())
+        {
+            float explodeRadius = sSpellMgr->AssertSpellInfo(AURA_EXPLODE)->GetEffect(EFFECT_0).CalcRadius();
+            float radius = explodeRadius + DEFAULT_PLAYER_COMBAT_REACH * 1.5f;
+            for (Creature const* c : cList)
+                spots.emplace_back(*c, radius);
+        }
     }
     //Aucheai Crypts
     else if (unit->GetMapId() == 558)
@@ -5229,8 +5259,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (creature)
         {
             spellInfo = sSpellMgr->GetSpellInfo(32302); //Fiery Blast
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
-            spots.push_back(AoeSpotsVec::value_type(*creature, radius));
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
+            spots.emplace_back(*creature, radius);
         }
     }
     //The Eye of Eternity
@@ -5243,7 +5273,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         Cell::VisitAllObjects(unit->GetVehicleBase(), searcher2, 60.f);
 
         spellInfo = sSpellMgr->GetSpellInfo(57429); //Static Field damage
-        float radius = spellInfo->_effects[0].CalcRadius() + unit->GetVehicleBase()->GetCombatReach() * 1.2f;
+        float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + unit->GetVehicleBase()->GetCombatReach() * 1.2f;
         for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
             spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
     }
@@ -5260,8 +5290,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (!cList.empty())
         {
             spellInfo = sSpellMgr->GetSpellInfo(44198); //Burn damage (44197 -> 44198)
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 3.0f;
-            for (Creature* c : cList)
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 3.0f;
+            for (Creature const* c : cList)
                 spots.emplace_back(*c, radius);
         }
     }
@@ -5270,14 +5300,16 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<Creature*> cList;
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ZA_FIRE_BOMB, 40.f);
-        Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
-        //unit->VisitNearbyObject(40.f, searcher2);
+        Bcore::CreatureListSearcher searcher2(unit, cList, check2);
         Cell::VisitAllObjects(unit, searcher2, 40.f);
 
-        spellInfo = sSpellMgr->GetSpellInfo(42630); //Fire Bomb
-        float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
-        for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+        if (!cList.empty())
+        {
+            spellInfo = sSpellMgr->GetSpellInfo(42630); //Fire Bomb
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 1.2f;
+            for (Creature const* c : cList)
+                spots.emplace_back(*c, radius);
+        }
     }
     //Uthgarde Keep
     else if (unit->GetMapId() == 574)
@@ -5292,8 +5324,8 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         if (creature)
         {
             spellInfo = sSpellMgr->GetSpellInfo(42751); //Shadow Axe
-            float radius = spellInfo->_effects[0].CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
-            spots.push_back(AoeSpotsVec::value_type(*creature, radius));
+            float radius = spellInfo->GetEffect(EFFECT_0).CalcRadius() + DEFAULT_PLAYER_COMBAT_REACH * 2.0f;
+            spots.emplace_back(*creature, radius);
         }
     }
     //Icecrown Citadel
@@ -5301,14 +5333,13 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     {
         std::list<Creature*> cList;
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ICC_OOZE_PUDDLE, 50.f);
-        Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
-        //unit->VisitNearbyObject(50.f, searcher2);
+        Bcore::CreatureListSearcher searcher2(unit, cList, check2);
         Cell::VisitAllObjects(unit, searcher2, 50.f);
 
-        for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
+        for (Creature const* c : cList)
         {
-            float radius = (*ci)->GetObjectScale() * 2.5f + DEFAULT_PLAYER_COMBAT_REACH * 3.f; //grows
-            spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
+            float radius = c->GetObjectScale() * 2.5f + DEFAULT_PLAYER_COMBAT_REACH * 3.f; //grows
+            spots.emplace_back(*c, radius);
         }
     }
 
@@ -5341,20 +5372,18 @@ void bot_ai::CalculateAoeSafeSpots(Unit* target, float maxdist, AoeSafeSpotsVec&
     if (!GetAoeSpots().empty())
     {
         //find 200 safe spots
-        Position ppos;
-        float distdelta = maxdist / 200.f;
-        float angledelta = float(M_PI) / 12.5f;
+        const float distdelta = maxdist / 200.f;
+        const float angledelta = float(M_PI) / 12.5f;
         float aoedist = 0.f;
-        float aoeangle;
         for (uint8 i = 0; i < 8; ++i)
         {
-            aoeangle = 0.0f;
+            float aoeangle = 0.0f;
             for (uint8 j = 0; j < 25; ++j)
             {
                 aoedist += distdelta;
                 aoeangle += angledelta;
 
-                ppos = target->GetFirstCollisionPosition(aoedist, Position::NormalizeOrientation(aoeangle - target->GetOrientation()));
+                Position ppos = target->GetFirstCollisionPosition(aoedist, Position::NormalizeOrientation(aoeangle - target->GetOrientation()));
                 bool toofaraway = master->GetDistance(ppos) > maxdist;
 
                 if (!toofaraway && !IsWithinAoERadius(ppos))
@@ -6330,7 +6359,7 @@ bool bot_ai::Feasting() const
 }
 uint32 bot_ai::GetRation(bool drink) const
 {
-    for (int8 i = MAX_FEAST_SPELLS - 1; i >= 0; --i)
+    for (uint32 i = 0; i < MAX_FEAST_SPELLS; ++i)
         if (me->GetLevel() >= (drink ? DrinkSpells[i][0] : EatSpells[i][0]))
             return (drink ? DrinkSpells[i][1] : EatSpells[i][1]);
 
@@ -6350,7 +6379,7 @@ bool bot_ai::IsPotionReady() const
 }
 uint32 bot_ai::GetPotion(bool mana) const
 {
-    for (int8 i = MAX_POTION_SPELLS - 1; i >= 0; --i)
+    for (uint32 i = 0; i < MAX_POTION_SPELLS; ++i)
         if (me->GetLevel() >= (mana ? ManaPotionSpells[i][0] : HealingPotionSpells[i][0]))
             return (mana ? ManaPotionSpells[i][1] : HealingPotionSpells[i][1]);
 
@@ -7206,10 +7235,7 @@ uint32 bot_ai::RaceSpellForClass(uint8 myrace, uint8 myclass)
 //Including health calcs, set
 void bot_ai::_OnHealthUpdate() const
 {
-    uint8 myclass = _botclass;
     uint8 mylevel = master->GetLevel();
-    if (myclass == BOT_CLASS_DRUID && GetBotStance() != BOT_STANCE_NONE)
-        myclass = GetBotStance();
     //BOT_LOG_ERROR("entities.player", "_OnHealthUpdate(): updating bot {}", me->GetName());
     bool fullhp = me->GetHealth() == me->GetMaxHealth();
     float pct = fullhp ? 100.f : me->GetHealthPct(); // needs for regeneration
@@ -7260,10 +7286,7 @@ void bot_ai::_OnManaUpdate() const
     if (me->GetMaxPower(POWER_MANA) <= 1)
         return;
 
-    uint8 myclass = _botclass;
     uint8 mylevel = master->GetLevel();
-    if (myclass == BOT_CLASS_DRUID && GetBotStance() != BOT_STANCE_NONE)
-        myclass = GetBotStance();
 
     //BOT_LOG_ERROR("entities.player", "_OnManaUpdate(): updating bot {}", me->GetName());
     bool fullmana = me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA);
@@ -11330,7 +11353,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     ChatHandler ch(player->GetSession());
                     ch.PSendSysMessage("%s's Spells:", me->GetName());
                     uint32 counter = 0;
-                    SpellInfo const* spellInfo;
                     BotSpellMap const& myspells = GetSpellMap();
                     for (BotSpellMap::const_iterator itr = myspells.begin(); itr != myspells.end(); ++itr)
                     {
@@ -11339,7 +11361,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
                         ++counter;
                         std::ostringstream sstr;
-                        spellInfo = sSpellMgr->GetSpellInfo(itr->first); //always valid
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first); //always valid
                         _AddSpellLink(player, spellInfo, sstr);
                         sstr << " id: " <<  itr->second->spellId << ", base: " << itr->first
                             << ", cd: " << itr->second->cooldown << ", base: " << std::max<uint32>(spellInfo->RecoveryTime, spellInfo->CategoryRecoveryTime);
@@ -11857,7 +11879,7 @@ void bot_ai::FillKillReward(GameObject* go) const
             case 7: gold *= 0.750f; break;
             default:                break;
         }
-        gold = std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f) / float(DEFAULT_MAX_LEVEL) * lvl;
+        loot.gold = std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f) / float(DEFAULT_MAX_LEVEL) * lvl;
     }
 
     if (maxitems)
@@ -13042,6 +13064,230 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
 
     return false;
 }
+
+bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) const
+{
+    if (!_canEquip(proto, slot, true))
+        return false;
+
+    auto item_stat_check = [](_ItemStat const& stat, uint32 wanted_stat) { return stat.ItemStatType == wanted_stat && stat.ItemStatValue > 0; };
+    auto item_has_stat = [&item_stat_check](ItemTemplate const* itemProto, uint32 wanted_stat) {
+        return std::ranges::any_of(itemProto->ItemStat, [=, &item_stat_check](_ItemStat const& stat) { return item_stat_check(stat, wanted_stat); });
+    };
+
+    if (me->GetLevel() >= DEFAULT_MAX_LEVEL && me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
+    {
+        if (Rand() < 20 && proto->ItemLevel < 245)
+            return false;
+        if (Rand() < 10 && proto->ItemLevel < 264)
+            return false;
+
+        switch (slot)
+        {
+            case BOT_SLOT_HEAD:
+            case BOT_SLOT_SHOULDERS:
+            case BOT_SLOT_CHEST:
+            case BOT_SLOT_WAIST:
+            case BOT_SLOT_LEGS:
+            case BOT_SLOT_FEET:
+            case BOT_SLOT_WRIST:
+            case BOT_SLOT_HANDS:
+                if (!item_has_stat(proto, ITEM_MOD_RESILIENCE_RATING))
+                    return false;
+                break;
+            default:
+                break;
+        }
+    }
+
+    switch (GetSpec())
+    {
+        case BOT_SPEC_WARRIOR_ARMS:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    return proto->InventoryType == INVTYPE_2HWEAPON;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_WARRIOR_FURY:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND) :
+                        (proto->InventoryType == INVTYPE_2HWEAPON);
+                case BOT_SLOT_OFFHAND:
+                    return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND) :
+                        (proto->InventoryType == INVTYPE_2HWEAPON);
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_WARRIOR_PROTECTION:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND;
+                case BOT_SLOT_OFFHAND:
+                    return proto->InventoryType == INVTYPE_SHIELD;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_PALADIN_PROTECTION:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
+                        return false;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
+                case BOT_SLOT_OFFHAND:
+                    if (!(proto->InventoryType == INVTYPE_SHIELD))
+                        return false;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_PALADIN_HOLY:
+        case BOT_SPEC_SHAMAN_ELEMENTAL:
+        case BOT_SPEC_SHAMAN_RESTORATION:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
+                        return false;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_INTELLECT);
+                case BOT_SLOT_OFFHAND:
+                    if (!(proto->InventoryType == INVTYPE_SHIELD))
+                        return false;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_INTELLECT);
+                default:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_INTELLECT);
+            }
+            break;
+        case BOT_SPEC_PALADIN_RETRIBUTION:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    return proto->InventoryType == INVTYPE_2HWEAPON;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_HUNTER_BEASTMASTERY:
+        case BOT_SPEC_HUNTER_MARKSMANSHIP:
+        case BOT_SPEC_HUNTER_SURVIVAL:
+            switch (slot)
+            {
+                case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                    break;
+                default:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_AGILITY);
+                    break;
+            }
+            break;
+        case BOT_SPEC_ROGUE_ASSASINATION:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
+                    return proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER;
+                case BOT_SLOT_RANGED:
+                    return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_ROGUE_COMBAT:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
+                    return proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE;
+                case BOT_SLOT_RANGED:
+                    return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_ROGUE_SUBTLETY:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
+                    return proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE;
+                case BOT_SLOT_RANGED:
+                    return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_DK_FROST:
+            switch (slot)
+            {
+                case BOT_SLOT_MAINHAND:
+                    return me->GetLevel() < 61 || proto->InventoryType == INVTYPE_2HWEAPON;
+                default:
+                    break;
+            }
+            break;
+        case BOT_SPEC_SHAMAN_ENHANCEMENT:
+            switch (slot)
+            {
+                case BOT_SLOT_OFFHAND:
+                    return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND;
+                case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                    break;
+                default:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_AGILITY);
+            }
+            break;
+        case BOT_SPEC_DRUID_FERAL:
+            switch (slot)
+            {
+                case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                    break;
+                case BOT_SLOT_MAINHAND:
+                    if (proto->InventoryType != INVTYPE_2HWEAPON)
+                        return false;
+                [[fallthrough]];
+                default:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_AGILITY);
+            }
+            break;
+        case BOT_SPEC_DRUID_BALANCE:
+            switch (slot)
+            {
+                case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
+                    break;
+                default:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return item_has_stat(proto, ITEM_MOD_INTELLECT);
+            }
+            break;
+        default:
+            break;
+    }
+
+    return true;
+}
+
 
 void bot_ai::_removeEquipment(uint8 slot)
 {
@@ -14299,7 +14545,7 @@ float bot_ai::_getItemGearStatScore(ItemTemplate const* iproto, uint8 forslot, I
 
     //BOT_LOG_ERROR("scripts", "_getItemGearScore for {} - {}", proto->ItemId, proto->Name1);
 
-    ItemStatBonus istats = {};
+    ItemStatBonus istats{};
     //for (uint8 i = 0; i != MAX_BOT_ITEM_MOD; ++i)
     //    BOT_LOG_ERROR("scripts", "_getItemGearScore at {} {}", uint32(i), istats[i]);
 
@@ -15344,6 +15590,8 @@ void bot_ai::InitEquips()
 
     if (IsWanderer())
     {
+        auto fit_check = [this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForWanderingBot(slot, proto); };
+
         GenerateRand();
         uint8 lvl = me->GetLevel();
         std::ostringstream gss;
@@ -15357,243 +15605,7 @@ void bot_ai::InitEquips()
             if ((i == BOT_SLOT_TRINKET1 || i == BOT_SLOT_TRINKET2 || i == BOT_SLOT_HEAD) && lvl < 30)
                 continue;
 
-            Item* item = BotDataMgr::GenerateWanderingBotItem(i, _botclass, lvl, [this, lslot = i](ItemTemplate const* proto) {
-                if (!_canEquip(proto, lslot, true))
-                    return false;
-
-                if (me->GetLevel() >= DEFAULT_MAX_LEVEL && me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
-                {
-                    if (Rand() < 20 && proto->ItemLevel < 245)
-                        return false;
-                    if (Rand() < 10 && proto->ItemLevel < 264)
-                        return false;
-
-                    switch (lslot)
-                    {
-                        case BOT_SLOT_HEAD:
-                        case BOT_SLOT_SHOULDERS:
-                        case BOT_SLOT_CHEST:
-                        case BOT_SLOT_WAIST:
-                        case BOT_SLOT_LEGS:
-                        case BOT_SLOT_FEET:
-                        case BOT_SLOT_WRIST:
-                        case BOT_SLOT_HANDS:
-                            if (!std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                return stat.ItemStatType == ITEM_MOD_RESILIENCE_RATING && stat.ItemStatValue > 0;
-                            }))
-                                return false;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                switch (GetSpec())
-                {
-                    case BOT_SPEC_WARRIOR_ARMS:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                return proto->InventoryType == INVTYPE_2HWEAPON;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_WARRIOR_FURY:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND) :
-                                    (proto->InventoryType == INVTYPE_2HWEAPON);
-                            case BOT_SLOT_OFFHAND:
-                                return (me->GetLevel() < 60) ? (proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND) :
-                                    (proto->InventoryType == INVTYPE_2HWEAPON);
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_WARRIOR_PROTECTION:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND;
-                            case BOT_SLOT_OFFHAND:
-                                return proto->InventoryType == INVTYPE_SHIELD;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_PALADIN_PROTECTION:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
-                                    return false;
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return !std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                            case BOT_SLOT_OFFHAND:
-                                if (!(proto->InventoryType == INVTYPE_SHIELD))
-                                    return false;
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return !std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_PALADIN_HOLY:
-                    case BOT_SPEC_SHAMAN_ELEMENTAL:
-                    case BOT_SPEC_SHAMAN_RESTORATION:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                if (!(proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONMAINHAND))
-                                    return false;
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                            case BOT_SLOT_OFFHAND:
-                                if (!(proto->InventoryType == INVTYPE_SHIELD))
-                                    return false;
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                            default:
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                        }
-                        break;
-                    case BOT_SPEC_PALADIN_RETRIBUTION:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                return proto->InventoryType == INVTYPE_2HWEAPON;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_HUNTER_BEASTMASTERY:
-                    case BOT_SPEC_HUNTER_MARKSMANSHIP:
-                    case BOT_SPEC_HUNTER_SURVIVAL:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
-                                break;
-                            default:
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
-                                });
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_ROGUE_ASSASINATION:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
-                                return proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER;
-                            case BOT_SLOT_RANGED:
-                                return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_ROGUE_COMBAT:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
-                                return proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE;
-                            case BOT_SLOT_RANGED:
-                                return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_ROGUE_SUBTLETY:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND: case BOT_SLOT_OFFHAND:
-                                return proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE;
-                            case BOT_SLOT_RANGED:
-                                return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_DK_FROST:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_MAINHAND:
-                                return me->GetLevel() < 61 || proto->InventoryType == INVTYPE_2HWEAPON;
-                            default:
-                                break;
-                        }
-                        break;
-                    case BOT_SPEC_SHAMAN_ENHANCEMENT:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_OFFHAND:
-                                return proto->InventoryType == INVTYPE_WEAPON || proto->InventoryType == INVTYPE_WEAPONOFFHAND;
-                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
-                                break;
-                            default:
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
-                                });
-                        }
-                        break;
-                    case BOT_SPEC_DRUID_FERAL:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
-                                break;
-                            case BOT_SLOT_MAINHAND:
-                                if (proto->InventoryType != INVTYPE_2HWEAPON)
-                                    return false;
-                            [[fallthrough]];
-                            default:
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
-                                });
-                        }
-                        break;
-                    case BOT_SPEC_DRUID_BALANCE:
-                        switch (lslot)
-                        {
-                            case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
-                                break;
-                            default:
-                                if (me->GetLevel() < 70)
-                                    break;
-                                return std::any_of(proto->ItemStat.cbegin(), proto->ItemStat.cend(), [](_ItemStat const& stat) {
-                                    return stat.ItemStatType == ITEM_MOD_INTELLECT && stat.ItemStatValue > 0;
-                                });
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                return true;
-            });
-
+            Item* item = BotDataMgr::GenerateWanderingBotItem(i, _botclass, lvl, fit_check);
             if (!item)
             {
                 if (i <= BOT_SLOT_RANGED && einfo->ItemEntry[i] != 0)
@@ -16648,11 +16660,9 @@ void bot_ai::OnBotChannelFinish(Spell const* spell)
 
 void bot_ai::OnBotSpellInterrupted(SpellSchoolMask schoolMask, uint32 unTimeMs)
 {
-    SpellInfo const* info;
-
     for (BotSpellMap::const_iterator itr = _spells.begin(); itr != _spells.end(); ++itr)
     {
-        info = sSpellMgr->GetSpellInfo(itr->second->spellId);
+        SpellInfo const* info = sSpellMgr->GetSpellInfo(itr->second->spellId);
         if (!info || !(info->GetSchoolMask() & schoolMask)) continue;
         if (info->IsCooldownStartedOnEvent()) continue;
         if (info->PreventionType != SPELL_PREVENTION_TYPE_SILENCE) continue;
@@ -18099,11 +18109,10 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     //Check current cast state: interrupt casts that became pointless
     if (me->HasUnitState(UNIT_STATE_CASTING) && !HasBotCommandState(BOT_COMMAND_ISSUED_ORDER) && urand(1,100) <= 75)
     {
-        bool interrupt;
-        Unit const* target;
         for (uint8 i = CURRENT_FIRST_NON_MELEE_SPELL; i != CURRENT_MAX_SPELL; ++i)
         {
-            interrupt = false;
+            bool interrupt = false;
+            Unit const* target = nullptr;
             Spell* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
             if (!spell)
                 continue;
@@ -19112,7 +19121,7 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
     mypos.m_positionX += movedist * std::cos(me->ToAbsoluteAngle(base_angle));
     mypos.m_positionY += movedist * std::sin(me->ToAbsoluteAngle(base_angle));
     Bcore::NormalizeMapCoord(mypos.m_positionX);
-    Bcore::NormalizeMapCoord(pos.m_positionY);
+    Bcore::NormalizeMapCoord(mypos.m_positionY);
 
     ground = me->GetMapHeight(mypos.m_positionX, mypos.m_positionY, MAX_HEIGHT, true, MAX_FALL_DISTANCE);
     floor = me->GetMapHeight(mypos.m_positionX, mypos.m_positionY, mypos.m_positionZ);
@@ -21214,7 +21223,7 @@ float bot_ai::GetBotAmmoDPS() const
 {
     if (CanUseAmmo())
     {
-        for (int8 i = MAX_AMMO_LEVEL - 1; i >= 0; --i)
+        for (uint32 i = 0; i < MAX_AMMO_LEVEL; ++i)
             if (me->GetLevel() >= AmmoDPSForLevel[i][0])
                 return float(AmmoDPSForLevel[i][1]);
 

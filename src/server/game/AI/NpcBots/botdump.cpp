@@ -170,13 +170,13 @@ std::string ValToString(uint32 v)
 }
 
 template<typename T>
-bool ExtractValueFromString(std::string const& line, T& v, size_t offset, std::string const sep = "'")
+bool ExtractValueFromString(std::string const& line, T& v, size_t offset)
 {
     uint32 sepNum = 0;
 
     size_t begin_pos = 0, end_pos = 0;
 
-    size_t pos = line.find(sep);
+    size_t pos = line.find('\'');
     while (pos != std::string::npos)
     {
         ++sepNum;
@@ -194,7 +194,7 @@ bool ExtractValueFromString(std::string const& line, T& v, size_t offset, std::s
         if (begin_pos && end_pos)
             break;
 
-        pos = line.find(sep, pos + 1);
+        pos = line.find('\'', pos + 1);
     }
 
     if (begin_pos && end_pos)

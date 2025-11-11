@@ -773,7 +773,7 @@ public:
                 case 3: return 1.f /   2.50f;
                 case 2: return 1.f /   1.67f;
                 case 1: return 1.f /   1.25f;
-                default:return 1.f /   1.00f;
+                default:return         1.00f;
             }
         }
     };

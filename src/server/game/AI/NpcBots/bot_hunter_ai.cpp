@@ -616,16 +616,14 @@ public:
                 if (mtar && me->GetDistance(mtar) > 5 && me->GetDistance(mtar) < CalcSpellMaxRange(TRANQ_SHOT_1) &&
                     !mtar->IsImmunedToSpell(sSpellMgr->GetSpellInfo(TRANQ_SHOT_1), me))
                 {
-                    AuraApplication const* aurApp;
-                    SpellInfo const* spellInfo;
                     Unit::AuraMap const& auras = mtar->GetOwnedAuras();
                     for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
                     {
-                        spellInfo = itr->second->GetSpellInfo();
+                        SpellInfo const* spellInfo = itr->second->GetSpellInfo();
                         if (spellInfo->Dispel != DISPEL_MAGIC && spellInfo->Dispel != DISPEL_ENRAGE) continue;
                         if (spellInfo->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) continue;
                         //if (spellInfo->AttributesEx & SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR) continue;
-                        aurApp = itr->second->GetApplicationOfTarget(mtar->GetGUID());
+                        AuraApplication const* aurApp = itr->second->GetApplicationOfTarget(mtar->GetGUID());
                         if (aurApp && aurApp->IsPositive())
                         {
                             if (doCast(mtar, GetSpell(TRANQ_SHOT_1)))
@@ -961,7 +959,7 @@ public:
             {
                 uint32 STING = 0;
                 AuraEffect const* sting = nullptr;
-                if (!STING && GetSpell(SCORPID_STING_1) && mytar->GetTypeId() == TYPEID_UNIT &&
+                if (GetSpell(SCORPID_STING_1) && mytar->GetTypeId() == TYPEID_UNIT &&
                     mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)
                 {
                     sting = mytar->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0);
@@ -2196,13 +2194,11 @@ public:
         {
             uint32 mask = 0;
 
-            uint32 baseId;
-            bool isAspect;
             Unit::AuraApplicationMap const& aurapps = me->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = aurapps.begin(); itr != aurapps.end(); ++itr)
             {
-                isAspect = true;
-                baseId = itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
+                bool isAspect = true;
+                uint32 baseId = itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
                 switch (baseId)
                 {
                     //case ASPECT_OF_THE_MONKEY_1:

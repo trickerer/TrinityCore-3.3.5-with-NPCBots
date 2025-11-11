@@ -2347,7 +2347,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
     BOT_LOG_INFO("server.loading", ">> Sorted wandering bots gear in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
-Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check)
+Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check)
 {
     ASSERT(slot < BOT_INVENTORY_SIZE);
     ASSERT(botclass < BOT_CLASS_END);
@@ -2375,7 +2375,7 @@ Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 lev
             for (uint32 iid : *itemIdVec)
             {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(iid);
-                if ((!maxLvl || proto->ItemLevel <= maxLvl) && check(proto))
+                if ((!maxLvl || proto->ItemLevel <= maxLvl) && check(slot, proto))
                     validVec.push_back(iid);
             }
         }

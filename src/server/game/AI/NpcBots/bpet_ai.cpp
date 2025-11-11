@@ -1542,7 +1542,7 @@ Unit* bot_pet_ai::_getTarget(bool &reset) const
         foldist = std::max<float>(foldist, spelldist + 4.f);
     }
     bool dropTarget = false;
-    if (!dropTarget && mytar)
+    if (mytar)
     {
         dropTarget = IAmFree() ?
             petOwner->GetDistance(mytar) > foldist :
@@ -2327,11 +2327,9 @@ void bot_pet_ai::OnBotPetSpellGo(Spell const* spell, bool ok)
 
 void bot_pet_ai::OnBotPetSpellInterrupted(SpellSchoolMask schoolMask, uint32 unTimeMs)
 {
-    SpellInfo const* info;
-
     for (BotPetSpellMap::iterator itr = _spells.begin(); itr != _spells.end(); ++itr)
     {
-        info = sSpellMgr->GetSpellInfo(itr->second->spellId);
+        SpellInfo const* info = sSpellMgr->GetSpellInfo(itr->second->spellId);
         if (!info || !(info->GetSchoolMask() & schoolMask)) continue;
         if (info->IsCooldownStartedOnEvent()) continue;
         if (info->PreventionType != SPELL_PREVENTION_TYPE_SILENCE) continue;
@@ -2384,10 +2382,9 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
     //Check current cast state: interrupt casts that became pointless
     if (me->HasUnitState(UNIT_STATE_CASTING) && urand(1,100) <= 75)
     {
-        bool interrupt;
         for (uint8 i = CURRENT_FIRST_NON_MELEE_SPELL; i != CURRENT_AUTOREPEAT_SPELL; ++i)
         {
-            interrupt = false;
+            bool interrupt = false;
             Spell* spell = me->GetCurrentSpell(CurrentSpellTypes(i));
             if (!spell)
                 continue;
