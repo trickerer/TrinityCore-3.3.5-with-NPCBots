@@ -237,7 +237,7 @@ class BotDataMgr
         static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
         static void CreateWanderingBotsSortedGear();
         static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
-        static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(ItemTemplate const*)>&& check);
+        static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check);
         static bool GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 spec);
         static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
         static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);

@@ -411,6 +411,8 @@ private:
         uint32 id;
         std::string name;
         uint8 race;
+
+        inline constexpr std::strong_ordering operator<=>(BotInfo const& other) const noexcept = default;
     };
 public:
     script_bot_commands() : CommandScript("script_bot_commands") { }
@@ -999,7 +1001,7 @@ public:
         {
             if (!wps_relinks.empty())
             {
-                std::sort(wps_relinks.begin(), wps_relinks.end(), [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) { return wlp1->Id() < wlp2->Id(); });
+                std::ranges::sort(wps_relinks, [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) { return wlp1->Id() < wlp2->Id(); });
                 for (WanderNodeLink const* wlp : wps_relinks)
                 {
                     handler->PSendSysMessage("Adding link %u->%u (w=%u)...", wp->GetWPId(), wlp->Id(), wlp->weight);
@@ -1637,7 +1639,7 @@ public:
         std::vector<WanderNode*> wander_nodes_copy;
         wander_nodes_copy.reserve(WanderNode::GetAllWPsCount());
         WanderNode::DoForAllWPs([&wander_nodes_copy](WanderNode* wp) { wander_nodes_copy.push_back(wp); });
-        std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
+        std::ranges::sort(wander_nodes_copy, [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
 
         uint32 startid = *start_id;
         uint32 endid = end_id.value_or(wander_nodes_copy.back()->GetWPId());
@@ -3382,7 +3384,7 @@ public:
             return false;
         }
 
-        std::sort(botlist.begin(), botlist.end(), [](BotInfo const& bi1, BotInfo const& bi2) { return bi1.id < bi2.id; });
+        std::ranges::sort(botlist);
 
         for (BotList::const_iterator itr = botlist.begin(); itr != botlist.end(); ++itr)
         {

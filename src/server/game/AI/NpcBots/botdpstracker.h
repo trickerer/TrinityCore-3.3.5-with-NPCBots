@@ -29,10 +29,10 @@ class DPSTracker
         DamageTakenMap _damages;
         DPSTakenMap _DPSes;
 
-        uint32 _updateTimer;
-        uint32 _inactiveTimer;
-        uint32 _trackTimer;
-        bool _active;
+        uint32 _updateTimer{};
+        uint32 _inactiveTimer{};
+        uint32 _trackTimer{};
+        bool _active{};
 };
 
 #endif

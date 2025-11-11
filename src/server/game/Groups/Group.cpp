@@ -2082,10 +2082,9 @@ void Group::UpdateBotOutOfRange(Creature* creature)
     WorldPacket data;
     BotMgr::BuildBotPartyMemberStatsChangedPacket(creature, &data);
 
-    Player* member;
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        member = itr->GetSource();
+        Player const*member = itr->GetSource();
         if (member/* && (!member->IsInMap(creature) || !member->IsWithinDist(creature, member->GetSightRange(), false))*/)
             member->SendDirectMessage(&data);
     }
@@ -2100,10 +2099,9 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     WorldPacket data;
     player->GetSession()->BuildPartyMemberStatsChangedPacket(player, &data);
 
-    Player* member;
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        member = itr->GetSource();
+        Player const* member = itr->GetSource();
         if (member && member != player && (!member->IsInMap(player) || !member->IsWithinDist(player, member->GetSightRange(), false)))
             member->SendDirectMessage(&data);
     }

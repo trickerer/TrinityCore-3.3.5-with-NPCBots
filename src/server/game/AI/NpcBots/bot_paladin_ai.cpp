@@ -2559,11 +2559,10 @@ public:
         {
             uint32 mask = 0;
 
-            bool blessing;
             Unit::AuraApplicationMap const& aurapps = target->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = aurapps.begin(); itr != aurapps.end(); ++itr)
             {
-                blessing = true;
+                bool blessing = true;
                 switch (itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id)
                 {
                     case BLESSING_OF_WISDOM_1:
@@ -2602,13 +2601,11 @@ public:
         {
             uint32 mask = 0;
 
-            uint32 baseId;
-            bool isAura;
             Unit::AuraApplicationMap const& aurapps = me->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = aurapps.begin(); itr != aurapps.end(); ++itr)
             {
-                isAura = true;
-                baseId = itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
+                bool isAura = true;
+                uint32 baseId = itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
                 switch (baseId)
                 {
                     case DEVOTION_AURA_1:
