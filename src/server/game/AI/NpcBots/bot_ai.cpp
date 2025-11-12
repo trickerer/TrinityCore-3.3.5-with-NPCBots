@@ -5246,6 +5246,42 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
                 spots.emplace_back(*c, radius);
         }
     }
+    // The Blood Furnace - Proximity Bombs
+    else if (unit->GetMapId() == 542)
+    {
+        std::list<GameObject*> proximityBombList;
+        static const std::array<uint32, 2> ProximityBombIds = { GAMEOBJECT_PROXIMITY_BOMB_N, GAMEOBJECT_PROXIMITY_BOMB_N };
+        auto bomb_check = [](GameObject const* go) { return go && std::ranges::find(ProximityBombIds, go->GetEntry()) != ProximityBombIds.cend(); };
+        Bcore::GameObjectListSearcher bombSearcher(unit, proximityBombList, bomb_check);
+        Cell::VisitAllObjects(unit, bombSearcher, 40.f);
+
+        if (!proximityBombList.empty())
+        {
+            for (GameObject const* go : proximityBombList)
+            {
+                float radius = 10.0f + DEFAULT_PLAYER_BOUNDING_RADIUS * go->GetObjectScale() + DEFAULT_PLAYER_COMBAT_REACH * 1.5f;
+                spots.emplace_back(*go, radius);
+            }
+        }
+    }
+    // Hellfire Ramparts - Liquid Fire puddles
+    if (unit->GetMapId() == 543) // Hellfire Ramparts
+    {
+        std::list<GameObject*> liquidFireList;
+        static const std::array<uint32, 3> LiquidFireIds = { GAMEOBJECT_LIQUID_FIRE_1, GAMEOBJECT_LIQUID_FIRE_2, GAMEOBJECT_LIQUID_FIRE_3 };
+        auto fire_check = [](GameObject const* go) { return go && std::ranges::find(LiquidFireIds, go->GetEntry()) != LiquidFireIds.cend(); };
+        Bcore::GameObjectListSearcher fireSearcher(unit, liquidFireList, fire_check);
+        Cell::VisitAllObjects(unit, fireSearcher, 40.f);
+
+        if (!liquidFireList.empty())
+        {
+            for (GameObject const* go : liquidFireList)
+            {
+                float radius = 10.0f + DEFAULT_PLAYER_BOUNDING_RADIUS * go->GetObjectScale() + DEFAULT_PLAYER_COMBAT_REACH * 1.5f;
+                spots.emplace_back(*go, radius);
+            }
+        }
+    }
     //Aucheai Crypts
     else if (unit->GetMapId() == 558)
     {
