@@ -77,9 +77,10 @@ public:
         WanderNode* wp;
         uint32 weight;
 
-        inline uint32 Id() const { return wp ? wp->GetWPId() : 0; }
+        inline constexpr uint32 Id() const noexcept { return wp ? wp->GetWPId() : 0; }
 
-        inline constexpr std::strong_ordering operator<=>(WanderNodeLink const& other) const noexcept = default;
+        inline constexpr bool operator==(WanderNodeLink const& other) const noexcept { return Id() == other.Id(); }
+        inline constexpr std::strong_ordering operator<=>(WanderNodeLink const& other) const noexcept { return Id() <=> other.Id(); }
 
         struct WeightExtractor {
             inline constexpr uint32 operator()(WanderNodeLink const& wpl) const noexcept { return wpl.weight; }
