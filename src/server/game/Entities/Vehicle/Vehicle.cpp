@@ -876,6 +876,9 @@ bool VehicleJoinEvent::Execute(uint64, uint32)
         player->SendOnCancelExpectedVehicleRideAura();
         if (!veSeat->HasFlag(VEHICLE_SEAT_FLAG_B_KEEP_PET))
             player->UnsummonPetTemporaryIfAny();
+
+        // This is not perfectly mirroring official behavior (aura removal is delayed, most likely on heartbeat)
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_SEATED);
     }
 
     //npcbot

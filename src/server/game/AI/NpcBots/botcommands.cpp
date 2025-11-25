@@ -407,12 +407,13 @@ private:
 
     struct BotInfo
     {
-        explicit BotInfo(uint32 Id, std::string&& Name, uint8 Race) : id(Id), name(std::move(Name)), race(Race) {}
+        BotInfo(uint32 Id, std::string&& Name, uint8 Race) : id(Id), name(std::move(Name)), race(Race) {}
         uint32 id;
         std::string name;
         uint8 race;
 
-        inline constexpr std::strong_ordering operator<=>(BotInfo const& other) const noexcept = default;
+        inline constexpr bool operator==(BotInfo const& other) const noexcept { return id == other.id; }
+        inline constexpr std::strong_ordering operator<=>(BotInfo const& other) const noexcept { return id <=> other.id; }
     };
 public:
     script_bot_commands() : CommandScript("script_bot_commands") { }
