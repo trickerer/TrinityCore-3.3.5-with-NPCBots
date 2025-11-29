@@ -451,7 +451,6 @@ public:
 
         static ChatCommandTable npcbotWPCommandTable =
         {
-            //{ "generate",   HandleNpcBotWPGenerateCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
             { "spawnall",   HandleNpcBotWPSpawnAllCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "move",       HandleNpcBotWPMoveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "add",        HandleNpcBotWPAddCommand,               rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
@@ -700,103 +699,6 @@ public:
         wp->SetupLinkFromAura();
         wp->SetupLinkToAura();
         return wpc;
-    }
-
-    static bool HandleNpcBotWPGenerateCommand(ChatHandler* handler, Optional<bool> save)
-    {
-        using WanderNodeLink = WanderNode::WanderNodeLink;
-
-        WanderNode::RemoveAllWPs();
-
-        handler->SendSysMessage("Generating wander nodes from POIs. No levels or flags will be set");
-
-        uint32 poiId_start = 0;
-        for (AreaPOIEntry const* aProto : sAreaPOIStore)
-        {
-            if (aProto->ContinentID != 0 && aProto->ContinentID != 1/* && aProto->ContinentID != 530 && aProto->ContinentID != 571*/)
-                continue;
-
-            uint32 poiId = ++poiId_start;
-            std::string poiName = aProto->Name;
-            if (strlen(aProto->Description) > 0)
-            {
-                poiName += " - ";
-                poiName += aProto->Description;
-            }
-            poiName.erase(std::remove_if(std::begin(poiName), std::end(poiName), [](char c) { return c == '\''; }), poiName.end());
-            uint32 poiMapId = aProto->ContinentID;
-            float x = aProto->Pos.X;
-            float y = aProto->Pos.Y;
-            float z = aProto->Pos.Z;
-            float o = frand(0.001f, float(M_PI + M_PI) - 0.001f);
-            float ground_z = sMapMgr->CreateBaseMap(poiMapId)->GetHeight(PHASEMASK_NORMAL, x, y, z);
-            if (ground_z > INVALID_HEIGHT)
-                z = ground_z;
-            uint32 poiZoneId, poiAreaId;
-            sMapMgr->GetZoneAndAreaId(PHASEMASK_NORMAL, poiZoneId, poiAreaId, poiMapId, x, y, z);
-
-            poiZoneId = GetZoneIdOverride(poiZoneId);
-            if (IsNoWPZone(poiZoneId))
-            {
-                --poiId_start;
-                continue;
-            }
-
-            WanderNode* wp = new WanderNode(poiId, poiMapId, x, y, z, o, poiZoneId, poiAreaId, poiName);
-            auto [minl, maxl] = GetZoneLevels(poiZoneId);
-            wp->SetLevels(minl, maxl);
-            BotWPFlags flags = BotWPFlags::BOTWP_FLAG_NONE;
-            wp->SetFlags(flags);
-            WanderNode::DoForAllMapWPs(poiMapId, [wp = wp](WanderNode const* mwp) {
-                if (mwp->GetWPId() != wp->GetWPId() && mwp->GetExactDist2d(wp) < MAX_VISIBILITY_DISTANCE)
-                    wp->Link(WanderNodeLink{ .wp = const_cast<WanderNode*>(mwp), .weight = 0 });
-            });
-
-            handler->SendSysMessage(wp->ToString());
-        }
-
-        handler->PSendSysMessage("Generating wander nodes completed with %u nodes", uint32(WanderNode::GetAllWPsCount()));
-
-        if (!(save && *save))
-            return true;
-
-        WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
-        trans->Append("DROP TABLE IF EXISTS creature_wander_nodes_");
-        trans->Append(
-            "CREATE TABLE creature_wander_nodes_ ("
-            "  `id` int(10) unsigned NOT NULL,"
-            "  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'RENAME_ME',"
-            "  `mapid` smallint(5) unsigned NOT NULL DEFAULT '0',"
-            "  `zoneid` int(10) unsigned NOT NULL DEFAULT '0',"
-            "  `areaid` int(10) unsigned NOT NULL DEFAULT '0',"
-            "  `minlevel` tinyint(3) unsigned NOT NULL DEFAULT '0',"
-            "  `maxlevel` tinyint(3) unsigned NOT NULL DEFAULT '0',"
-            "  `flags` int(10) unsigned NOT NULL DEFAULT '0',"
-            "  `x` float NOT NULL DEFAULT '0',"
-            "  `y` float NOT NULL DEFAULT '0',"
-            "  `z` float NOT NULL DEFAULT '0',"
-            "  `o` float NOT NULL DEFAULT '0',"
-            "  `links` mediumtext COLLATE utf8mb4_unicode_ci,"
-            "  PRIMARY KEY (`id`)"
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Bot Wander Map'"
-        );
-        std::ostringstream ss;
-        ss << "INSERT INTO creature_wander_nodes_ (id,mapid,x,y,z,o,zoneId,areaId,minlevel,maxlevel,flags,name,links) VALUES ";
-        WanderNode::DoForAllWPs([&ss](WanderNode const* wp) {
-            auto [minl, maxl] = wp->GetLevels();
-            ss << '(' << wp->GetWPId() << ',' << wp->GetMapId()
-                << ',' << wp->GetPositionX() << ',' << wp->GetPositionY() << ',' << wp->GetPositionZ() << ',' << wp->GetOrientation()
-                << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
-                << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
-        });
-        std::string val_str = ss.str();
-        val_str.resize(val_str.size() - 1u);
-        trans->Append(val_str.c_str());
-        WorldDatabase.CommitTransaction(trans);
-
-        handler->SendSysMessage("Saved.");
-
-        return true;
     }
 
     static bool HandleNpcBotWPSpawnAllCommand(ChatHandler* handler)
