@@ -506,16 +506,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
                             break;
                         }
 
-                        if (/*Creature* bot = */ObjectAccessor::GetCreature(*plrg, itr->first))
+                        if (ObjectAccessor::GetCreature(*plrg, itr->first))
                         {
-                            //if (!(bot->GetBotRoles() & ( 1 | 2 | 4 ))) //(BOT_ROLE_TANK | BOT_ROLE_DPS | BOT_ROLE_HEAL)
-                            //{
-                            //    //no valid roles - reqs are not met
-                            //    (ChatHandler(plrg->GetSession())).PSendSysMessage("Your bot %s does not have any viable roles assigned.", bot->GetName().c_str());
-                            //    joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
-                            //    continue;
-                            //}
-
                             ++memberCount;
                             players.insert(itr->first);
                         }
@@ -619,7 +611,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         // Send update to player
         LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_JOIN_QUEUE, dungeons, comment);
         //npcbot
-        std::map<ObjectGuid, uint8> brolemap;
+        std::vector<std::pair<ObjectGuid, uint8>> bot_roles;
         //end npcbot
         for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -674,7 +666,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
                     if (roles & PLAYER_ROLE_HEALER)
                         broles &= ~PLAYER_ROLE_HEALER;
 
-                    brolemap[bguid] = broles;
+                    bot_roles.emplace_back(bguid, broles);
                 }
                 //end npcbot
             }
@@ -682,8 +674,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         // Update leader role
         UpdateRoleCheck(gguid, guid, roles);
         //npcbot - update bots' roles
-        for (std::map<ObjectGuid, uint8>::const_iterator it = brolemap.begin(); it != brolemap.end(); ++it)
-            UpdateRoleCheck(gguid, it->first, it->second);
+        for (decltype(bot_roles)::value_type const& brole_pair : bot_roles)
+            UpdateRoleCheck(gguid, brole_pair.first, brole_pair.second);
         //end npcbot
     }
     else                                                   // Add player to queue
