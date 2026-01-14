@@ -22,7 +22,7 @@ TODO: Resolve remaining bugs with wrong power type after death
 TODO2: PvP behaviour revamp (again, it's like 5th time?)
 */
 
-#define MAX_TREANTS 3
+constexpr uint8 MAX_TREANTS = 3;
 
 enum DruidBaseSpells
 {
@@ -187,27 +187,17 @@ enum DruidSpecial
     FORCE_OF_NATURE_1                   = 33831 //not casted
 };
 
-static const uint32 Druid_spells_damage_arr[] =
+static const std::vector<uint32> Druid_spells_damage
 { FAERIE_FIRE_FERAL_1, CLAW_1, FEROCIOUS_BITE_1, MAIM_1, MANGLE_CAT_1, POUNCE_1, RAKE_1, RAVAGE_1, RIP_1, SHRED_1,
 SWIPE_CAT_1, LACERATE_1, MANGLE_BEAR_1, MAUL_1,SWIPE_BEAR_1, ENTANGLING_ROOTS_1, HURRICANE_1, INSECT_SWARM_1,
 WRATH_1, MOONFIRE_1, STARFALL_1, STARFIRE_1, TYPHOON_1, THORNS_1 };
-
-static const uint32 Druid_spells_cc_arr[] =
-{ BASH_1, CYCLONE_1, ENTANGLING_ROOTS_1, FERAL_CHARGE_BEAR_1, HIBERNATE_1, MAIM_1, POUNCE_1, TYPHOON_1 };
-
-static const uint32 Druid_spells_heal_arr[] =
-{ HEALING_TOUCH_1, LIFEBLOOM_1, NOURISH_1, REGROWTH_1, REJUVENATION_1, SWIFTMEND_1, TRANQUILITY_1, WILD_GROWTH_1 };
-
-static const uint32 Druid_spells_support_arr[] =
+static const std::vector<uint32> Druid_spells_cc{ BASH_1, CYCLONE_1, ENTANGLING_ROOTS_1, FERAL_CHARGE_BEAR_1, HIBERNATE_1, MAIM_1, POUNCE_1, TYPHOON_1 };
+static const std::vector<uint32> Druid_spells_heal{ HEALING_TOUCH_1, LIFEBLOOM_1, NOURISH_1, REGROWTH_1, REJUVENATION_1, SWIFTMEND_1, TRANQUILITY_1, WILD_GROWTH_1 };
+static const std::vector<uint32> Druid_spells_support
 { ABOLISH_POISON_1, BARKSKIN_1, BERSERK_1, CHALLENGING_ROAR_1, COWER_1, CURE_POISON_1, DASH_1, ENRAGE_1,
 FAERIE_FIRE_NORMAL_1, FAERIE_FIRE_FERAL_1, FERAL_CHARGE_BEAR_1, FERAL_CHARGE_CAT_1, FRENZIED_REGENERATION_1,
 GROWL_1, INNERVATE_1, MARK_OF_THE_WILD_1, NATURES_GRASP_1, NATURES_SWIFTNESS_1, PROWL_1, REMOVE_CURSE_1,
 REBIRTH_1, REVIVE_1, SAVAGE_ROAR_1, SURVIVAL_INSTINCTS_1, THORNS_1, TIGERS_FURY_1 };
-
-static const std::vector<uint32> Druid_spells_damage(FROM_ARRAY(Druid_spells_damage_arr));
-static const std::vector<uint32> Druid_spells_cc(FROM_ARRAY(Druid_spells_cc_arr));
-static const std::vector<uint32> Druid_spells_heal(FROM_ARRAY(Druid_spells_heal_arr));
-static const std::vector<uint32> Druid_spells_support(FROM_ARRAY(Druid_spells_support_arr));
 
 static float rageLossMult;
 

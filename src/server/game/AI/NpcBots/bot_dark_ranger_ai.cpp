@@ -49,14 +49,8 @@ enum DarkRangerSpecial
     MODEL_BLOODY_BONES                  = 25538
 };
 
-static const uint32 Darkranger_spells_damage_arr[] =
-{ BLACK_ARROW_1, DRAIN_LIFE_1 };
-
-static const uint32 Darkranger_spells_cc_arr[] =
-{ SILENCE_1 };
-
-static const std::vector<uint32> Darkranger_spells_damage(FROM_ARRAY(Darkranger_spells_damage_arr));
-static const std::vector<uint32> Darkranger_spells_cc(FROM_ARRAY(Darkranger_spells_cc_arr));
+static const std::vector<uint32> Darkranger_spells_damage{ BLACK_ARROW_1, DRAIN_LIFE_1 };
+static const std::vector<uint32> Darkranger_spells_cc{ SILENCE_1 };
 
 class dark_ranger_bot : public CreatureScript
 {

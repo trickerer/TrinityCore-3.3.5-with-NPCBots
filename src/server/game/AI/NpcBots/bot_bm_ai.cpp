@@ -39,10 +39,7 @@ enum BlademasterSpecial
     MIRROR_COST                             = 125 * 5
 };
 
-static const uint32 Blademaster_spells_support_arr[] =
-{ MIRROR_IMAGE_1, WINDWALK_1 };
-
-static const std::vector<uint32> Blademaster_spells_support(FROM_ARRAY(Blademaster_spells_support_arr));
+static const std::vector<uint32> Blademaster_spells_support{ MIRROR_IMAGE_1, WINDWALK_1 };
 
 class blademaster_bot : public CreatureScript
 {

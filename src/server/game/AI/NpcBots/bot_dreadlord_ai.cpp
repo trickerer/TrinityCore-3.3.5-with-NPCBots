@@ -46,18 +46,9 @@ enum DreadlordSpecial
     IMMOLATION              = 39007
 };
 
-static const uint32 Dreadlord_spells_damage_arr[] =
-{ CARRION_SWARM_1, INFERNO_1 };
-
-static const uint32 Dreadlord_spells_cc_arr[] =
-{ SLEEP_1 };
-
-static const uint32 Dreadlord_spells_support_arr[] =
-{ INFERNO_1 };
-
-static const std::vector<uint32> Dreadlord_spells_damage(FROM_ARRAY(Dreadlord_spells_damage_arr));
-static const std::vector<uint32> Dreadlord_spells_cc(FROM_ARRAY(Dreadlord_spells_cc_arr));
-static const std::vector<uint32> Dreadlord_spells_support(FROM_ARRAY(Dreadlord_spells_support_arr));
+static const std::vector<uint32> Dreadlord_spells_damage{ CARRION_SWARM_1, INFERNO_1 };
+static const std::vector<uint32> Dreadlord_spells_cc{ SLEEP_1 };
+static const std::vector<uint32> Dreadlord_spells_support{ INFERNO_1 };
 
 class dreadlord_bot : public CreatureScript
 {

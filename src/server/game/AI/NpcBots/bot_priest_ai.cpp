@@ -125,26 +125,17 @@ enum PriestSpecial
     SHADOWFIEND_1                   = 34433
 };
 
-static const uint32 Priest_spells_damage_arr[] =
-{ DEVOURING_PLAGUE_1, HOLY_FIRE_1, MIND_BLAST_1, MIND_FLAY_1, MIND_SEAR_1, PENANCE_1, SMITE_1, SW_PAIN_1, SW_DEATH_1,
-VAMPIRIC_TOUCH_1 };
-
-static const uint32 Priest_spells_cc_arr[] =
+static const std::vector<uint32> Priest_spells_damage
+{ DEVOURING_PLAGUE_1, HOLY_FIRE_1, MIND_BLAST_1, MIND_FLAY_1, MIND_SEAR_1, PENANCE_1, SMITE_1, SW_PAIN_1, SW_DEATH_1, VAMPIRIC_TOUCH_1 };
+static const std::vector<uint32> Priest_spells_cc
 { PSYCHIC_HORROR_1, PSYCHIC_SCREAM_1, SHACKLE_UNDEAD_1, SILENCE_1 };
-
-static const uint32 Priest_spells_heal_arr[] =
+static const std::vector<uint32> Priest_spells_heal
 { RENEW_1, FLASH_HEAL_1, LESSER_HEAL_1, NORMAL_HEAL_1, GREATER_HEAL_1, PRAYER_OF_HEALING_1, PRAYER_OF_MENDING_1,
 GUARDIAN_SPIRIT_1, PENANCE_1, DIVINE_HYMN_1, CIRCLE_OF_HEALING_1, DESPERATE_PRAYER_1 };
-
-static const uint32 Priest_spells_support_arr[] =
+static const std::vector<uint32> Priest_spells_support
 { PW_FORTITUDE_1, DIVINE_SPIRIT_1, SHADOW_PROTECTION_1, ABOLISH_DISEASE_1, CURE_DISEASE_1,
 DISPEL_MAGIC_1, MASS_DISPEL_1, DISPERSION_1, FADE_1, FEAR_WARD_1, HYMN_OF_HOPE_1, INNER_FIRE_1, INNER_FOCUS_1,
 LEVITATE_1, PAIN_SUPPRESSION_1, POWER_INFUSION_1, PW_SHIELD_1, RESURRECTION_1, SHADOWFORM_1, VAMPIRIC_EMBRACE_1 };
-
-static const std::vector<uint32> Priest_spells_damage(FROM_ARRAY(Priest_spells_damage_arr));
-static const std::vector<uint32> Priest_spells_cc(FROM_ARRAY(Priest_spells_cc_arr));
-static const std::vector<uint32> Priest_spells_heal(FROM_ARRAY(Priest_spells_heal_arr));
-static const std::vector<uint32> Priest_spells_support(FROM_ARRAY(Priest_spells_support_arr));
 
 class priest_bot : public CreatureScript
 {

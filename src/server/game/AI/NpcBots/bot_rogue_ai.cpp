@@ -167,22 +167,15 @@ enum RogueSpecial
     THISTLE_TEA                         = 9512 //'Restore Energy' 1 min cd
 };
 
-static const uint32 Rogue_spells_damage_arr[] =
+static const std::vector<uint32> Rogue_spells_damage
 { AMBUSH_1, BACKSTAB_1, DEADLY_THROW_1, EVISCERATE_1, ENVENOM_1, FAN_OF_KNIVES_1, GARROTE_1, GHOSTLY_STRIKE_1, GOUGE_1,
 HEMORRHAGE_1, KILLING_SPREE_1, MUTILATE_1, RIPOSTE_1, RUPTURE_1, SINISTER_STRIKE_1 };
-
-static const uint32 Rogue_spells_cc_arr[] =
-{ BLIND_1, CHEAP_SHOT_1, /*DEADLY_THROW_1, */DISMANTLE_1, GOUGE_1, KICK_1, KIDNEY_SHOT_1, /*SAP_1*/ };
-
-static const uint32 Rogue_spells_support_arr[] =
+static const std::vector<uint32> Rogue_spells_cc{ BLIND_1, CHEAP_SHOT_1, /*DEADLY_THROW_1, */DISMANTLE_1, GOUGE_1, KICK_1, KIDNEY_SHOT_1, /*SAP_1*/ };
+static const std::vector<uint32> Rogue_spells_support
 { /*EXPOSE_ARMOR_1, DISTRACT_1, PICK_LOCK_1,*/ STEALTH_1, ADRENALINE_RUSH_1, BLADE_FLURRY_1, CLOAK_OF_SHADOWS_1,
 COLD_BLOOD_1, DISMANTLE_1, EVASION_1, FEINT_1, HUNGER_FOR_BLOOD_1, PREMEDITATION_1, PREPARATION_1, SHADOW_DANCE_1,
 SHADOWSTEP_1, SLICE_DICE_1, SPRINT_1, TRICKS_OF_THE_TRADE_1, VANISH_1, DISARM_TRAP_1, THISTLE_TEA,
 /*CRIPPLING_POISON_1, INSTANT_POISON_1, DEADLY_POISON_1, WOUND_POISON_1, MIND_NUMBING_POISON_1, ANESTHETIC_POISON_1*/ };
-
-static const std::vector<uint32> Rogue_spells_damage(FROM_ARRAY(Rogue_spells_damage_arr));
-static const std::vector<uint32> Rogue_spells_cc(FROM_ARRAY(Rogue_spells_cc_arr));
-static const std::vector<uint32> Rogue_spells_support(FROM_ARRAY(Rogue_spells_support_arr));
 
 class rogue_bot : public CreatureScript
 {

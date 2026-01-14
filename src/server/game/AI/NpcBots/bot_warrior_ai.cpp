@@ -162,24 +162,18 @@ enum WarriorSpecial
     BERSERKER_STANCE_PASSIVE                = 7381
 };
 
-static  uint32 Warrior_spells_damage_arr[] =
+static const std::vector<uint32> Warrior_spells_damage
 { BLADESTORM_1, BLOODTHIRST_1, CLEAVE_1, CONCUSSION_BLOW_1, DEVASTATE_1, EXECUTE_1, HEROIC_STRIKE_1, HEROIC_THROW_1,
 INTERCEPT_1, MOCKING_BLOW_1, MORTAL_STRIKE_1, OVERPOWER_1, REND_1, RETALIATION_1, REVENGE_1, SHATTERING_THROW_1,
 SHIELD_SLAM_1, SHOCKWAVE_1, SLAM_1, THUNDER_CLAP_1, VICTORY_RUSH_1, WHIRLWIND_1 };
-
-static  uint32 Warrior_spells_cc_arr[] =
+static const std::vector<uint32> Warrior_spells_cc
 { CHARGE_1, INTERCEPT_1, INTIMIDATING_SHOUT_1, CONCUSSION_BLOW_1, DISARM_1, HAMSTRING_1, PIERCING_HOWL_1,
 SHIELD_BASH_1, SHOCKWAVE_1 };
-
-static  uint32 Warrior_spells_support_arr[] =
+static const std::vector<uint32> Warrior_spells_support
 { BATTLE_SHOUT_1, COMMANDING_SHOUT_1, CHALLENGING_SHOUT_1, DEMORALIZING_SHOUT_1, BERSERKER_RAGE_1, BLOODRAGE_1,
 DEATH_WISH_1, ENRAGED_REGENERATION_1, HEROIC_FURY_1, INTERVENE_1, LAST_STAND_1, PUMMEL_1, RECKLESSNESS_1,
 RETALIATION_1, SHIELD_BASH_1, SHIELD_BLOCK_1, SHIELD_WALL_1, SPELL_REFLECTION_1, SUNDER_ARMOR_1, SWEEPING_STRIKES_1,
 TAUNT_1, VIGILANCE_1 };
-
-static const std::vector<uint32> Warrior_spells_damage(FROM_ARRAY(Warrior_spells_damage_arr));
-static const std::vector<uint32> Warrior_spells_cc(FROM_ARRAY(Warrior_spells_cc_arr));
-static const std::vector<uint32> Warrior_spells_support(FROM_ARRAY(Warrior_spells_support_arr));
 
 static float rageIncomeMult;
 static float rageLossMult;
@@ -764,7 +758,7 @@ public:
             //UBERS
             //Shield Wall
             if (IsSpellReady(SHIELD_WALL_1, diff, false) && CanBlock() &&
-                GetHealthPCT(me) < (30 + 4 * b_attackers.size() + 20 * (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->isWorldBoss())) &&
+                GetHealthPCT(me) < (30 + 4 * b_attackers.size() + 20ull * (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->isWorldBoss())) &&
                 (_inStance(2) || stanceChange(diff, 2)))
             {
                 if (doCast(me, GetSpell(SHIELD_WALL_1)))

@@ -67,14 +67,8 @@ enum NecromancerSpecial
     CE_MIN_TARGETS          = 3
 };
 
-static const uint32 Necromancer_spells_damage_arr[] =
-{ /*MAIN_ATTACK_1, */CORPSE_EXPLOSION_1/*, ATTRACT_1*/ };
-
-static const uint32 Necromancer_spells_support_arr[] =
-{ RAISE_DEAD_1, UNHOLY_FRENZY_1, CRIPPLE_1/*, ATTRACT_1*/ };
-
-static const std::vector<uint32> Necromancer_spells_damage(FROM_ARRAY(Necromancer_spells_damage_arr));
-static const std::vector<uint32> Necromancer_spells_support(FROM_ARRAY(Necromancer_spells_support_arr));
+static const std::vector<uint32> Necromancer_spells_damage{ /*MAIN_ATTACK_1, */CORPSE_EXPLOSION_1/*, ATTRACT_1*/ };
+static const std::vector<uint32> Necromancer_spells_support{ RAISE_DEAD_1, UNHOLY_FRENZY_1, CRIPPLE_1/*, ATTRACT_1*/ };
 
 class necromancer_bot : public CreatureScript
 {
@@ -202,7 +196,7 @@ public:
 
         void CheckRaiseDead(uint32 diff)
         {
-            if (!IsSpellReady(RAISE_DEAD_1, diff) || _raiseDeadCheckTimer > diff || _minions.size() > MAX_MINIONS - 2 ||
+            if (!IsSpellReady(RAISE_DEAD_1, diff) || _raiseDeadCheckTimer > diff || _minions.size() + 2 > MAX_MINIONS ||
                 me->GetPower(POWER_MANA) < RAISE_DEAD_COST || Rand() > 50)
                 return;
 

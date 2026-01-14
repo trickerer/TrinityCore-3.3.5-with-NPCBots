@@ -622,8 +622,6 @@ enum BotAwaitStates
 
 constexpr size_t MAX_SEND_POINTS = 5u;
 
-#define FROM_ARRAY(arr) arr, arr + sizeof(arr) / sizeof(arr[0])
-
 //Only non-persistent types are allowed
 enum BotOrderTypes
 {

@@ -173,22 +173,16 @@ enum CurseType : uint32
                                 CURSE_MASK_MY_ELEMENTS | CURSE_MASK_MY_TONGUES | CURSE_MASK_MY_EXHAUSTION)
 };
 
-static const uint32 Warlock_spells_damage_arr[] =
+static const std::vector<uint32> Warlock_spells_damage
 { CHAOS_BOLT_1, CONFLAGRATE_1, CORRUPTION_1, CURSE_OF_AGONY_1, CURSE_OF_DOOM_1, DEATH_COIL_1, DRAIN_SOUL_1, HAUNT_1,
 HELLFIRE_1, IMMOLATE_1, INCINERATE_1, RAIN_OF_FIRE_1, SEARING_PAIN_1, SEED_OF_CORRUPTION_1, SHADOW_BOLT_1,
 SHADOWBURN_1, SHADOWFLAME_1, SHADOWFURY_1, SOUL_FIRE_1, UNSTABLE_AFFLICTION_1 };
-
-static const uint32 Warlock_spells_cc_arr[] =
+static const std::vector<uint32> Warlock_spells_cc
 { BANISH_1, CURSE_OF_TONGUES_1, CURSE_OF_EXHAUSTION_1, DEATH_COIL_1, FEAR_1, HOWL_OF_TERROR_1, SHADOWFURY_1 };
-
-static const uint32 Warlock_spells_support_arr[] =
+static const std::vector<uint32> Warlock_spells_support
 { CURSE_OF_TONGUES_1, CURSE_OF_EXHAUSTION_1, CURSE_OF_THE_ELEMENTS_1, CURSE_OF_WEAKNESS_1, DARK_PACT_1, DRAIN_MANA_1,
 DEMON_SKIN_1, DEMON_ARMOR_1, DETECT_INVISIBILITY_1, FEL_ARMOR_1, LIFE_TAP_1, SHADOW_WARD_1, SOULSHATTER_1,
 UNENDING_BREATH_1/*, CREATE_HEALTHSTONE_1, CREATE_SOULSTONE_1, RITUAL_OF_SUMMONING_1, RITUAL_OF_SOULS_1*/ };
-
-static const std::vector<uint32> Warlock_spells_damage(FROM_ARRAY(Warlock_spells_damage_arr));
-static const std::vector<uint32> Warlock_spells_cc(FROM_ARRAY(Warlock_spells_cc_arr));
-static const std::vector<uint32> Warlock_spells_support(FROM_ARRAY(Warlock_spells_support_arr));
 
 class warlock_bot : public CreatureScript
 {
@@ -221,7 +215,18 @@ public:
 */
     struct warlock_botAI : public bot_ai
     {
-        static uint32 const _healthStoneSpells[8/*createHealthstoneRank*/];
+        //HealthstoneSpellIds (Improved Healthstone rank 2)
+        static constexpr uint32 _healthStoneSpells[8/*createHealthstoneRank*/]
+        {
+            23469,// Minor
+            23471,// Lesser
+            23473,//
+            23475,// Greater
+            23477,// Major
+            27237,// Master
+            47872,// Demonic
+            47877 // Fel
+        };
 
         warlock_botAI(Creature* creature) : bot_ai(creature)
         {
@@ -332,7 +337,7 @@ public:
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(CREATE_SOULSTONE_1);
                     uint32 rank = spellInfo->GetRank();
 
-                    while (rank + 1 < std::size(_healthStoneSpells) && target->GetLevel() > spellInfo->SpellLevel && spellInfo->GetNextRankSpell())
+                    while (rank < std::size(_healthStoneSpells) - 1 && target->GetLevel() > spellInfo->SpellLevel && spellInfo->GetNextRankSpell())
                     {
                         spellInfo = spellInfo->GetNextRankSpell();
                         rank = spellInfo->GetRank();
@@ -2106,19 +2111,6 @@ public:
             return mask;
         }
     };
-};
-
-//HealthstoneSpellIds (Improved Healthstone rank 2)
-uint32 const warlock_bot::warlock_botAI::_healthStoneSpells[8/*createHealthstoneRank*/] =
-{
-    23469,// Minor
-    23471,// Lesser
-    23473,//
-    23475,// Greater
-    23477,// Major
-    27237,// Master
-    47872,// Demonic
-    47877 // Fel
 };
 
 void AddSC_warlock_bot()

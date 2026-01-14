@@ -83,18 +83,9 @@ enum CryptLordSpecial
     MAX_LOCUSTS_MAXLEVEL    = 40
 };
 
-static const uint32 CryptLord_spells_damage_arr[] =
-{ IMPALE_1, LOCUST_SWARM_1 };
-
-static const uint32 CryptLord_spells_cc_arr[] =
-{ IMPALE_1, LOCUST_SWARM_1 };
-
-static const uint32 CryptLord_spells_support_arr[] =
-{ CARRION_BEETLES_1 };
-
-static const std::vector<uint32> CryptLord_spells_damage(FROM_ARRAY(CryptLord_spells_damage_arr));
-static const std::vector<uint32> CryptLord_spells_cc(FROM_ARRAY(CryptLord_spells_cc_arr));
-static const std::vector<uint32> CryptLord_spells_support(FROM_ARRAY(CryptLord_spells_support_arr));
+static const std::vector<uint32> CryptLord_spells_damage{ IMPALE_1, LOCUST_SWARM_1 };
+static const std::vector<uint32> CryptLord_spells_cc{ IMPALE_1, LOCUST_SWARM_1 };
+static const std::vector<uint32> CryptLord_spells_support{ CARRION_BEETLES_1 };
 
 class crypt_lord_bot : public CreatureScript
 {

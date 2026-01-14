@@ -162,24 +162,18 @@ enum HunterSpecial
 };
 //talent tiers 20-32-44-56-68-80
 
-static const uint32 Hunter_spells_damage_arr[] =
+static const std::vector<uint32> Hunter_spells_damage
 { AIMED_SHOT_1, ARCANE_SHOT_1, BLACK_ARROW_1, COUNTERATTACK_1, CHIMERA_SHOT_1, EXPLOSIVE_SHOT_1, EXPLOSIVE_TRAP_1,
 IMMOLATION_TRAP_1, KILL_SHOT_1, MONGOOSE_BITE_1, MULTISHOT_1, RAPTOR_STRIKE_1, SCATTER_SHOT_1, SERPENT_STING_1,
 STEADY_SHOT_1, VOLLEY_1, WYVERN_STING_1 };
-
-static const uint32 Hunter_spells_cc_arr[] =
+static const std::vector<uint32> Hunter_spells_cc
 { CONCUSSIVE_SHOT_1, FREEZING_ARROW_1, FREEZING_TRAP_1, FROST_TRAP_1, SCARE_BEAST_1, SCATTER_SHOT_1,
 SILENCING_SHOT_1, WING_CLIP_1, WYVERN_STING_1 };
-
-static const uint32 Hunter_spells_support_arr[] =
+static const std::vector<uint32> Hunter_spells_support
 { /*ASPECT_OF_THE_BEAST_1, */ASPECT_OF_THE_MONKEY_1, ASPECT_OF_THE_HAWK_1, ASPECT_OF_THE_DRAGONHAWK_1,
 ASPECT_OF_THE_CHEETAH_1, ASPECT_OF_THE_PACK_1, ASPECT_OF_THE_VIPER_1, ASPECT_OF_THE_WILD_1,
 DETERRENCE_1, DISENGAGE_1, DISTRACTING_SHOT_1, FEIGN_DEATH_1, FLARE_1, HUNTERS_MARK_1, MEND_PET_1,
 MISDIRECTION_1, RAPID_FIRE_1, READINESS_1, SCORPID_STING_1, /*SNAKE_TRAP_1, */TRANQ_SHOT_1, VIPER_STING_1 };
-
-static const std::vector<uint32> Hunter_spells_damage(FROM_ARRAY(Hunter_spells_damage_arr));
-static const std::vector<uint32> Hunter_spells_cc(FROM_ARRAY(Hunter_spells_cc_arr));
-static const std::vector<uint32> Hunter_spells_support(FROM_ARRAY(Hunter_spells_support_arr));
 
 class hunter_bot : public CreatureScript
 {

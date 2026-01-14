@@ -48,18 +48,9 @@ enum SphynxSpecial
     SPLASH_ATTACK_COST      = BASE_MANA_SPHYNX/16//6.25%
 };
 
-static const uint32 Sphynx_spells_damage_arr[] =
-{ /*MAIN_ATTACK_1, */SPLASH_ATTACK_1 };
-
-static const uint32 Sphynx_spells_heal_arr[] =
-{ REPLENISH_HEALTH_1 };
-
-static const uint32 Sphynx_spells_support_arr[] =
-{ DEVOUR_MAGIC_1, /*DRAIN_MANA_1, */REPLENISH_HEALTH_1, REPLENISH_MANA_1 };
-
-static const std::vector<uint32> Sphynx_spells_damage(FROM_ARRAY(Sphynx_spells_damage_arr));
-static const std::vector<uint32> Sphynx_spells_heal(FROM_ARRAY(Sphynx_spells_heal_arr));
-static const std::vector<uint32> Sphynx_spells_support(FROM_ARRAY(Sphynx_spells_support_arr));
+static const std::vector<uint32> Sphynx_spells_damage{ /*MAIN_ATTACK_1, */SPLASH_ATTACK_1 };
+static const std::vector<uint32> Sphynx_spells_heal{ REPLENISH_HEALTH_1 };
+static const std::vector<uint32> Sphynx_spells_support{ DEVOUR_MAGIC_1, /*DRAIN_MANA_1, */REPLENISH_HEALTH_1, REPLENISH_MANA_1 };
 
 class sphynx_bot : public CreatureScript
 {

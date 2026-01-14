@@ -26,8 +26,8 @@ Unsummon elemental totems if Elementals are killed
 Aura application bug for bot in other subgroup, maybe caused by creatorGUID mismatch
 */
 
-#define MAX_WOLVES 2
-#define MAX_TOTEMS 4
+constexpr uint8 MAX_WOLVES = 2;
+constexpr uint8 MAX_TOTEMS = 4;
 
 enum ShamanBaseSpells
 {
@@ -249,17 +249,12 @@ enum BotTotemType : uint32
                                     BOT_TOTEM_MASK_MY_TOTEM_WATER | BOT_TOTEM_MASK_MY_TOTEM_AIR)
 };
 
-static const uint32 Shaman_spells_damage_arr[] =
+static const std::vector<uint32> Shaman_spells_damage
 { EARTH_SHOCK_1, FLAME_SHOCK_1, FROST_SHOCK_1, STORMSTRIKE_1, CHAIN_LIGHTNING_1, LAVA_BURST_1, LIGHTNING_BOLT_1,
 FIRE_NOVA_1, MAGMA_TOTEM_1, SEARING_TOTEM_1, LIGHTNING_SHIELD_1, THUNDERSTORM_1, EARTH_ELEMENTAL_TOTEM_1, FIRE_ELEMENTAL_TOTEM_1 };
-
-static const uint32 Shaman_spells_cc_arr[] =
-{ EARTHBIND_TOTEM_1, FROST_SHOCK_1, HEX_1, WIND_SHEAR_1 };
-
-static const uint32 Shaman_spells_heal_arr[] =
-{ EARTH_SHIELD_1, CHAIN_HEAL_1, LESSER_HEALING_WAVE_1, HEALING_WAVE_1, RIPTIDE_1, HEALING_STREAM_TOTEM_1 };
-
-static const uint32 Shaman_spells_support_arr[] =
+static const std::vector<uint32> Shaman_spells_cc{ EARTHBIND_TOTEM_1, FROST_SHOCK_1, HEX_1, WIND_SHEAR_1 };
+static const std::vector<uint32> Shaman_spells_heal{ EARTH_SHIELD_1, CHAIN_HEAL_1, LESSER_HEALING_WAVE_1, HEALING_WAVE_1, RIPTIDE_1, HEALING_STREAM_TOTEM_1 };
+static const std::vector<uint32> Shaman_spells_support
 { ANCESTRAL_SPIRIT_1, GHOST_WOLF_1, FERAL_SPIRIT_1, BLOODLUST_1, HEROISM_1, CURE_TOXINS_1, CLEANSE_SPIRIT_1,
 LIGHTNING_SHIELD_1, NATURES_SWIFTNESS_1, PURGE_1, REINCARNATION_1, SHAMANISTIC_RAGE_1, TIDAL_FORCE_1,
 /*WATER_BREATHING_1, */WATER_SHIELD_1, WATER_WALKING_1, /*ELEMENTAL_MASTERY_1, STONECLAW_TOTEM_1,*/
@@ -267,11 +262,6 @@ FIRE_RESISTANCE_TOTEM_1, FROST_RESISTANCE_TOTEM_1, NATURE_RESISTANCE_TOTEM_1, FL
 /*SENTRY_TOTEM_1, STONESKIN_TOTEM_1, */STRENGTH_OF_EARTH_TOTEM_1, WINDFURY_TOTEM_1, WRATH_OF_AIR_TOTEM_1,
 CLEANSING_TOTEM_1, MANA_SPRING_TOTEM_1, TOTEM_OF_WRATH_1, MANA_TIDE_TOTEM_1, TREMOR_TOTEM_1/*, TOTEMIC_RECALL_1,
 ROCKBITER_WEAPON_1, FLAMETONGUE_WEAPON_1, FROSTBRAND_WEAPON_1, WINDFURY_WEAPON_1, EARTHLIVING_WEAPON_1*/ };
-
-static const std::vector<uint32> Shaman_spells_damage(FROM_ARRAY(Shaman_spells_damage_arr));
-static const std::vector<uint32> Shaman_spells_cc(FROM_ARRAY(Shaman_spells_cc_arr));
-static const std::vector<uint32> Shaman_spells_heal(FROM_ARRAY(Shaman_spells_heal_arr));
-static const std::vector<uint32> Shaman_spells_support(FROM_ARRAY(Shaman_spells_support_arr));
 
 class shaman_bot : public CreatureScript
 {

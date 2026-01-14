@@ -146,23 +146,15 @@ enum MageSpecial
     IGNITE_TRIGGERED                    = 12654
 };
 
-static const uint32 Mage_spells_damage_arr[] =
+static const std::vector<uint32> Mage_spells_damage
 { ARCANEMISSILES_1, ARCANE_BLAST_1, BLAST_WAVE_1, BLIZZARD_1, CONE_OF_COLD_1, DEEP_FREEZE_1, DRAGON_BREATH_1, FIREBALL_1,
-FIRE_BLAST_1, FLAMESTRIKE_1, FROSTBOLT_1, FROSTFIRE_BOLT_1, FROST_NOVA_1, ICE_LANCE_1, LIVING_BOMB_1, PYROBLAST_1,
-SCORCH_1 };
-
-static const uint32 Mage_spells_cc_arr[] =
-{ COUNTERSPELL_1, DRAGON_BREATH_1, DEEP_FREEZE_1, FROST_NOVA_1, POLYMORPH_1 };
-
-static const uint32 Mage_spells_support_arr[] =
+FIRE_BLAST_1, FLAMESTRIKE_1, FROSTBOLT_1, FROSTFIRE_BOLT_1, FROST_NOVA_1, ICE_LANCE_1, LIVING_BOMB_1, PYROBLAST_1, SCORCH_1 };
+static const std::vector<uint32> Mage_spells_cc{ COUNTERSPELL_1, DRAGON_BREATH_1, DEEP_FREEZE_1, FROST_NOVA_1, POLYMORPH_1 };
+static const std::vector<uint32> Mage_spells_support
 { AMPLIFYMAGIC_1, ARCANEINTELLECT_1, BLINK_1, COMBUSTION_1, DAMPENMAGIC_1, EVOCATION_1, FIRE_WARD_1, FROST_WARD_1,
 FROST_ARMOR_1, FOCUS_MAGIC_1, ICE_BARRIER_1, ICE_BLOCK_1, ICY_VEINS_1, INVISIBILITY_1, ICE_ARMOR_1, MOLTEN_ARMOR_1,
 SLOW_FALL_1, SPELLSTEAL_1, REMOVE_CURSE_1, CONJURE_MANA_GEM_1, RITUAL_OF_REFRESHMENT_1, SUMMON_WATER_ELEMENTAL_1,
 COLD_SNAP_1, PRESENCE_OF_MIND_1, ARCANE_POWER_1 };
-
-static const std::vector<uint32> Mage_spells_damage(FROM_ARRAY(Mage_spells_damage_arr));
-static const std::vector<uint32> Mage_spells_cc(FROM_ARRAY(Mage_spells_cc_arr));
-static const std::vector<uint32> Mage_spells_support(FROM_ARRAY(Mage_spells_support_arr));
 
 class mage_bot : public CreatureScript
 {
@@ -520,7 +512,8 @@ public:
                 }
             }
 
-            auto [can_do_frost, can_do_fire, can_do_arcane] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE);
+            const auto [can_do_frost, can_do_fire, can_do_arcane] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_FIRE, SPELL_SCHOOL_ARCANE);
+            const auto can_do_frost_or_fire = can_do_frost || can_do_fire;
 
             //spell reflections: Ice Lance instant / Frostbolt Rank 1
             if (IsSpellReady(ICE_LANCE_1, diff) && can_do_frost && dist < CalcSpellMaxRange(ICE_LANCE_1) && CanRemoveReflectSpells(mytar, ICE_LANCE_1) &&
@@ -595,7 +588,7 @@ public:
                     return;
             }
             //Fireball or Frostfire Bolt (instant cast or combustion use up)
-            if (/*fbCasted && */IsSpellReady(FROSTFIREBOLT, diff) && (can_do_frost | can_do_fire) && dist < CalcSpellMaxRange(FROSTFIREBOLT) && Rand() < 150 &&
+            if (/*fbCasted && */IsSpellReady(FROSTFIREBOLT, diff) && can_do_frost_or_fire && dist < CalcSpellMaxRange(FROSTFIREBOLT) && Rand() < 150 &&
                 ((((CCed(mytar, true) || b_attackers.empty()) && me->HasAura(COMBUSTION_BUFF)) || me->HasAura(BRAIN_FREEZE_BUFF)) ||
                 !GetSpell(FROSTBOLT_1))) //level 1-3
             {
@@ -620,7 +613,7 @@ public:
             }
             if (GetSpec() != BOT_SPEC_MAGE_ARCANE || !GetSpell(ARCANE_BLAST_1))
             {
-                if (IsSpellReady(FROSTFIREBOLT, diff) && (can_do_frost | can_do_fire) && (GetSpec() == BOT_SPEC_MAGE_FIRE ||
+                if (IsSpellReady(FROSTFIREBOLT, diff) && can_do_frost_or_fire && (GetSpec() == BOT_SPEC_MAGE_FIRE ||
                     (GetSpec() == BOT_SPEC_MAGE_FROST && (FROSTFIREBOLT == FROSTFIRE_BOLT_1 || !GetSpell(FROSTBOLT_1)))) &&
                     dist < CalcSpellMaxRange(FROSTFIREBOLT))
                 {

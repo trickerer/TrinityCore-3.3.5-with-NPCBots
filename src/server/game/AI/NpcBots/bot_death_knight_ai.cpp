@@ -164,22 +164,16 @@ enum DeathKnightSpecial
     NPC_DANCING_RUNE_WEAPON             = 27893
 };
 
-static const uint32 Deathknight_spells_damage_arr[] =
+static const std::vector<uint32> Deathknight_spells_damage
 { BLOOD_BOIL_1, BLOOD_STRIKE_1, DEATH_AND_DECAY_1, DEATH_COIL_1,DEATH_STRIKE_1,
 FROST_STRIKE_1, HEART_STRIKE_1, HOWLING_BLAST_1, HUNGERING_COLD_1, ICY_TOUCH_1,
 OBLITERATE_1, PESTILENCE_1, PLAGUE_STRIKE_1, RUNE_STRIKE_1, SCOURGE_STRIKE_1 };
-
-static const uint32 Deathknight_spells_cc_arr[] =
+static const std::vector<uint32> Deathknight_spells_cc
 { DEATH_GRIP_1, CHAINS_OF_ICE_1, MIND_FREEZE_1, STRANGULATE_1 };
-
-static const uint32 Deathknight_spells_support_arr[] =
+static const std::vector<uint32> Deathknight_spells_support
 { ANTI_MAGIC_SHELL_1, ANTI_MAGIC_ZONE_1, ARMY_OF_THE_DEAD_1, BLOOD_TAP_1, BONE_SHIELD_1,DARK_COMMAND_1, DEATHCHILL_1,
 DEATH_COIL_1, EMPOWER_RUNE_WEAPON_1, HORN_OF_WINTER_1, HUNGERING_COLD_1,HYSTERIA_1, ICEBOUND_FORTITUDE_1,
 LICHBORNE_1, MARK_OF_BLOOD_1, PATH_OF_FROST_1, PESTILENCE_1, RUNE_TAP_1,UNBREAKABLE_ARMOR_1, VAMPIRIC_BLOOD_1 };
-
-static const std::vector<uint32> Deathknight_spells_damage(FROM_ARRAY(Deathknight_spells_damage_arr));
-static const std::vector<uint32> Deathknight_spells_cc(FROM_ARRAY(Deathknight_spells_cc_arr));
-static const std::vector<uint32> Deathknight_spells_support(FROM_ARRAY(Deathknight_spells_support_arr));
 
 const RuneType runeSlotTypes[MAX_RUNES] =
 {
