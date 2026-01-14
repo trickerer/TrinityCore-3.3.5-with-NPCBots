@@ -165,8 +165,6 @@ static void ApplyBotPercentModFloatVar(float &var, float val, bool apply)
     var *= (apply ? ((100.f + val) / 100.f) : (100.f / (100.f + val)));
 }
 
-static uint16 __rand; //calculated for each bot separately once every updateAI tick
-
 bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
     _botData(const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(creature->GetEntry() == BOT_ENTRY_MIRROR_IMAGE_BM ? creature->ToTempSummon()->GetSummonerGUID().GetEntry() : creature->GetEntry()))),
     _botExtras(const_cast<NpcBotExtras*>(BotDataMgr::SelectNpcBotExtras(creature->GetEntry())))
@@ -319,14 +317,10 @@ bot_ai::~bot_ai()
         BotDataMgr::UnregisterBot(me);
 }
 
-uint16 bot_ai::Rand() const
-{
-    return __rand;
-}
 //0-178
-void bot_ai::GenerateRand() const
+void bot_ai::GenerateRand()
 {
-    __rand = urand(0, IAmFree() ? 100 : 100 + (master->GetNpcBotsCount() - 1) * 2);
+    _rand = urand(0, IAmFree() ? 100 : 100 + (master->GetNpcBotsCount() - 1) * 2);
 }
 
 const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 textId)
@@ -7803,11 +7797,11 @@ bool bot_ai::Wait()
         return true;
 
     if (IAmFree())
-        waitTimer = (me->IsInCombat() || me->GetVictim() || IsCasting() || me->GetMap()->IsBattlegroundOrArena()) ? 500 : ((__rand + 100) * 20);
+        waitTimer = (me->IsInCombat() || me->GetVictim() || IsCasting() || me->GetMap()->IsBattlegroundOrArena()) ? 500 : ((_rand + 100) * 20);
     else if (master->GetMap()->GetEntry()->IsWorldMap() && !me->IsInCombat() && !IsCasting())
-        waitTimer = std::min<uint32>(uint32(50 * (master->GetNpcBotsCount() - 1) + __rand), 500);
+        waitTimer = std::min<uint32>(uint32(50 * (master->GetNpcBotsCount() - 1) + _rand), 500);
     else
-        waitTimer = __rand;
+        waitTimer = _rand;
 
     waitTimer += BotMgr::GetBaseUpdateDelay();
 
@@ -18563,7 +18557,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
     if (checkAurasTimer <= lastdiff)
     {
-        checkAurasTimer += uint32(__rand + __rand + (IAmFree() ? 1000 : 40 * (1 + master->GetNpcBotsCount())));
+        checkAurasTimer += uint32(_rand + _rand + (IAmFree() ? 1000 : 40 * (1 + master->GetNpcBotsCount())));
 
         //group demand
         if (!IAmFree() && HasRole(BOT_ROLE_PARTY) && (!master->GetGroup() || !master->GetGroup()->IsMember(me->GetGUID())))
@@ -21312,46 +21306,32 @@ bool bot_ai::IsPetMelee(uint32 entry)
 
 bool bot_ai::IsMeleeClass(uint8 m_class)
 {
-    return
-        (m_class == CLASS_WARRIOR || m_class == CLASS_ROGUE || m_class == CLASS_PALADIN ||
-        m_class == CLASS_DEATH_KNIGHT || m_class == BOT_CLASS_BM || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_CRYPT_LORD);
+    return IsBotClassMask(m_class, MELEE_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsTankingClass(uint8 m_class)
 {
-    return (m_class == CLASS_WARRIOR || m_class == CLASS_PALADIN ||
-        m_class == CLASS_DEATH_KNIGHT || m_class == BOT_CLASS_SPHYNX ||
-        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_CRYPT_LORD);
+    return IsBotClassMask(m_class, TANKING_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsBlockingClass(uint8 m_class)
 {
-    return (m_class == CLASS_WARRIOR || m_class == CLASS_PALADIN || m_class == CLASS_SHAMAN ||
-        m_class == BOT_CLASS_SPELLBREAKER);
+    return IsBotClassMask(m_class, BLOCKING_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsCastingClass(uint8 m_class)
 {
     //Class can benefit from spellpower
-    return (m_class == CLASS_PALADIN || m_class == CLASS_PRIEST || m_class == CLASS_SHAMAN ||
-        m_class == CLASS_MAGE || m_class == CLASS_WARLOCK || m_class == CLASS_DRUID ||
-        m_class == BOT_CLASS_SPHYNX || m_class == BOT_CLASS_ARCHMAGE || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_SPELLBREAKER || m_class == BOT_CLASS_DARK_RANGER || m_class == BOT_CLASS_NECROMANCER ||
-        m_class == BOT_CLASS_SEA_WITCH);
+    return IsBotClassMask(m_class, CASTING_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsHealingClass(uint8 m_class)
 {
-    return
-        (m_class == BOT_CLASS_PRIEST || m_class == BOT_CLASS_DRUID ||
-        m_class == BOT_CLASS_SHAMAN || m_class == BOT_CLASS_PALADIN ||
-        m_class == BOT_CLASS_SPHYNX);
+    return IsBotClassMask(m_class, HEALING_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsHumanoidClass(uint8 m_class)
 {
-    return m_class != BOT_CLASS_SPHYNX;
+    return IsBotClassMask(m_class, HUMANOID_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsHeroExClass(uint8 m_class)
 {
-    return m_class == BOT_CLASS_BM || m_class == BOT_CLASS_ARCHMAGE || m_class == BOT_CLASS_DREADLORD ||
-        m_class == BOT_CLASS_DARK_RANGER || m_class == BOT_CLASS_SEA_WITCH || m_class == BOT_CLASS_CRYPT_LORD;
+    return IsBotClassMask(m_class, HERO_BOT_CLASSES_MASK);
 }
 bool bot_ai::IsMelee() const
 {

@@ -332,6 +332,7 @@ class bot_ai : public CreatureAI
         static uint32 TextForSpec(uint8 spec);
         static bool IsValidSpecForClass(uint8 m_class, uint8 spec);
 
+        static bool IsBotClassMask(uint8 m_class, uint32 class_mask) { return !!((1ull << m_class) & class_mask); }
         static bool IsMeleeClass(uint8 m_class);
         static bool IsTankingClass(uint8 m_class);
         static bool IsBlockingClass(uint8 m_class);
@@ -520,8 +521,8 @@ class bot_ai : public CreatureAI
         uint32 GetRation(bool drink) const;
 
         bool Wait();
-        uint16 Rand() const;
-        void GenerateRand() const;
+        uint16 Rand() const { return _rand; }
+        void GenerateRand();
 
         static uint32 GetLostHP(Unit const* unit);
         static uint8 GetHealthPCT(Unit const* u);
@@ -700,6 +701,8 @@ class bot_ai : public CreatureAI
 
         uint32 _botCommandState;
         uint8 _botAwaitState;
+
+        uint16 _rand;
 
         //stats
         float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen, resilience;
