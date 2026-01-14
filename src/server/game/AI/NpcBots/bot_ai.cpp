@@ -174,8 +174,6 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
     //moved
     _potionTimer = 0;
 
-    _classinfo = new PlayerClassLevelInfo();
-
     for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
         for (uint8 j = 0; j != MAX_BOT_ITEM_MOD; ++j)
             _stats[i][j] = 0;
@@ -316,8 +314,6 @@ bot_ai::~bot_ai()
     for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
         if (_equips[i])
             delete _equips[i];
-
-    delete _classinfo;
 
     if (!IsTempBot())
         BotDataMgr::UnregisterBot(me);
@@ -2378,8 +2374,6 @@ void bot_ai::SetStats(bool force)
         InitPowers();
         InitSpells(); //this must stay before class passives
         ApplyClassPassives();
-
-        sObjectMgr->GetPlayerClassLevelInfo(GetPlayerClass(), std::min<uint8>(mylevel, DEFAULT_MAX_LEVEL), _classinfo);
 
         PlayerLevelInfo info;
         sObjectMgr->GetPlayerLevelInfo(GetPlayerRace(), GetPlayerClass(), std::min<uint8>(mylevel, DEFAULT_MAX_LEVEL), &info);
@@ -7272,10 +7266,13 @@ uint32 bot_ai::RaceSpellForClass(uint8 myrace, uint8 myclass)
 void bot_ai::_OnHealthUpdate() const
 {
     uint8 mylevel = master->GetLevel();
+    PlayerClassLevelInfo classinfo;
+    sObjectMgr->GetPlayerClassLevelInfo(GetPlayerClass(), std::min<uint8>(mylevel, DEFAULT_MAX_LEVEL), &classinfo);
+
     //BOT_LOG_ERROR("entities.player", "_OnHealthUpdate(): updating bot {}", me->GetName());
     bool fullhp = me->GetHealth() == me->GetMaxHealth();
     float pct = fullhp ? 100.f : me->GetHealthPct(); // needs for regeneration
-    uint32 m_basehp = uint32(_classinfo->basehealth * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHPMod() : BotMgr::GetBotHPMod()));
+    uint32 m_basehp = uint32(classinfo.basehealth * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHPMod() : BotMgr::GetBotHPMod()));
     //BOT_LOG_ERROR("entities.player", "class base health: {}", m_basehp);
     me->SetCreateHealth(m_basehp);
 
@@ -7323,11 +7320,13 @@ void bot_ai::_OnManaUpdate() const
         return;
 
     uint8 mylevel = master->GetLevel();
+    PlayerClassLevelInfo classinfo;
+    sObjectMgr->GetPlayerClassLevelInfo(GetPlayerClass(), std::min<uint8>(mylevel, DEFAULT_MAX_LEVEL), &classinfo);
 
     //BOT_LOG_ERROR("entities.player", "_OnManaUpdate(): updating bot {}", me->GetName());
     bool fullmana = me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA);
     float pct = fullmana ? 100.f : (float(me->GetPower(POWER_MANA)) * 100.f) / float(me->GetMaxPower(POWER_MANA));
-    float m_basemana = _classinfo->basemana;
+    float m_basemana = classinfo.basemana;
     if (_botclass == BOT_CLASS_BM)
         m_basemana = float(BASE_MANA_1_BM) + float(BASE_MANA_10_BM - BASE_MANA_1_BM) * (mylevel/81.f);
     if (_botclass == BOT_CLASS_SPHYNX)
@@ -7785,13 +7784,13 @@ void bot_ai::OnSpellHitTarget(Unit* /*target*/, SpellInfo const* spell)
         //Flame Spike, Revivify
         if (spellId == 56091 || spellId == 57090)
         {
-            vehcomboPoints = std::min(vehcomboPoints + 1, 5);
-            //BOT_LOG_ERROR("scripts", "OnBotSpellGo(): veh cp spell {} now cp {}", curInfo->Id, uint32(vehcomboPoints));
+            _vehcomboPoints = std::min(_vehcomboPoints + 1, 5);
+            //BOT_LOG_ERROR("scripts", "OnBotSpellGo(): veh cp spell {} now cp {}", curInfo->Id, uint32(_vehcomboPoints));
         }
         //Engulf in Flames, Life Burst, Flame Shield   moved to globalupdate
         if (spellId == 56092 || spellId == 57143 || spellId == 57108)
         {
-            vehcomboPoints = 0;
+            _vehcomboPoints = 0;
             //BOT_LOG_ERROR("scripts", "OnSpellHitTarget(): veh cp waster {}", curInfo->Id);
         }
     }
@@ -14205,7 +14204,7 @@ void bot_ai::ApplyItemsSpells()
 //stats bonuses from equipment
 inline float bot_ai::_getBotStat(uint8 slot, BotStatMods stat) const
 {
-    return float(_stats[slot][stat]);
+    return static_cast<float>(_stats[slot][stat]);
 }
 
 float bot_ai::_getTotalBotStat(BotStatMods stat) const
@@ -14218,7 +14217,7 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
     Stats fstat = STAT_STRENGTH;
     UnitMods fmod = UNIT_MOD_END;
     float fpct = 0.0f;
-    float fval = float(value);
+    float fval = static_cast<float>(value);
 
     switch (stat)
     {
@@ -14456,7 +14455,7 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
     return fval;
 }
 
-inline float bot_ai::_getRatingMultiplier(CombatRating cr) const
+float bot_ai::_getRatingMultiplier(CombatRating cr) const
 {
     GtCombatRatingsEntry const* Rating = sGtCombatRatingsStore.LookupEntry(cr*GT_MAX_LEVEL + (me->GetLevel()-1));
     GtOCTClassCombatRatingScalarEntry const* classRating = sGtOCTClassCombatRatingScalarStore.LookupEntry((GetPlayerClass()-1)*GT_MAX_RATING + cr + 1);
@@ -14580,7 +14579,7 @@ float bot_ai::_getItemGearStatScore(ItemTemplate const* iproto, uint8 forslot, I
 
     //BOT_LOG_ERROR("scripts", "_getItemGearScore for {} - {}", proto->ItemId, proto->Name1);
 
-    ItemStatBonus istats{};
+    std::remove_cvref_t<decltype(_stats[BOT_SLOT_MAINHAND])> istats{};
     //for (uint8 i = 0; i != MAX_BOT_ITEM_MOD; ++i)
     //    BOT_LOG_ERROR("scripts", "_getItemGearScore at {} {}", uint32(i), istats[i]);
 
@@ -16652,7 +16651,7 @@ void bot_ai::OnBotOwnerSpellGo(Spell const* spell, bool ok)
         //}
 
         Vehicle const* veh = me->GetVehicle();
-        if (veh && veh->GetBase()->GetTypeId() == TYPEID_UNIT && curVehStrat == BOT_VEH_STRAT_GENERIC &&
+        if (veh && veh->GetBase()->GetTypeId() == TYPEID_UNIT && _curVehStrat == BOT_VEH_STRAT_GENERIC &&
             veh->GetBase()->ToCreature()->HasSpell(spellInfo->Id))
         {
             SpellCastTargets targets;
@@ -17096,7 +17095,7 @@ void bot_ai::DoSkytalonVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 
     Creature* drake = me->GetVehicleCreatureBase();
@@ -17124,7 +17123,7 @@ void bot_ai::DoSkytalonVehicleStrats(uint32 diff)
         finishPower = 50;
     }
 
-    if (vehcomboPoints >= finishComboPoints && (Rand() < 75 + 40*(vehcomboPoints >= 5 || drakePower < finishPower)))
+    if (_vehcomboPoints >= finishComboPoints && (Rand() < 75 + 40*(_vehcomboPoints >= 5 || drakePower < finishPower)))
     {
         if (drakePower >= finishPower)
         {
@@ -17249,7 +17248,7 @@ void bot_ai::DoSkytalonVehicleStrats(uint32 diff)
     if (!drakespell)
     {
         BOT_LOG_ERROR("scripts", "DoSkytalonVehicleStrats no spell for role mask {} cp {}, power {}, target {}",
-            GetBotRoles(), uint32(vehcomboPoints), drakePower, target->GetName());
+            GetBotRoles(), uint32(_vehcomboPoints), drakePower, target->GetName());
         return;
     }
 
@@ -17267,7 +17266,7 @@ void bot_ai::DoRubyDrakeVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 
     Creature* drake = me->GetVehicleCreatureBase();
@@ -17364,7 +17363,7 @@ void bot_ai::DoEmeraldDrakeVehicleStrats(uint32 diff)
             return;
     }
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 
     Aura const* pois = opponent->GetAura(50328, drake->GetGUID()); //Leeching Poison
@@ -17492,7 +17491,7 @@ void bot_ai::DoAmberDrakeVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 
     Creature* drake = me->GetVehicleCreatureBase();
@@ -17616,7 +17615,7 @@ void bot_ai::DoArgentMountVehicleStrats(uint32 diff)
         }
     }
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 
     //Unit const* mmover = master->GetVehicle() ? master->GetVehicleBase() : master;
@@ -17667,7 +17666,7 @@ void bot_ai::DoDemolisherVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 }
 void bot_ai::DoSiegeEngineVehicleStrats(uint32 diff)
@@ -17677,7 +17676,7 @@ void bot_ai::DoSiegeEngineVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 }
 void bot_ai::DoChopperVehicleStrats(uint32 diff)
@@ -17687,7 +17686,7 @@ void bot_ai::DoChopperVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 }
 void bot_ai::DoGenericVehicleStrats(uint32 diff)
@@ -17697,15 +17696,15 @@ void bot_ai::DoGenericVehicleStrats(uint32 diff)
 
     GC_Timer = 350; //at least this delay
 
-    if (!CheckVehicleAttackTarget(curVehStrat))
+    if (!CheckVehicleAttackTarget(_curVehStrat))
         return;
 }
 void bot_ai::DoVehicleStrats(BotVehicleStrats strat, uint32 diff)
 {
-    if (curVehStrat != strat)
+    if (_curVehStrat != strat)
     {
         //BOT_LOG_ERROR("scripts", "DoVehicleStrats doing strat {}", uint32(strat));
-        curVehStrat = strat;
+        _curVehStrat = strat;
     }
 
     //if (!master->GetVehicle() || me->GetVehicle()->GetCreatureEntry() != master->GetVehicle()->GetCreatureEntry())
@@ -17801,7 +17800,7 @@ void bot_ai::DoVehicleActions(uint32 diff)
         */
         default:
             strat = BOT_VEH_STRAT_GENERIC;
-            if (curVehStrat != strat)
+            if (_curVehStrat != strat)
                 BOT_LOG_DEBUG("scripts", "bot_ai DoVehicleActions: {} has to use generic strat for vehicle creature {} ({})",
                 me->GetName(), me->GetVehicleBase()->GetName(), me->GetVehicleBase()->GetEntry());
             break;
@@ -20704,7 +20703,7 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
             ASSERT(vehicle->GetBase()->SetCharmedBy(me, CHARM_TYPE_VEHICLE));
             vehicle->GetBase()->SetControlledByPlayer(true);
 
-            vehcomboPoints = 0;
+            _vehcomboPoints = 0;
             //flight mode
             switch (vehicle->GetBase()->GetEntry())
             {
@@ -20772,7 +20771,7 @@ void bot_ai::OnBotExitVehicle(Vehicle const* vehicle)
                 vehicle->GetBase()->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
             vehicle->GetBase()->SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
 
-            curVehStrat = BOT_VEH_STRAT_NONE;
+            _curVehStrat = BOT_VEH_STRAT_NONE;
             if (vehicle->GetBase()->IsSummon())
                 vehicle->GetBase()->ToCreature()->DespawnOrUnsummon(1ms);
         }
@@ -21202,7 +21201,7 @@ uint8 bot_ai::GetPlayerRace() const
 
 uint8 bot_ai::GetBotComboPoints() const
 {
-    return me->GetVehicle() ? vehcomboPoints : uint8(GetAIMiscValue(BOTAI_MISC_COMBO_POINTS));
+    return me->GetVehicle() ? _vehcomboPoints : uint8(GetAIMiscValue(BOTAI_MISC_COMBO_POINTS));
 }
 
 void bot_ai::SetAIMiscValue(uint32 data, uint32 value)

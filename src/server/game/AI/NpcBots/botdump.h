@@ -32,13 +32,11 @@ class BotStringTransaction;
 class NPCBotsDump
 {
     public:
-        NPCBotsDump() {}
-
         BotDataDumpResult Write(std::string const& file);
         BotDataDumpResult Load(std::string const& file);
 
     private:
-        bool GetDump(std::string& dump);
+        std::string GetDump();
         BotDataVerificationResult VerifyWriteData(uint32 entry) const;
         void AppendBotNPCBotData(BotStringTransaction* trans, uint32 entry) const;
         void AppendBotNPCBotTransmogData(BotStringTransaction* trans, uint32 entry) const;

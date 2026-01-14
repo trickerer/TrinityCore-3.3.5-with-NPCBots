@@ -10,7 +10,6 @@
 #include "Position.h"
 
 #include <tuple>
-#include <unordered_set>
 
 /*
 NpcBot System by Trickerer (onlysuffering@gmail.com)
@@ -79,6 +78,7 @@ class bot_ai : public CreatureAI
         void UnsummonCreature(Creature* creature, bool save);
         void UnsummonPet(bool save);
         template<typename C>
+        requires std::is_pointer_v<typename C::value_type>
         void UnsummonCreatures(C const& container, bool save)
         {
             C c2 = container; // copy; original container might get modified from within the loop
@@ -571,6 +571,12 @@ class bot_ai : public CreatureAI
 
         uint32 GetLastWMOArea() const { return _lastWMOAreaId; }
 
+        uint8 _botclass;
+        uint8 _spec;
+        uint8 _newspec;
+        int8 _primaryIconTank;
+        int8 _primaryIconDamage;
+
         Player* master;
         Player* _prevRRobin;
         Unit* opponent;
@@ -579,14 +585,6 @@ class bot_ai : public CreatureAI
         EventProcessor Events;
         ObjectGuid aftercastTargetGuid;
         uint32 GC_Timer;
-
-        uint8 _botclass;
-        uint8 _spec, _newspec;
-        int8 _primaryIconTank, _primaryIconDamage;
-
-        BotVehicleStrats curVehStrat;
-        uint8 vehcomboPoints;
-        bool shouldEnterVehicle;
 
     private:
         void FindMaster();
@@ -695,7 +693,6 @@ class bot_ai : public CreatureAI
         NpcBotData* const _botData;
         NpcBotExtras* const _botExtras;
 
-        PlayerClassLevelInfo* _classinfo;
         SpellInfo const* m_botSpellInfo;
         Position homepos, movepos, attackpos, sendlastpos;
         Position sendpos[MAX_SEND_POINTS];
@@ -730,12 +727,19 @@ class bot_ai : public CreatureAI
         uint32 _lastZoneId, _lastAreaId, _lastWMOAreaId;
         uint32 _selfrez_spell_id;
 
-        uint8 _unreachableCount, _jumpCount, _evadeCount;
+        uint8 _unreachableCount;
+        uint8 _jumpCount;
+        uint8 _evadeCount;
         uint8 _healHpPctThreshold;
         uint32 _roleMask;
         uint32 _usableItemSlotsMask;
         ObjectGuid::LowType _ownerGuid;
         ObjectGuid _lastTargetGuid;
+
+        BotVehicleStrats _curVehStrat;
+        uint8 _vehcomboPoints;
+        bool shouldEnterVehicle;
+
         bool doHealth, doMana, shouldUpdateStats;
         bool feast_health, feast_mana;
         bool spawned;
@@ -744,6 +748,10 @@ class bot_ai : public CreatureAI
         bool _atHome;
         bool _duringTeleport;
         bool _canAppearInWorld;
+
+        //save flags
+        bool _saveDisabledSpells;
+        bool _saveMiscValues;
 
         //wandering bots
         bool _wanderer;
@@ -765,10 +773,6 @@ class bot_ai : public CreatureAI
         uint16 _pvpKillsCount;
         uint16 _playerKillsCount;
 
-        //save flags
-        bool _saveDisabledSpells;
-        bool _saveMiscValues;
-
         TeleportHomeEvent* teleHomeEvent;
         TeleportFinishEvent* teleFinishEvent;
         AwaitStateRemovalEvent* awaitStateRemEvent;
@@ -785,12 +789,11 @@ class bot_ai : public CreatureAI
             bool enabled;
         };
 
-        typedef int32 ItemStatBonus[MAX_BOT_ITEM_MOD];
-        ItemStatBonus _stats[BOT_INVENTORY_SIZE];
+        int32 _stats[BOT_INVENTORY_SIZE][MAX_BOT_ITEM_MOD];
         Item* _equips[BOT_INVENTORY_SIZE];
 
     public:
-        typedef std::unordered_map<uint32 /*firstrankspellid*/, BotSpell* /*spell*/> BotSpellMap;
+        using BotSpellMap = std::unordered_map<uint32 /*firstrankspellid*/, BotSpell* /*spell*/>;
         BotSpellMap const& GetSpellMap() const { return _spells; }
 
     private:
@@ -840,7 +843,7 @@ class bot_ai : public CreatureAI
     private:
         void _ProcessOrders();
 
-        typedef std::queue<BotOrder> OrdersQueue;
+        using OrdersQueue = std::queue<BotOrder>;
         OrdersQueue _orders;
 };
 
