@@ -188,6 +188,11 @@ public:
     void SetLevels(std::pair<uint8, uint8> levels) { std::tie(_minLevel, _maxLevel) = levels; }
     inline void SetLevels(uint8 minLevel, uint8 maxLevel) { SetLevels(std::pair{ minLevel, maxLevel }); }
 
+    void SetWaitTime(std::pair<uint32, uint32> waitTime) { std::tie(_minWaitTime, _maxWaitTime) = waitTime; }
+    inline void SetWaitTime(uint32 minWaitTime, uint32 maxWaitTime) { SetWaitTime(std::pair{ minWaitTime, maxWaitTime }); }
+
+    void SetProximity(float proximity) { _proximity = proximity; }
+
     void SetFlags(BotWPFlags flags);
     void RemoveFlags(BotWPFlags flags);
     bool HasFlag(BotWPFlags flags) const;
@@ -205,6 +210,8 @@ public:
     uint32 GetAreaId() const { return _areaId; }
     std::string const& GetName() const { return _name; }
     std::pair<uint8, uint8> GetLevels() const { return { _minLevel, _maxLevel }; }
+    std::pair<uint32, uint32> GetWaitTime() const { return { _minWaitTime, _maxWaitTime }; }
+    float GetProximity() const { return _proximity; }
     uint32 GetFlags() const { return _flags; }
 
     void SetupLinkFromAura() const;
@@ -221,6 +228,9 @@ private:
     /*const*/ std::string _name;
     uint8 _minLevel;
     uint8 _maxLevel;
+    uint32 _minWaitTime;
+    uint32 _maxWaitTime;
+    float _proximity;
     uint32 _flags;
 
     node_lltype _links;
