@@ -2654,7 +2654,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
             if (itr->second->owner == *(uint32*)(data))
                 break;
             itr->second->owner = *(uint32*)(data);
-            itr->second->hire_time = itr->second->owner ? uint64(time(0)) : 1ULL;
+            itr->second->hire_time = itr->second->owner ? uint64(std::time(0)) : 1ULL;
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER);
             //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE entry = ?", CONNECTION_ASYNC
             bstmt->setUInt32(0, itr->second->owner);
@@ -2853,7 +2853,7 @@ void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType upd
         CharacterDatabase.CommitTransaction(trans);
 }
 
-void BotDataMgr::SaveNpcBotStats(NpcBotStats const* stats)
+void BotDataMgr::SaveNpcBotStats(NpcBotStats const& stats)
 {
     CharacterDatabasePreparedStatement* bstmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_NPCBOT_STATS);
     //"REPLACE INTO characters_npcbot_stats
@@ -2863,33 +2863,33 @@ void BotDataMgr::SaveNpcBotStats(NpcBotStats const* stats)
     //(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC
 
     uint32 index = 0;
-    bstmt->setUInt32(  index, stats->entry);
-    bstmt->setUInt32(++index, stats->maxhealth);
-    bstmt->setUInt32(++index, stats->maxpower);
-    bstmt->setUInt32(++index, stats->strength);
-    bstmt->setUInt32(++index, stats->agility);
-    bstmt->setUInt32(++index, stats->stamina);
-    bstmt->setUInt32(++index, stats->intellect);
-    bstmt->setUInt32(++index, stats->spirit);
-    bstmt->setUInt32(++index, stats->armor);
-    bstmt->setUInt32(++index, stats->defense);
-    bstmt->setUInt32(++index, stats->resHoly);
-    bstmt->setUInt32(++index, stats->resFire);
-    bstmt->setUInt32(++index, stats->resNature);
-    bstmt->setUInt32(++index, stats->resFrost);
-    bstmt->setUInt32(++index, stats->resShadow);
-    bstmt->setUInt32(++index, stats->resArcane);
-    bstmt->setFloat (++index, stats->blockPct);
-    bstmt->setFloat (++index, stats->dodgePct);
-    bstmt->setFloat (++index, stats->parryPct);
-    bstmt->setFloat (++index, stats->critPct);
-    bstmt->setUInt32(++index, stats->attackPower);
-    bstmt->setUInt32(++index, stats->spellPower);
-    bstmt->setUInt32(++index, stats->spellPen);
-    bstmt->setFloat (++index, stats->hastePct);
-    bstmt->setFloat (++index, stats->hitBonusPct);
-    bstmt->setUInt32(++index, stats->expertise);
-    bstmt->setFloat (++index, stats->armorPenPct);
+    bstmt->setUInt32(  index, stats.entry);
+    bstmt->setUInt32(++index, stats.maxhealth);
+    bstmt->setUInt32(++index, stats.maxpower);
+    bstmt->setUInt32(++index, stats.strength);
+    bstmt->setUInt32(++index, stats.agility);
+    bstmt->setUInt32(++index, stats.stamina);
+    bstmt->setUInt32(++index, stats.intellect);
+    bstmt->setUInt32(++index, stats.spirit);
+    bstmt->setUInt32(++index, stats.armor);
+    bstmt->setUInt32(++index, stats.defense);
+    bstmt->setUInt32(++index, stats.resHoly);
+    bstmt->setUInt32(++index, stats.resFire);
+    bstmt->setUInt32(++index, stats.resNature);
+    bstmt->setUInt32(++index, stats.resFrost);
+    bstmt->setUInt32(++index, stats.resShadow);
+    bstmt->setUInt32(++index, stats.resArcane);
+    bstmt->setFloat (++index, stats.blockPct);
+    bstmt->setFloat (++index, stats.dodgePct);
+    bstmt->setFloat (++index, stats.parryPct);
+    bstmt->setFloat (++index, stats.critPct);
+    bstmt->setUInt32(++index, stats.attackPower);
+    bstmt->setUInt32(++index, stats.spellPower);
+    bstmt->setUInt32(++index, stats.spellPen);
+    bstmt->setFloat (++index, stats.hastePct);
+    bstmt->setFloat (++index, stats.hitBonusPct);
+    bstmt->setUInt32(++index, stats.expertise);
+    bstmt->setFloat (++index, stats.armorPenPct);
 
     CharacterDatabase.Execute(bstmt);
 }

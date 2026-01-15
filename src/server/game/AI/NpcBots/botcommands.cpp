@@ -3146,8 +3146,6 @@ public:
         }
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &guidlow);
-        bot->GetBotAI()->ReinitOwner();
-        //bot->GetBotAI()->Reset();
 
         handler->PSendSysMessage("%s's new owner is %s (guidlow: %u)", bot->GetName(), characterName, guidlow);
         return true;
@@ -4931,7 +4929,6 @@ public:
 
         ObjectGuid::LowType guidlow = owner->GetGUID().GetCounter();
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &guidlow);
-        bot->GetBotAI()->ReinitOwner();
 
         if (owner->GetBotMgr()->AddBot(bot) == BOT_ADD_SUCCESS)
         {

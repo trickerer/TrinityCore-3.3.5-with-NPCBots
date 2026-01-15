@@ -1963,12 +1963,12 @@ BotAddResult BotMgr::AddBot(Creature* bot)
 
     if (!bot->GetBotAI()->IsTempBot())
     {
+        uint32 newOwner = _owner->GetGUID().GetCounter();
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
+
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_FOLLOW, true);
         if (bot->GetBotAI()->HasRole(BOT_ROLE_PARTY))
             AddBotToGroup(bot);
-
-        uint32 newOwner = _owner->GetGUID().GetCounter();
-        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
     }
 
     return BOT_ADD_SUCCESS;

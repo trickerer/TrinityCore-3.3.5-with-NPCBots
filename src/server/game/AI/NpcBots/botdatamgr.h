@@ -209,7 +209,7 @@ class BotDataMgr
         static NpcBotData const* SelectNpcBotData(uint32 entry);
         static void UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType, void* data = nullptr);
         static void UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType updateType, void* data = nullptr);
-        static void SaveNpcBotStats(NpcBotStats const* stats);
+        static void SaveNpcBotStats(NpcBotStats const& stats);
 
         static NpcBotAppearanceData const* SelectNpcBotAppearance(uint32 entry);
         static NpcBotExtras const* SelectNpcBotExtras(uint32 entry);

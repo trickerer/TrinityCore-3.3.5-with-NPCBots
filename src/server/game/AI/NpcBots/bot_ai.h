@@ -49,7 +49,7 @@ class bot_ai : public CreatureAI
     public:
         virtual ~bot_ai();
 
-        bool canUpdate;
+        bool canUpdate{true};
 
         void InitializeAI() override;
         //void Reset() override { }
@@ -117,7 +117,7 @@ class bot_ai : public CreatureAI
         void GetNextEvadeMovePoint(Position& pos, bool& use_path) const;
 
         EventProcessor* GetEvents() { return &Events; }
-        ObjectGuid::LowType GetBotOwnerGuid() const { return _ownerGuid; }
+        ObjectGuid::LowType GetBotOwnerGuid() const;
         Player* GetBotOwner() const { return master; }
         bool SetBotOwner(Player* newowner);
         void CheckOwnerExpiry();
@@ -325,7 +325,6 @@ class bot_ai : public CreatureAI
         virtual void SpendRunes(SpellInfo const* /*spellInfo*/, bool /*didHit*/) {}
 
         void ReInitFaction() { InitFaction(); }
-        void ReinitOwner() { InitOwner(); }
         void SetSpec(uint8 spec, bool activate = true);
         uint8 GetSpec() const;
         static uint8 SelectSpecForClass(uint8 m_class);
@@ -572,20 +571,20 @@ class bot_ai : public CreatureAI
 
         uint32 GetLastWMOArea() const { return _lastWMOAreaId; }
 
-        uint8 _botclass;
-        uint8 _spec;
-        uint8 _newspec;
-        int8 _primaryIconTank;
-        int8 _primaryIconDamage;
+        uint8 _botclass{};
+        uint8 _spec{};
+        uint8 _newspec{};
+        int8 _primaryIconTank{-1};
+        int8 _primaryIconDamage{-1};
 
-        Player* master;
-        Player* _prevRRobin;
-        Unit* opponent;
-        Unit* disttarget;
-        Creature* botPet;
+        Player* master{};
+        Player* _prevRRobin{};
+        Unit* opponent{};
+        Unit* disttarget{};
+        Creature* botPet{};
         EventProcessor Events;
         ObjectGuid aftercastTargetGuid;
-        uint32 GC_Timer;
+        uint32 GC_Timer{};
 
     private:
         void FindMaster();
@@ -622,7 +621,6 @@ class bot_ai : public CreatureAI
         void InitRoles();
         void InitSpec();
         void InitEquips();
-        void InitOwner();
         void InitFaction();
         void InitRace();
 
@@ -692,93 +690,95 @@ class bot_ai : public CreatureAI
         void _saveStats();
 
         NpcBotData* const _botData;
-        NpcBotExtras* const _botExtras;
+        NpcBotExtras const* const _botExtras;
 
-        SpellInfo const* m_botSpellInfo;
-        Position homepos, movepos, attackpos, sendlastpos;
-        Position sendpos[MAX_SEND_POINTS];
+        SpellInfo const* m_botSpellInfo{};
+        Position homepos{}, movepos{}, attackpos{}, sendlastpos{};
+        Position sendpos[MAX_SEND_POINTS]{};
         AoeSpotsVec _aoeSpots;
 
-        uint32 _botCommandState;
-        uint8 _botAwaitState;
+        uint32 _botCommandState{};
+        uint8 _botAwaitState{};
 
-        uint16 _rand;
+        uint16 _rand{};
 
         //stats
-        float hit, parry, dodge, block, crit, dmg_taken_phy, dmg_taken_mag, armor_pen, resilience;
-        uint32 expertise, spellpower, spellpen, defense, blockvalue;
-        int32 haste, resistbonus[MAX_SPELL_SCHOOL - 1];
+        float hit{}, parry{}, dodge{}, block{}, crit{}, armor_pen{}, resilience{};
+        float dmg_taken_phy{1.f}, dmg_taken_mag{1.f};
+        uint32 expertise{}, spellpower{}, spellpen{}, defense{};
+        uint32 blockvalue{1};
+        int32 haste{};
+        int32 resistbonus[MAX_SPELL_SCHOOL - 1]{};
 
         //timers
-        uint32 _reviveTimer, _powersTimer, _chaseTimer, _engageTimer, _potionTimer;
-        uint32 lastdiff, checkAurasTimer, checkMasterTimer, roleTimer, ordersTimer, regenTimer, _updateTimerLong, _updateTimerMedium, _updateTimerEx1, _updateTimerEx2;
-        uint32 _checkOwershipTimer;
-        uint32 _moveBehindTimer;
-        uint32 _rentTimer;
-        uint32 _wmoAreaUpdateTimer;
-        uint32 waitTimer;
-        uint32 itemsAutouseTimer;
-        uint32 evadeDelayTimer;
-        uint32 indoorsTimer;
-        uint32 outdoorsTimer;
-        uint32 _contestedPvPTimer;
-        uint32 _groupUpdateTimer;
+        uint32 _reviveTimer{}, _powersTimer{}, _chaseTimer{}, _engageTimer{}, _potionTimer{};
+        uint32 lastdiff{}, checkAurasTimer{}, roleTimer{}, ordersTimer{}, regenTimer{}, _updateTimerLong{}, _updateTimerMedium{}, _updateTimerEx1{}, _updateTimerEx2{};
+        uint32 _checkOwershipTimer{}, _checkMasterTimer{};
+        uint32 _moveBehindTimer{};
+        uint32 _rentTimer{};
+        uint32 _wmoAreaUpdateTimer{};
+        uint32 waitTimer{};
+        uint32 itemsAutouseTimer{};
+        uint32 evadeDelayTimer{};
+        uint32 indoorsTimer{};
+        uint32 outdoorsTimer{};
+        uint32 _contestedPvPTimer{};
+        uint32 _groupUpdateTimer{BOT_GROUP_UPDATE_TIMER};
         //save timers
-        uint32 _saveDisabledSpellsTimer;
-        uint32 _saveMiscValuesTimer;
+        uint32 _saveDisabledSpellsTimer{};
+        uint32 _saveMiscValuesTimer{};
 
-        uint32 _lastZoneId, _lastAreaId, _lastWMOAreaId;
-        uint32 _selfrez_spell_id;
+        uint32 _lastZoneId{}, _lastAreaId{}, _lastWMOAreaId{};
+        uint32 _selfrez_spell_id{};
 
-        uint8 _unreachableCount;
-        uint8 _jumpCount;
-        uint8 _evadeCount;
-        uint8 _healHpPctThreshold;
-        uint32 _roleMask;
-        uint32 _usableItemSlotsMask;
-        ObjectGuid::LowType _ownerGuid;
+        uint8 _unreachableCount{};
+        uint8 _jumpCount{};
+        uint8 _evadeCount{};
+        uint8 _healHpPctThreshold{95u};
+        uint32 _roleMask{};
+        uint32 _usableItemSlotsMask{};
         ObjectGuid _lastTargetGuid;
 
-        BotVehicleStrats _curVehStrat;
-        uint8 _vehcomboPoints;
-        bool shouldEnterVehicle;
+        BotVehicleStrats _curVehStrat{};
+        uint8 _vehcomboPoints{};
+        bool shouldEnterVehicle{};
 
-        bool doHealth, doMana, shouldUpdateStats;
-        bool feast_health, feast_mana;
-        bool spawned;
-        bool firstspawn;
-        bool _evadeMode;
-        bool _atHome;
-        bool _duringTeleport;
-        bool _canAppearInWorld;
+        bool doHealth{}, doMana{}, shouldUpdateStats{};
+        bool feast_health{}, feast_mana{};
+        bool spawned{};
+        bool firstspawn{true};
+        bool _evadeMode{};
+        bool _atHome{true};
+        bool _duringTeleport{};
+        bool _canAppearInWorld{};
 
         //save flags
-        bool _saveDisabledSpells;
-        bool _saveMiscValues;
+        bool _saveDisabledSpells{};
+        bool _saveMiscValues{};
 
         //wandering bots
-        bool _wanderer;
-        uint8 _baseLevel;
-        WanderNode const* _travel_node_last;
-        WanderNode const* _travel_node_cur;
+        bool _wanderer{};
+        uint8 _baseLevel{};
+        WanderNode const* _travel_node_last{};
+        WanderNode const* _travel_node_cur{};
 
-        uint32 _groupUpdateMask;
-        uint64 _auraRaidUpdateMask;
+        uint32 _groupUpdateMask{};
+        uint64 _auraRaidUpdateMask{};
         GroupBotReference _group;
         GroupBotReference _originalGroup;
-        Battleground* _bg;
+        Battleground* _bg{};
 
-        float _energyFraction;
+        float _energyFraction{};
 
         //counters (this session)
-        uint16 _deathsCount;
-        uint16 _killsCount;
-        uint16 _pvpKillsCount;
-        uint16 _playerKillsCount;
+        uint16 _deathsCount{};
+        uint16 _killsCount{};
+        uint16 _pvpKillsCount{};
+        uint16 _playerKillsCount{};
 
-        TeleportHomeEvent* teleHomeEvent;
-        TeleportFinishEvent* teleFinishEvent;
-        AwaitStateRemovalEvent* awaitStateRemEvent;
+        TeleportHomeEvent* teleHomeEvent{};
+        TeleportFinishEvent* teleFinishEvent{};
+        AwaitStateRemovalEvent* awaitStateRemEvent{};
 
         struct BotSpell
         {
@@ -792,8 +792,8 @@ class bot_ai : public CreatureAI
             bool enabled;
         };
 
-        int32 _stats[BOT_INVENTORY_SIZE][MAX_BOT_ITEM_MOD];
-        Item* _equips[BOT_INVENTORY_SIZE];
+        int32 _stats[BOT_INVENTORY_SIZE][MAX_BOT_ITEM_MOD]{};
+        Item* _equips[BOT_INVENTORY_SIZE]{};
 
     public:
         using BotSpellMap = std::unordered_map<uint32 /*firstrankspellid*/, BotSpell* /*spell*/>;
