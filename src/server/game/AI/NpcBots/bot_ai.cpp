@@ -19024,11 +19024,12 @@ void bot_ai::Evade()
                     float y = nextNode->GetPositionY();
                     float z = nextNode->GetPositionZ();
                     float o = nextNode->GetOrientation();
-                    if (nextNode->GetProximity() > 0.5f) {
-                        float angle = frand(0.f, float(M_PI * 2.f));
-                        float dist = frand (0.f, nextNode->GetProximity() * 2.f);
-                        x = x + dist * std::cos(angle);
-                        y = y + dist * std::sin(angle);
+                    if (nextNode->GetProximity() > 0.5f)
+                    {
+                        float angle = frand(0.f, float(M_PI) * 2.f);
+                        float pdist = frand(0.f, nextNode->GetProximity() * 2.f);
+                        x = x + pdist * std::cos(angle);
+                        y = y + pdist * std::sin(angle);
                         float ground = z;
                         me->UpdateGroundPositionZ(x, y, ground);
                         if (ground > INVALID_HEIGHT)
