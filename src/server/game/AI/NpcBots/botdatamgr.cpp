@@ -1422,7 +1422,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
         wp->SetFlags(BotWPFlags(flags));
         wp->SetWaitTime(minwaittime, maxwaittime);
         wp->SetProximity(proximity);
-        
+
         if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !lstr.empty())
             all_spawn_nodes.push_back(wp);
 

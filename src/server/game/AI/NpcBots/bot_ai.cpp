@@ -19029,8 +19029,12 @@ void bot_ai::Evade()
                         float dist = frand (0.f, nextNode->GetProximity() * 2.f);
                         x = x + dist * std::cos(angle);
                         y = y + dist * std::sin(angle);
-                        if (me->GetMap()) 
-                            z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z + 2);
+                        float ground = z;
+                        me->UpdateGroundPositionZ(x, y, ground);
+                        if (ground > INVALID_HEIGHT)
+                            z = ground;
+                        else
+                            z += 2.f;
                     }
                     homepos.Relocate(x, y, z, o);
                     if (me->GetMap()->GetEntry()->IsContinent())
