@@ -4220,6 +4220,38 @@ NpcBot.MaxBotsPerAccount = 0
 NpcBot.Botgiver.FilterRaces = 0
 
 #
+#    NpcBot.SharedOwnership.Options
+#        Description: Bitmask describing enabled shared ownership options.
+#        Note:        WARNING! SHARED BOT OWNERSHIP ENABLES EXPLOITS! USE ON YOUR OWN RISK!
+#        Note2:       Term 'share' below refers to a player whom ownership is being shared with
+#        Values:
+#                     0 - Disable completely (default)
+#                     1 - Enable (allows bot owner to share their bots)
+#                     2 - Shared equipment management (including soulbound items)
+#                     4 - Shared ownership extension (allow shares to share the bot further)
+#                     8 - Shared ownership removal (allows shares to remove other shares)
+#        Notes:
+#                     Initially only bot owner can add new shares
+#                     Shares cannot remove bot owner from shared owneship list (or add to it)
+#                     Shares cannot dismiss the bot. If bot ownership expires due to bot expiry
+#                       timer equipment is always returned to the original owner. If share's bot
+#                       ownership expires due to rent cost the bot becomes unbound instead.
+#                     Bots will accept any player from total ownership list as current master,
+#                       whoever is logged in currently and will not switch until they log out,
+#                       original owner takes priority but only if bot has no master currently.
+
+NpcBot.SharedOwnership.Options = 0
+
+#
+#    NpcBot.SharedOwnership.MaxOwners
+#        Description: Maximum number of players a bot can be shared with (NOT counting the owner)
+#        Note:        WARNING! SHARED BOT OWNERSHIP ENABLES EXPLOITS! USE ON YOUR OWN RISK!
+#        Default:     0
+#        Max:         39
+
+NpcBot.SharedOwnership.MaxOwners = 0
+
+#
 #    NpcBot.BaseFollowDistance
 #        Description: Default bot follow distance.
 #        Note:        This parameter determines bots' formation size, distance at which bots

@@ -825,13 +825,13 @@ void BotDataMgr::LoadNpcBots(bool spawn)
     else
         BOT_LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `characters_npcbot_transmog` is empty!");
 
-    //                                       0      1      2      3     4        5
-    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, UNIX_TIMESTAMP(hire_time), "
-    //   6          7          8          9               10          11          12         13         14
+    //                                       0      1      2      3     4        5                          6
+    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, UNIX_TIMESTAMP(hire_time), shared_owners, "
+    //   7          8          9          10              11          12          13         14         15
         "equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet, "
-    //   15          16          17         18         19            20            21             22             23
+    //   16          17          18         19         20            21            22             23             24
         "equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck, "
-    //   24               25
+    //   25               26
         "spells_disabled, miscvalues FROM characters_npcbot");
 
     std::vector<uint32> entryList;
@@ -864,6 +864,20 @@ void BotDataMgr::LoadNpcBots(bool spawn)
             botData->spec =         field[++index].GetUInt8();
             botData->faction =      field[++index].GetUInt32();
             botData->hire_time =    field[++index].GetUInt64();
+
+            for (std::string_view shared_owner_sv : Bcore::Tokenize(field[++index].GetStringView(), ' ', false))
+            {
+                if (Optional<uint32> showner_guid = Bcore::StringTo<uint32>(shared_owner_sv))
+                {
+                    const ObjectGuid showner_pguid = ObjectGuid::Create<HighGuid::Player>(*showner_guid);
+                    if (!sCharacterCache->HasCharacterCacheEntry(showner_pguid))
+                    {
+                        BOT_LOG_WARN("server.loading", "Bot entry {} has shared owner {} which doesn't exist! Skipped.", entry, *showner_guid);
+                        continue;
+                    }
+                    botData->shared_owners.insert(*showner_guid);
+                }
+            }
 
             for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
                 botData->equips[i] = field[++index].GetUInt32();
@@ -2694,6 +2708,26 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
             bstmt->setUInt32(1, entry);
             CharacterDatabase.Execute(bstmt);
             break;
+        case NPCBOT_UPDATE_SHARED_OWNERS:
+        {
+            NpcBotData::SharedOwnersContainer const* shared_owners = (NpcBotData::SharedOwnersContainer const*)(data);
+
+            if (std::addressof(itr->second->shared_owners) != shared_owners)
+                itr->second->shared_owners = *shared_owners;
+
+            std::vector shared_owners_v(itr->second->shared_owners.cbegin(), itr->second->shared_owners.cend());
+            std::ranges::sort(shared_owners_v);
+            std::ostringstream ss;
+            for (uint32 guid_low : shared_owners_v)
+                ss << guid_low << ' ';
+
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_SHARED_OWNERS);
+            //"UPDATE characters_npcbot SET shared_owners = ? WHERE entry = ?", CONNECTION_ASYNC
+            bstmt->setString(0, ss.str());
+            bstmt->setUInt32(1, entry);
+            CharacterDatabase.Execute(bstmt);
+            break;
+        }
         case NPCBOT_UPDATE_DISABLED_SPELLS:
         {
             NpcBotData::DisabledSpellsContainer const* spells = (NpcBotData::DisabledSpellsContainer const*)(data);
@@ -2835,6 +2869,10 @@ void BotDataMgr::UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType upd
             trans->Append(bstmt);
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NPCBOT_TRANSMOG_ALL);
             //"DELETE FROM characters_npcbot_transmog WHERE entry IN (SELECT entry FROM characters_npcbot WHERE owner = ?)", CONNECTION_ASYNC
+            bstmt->setUInt32(0, playerGuid);
+            trans->Append(bstmt);
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_SHARED_OWNERS_ALL);
+            //"UPDATE characters_npcbot SET shared_owners = NULL WHERE owner = ?", CONNECTION_ASYNC
             bstmt->setUInt32(0, playerGuid);
             trans->Append(bstmt);
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER_ALL);
@@ -3040,7 +3078,7 @@ NpcBotRegistry const& BotDataMgr::GetExistingNPCBots()
     return _existingBots;
 }
 
-void BotDataMgr::GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid)
+void BotDataMgr::GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid, bool count_shared)
 {
     ASSERT(AllBotsLoaded());
 
@@ -3048,7 +3086,7 @@ void BotDataMgr::GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, Objec
 
     for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
     {
-        if (_botsData[(*ci)->GetEntry()]->owner == owner_guid.GetCounter())
+        if (_botsData.at((*ci)->GetEntry())->owner == owner_guid.GetCounter() || (count_shared && _botsData.at((*ci)->GetEntry())->shared_owners.contains(owner_guid.GetCounter())))
             guids_vec.push_back((*ci)->GetGUID());
     }
 }
@@ -3080,13 +3118,13 @@ std::vector<uint32> BotDataMgr::GetExistingNPCBotIds()
     return existing_ids;
 }
 
-uint8 BotDataMgr::GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask)
+uint8 BotDataMgr::GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask, bool count_shared)
 {
     uint8 count = 0;
     for (decltype(_botsData)::value_type const& bdata : _botsData)
-        if (bdata.second->owner == owner_guid.GetCounter() && (!class_mask || !!(class_mask & (1u << (_botsExtras[bdata.first]->bclass - 1)))))
+        if ((bdata.second->owner == owner_guid.GetCounter() || (count_shared && bdata.second->shared_owners.contains(owner_guid.GetCounter()))) &&
+            (!class_mask || !!(class_mask & (1u << (_botsExtras.at(bdata.first)->bclass - 1)))))
             ++count;
-
     return count;
 }
 

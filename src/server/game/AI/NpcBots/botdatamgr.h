@@ -58,6 +58,7 @@ enum NpcBotDataUpdateType
     NPCBOT_UPDATE_OWNER                 = 1,
     NPCBOT_UPDATE_ROLES,
     NPCBOT_UPDATE_SPEC,
+    NPCBOT_UPDATE_SHARED_OWNERS,
     NPCBOT_UPDATE_DISABLED_SPELLS,
     NPCBOT_UPDATE_MISCVALUES,
     NPCBOT_UPDATE_FACTION,
@@ -69,8 +70,9 @@ enum NpcBotDataUpdateType
 
 struct NpcBotData
 {
-    typedef std::set<uint32> DisabledSpellsContainer;
-    typedef std::map<uint32, uint32> MiscValuesContainer;
+    using DisabledSpellsContainer = std::set<uint32>;
+    using MiscValuesContainer = std::map<uint32, uint32>;
+    using SharedOwnersContainer = std::set<uint32>;
 
     friend class BotDataMgr;
     friend struct WanderingBotsGenerator;
@@ -83,6 +85,7 @@ public:
     uint32 equips[BOT_INVENTORY_SIZE];
     DisabledSpellsContainer disabled_spells;
     MiscValuesContainer miscvalues;
+    SharedOwnersContainer shared_owners;
 
 private:
     NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)
@@ -225,10 +228,10 @@ class BotDataMgr
         static Creature const* FindBot(uint32 entry);
         static Creature const* FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids = nullptr);
         static NpcBotRegistry const& GetExistingNPCBots();
-        static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid);
+        static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid, bool count_shared = false);
         static ObjectGuid GetNPCBotGuid(uint32 entry);
         static std::vector<uint32> GetExistingNPCBotIds();
-        static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
+        static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0, bool count_shared = false);
         static uint8 GetAccountBotsCount(uint32 account_id);
 
         static void DespawnWandererBot(uint32 entry);
