@@ -14586,6 +14586,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player const* t
                     if (!target->CanSeeSpellClickOn(creature))
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
 
+                //npcbot: make wandering bots non-interactive for non-GM players
+                if ((appendValue & UNIT_NPC_FLAG_GOSSIP) && !target->IsGameMaster() && IsNPCBotOrPet() && creature->IsWandererBot())
+                    appendValue &= ~UNIT_NPC_FLAG_GOSSIP;
+                //end npcbot
+
                 fieldBuffer << uint32(appendValue);
             }
             else if (index == UNIT_FIELD_AURASTATE)
