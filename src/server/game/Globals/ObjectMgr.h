@@ -188,8 +188,7 @@ enum ScriptsType
 {
     SCRIPTS_FIRST = 1,
 
-    SCRIPTS_SPELL = SCRIPTS_FIRST,
-    SCRIPTS_EVENT,
+    SCRIPTS_EVENT = SCRIPTS_FIRST,
     SCRIPTS_WAYPOINT,
 
     SCRIPTS_LAST
@@ -427,7 +426,6 @@ typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap> ScriptMapMap;
 typedef std::multimap<uint32 /*spell id*/, std::pair<uint32 /*script id*/, bool /*enabled*/>> SpellScriptsContainer;
 typedef std::pair<SpellScriptsContainer::iterator, SpellScriptsContainer::iterator> SpellScriptsBounds;
-TC_GAME_API extern ScriptMapMap sSpellScripts;
 TC_GAME_API extern ScriptMapMap sEventScripts;
 TC_GAME_API extern ScriptMapMap sWaypointScripts;
 
@@ -1153,7 +1151,6 @@ class TC_GAME_API ObjectMgr
         bool LoadTrinityStrings();
 
         void LoadEventScripts();
-        void LoadSpellScripts();
         void LoadWaypointScripts();
 
         void LoadSpellScriptNames();
