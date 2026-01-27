@@ -1661,10 +1661,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                 bot->RemoveFromWorld();
             }
 
-            ASSERT(bot->GetGUID());
-
             bot->RemoveAllGameObjects();
-
             bot->m_Events.KillAllEvents(false);
             bot->CombatStop();
             bot->ClearComboPoints();
