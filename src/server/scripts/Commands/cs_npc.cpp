@@ -218,7 +218,7 @@ public:
         CreatureData const* data = sObjectMgr->GetCreatureData(lowGuid);
         if (!data)
         {
-            handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowGuid);
+            handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, *lowGuid);
             handler->SetSentErrorMessage(true);
             return false;
         }

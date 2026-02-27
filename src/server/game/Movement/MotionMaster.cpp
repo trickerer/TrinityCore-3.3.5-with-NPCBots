@@ -534,6 +534,13 @@ bool MotionMaster::StopOnDeath()
     return true;
 }
 
+void MotionMaster::InterruptOnTeleport()
+{
+    if (MovementGenerator* top = GetCurrentMovementGenerator())
+        if (!top->HasFlag(MOVEMENTGENERATOR_FLAG_DEACTIVATED | MOVEMENTGENERATOR_FLAG_FINALIZED))
+            top->Deactivate(_owner); // only deactivate top, don't remove it. non-resumable generators will clean up themselves on next update
+}
+
 void MotionMaster::MoveIdle()
 {
     Add(GetIdleMovementGenerator(), MOTION_SLOT_DEFAULT);
@@ -1053,6 +1060,37 @@ void MotionMaster::MoveFormation(Unit* leader, float range, float angle, uint32 
     }
 }
 
+void MotionMaster::MoveFace(float orientation, uint32 id /*= EVENT_FACE*/)
+{
+    TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveFace: '{}', faces '{}'", _owner->GetGUID(), orientation);
+
+    std::function<void(Movement::MoveSplineInit&)> initializer = [owner = _owner, orientation](Movement::MoveSplineInit& init)
+    {
+        init.MoveTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), false);
+        if (owner->GetTransport())
+            init.DisableTransportPathTransformations();     // It makes no sense to target global orientation
+        init.SetFacing(orientation);
+    };
+
+    Add(new ImmediateMovementGenerator(std::move(initializer), FACE_MOTION_TYPE, id));
+}
+
+void MotionMaster::MoveFace(WorldObject const* object, uint32 id /*= EVENT_FACE*/)
+{
+    if (!object)
+        return;
+
+    TC_LOG_DEBUG("movement.motionmaster", "MotionMaster::MoveFace: '{}', faces '{}'", _owner->GetGUID(), object->GetGUID());
+
+    std::function<void(Movement::MoveSplineInit&)> initializer = [owner = _owner, object](Movement::MoveSplineInit& init)
+    {
+        init.MoveTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), false);
+        init.SetFacing(owner->GetAbsoluteAngle(object));    // when on transport, GetAbsoluteAngle will still return global coordinates (and angle) that needs transforming
+    };
+
+    Add(new ImmediateMovementGenerator(std::move(initializer), FACE_MOTION_TYPE, id));
+}
+
 void MotionMaster::LaunchMoveSpline(std::function<void(Movement::MoveSplineInit& init)>&& initializer, uint32 id/*= 0*/, MovementGeneratorPriority priority/* = MOTION_PRIORITY_NORMAL*/, MovementGeneratorType type/*= EFFECT_MOTION_TYPE*/)
 {
     if (IsInvalidMovementGeneratorType(type))
@@ -1151,7 +1189,9 @@ void MotionMaster::DirectAdd(MovementGenerator* movement, MovementSlot slot/* = 
             auto where = _generators.lower_bound(movement);
             if (!_generators.empty())
             {
-                bool replacesExisting = where != _generators.end() && !_generators.key_comp()(movement, *where);
+                bool replacesExisting = !movement->HasFlag(MOVEMENTGENERATOR_FLAG_IMMEDIATE)
+                    && where != _generators.end()
+                    && !_generators.key_comp()(movement, *where);
                 auto top = _generators.begin();
                 if (replacesExisting)
                     Remove(where, where == top, false);
