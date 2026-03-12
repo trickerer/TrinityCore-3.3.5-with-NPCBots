@@ -142,6 +142,8 @@ enum BotCommonValues
 //COMMON GAMEEVENTS
     GAME_EVENT_WINTER_VEIL              = 2,
 //COMMON FACTIONS
+    FACTION_TEMPLATE_ALLIANCE_DEFAULT   = 1, // Human warrior
+    FACTION_TEMPLATE_HORDE_DEFAULT      = 2, // Orc warrior
     FACTION_TEMPLATE_NEUTRAL_HOSTILE    = FACTION_CREATURE, // 2150 //Hates players and other bots, not attacked by guards
   //SOUNDS
     SOUND_FREEZE_IMPACT_WINDWALK        = 29,

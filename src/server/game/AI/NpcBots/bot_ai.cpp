@@ -19404,18 +19404,28 @@ void bot_ai::GetHomePosition(uint16& mapid, Position* pos) const
 }
 
 //WANDER NODES
-/*static */bool bot_ai::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport)
+/*static */bool bot_ai::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport, bool spawn)
 {
-    if (!teleport)
+    if (!teleport && !spawn && wp->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_FACTION))
+        return true;
+
+    MapEntry const* mapEntry = sMapStore.LookupEntry(wp->GetMapId());
+    if (teleport && !mapEntry->IsContinent())
+        return false;
+
+    if ((teleport || spawn) && (wp->GetLevels().second <= 10 || mapEntry->IsBattlegroundOrArena()))
     {
-        if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_FACTION))
-            return true;
-    }
-    else
-    {
-        MapEntry const* mapEntry = sMapStore.LookupEntry(wp->GetMapId());
-        if (!mapEntry->IsContinent())
-            return false;
+        switch (BotDataMgr::GetTeamIdForFaction(factionTemplateId))
+        {
+            case TEAM_ALLIANCE:
+                return wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY);
+            case TEAM_HORDE:
+                return wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
+            case TEAM_NEUTRAL:
+                return true;
+            default:
+                return true;
+        }
     }
 
     switch (BotDataMgr::GetTeamIdForFaction(factionTemplateId))

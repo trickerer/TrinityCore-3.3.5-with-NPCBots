@@ -185,7 +185,7 @@ class bot_ai : public CreatureAI
         //wandering bots
         bool IsWanderer() const { return _wanderer; }
         void SetWanderer();
-        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
+        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport, bool spawn = false);
         WanderNode const* GetClosestWanderNode() const;
         WanderNode const* GetNextWanderNode(Position const* fromPos, uint8 lvl, bool random) const;
         WanderNode const* GetNextTravelNode(Position const* from, bool random) const;

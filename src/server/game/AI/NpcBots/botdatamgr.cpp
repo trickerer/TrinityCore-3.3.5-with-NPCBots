@@ -443,16 +443,12 @@ public:
             {
                 if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN))
                 {
-                    if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY))
+                    if (bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_ALLIANCE_DEFAULT, false, true))
                         spawns_a.push_back(wp);
-                    else if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
+                    else if (bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_HORDE_DEFAULT, false, true))
                         spawns_h.push_back(wp);
-                    else
-                    {
-                        spawns_a.push_back(wp);
-                        spawns_h.push_back(wp);
+                    if (bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_NEUTRAL_HOSTILE, false, true))
                         spawns_n.push_back(wp);
-                    }
                 }
             }
         });
@@ -1438,7 +1434,12 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
         wp->SetProximity(proximity);
 
         if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && !lstr.empty())
+        {
             all_spawn_nodes.push_back(wp);
+
+            if (!wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY) && wp->GetLevels().second <= 10)
+                BOT_LOG_WARN("server.loading", "WP {} is a start location but has no HORDE or ALLIANCE flag assigned! Only Neutral bots will spawn there!", id);
+        }
 
         if (lstr.empty())
         {
@@ -1469,9 +1470,9 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
         uint32 mapId = wp->GetMapId();
         auto [minLevel, maxLevel] = wp->GetLevels();
 
-        spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
-        spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY));
-        spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY));
+        spawn_node_exists_a[mapId] |= (maxLevel >= maxof_minclasslvl_nr && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_ALLIANCE_DEFAULT, false, true));
+        spawn_node_exists_h[mapId] |= (maxLevel >= maxof_minclasslvl_nr && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_HORDE_DEFAULT, false, true));
+        spawn_node_exists_n[mapId] |= (maxLevel >= maxof_minclasslvl_ex && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_NEUTRAL_HOSTILE, false, true));
 
         decltype(_wpMinSpawnLevelPerMapId)::const_iterator mincit = _wpMinSpawnLevelPerMapId.find(mapId);
         _wpMinSpawnLevelPerMapId[mapId] = std::min<uint8>((mincit != _wpMinSpawnLevelPerMapId.cend()) ? mincit->second : uint8(DEFAULT_MAX_LEVEL), minLevel);
@@ -1538,9 +1539,9 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             maxLevel = std::min<uint8>(maxLevel, max_spawn_level);
             for (uint8 k = 0; k < TEAMS_COUNT; ++k)
             {
-                if ((k == 0 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY)) ||
-                    (k == 1 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY)) ||
-                    (k == 2 && !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY)))
+                if ((k == 0 && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_ALLIANCE_DEFAULT, false, true)) ||
+                    (k == 1 && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_HORDE_DEFAULT, false, true)) ||
+                    (k == 2 && bot_ai::IsWanderNodeAvailableForBotFaction(wp, FACTION_TEMPLATE_NEUTRAL_HOSTILE, false, true)))
                 {
                     for (size_t i = minLevel; i <= maxLevel; ++i)
                         spawn_node_levels[k][i - 1] = true;
