@@ -5865,6 +5865,7 @@ uint32 bot_ai::_selectMountSpell() const
 
     Unit::AuraEffectList const& mounts = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
     int32 maxMountSpeed = !IAmFree() ? 0 : 999;
+    const bool master_can_fly = master->CanFly();
     if (!IAmFree())
     {
         Aura const* mountAura = nullptr;
@@ -5873,7 +5874,7 @@ uint32 bot_ai::_selectMountSpell() const
             for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
             {
                 AuraEffect const* maeff = meff->GetBase()->GetEffect(i);
-                if (maeff && (maeff->GetSpellEffectInfo().IsAura(master->CanFly() ? SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED : SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)) &&
+                if (maeff && (maeff->GetSpellEffectInfo().IsAura(master_can_fly ? SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED : SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)) &&
                     maeff->GetAmount() > maxMountSpeed)
                 {
                     maxMountSpeed = maeff->GetAmount();
@@ -5890,7 +5891,7 @@ uint32 bot_ai::_selectMountSpell() const
 
     //Winter Veil addition
     if (sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL))
-        myMountSpellId = master->CanFly() ? REINDEER_FLY : REINDEER;
+        myMountSpellId = master_can_fly ? REINDEER_FLY : REINDEER;
     if (!myMountSpellId && me->GetMapId() == 531) //Ahn'Qiraj
     {
         //Select AQ40 mount
@@ -5904,7 +5905,7 @@ uint32 bot_ai::_selectMountSpell() const
     {
         using MountArray = std::array<uint32, NUM_MOUNTS_PER_SPEED>;
 
-        bool can_fly = !IAmFree() ? master->CanFly() : false; //(!instt && me->GetMap()->GetEntry()->ExpansionID > 0);
+        bool can_fly = !IAmFree() && master_can_fly; //(!instt && me->GetMap()->GetEntry()->ExpansionID > 0);
         bool useSlowMount = can_fly ? (me->GetLevel() < 70 || maxMountSpeed < 220) : (me->GetLevel() < minLevel100 || maxMountSpeed < 80);
 
         if (!can_fly)
