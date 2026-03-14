@@ -159,7 +159,7 @@ public:
                 me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 
                 if (!IAmFree() && me->IsStandState() && !me->isMoving() && !master->isMoving() && !me->IsMounted() &&
-                    !me->IsInCombat() && !master->IsInCombat() && Rand() < 10 && me->GetDistance(master) < 15 &&
+                    !me->IsInCombat() && !master->IsInCombat() && !IsCasting() && Rand() < 10 && me->GetDistance(master) < 15 &&
                     !me->HasStealthAura() && !me->HasInvisibilityAura() && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) &&
                     _minions.empty())
                 {
