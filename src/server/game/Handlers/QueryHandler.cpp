@@ -41,6 +41,9 @@
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
+    WorldPackets::Query::QueryPlayerNameResponse response;
+    response.Player = guid;
+
     //npcbot: try query bot info
     if (guid.IsCreature())
     {
@@ -48,7 +51,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
         CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureId);
         if (creatureTemplate && creatureTemplate->IsNPCBot())
         {
-            std::string creatureName = creatureTemplate->Name;
+            std::string_view creatureName = creatureTemplate->Name;
             if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale(creatureId))
             {
                 uint32 loc = GetSessionDbLocaleIndex();
@@ -59,61 +62,44 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
             NpcBotExtras const* extData = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(creatureId));
             NpcBotAppearanceData const* appData = BotDataMgr::SelectNpcBotAppearance(creatureId);
 
-            WorldPacket bpdata(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
-            bpdata << guid.WriteAsPacked();
-            bpdata << uint8(0);
-            bpdata << creatureName;
-            bpdata << uint8(0);
-            bpdata << uint8(BotMgr::GetBotPlayerRace(extData->bclass, extData->race));
-            bpdata << uint8(appData ? appData->gender : uint8(GENDER_MALE));
-            bpdata << uint8(BotMgr::GetBotPlayerClass(extData->bclass));
-            bpdata << uint8(0);
-            SendPacket(&bpdata);
-            return;
+            response.Result = RESPONSE_SUCCESS; // name known
+
+            WorldPackets::Query::PlayerGuidLookupData& bdata = response.Data.emplace();
+            bdata.Name = creatureName;
+            bdata.Race = BotMgr::GetBotPlayerRace(extData->bclass, extData->race);
+            bdata.Sex = appData ? appData->gender : static_cast<uint8>(GENDER_MALE);
+            bdata.ClassID = BotMgr::GetBotPlayerClass(extData->bclass);
         }
+        else
+            response.Result = RESPONSE_FAILURE; // name unknown
+
+        SendPacket(response.Write());
+        return;
     }
     //end npcbot
 
-    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
-    CharacterCacheEntry const* nameData = sCharacterCache->GetCharacterCacheByGuid(guid);
-
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
-    data << guid.WriteAsPacked();
-    if (!nameData)
+    if (CharacterCacheEntry const* characterInfo = sCharacterCache->GetCharacterCacheByGuid(guid))
     {
-        data << uint8(1);                           // name unknown
-        SendPacket(&data);
-        return;
-    }
+        response.Result = RESPONSE_SUCCESS; // name known
 
-    data << uint8(0);                               // name known
-    data << nameData->Name;                         // played name
-    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(nameData->Race);
-    data << uint8(nameData->Sex);
-    data << uint8(nameData->Class);
+        WorldPackets::Query::PlayerGuidLookupData& data = response.Data.emplace();
+        data.Name = characterInfo->Name;
+        data.Race = characterInfo->Race;
+        data.Sex = characterInfo->Sex;
+        data.ClassID = characterInfo->Class;
 
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
-    {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
+            data.DeclinedNames = player->GetDeclinedNames();
     }
     else
-        data << uint8(0);                           // Name is not declined
+        response.Result = RESPONSE_FAILURE; // name unknown
 
-    SendPacket(&data);
+    SendPacket(response.Write());
 }
 
-void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
+void WorldSession::HandleNameQueryOpcode(WorldPackets::Query::QueryPlayerName& queryPlayerName)
 {
-    ObjectGuid guid;
-    recvData >> guid;
-
-    // This is disable by default to prevent lots of console spam
-    // TC_LOG_INFO("network", "HandleNameQueryOpcode {}", guid);
-
-    SendNameQueryOpcode(guid);
+    SendNameQueryOpcode(queryPlayerName.Player);
 }
 
 void WorldSession::HandleQueryTimeOpcode(WorldPacket & /*recvData*/)

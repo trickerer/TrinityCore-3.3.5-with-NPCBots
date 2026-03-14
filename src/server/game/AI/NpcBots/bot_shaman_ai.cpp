@@ -2050,7 +2050,7 @@ public:
                     if (baseId == CHAIN_LIGHTNING_1)
                     {
                         //Normalize chance
-                        if (urand(1,100) <= (100.f / spell->_effects[0].ChainTarget))
+                        if (urand(1,100) <= (100.f / spell->_effects[0].ChainTargets))
                             me->CastSpell(target, procId, true);
                     }
                 }

@@ -2982,7 +2982,7 @@ int32 BotMgr::GetHPSTaken(Unit const* unit) const
     //HoTs
     Unit::AuraEffectList const& hots = unit->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
     for (Unit::AuraEffectList::const_iterator itr = hots.begin(); itr != hots.end(); ++itr)
-        amount += int32((*itr)->GetAmount() / ((*itr)->GetAmplitude() * 0.001f));
+        amount += int32((*itr)->GetAmount() / ((*itr)->GetPeriod() * 0.001f));
 
     //if (amount != 0)
     //    BOT_LOG_ERROR("entities.player", "BotMgr:GetHPSTaken(): {} got {})", unit->GetName(), amount);

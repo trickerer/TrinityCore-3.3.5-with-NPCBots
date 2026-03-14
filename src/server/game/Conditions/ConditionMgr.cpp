@@ -1774,7 +1774,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond) const
                 if (!((1 << spellEffectInfo.EffectIndex) & cond->SourceGroup))
                     continue;
 
-                if (spellEffectInfo.ChainTarget > 0)
+                if (spellEffectInfo.ChainTargets > 0)
                     continue;
 
                 switch (spellEffectInfo.TargetA.GetSelectionCategory())

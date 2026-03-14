@@ -277,8 +277,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].BasePoints = -200;
     sinfo->_effects[0].MiscValue = DISPEL_POISON;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
     // END SPELL_NULLIFY_POISON
 
     //BLADEMASTER
@@ -304,7 +304,7 @@ void GenerateBotCustomSpells()
     sinfo->AuraInterruptFlags =
         AURA_INTERRUPT_FLAG_SPELL_ATTACK | AURA_INTERRUPT_FLAG_MELEE_ATTACK |
         AURA_INTERRUPT_FLAG_NOT_ABOVEWATER | AURA_INTERRUPT_FLAG_MOUNT; //0x00003C07;vanish
-    sinfo->CasterAuraStateNot = 0;
+    sinfo->ExcludeCasterAuraState = 0;
     //3.1) END TRANSPARENCY
 
     spellId = SPELL_NETHERWALK; //31599
@@ -326,12 +326,12 @@ void GenerateBotCustomSpells()
     sinfo->AuraInterruptFlags =
         AURA_INTERRUPT_FLAG_SPELL_ATTACK | AURA_INTERRUPT_FLAG_MELEE_ATTACK |
         AURA_INTERRUPT_FLAG_NOT_ABOVEWATER | AURA_INTERRUPT_FLAG_MOUNT; //0x00003C07;vanish
-    sinfo->CasterAuraStateNot = 0;
+    sinfo->ExcludeCasterAuraState = 0;
 
     sinfo->_effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[0].BasePoints = 100;
     sinfo->_effects[0].RealPointsPerLevel = 2.5f;
-    sinfo->_effects[0].ValueMultiplier = 1.0f;
+    sinfo->_effects[0].Amplitude = 1.0f;
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     sinfo->_effects[0].ApplyAuraName = SPELL_AURA_MOD_INVISIBILITY;
     sinfo->_effects[0].Amplitude = 0;
@@ -341,7 +341,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[1].BasePoints = 10;
     sinfo->_effects[1].RealPointsPerLevel = 0.5f;
-    sinfo->_effects[1].ValueMultiplier = 1.0f;
+    sinfo->_effects[1].Amplitude = 1.0f;
     sinfo->_effects[1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     sinfo->_effects[1].TargetB = SpellImplicitTargetInfo(0);
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_MOD_INCREASE_SPEED;
@@ -407,18 +407,18 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 300;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 0.f;
-    sinfo->_effects[0].DamageMultiplier = 0.75f;
+    sinfo->_effects[0].BonusCoefficient = 0.f;
+    sinfo->_effects[0].ChainAmplitude = 0.75f;
     sinfo->_effects[0].RealPointsPerLevel = 50.f;
-    //sinfo->_effects[0].ValueMultiplier = 1.f;
+    //sinfo->_effects[0].Amplitude = 1.f;
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_SCHOOL_DAMAGE;
     sinfo->_effects[1].BasePoints = 50;
-    sinfo->_effects[1].BonusMultiplier = 1.0f;
-    sinfo->_effects[1].DamageMultiplier = 0.5f;
+    sinfo->_effects[1].BonusCoefficient = 1.0f;
+    sinfo->_effects[1].ChainAmplitude = 0.5f;
     sinfo->_effects[1].DieSides = /*17*/25;
     sinfo->_effects[1].RealPointsPerLevel = 30.f;
-    //sinfo->_effects[1].ValueMultiplier = 1.f;
+    //sinfo->_effects[1].Amplitude = 1.f;
     sinfo->_effects[1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     sinfo->_effects[1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_DEST_AREA_ENEMY);
     sinfo->_effects[1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_12_YARDS);
@@ -443,10 +443,10 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 200;
     sinfo->_effects[0].DieSides = /*12*/25;
-    sinfo->_effects[0].BonusMultiplier = 1.15f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.15f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 10.f;
-    //sinfo->_effects[0].ValueMultiplier = 1.f;
+    //sinfo->_effects[0].Amplitude = 1.f;
     //6) END SHADOW BOLT (BASE ATTACK)
 
     //7) ATTACK ANIMATION
@@ -481,9 +481,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Effect = SPELL_EFFECT_DUMMY;
     sinfo->_effects[0].BasePoints = 1;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].ValueMultiplier = 0.f;
+    sinfo->_effects[0].Amplitude = 0.f;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].DamageMultiplier = 0.f;
+    sinfo->_effects[0].ChainAmplitude = 0.f;
     sinfo->_effects[0].TargetB = SpellImplicitTargetInfo(0);
     sinfo->_effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_0_YARDS);
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
@@ -558,9 +558,9 @@ void GenerateBotCustomSpells()
     //sinfo->_effects[0].Effect = SPELL_EFFECT_POWER_DRAIN;
     sinfo->_effects[0].BasePoints = 999999;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_NONE;
@@ -593,9 +593,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].BasePoints = 3;
     sinfo->_effects[0].DieSides = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].ValueMultiplier = 0.f;
+    sinfo->_effects[0].Amplitude = 0.f;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].DamageMultiplier = 0.f;
+    sinfo->_effects[0].ChainAmplitude = 0.f;
     sinfo->_effects[0].TriggerSpell = SPELL_TRIGGERED_ENERGIZE;
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
     sinfo->_effects[0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
@@ -629,9 +629,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].BasePoints = 3;
     sinfo->_effects[0].DieSides = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].ValueMultiplier = 0.f;
+    sinfo->_effects[0].Amplitude = 0.f;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].DamageMultiplier = 0.f;
+    sinfo->_effects[0].ChainAmplitude = 0.f;
     sinfo->_effects[0].TriggerSpell = SPELL_TRIGGERED_HEAL;
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
     sinfo->_effects[0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
@@ -698,10 +698,10 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 15;
     sinfo->_effects[0].DieSides = 9;
-    sinfo->_effects[0].BonusMultiplier = 0.5f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 0.5f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 15.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     //14) END FIREBALL (MAIN ATTACK)
 
     //15) BLIZZARD
@@ -730,10 +730,10 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 26;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 1.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 15.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     sinfo->_effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_13_YARDS);
     sinfo->_effects[0].Amplitude = 1000;
     //15) END BLIZZARD
@@ -782,10 +782,10 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 25;
     sinfo->_effects[0].DieSides = 20;
-    sinfo->_effects[0].BonusMultiplier = 1.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 25.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     //17) END WATERBOLT (MAIN ATTACK)
 
     //DREADLORD
@@ -919,10 +919,10 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_104);
     sinfo->_effects[0].BasePoints = 425;
     sinfo->_effects[0].DieSides = 150;
-    sinfo->_effects[0].BonusMultiplier = 2.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 2.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 37.5f; //2000 avg at 80
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     sinfo->_effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_40_YARDS);
     //21) END CARRION SWARM
 
@@ -1002,7 +1002,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].BasePoints = 1;
     sinfo->_effects[0].DieSides = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].BonusMultiplier = 0.f;
+    sinfo->_effects[0].BonusCoefficient = 0.f;
     //24.1) END STEAL MAGIC VISUAL
 
     //25) FEEDBACK
@@ -1027,7 +1027,7 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].Effect = SPELL_EFFECT_POWER_BURN;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     //25) END FEEDBACK
 
     // DARK RANGER
@@ -1069,10 +1069,10 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_NONE;
     sinfo->_effects[1].BasePoints = 150;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].BonusMultiplier = 1.f;
-    sinfo->_effects[1].DamageMultiplier = 1.f;
+    sinfo->_effects[1].BonusCoefficient = 1.f;
+    sinfo->_effects[1].ChainAmplitude = 1.f;
     sinfo->_effects[1].RealPointsPerLevel = 0.f;
-    sinfo->_effects[1].ValueMultiplier = 1.f;
+    sinfo->_effects[1].Amplitude = 1.f;
     sinfo->_effects[1].Amplitude = 0;
     sinfo->_effects[1].RadiusEntry = nullptr;
 
@@ -1081,10 +1081,10 @@ void GenerateBotCustomSpells()
     //sinfo->_effects[0].ApplyAuraName = SPELL_AURA_PERIODIC_DAMAGE;
     sinfo->_effects[0].BasePoints = 100;
     //sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 1.5f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.5f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 10.f;
-    //sinfo->_effects[0].ValueMultiplier = 1.f;
+    //sinfo->_effects[0].Amplitude = 1.f;
     //sinfo->_effects[0].RadiusEntry = nullptr;
     sinfo->_effects[0].Amplitude = 2000;
     //26) END BLACK ARROW
@@ -1125,10 +1125,10 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].ApplyAuraName = SPELL_AURA_PERIODIC_LEECH;
     sinfo->_effects[0].BasePoints = 45;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 1.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 6.f;
-    sinfo->_effects[0].ValueMultiplier = 2.f;
+    sinfo->_effects[0].Amplitude = 2.f;
     sinfo->_effects[0].RadiusEntry = nullptr;
     sinfo->_effects[0].Amplitude = 1000;
     //27) END DRAIN LIFE
@@ -1189,10 +1189,10 @@ void GenerateBotCustomSpells()
 
     sinfo->_effects[0].BasePoints = 15;
     sinfo->_effects[0].DieSides = 9;
-    sinfo->_effects[0].BonusMultiplier = 0.75f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 0.75f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 8.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     //29) END SHADOW BOLT (MAIN_ATTACK)
 
     //30) RAISE DEAD
@@ -1346,10 +1346,10 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].RadiusEntry = nullptr;//sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50_YARDS);
     sinfo->_effects[0].BasePoints = 1;
     sinfo->_effects[0].DieSides = 49;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 15.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     //35) END FORKED LIGHTNING
 
     //36) FORKED LIGHTNING EFFECT
@@ -1413,10 +1413,10 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     sinfo->_effects[0].BasePoints = 10;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 0.5f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 0.5f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 2.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     sinfo->_effects[0].RadiusEntry = nullptr;
     sinfo->_effects[1].Effect = SPELL_EFFECT_NONE;
     //37) END FROST ARROW
@@ -1443,20 +1443,20 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     sinfo->_effects[0].BasePoints = -30;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 1.f;
-    sinfo->_effects[0].DamageMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.f;
+    sinfo->_effects[0].ChainAmplitude = 1.f;
     sinfo->_effects[0].RealPointsPerLevel = 0.f;
-    sinfo->_effects[0].ValueMultiplier = 1.f;
+    sinfo->_effects[0].Amplitude = 1.f;
     sinfo->_effects[0].RadiusEntry = nullptr;
     sinfo->_effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
     sinfo->_effects[1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     sinfo->_effects[1].BasePoints = -30;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].BonusMultiplier = 1.f;
-    sinfo->_effects[1].DamageMultiplier = 1.f;
+    sinfo->_effects[1].BonusCoefficient = 1.f;
+    sinfo->_effects[1].ChainAmplitude = 1.f;
     sinfo->_effects[1].RealPointsPerLevel = 0.f;
-    sinfo->_effects[1].ValueMultiplier = 1.f;
+    sinfo->_effects[1].Amplitude = 1.f;
     sinfo->_effects[1].RadiusEntry = nullptr;
     //38) END FROST ARROW EFFECT
 
@@ -1479,7 +1479,7 @@ void GenerateBotCustomSpells()
     sinfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
 
     sinfo->_effects[0].BasePoints = 1000000000;
-    sinfo->_effects[0].ValueMultiplier = 10.f;
+    sinfo->_effects[0].Amplitude = 10.f;
     //39) END MANA SHIELD
 
     //40) TORNADO
@@ -1570,7 +1570,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[2].BasePoints = 212;
     sinfo->_effects[2].DieSides = 183;
     sinfo->_effects[2].RealPointsPerLevel = 35.f;
-    sinfo->_effects[2].BonusMultiplier = 0.25f;
+    sinfo->_effects[2].BonusCoefficient = 0.25f;
     sinfo->_effects[2].Amplitude = 1500;
     //41) END TORNADO EFFECT
 
@@ -1614,7 +1614,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].BasePoints = 541;
     sinfo->_effects[0].DieSides = 215;
     sinfo->_effects[0].RealPointsPerLevel = 40.f;
-    sinfo->_effects[0].BonusMultiplier = 0.5f;
+    sinfo->_effects[0].BonusCoefficient = 0.5f;
     //42) END TORNADO EFFECT2
 
     //43) TORNADO EFFECT3
@@ -1694,7 +1694,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].TargetB = SpellImplicitTargetInfo(0);
     sinfo->_effects[0].BasePoints = 100;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].BonusMultiplier = 1.f;
+    sinfo->_effects[0].BonusCoefficient = 1.f;
     //44) END SHOOT
 
     //CRYPT LORD
@@ -1737,8 +1737,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
@@ -1751,8 +1751,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].Amplitude = 0;
     sinfo->_effects[1].RealPointsPerLevel = 0.0f;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].DamageMultiplier = 0.0f;
-    sinfo->_effects[1].BonusMultiplier = 0.0f;
+    sinfo->_effects[1].ChainAmplitude = 0.0f;
+    sinfo->_effects[1].BonusCoefficient = 0.0f;
     //45) END IMPALE
 
     //46) IMPALE DAMAGE
@@ -1795,8 +1795,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 0;
     sinfo->_effects[0].RealPointsPerLevel = 35.0f;
     sinfo->_effects[0].DieSides = 200;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_KNOCK_BACK;
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_NONE;
@@ -1810,8 +1810,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].Amplitude = 0;
     sinfo->_effects[1].RealPointsPerLevel = 0.0;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].DamageMultiplier = 0.0f;
-    sinfo->_effects[1].BonusMultiplier = 0.0f;
+    sinfo->_effects[1].ChainAmplitude = 0.0f;
+    sinfo->_effects[1].BonusCoefficient = 0.0f;
 
     sinfo->_effects[2].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[2].ApplyAuraName = SPELL_AURA_MOD_STUN;
@@ -1827,8 +1827,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[2].Amplitude = 0;
     sinfo->_effects[2].RealPointsPerLevel = 0.0;
     sinfo->_effects[2].DieSides = 0;
-    sinfo->_effects[2].DamageMultiplier = 0.0f;
-    sinfo->_effects[2].BonusMultiplier = 0.0f;
+    sinfo->_effects[2].ChainAmplitude = 0.0f;
+    sinfo->_effects[2].BonusCoefficient = 0.0f;
     //46) END IMPALE DAMAGE
 
     //47) IMPALE VISUAL
@@ -1870,8 +1870,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_NONE;
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_NONE;
@@ -1883,8 +1883,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].Amplitude = 0;
     sinfo->_effects[1].RealPointsPerLevel = 0.0;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].DamageMultiplier = 0.0f;
-    sinfo->_effects[1].BonusMultiplier = 0.0f;
+    sinfo->_effects[1].ChainAmplitude = 0.0f;
+    sinfo->_effects[1].BonusCoefficient = 0.0f;
     //47) END IMPALE VISUAL
 
     //48) CARRION BEETLES
@@ -1919,8 +1919,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 500;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
     //48) END CARRION BEETLES
 
     //49) LOCUST SWARM
@@ -1963,8 +1963,8 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
     sinfo->_effects[0].DieSides = 0;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
 
     for (uint8 i = EFFECT_1; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -1979,8 +1979,8 @@ void GenerateBotCustomSpells()
         sinfo->_effects[i].Amplitude = 0;
         sinfo->_effects[i].RealPointsPerLevel = 0.0f;
         sinfo->_effects[i].DieSides = 0;
-        sinfo->_effects[i].DamageMultiplier = 0.0f;
-        sinfo->_effects[i].BonusMultiplier = 0.0f;
+        sinfo->_effects[i].ChainAmplitude = 0.0f;
+        sinfo->_effects[i].BonusCoefficient = 0.0f;
     }
     //49) END LOCUST SWARM
 
@@ -2026,9 +2026,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Amplitude = 0;
     sinfo->_effects[0].RealPointsPerLevel = 0.0f;
     sinfo->_effects[0].DieSides = 25;
-    sinfo->_effects[0].DamageMultiplier = 0.0f;
-    sinfo->_effects[0].ValueMultiplier = 0.0f;
-    sinfo->_effects[0].BonusMultiplier = 0.0f;
+    sinfo->_effects[0].ChainAmplitude = 0.0f;
+    sinfo->_effects[0].Amplitude = 0.0f;
+    sinfo->_effects[0].BonusCoefficient = 0.0f;
 
     sinfo->_effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[1].ApplyAuraName = SPELL_AURA_MOD_PACIFY_SILENCE;
@@ -2041,9 +2041,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[1].Amplitude = 0;
     sinfo->_effects[1].RealPointsPerLevel = 0.0f;
     sinfo->_effects[1].DieSides = 0;
-    sinfo->_effects[1].DamageMultiplier = 0.0f;
-    sinfo->_effects[1].ValueMultiplier = 0.0f;
-    sinfo->_effects[1].BonusMultiplier = 0.0f;
+    sinfo->_effects[1].ChainAmplitude = 0.0f;
+    sinfo->_effects[1].Amplitude = 0.0f;
+    sinfo->_effects[1].BonusCoefficient = 0.0f;
 
     sinfo->_effects[2].Effect = SPELL_EFFECT_APPLY_AURA;
     sinfo->_effects[2].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
@@ -2057,9 +2057,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[2].Amplitude = 0;
     sinfo->_effects[2].RealPointsPerLevel = 0.0f;
     sinfo->_effects[2].DieSides = 0;
-    sinfo->_effects[2].DamageMultiplier = 0.0f;
-    sinfo->_effects[2].ValueMultiplier = 0.0f;
-    sinfo->_effects[2].BonusMultiplier = 0.0f;
+    sinfo->_effects[2].ChainAmplitude = 0.0f;
+    sinfo->_effects[2].Amplitude = 0.0f;
+    sinfo->_effects[2].BonusCoefficient = 0.0f;
     //50) END SOUL BITE
 
     //51) ENERGIZE VISUAL
