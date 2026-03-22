@@ -157,6 +157,24 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
     return LOCATION_REPOSITORY;
 }
 
+// npcbot
+template<>
+std::string DBUpdater<LoginDatabaseConnection>::GetBaseNPCBotFile()
+{
+    return BuiltInConfig::GetSourceDirectory() + "/sql/base/auth_npcbots.sql";
+}
+template<>
+std::string DBUpdater<CharacterDatabaseConnection>::GetBaseNPCBotFile()
+{
+    return BuiltInConfig::GetSourceDirectory() + "/sql/base/characters_npcbots.sql";
+}
+template<>
+std::string DBUpdater<WorldDatabaseConnection>::GetBaseNPCBotFile()
+{
+    return BuiltInConfig::GetSourceDirectory() + "/sql/base/world_npcbots.sql";
+}
+//end npcbot
+
 template<class T>
 bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
@@ -261,6 +279,16 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 
     TC_LOG_INFO("sql.updates", "Database {} is empty, auto populating it...", DBUpdater<T>::GetTableName());
 
+    //npcbot
+    Path const nbase(DBUpdater<T>::GetBaseNPCBotFile());
+    if (!exists(nbase))
+    {
+        TC_LOG_ERROR("sql.updates", ">> [NPCBots] Base file \"{}\" is missing. Try fixing it by cloning the source again.",
+            nbase.generic_string());
+        return false;
+    }
+    //end npcbot
+
     std::string const p = DBUpdater<T>::GetBaseFile();
     if (p.empty())
     {
@@ -304,6 +332,26 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
     }
 
     TC_LOG_INFO("sql.updates", ">> Done!");
+
+    //npcbot
+    if (!exists(nbase))
+    {
+        TC_LOG_ERROR("sql.updates", ">> [NPCBots] Base file \"{}\" is missing. You'll have to apply it manually!",
+            nbase.generic_string());
+        return false;
+    }
+    TC_LOG_INFO("sql.updates", ">> [NPCBots] Applying \'{}\'...", nbase.generic_string());
+    try
+    {
+        ApplyFile(pool, nbase);
+    }
+    catch (UpdateException&)
+    {
+        return false;
+    }
+    TC_LOG_INFO("sql.updates", ">> Done!");
+    //end npcbot
+
     return true;
 }
 

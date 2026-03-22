@@ -74,6 +74,10 @@ public:
 
     static std::string GetBaseFile();
 
+    //npcbot
+    static std::string GetBaseNPCBotFile();
+    //end npcbot
+
     static bool IsEnabled(uint32 const updateMask);
 
     static BaseLocation GetBaseLocationType();
