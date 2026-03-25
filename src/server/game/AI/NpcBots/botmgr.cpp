@@ -54,8 +54,8 @@ uint8 _basefollowdist;
 uint8 _maxClassNpcBots;
 uint8 _maxAccountNpcBots;
 uint8 _maxSharedOwners;
-uint8 _xpReductionAmount;
-uint8 _xpReductionStartingNumber;
+uint8 _xpReductionExtraAmount;
+uint8 _xpReductionExtraStartingNumber;
 uint8 _mountLevel60;
 uint8 _mountLevel100;
 uint8 _healTargetIconFlags;
@@ -87,8 +87,8 @@ uint32 _targetBGPlayersPerTeamCount_IC;
 uint32 _shared_ownership_options;
 bool _enableNpcBots;
 bool _logToDB;
-bool _xpReductionBlizzlikeEnable;
-bool _xpReductionBlizzlikeGroupOnly;
+bool _xpReductionEnable;
+bool _xpReductionGroupOnly;
 bool _moneyLootShareEnable;
 bool _moneyLootShareGroupOnly;
 bool _enableNpcBotsDungeons;
@@ -339,10 +339,10 @@ void BotMgr::LoadConfig(bool reload)
     _shared_ownership_options       = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.Options", 0);
     _maxSharedOwners                = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.MaxOwners", 0);
     _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
-    _xpReductionAmount              = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Amount", 0);
-    _xpReductionStartingNumber      = sConfigMgr->GetIntDefault("NpcBot.XpReduction.StartingNumber", 2);
-    _xpReductionBlizzlikeEnable     = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.Enable", true);
-    _xpReductionBlizzlikeGroupOnly  = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.GroupOnly", false);
+    _xpReductionEnable              = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Enable", false);
+    _xpReductionGroupOnly           = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.GroupOnly", false);
+    _xpReductionExtraAmount         = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.Amount", 0);
+    _xpReductionExtraStartingNumber = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.StartingNumber", 2);
     _moneyLootShareEnable           = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.Enable", false);
     _moneyLootShareGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.GroupOnly", false);
     _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
@@ -1126,21 +1126,21 @@ float BotMgr::GetBotStatLimitCrit()
     return _botStatLimits_crit;
 }
 
-uint8 BotMgr::GetNpcBotXpReduction()
+bool BotMgr::IsNpcBotXpReductionEnabled()
 {
-    return _xpReductionAmount;
+    return _xpReductionEnable;
 }
-uint8 BotMgr::GetNpcBotXpReductionStartingNumber()
+bool BotMgr::IsNpcBotXpReductionGroupOnly()
 {
-    return _xpReductionStartingNumber;
+    return _xpReductionGroupOnly;
 }
-bool BotMgr::GetNpcBotXpReductionBlizzlikeEnabled()
+uint8 BotMgr::GetNpcBotXpReductionExtraAmount()
 {
-    return _xpReductionBlizzlikeEnable;
+    return _xpReductionExtraAmount;
 }
-bool BotMgr::GetNpcBotXpReductionBlizzlikeGroupOnly()
+uint8 BotMgr::GetNpcBotXpReductionExtraStartingNumber()
 {
-    return _xpReductionBlizzlikeGroupOnly;
+    return _xpReductionExtraStartingNumber;
 }
 
 bool BotMgr::GetNpcBotMoneyShareEnabled()
