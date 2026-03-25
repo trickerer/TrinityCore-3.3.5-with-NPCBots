@@ -89,6 +89,8 @@ bool _enableNpcBots;
 bool _logToDB;
 bool _xpReductionEnable;
 bool _xpReductionGroupOnly;
+bool _honorReductionEnable;
+bool _honorReductionGroupOnly;
 bool _moneyLootShareEnable;
 bool _moneyLootShareGroupOnly;
 bool _enableNpcBotsDungeons;
@@ -343,6 +345,8 @@ void BotMgr::LoadConfig(bool reload)
     _xpReductionGroupOnly           = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.GroupOnly", false);
     _xpReductionExtraAmount         = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.Amount", 0);
     _xpReductionExtraStartingNumber = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.StartingNumber", 2);
+    _honorReductionEnable           = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.Enable", false);
+    _honorReductionGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.GroupOnly", false);
     _moneyLootShareEnable           = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.Enable", false);
     _moneyLootShareGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.GroupOnly", false);
     _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
@@ -1141,6 +1145,15 @@ uint8 BotMgr::GetNpcBotXpReductionExtraAmount()
 uint8 BotMgr::GetNpcBotXpReductionExtraStartingNumber()
 {
     return _xpReductionExtraStartingNumber;
+}
+
+bool BotMgr::IsNpcBotHonorReductionEnabled()
+{
+    return _honorReductionEnable;
+}
+bool BotMgr::IsNpcBotHonorReductionGroupOnly()
+{
+    return _honorReductionGroupOnly;
 }
 
 bool BotMgr::GetNpcBotMoneyShareEnabled()

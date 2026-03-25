@@ -270,6 +270,8 @@ class TC_GAME_API BotMgr
         static bool IsNpcBotXpReductionGroupOnly();
         static uint8 GetNpcBotXpReductionExtraAmount();
         static uint8 GetNpcBotXpReductionExtraStartingNumber();
+        static bool IsNpcBotHonorReductionEnabled();
+        static bool IsNpcBotHonorReductionGroupOnly();
         static bool GetNpcBotMoneyShareEnabled();
         static bool GetNpcBotMoneyShareGroupOnly();
         static uint8 GetNpcBotMountLevel60();

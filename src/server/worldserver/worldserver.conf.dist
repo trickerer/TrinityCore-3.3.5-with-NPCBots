@@ -4284,6 +4284,17 @@ NpcBot.XpReduction.Extra.Amount         = 0
 NpcBot.XpReduction.Extra.StartingNumber = 2
 
 #
+#    NpcBot.HonorReduction.Enable
+#    NpcBot.HonorReduction.GroupOnly
+#        Description: Enable Blizzlike honor gain reduction when using bots counting
+#                     either all participating bots or in <GroupOnly>.
+#        Default:     0 - (NpcBot.HonorReduction.Enable)
+#                     0 - (NpcBot.HonorReduction.GroupOnly)
+
+NpcBot.HonorReduction.Enable    = 0
+NpcBot.HonorReduction.GroupOnly = 0
+
+#
 #    NpcBot.MoneyShare.Enable
 #    NpcBot.MoneyShare.GroupOnly
 #        Description: Share money loot with bots, effectively reducing money amount players receive.
