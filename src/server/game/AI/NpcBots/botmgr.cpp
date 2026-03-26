@@ -206,8 +206,7 @@ ItemLvlBrackets _botwanderer_itemlvl_level_brackets;
 std::vector<uint32> _disabled_instance_maps;
 std::vector<uint32> _enabled_wander_node_maps;
 
-bool __firstload = true;
-
+void AddSC_botmgr_scripts();
 void AddSC_death_knight_bot();
 void AddSC_druid_bot();
 void AddSC_hunter_bot();
@@ -246,6 +245,7 @@ void AddSC_botdatamgr_scripts();
 
 void AddNpcBotScripts()
 {
+    AddSC_botmgr_scripts();
     AddSC_death_knight_bot();
     AddSC_druid_bot();
     AddSC_hunter_bot();
@@ -283,6 +283,441 @@ void AddNpcBotScripts()
     AddSC_botdatamgr_scripts();
 }
 
+class NPCBotsConfigScript : public WorldScript
+{
+public:
+    NPCBotsConfigScript() : WorldScript("NPCBotsConfigScript") { }
+
+    void OnConfigLoad(bool reload) override
+    {
+        _initNpcbotsConfig(reload);
+    }
+
+    static void ReloadConfig()
+    {
+        TC_LOG_INFO("misc", "Re-Loading config settings...");
+        sWorld->LoadConfigSettings(true);
+        sMapMgr->InitializeVisibilityDistanceInfo();
+        TC_LOG_INFO("misc", "World config settings reloaded.");
+    }
+
+private:
+    static void _initNpcbotsConfig(bool reload)
+    {
+        _loadConfig(reload);
+
+        TC_LOG_INFO("server.loading", ">> NPCBots config {}.", reload ? "re-loaded" : "loaded");
+
+        if (_enableNpcBots)
+            TC_LOG_INFO("server.loading", ">> NPCBots system enabled");
+    }
+
+    static void _loadConfig(bool reload)
+    {
+        _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
+        _logToDB                        = sConfigMgr->GetBoolDefault("NpcBot.LogToDB", true);
+        _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
+        _maxAccountNpcBots              = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerAccount", 0);
+        _filterRaces                    = sConfigMgr->GetBoolDefault("NpcBot.Botgiver.FilterRaces", false);
+        _shared_ownership_options       = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.Options", 0);
+        _maxSharedOwners                = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.MaxOwners", 0);
+        _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
+        _xpReductionEnable              = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Enable", false);
+        _xpReductionGroupOnly           = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.GroupOnly", false);
+        _xpReductionExtraAmount         = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.Amount", 0);
+        _xpReductionExtraStartingNumber = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.StartingNumber", 2);
+        _honorReductionEnable           = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.Enable", false);
+        _honorReductionGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.GroupOnly", false);
+        _moneyLootShareEnable           = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.Enable", false);
+        _moneyLootShareGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.GroupOnly", false);
+        _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
+        _mountLevel100                  = sConfigMgr->GetIntDefault("NpcBot.MountLevel.100", 40);
+        _healTargetIconFlags            = sConfigMgr->GetIntDefault("NpcBot.HealTargetIconMask", 0);
+        _tankingTargetIconFlags         = sConfigMgr->GetIntDefault("NpcBot.TankTargetIconMask", 0);
+        _offTankingTargetIconFlags      = sConfigMgr->GetIntDefault("NpcBot.OffTankTargetIconMask", 0);
+        _dpsTargetIconFlags             = sConfigMgr->GetIntDefault("NpcBot.DPSTargetIconMask", 0);
+        _rangedDpsTargetIconFlags       = sConfigMgr->GetIntDefault("NpcBot.RangedDPSTargetIconMask", 0);
+        _noDpsTargetIconFlags           = sConfigMgr->GetIntDefault("NpcBot.NoDPSTargetIconMask", 0);
+        _mult_dmg_physical              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Physical", 1.0f);
+        _mult_dmg_spell                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Spell", 1.0f);
+        _mult_healing                   = sConfigMgr->GetFloatDefault("NpcBot.Mult.Healing", 1.0f);
+        _mult_hp                        = sConfigMgr->GetFloatDefault("NpcBot.Mult.HP", 1.0f);
+        _mult_dmg_wanderer              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Damage", 1.0f);
+        _mult_healing_wanderer          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Healing", 1.0f);
+        _mult_hp_wanderer               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.HP", 1.0f);
+        _mult_speed_wanderer            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Speed", 1.0f);
+        _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
+        _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
+        _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
+        _mult_dmg_rogue                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Rogue", 1.0f);
+        _mult_dmg_priest                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Priest", 1.0f);
+        _mult_dmg_deathknight           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DeathKnight", 1.0f);
+        _mult_dmg_shaman                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Shaman", 1.0f);
+        _mult_dmg_mage                  = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Mage", 1.0f);
+        _mult_dmg_warlock               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warlock", 1.0f);
+        _mult_dmg_druid                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Druid", 1.0f);
+        _mult_dmg_blademaster           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Blademaster", 1.0f);
+        _mult_dmg_obsidiandestroyer     = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.ObsidianDestroyer", 1.0f);
+        _mult_dmg_archmage              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Archmage", 1.0f);
+        _mult_dmg_dreadlord             = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Dreadlord", 1.0f);
+        _mult_dmg_spellbreaker          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SpellBreaker", 1.0f);
+        _mult_dmg_darkranger            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DarkRanger", 1.0f);
+        _mult_dmg_necromancer           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Necromancer", 1.0f);
+        _mult_dmg_seawitch              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SeaWitch", 1.0f);
+        _mult_dmg_cryptlord             = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.CryptLord", 1.0f);
+        _enableNpcBotsDungeons          = sConfigMgr->GetBoolDefault("NpcBot.Enable.Dungeon", true);
+        _enableNpcBotsRaids             = sConfigMgr->GetBoolDefault("NpcBot.Enable.Raid", false);
+        _enableNpcBotsBGs               = sConfigMgr->GetBoolDefault("NpcBot.Enable.BG", false);
+        _enableNpcBotsArenas            = sConfigMgr->GetBoolDefault("NpcBot.Enable.Arena", false);
+        _enableDungeonFinder            = sConfigMgr->GetBoolDefault("NpcBot.Enable.DungeonFinder", true);
+        _enableNpcBotsPremade           = sConfigMgr->GetBoolDefault("NpcBot.Premade.Enable", false);
+        _limitNpcBotsDungeons           = sConfigMgr->GetBoolDefault("NpcBot.Limit.Dungeon", true);
+        _limitNpcBotsRaids              = sConfigMgr->GetBoolDefault("NpcBot.Limit.Raid", true);
+        _hideSpawns                     = sConfigMgr->GetBoolDefault("NpcBot.HideSpawns", false);
+        _botInfoPacketsLimit            = sConfigMgr->GetIntDefault("NpcBot.InfoPacketsLimit", -1);
+        _npcBotsCostHire                = sConfigMgr->GetIntDefault("NpcBot.Cost.Hire", 1000000);
+        _npcBotsCostRent                = sConfigMgr->GetIntDefault("NpcBot.Cost.Rent", 0);
+        _npcBotUpdateDelayBase          = sConfigMgr->GetIntDefault("NpcBot.UpdateDelay.Base", 0);
+        _npcBotEngageDelayDPS_default   = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.DPS", 0);
+        _npcBotEngageDelayHeal_default  = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.Heal", 0);
+        _npcBotOwnerExpireTime          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireTime", 0);
+        _npcBotOwnerExpireMode          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireMode", 0);
+        _botPvP                         = sConfigMgr->GetBoolDefault("NpcBot.PvP", true);
+        _botMovementFoodInterrupt       = sConfigMgr->GetBoolDefault("NpcBot.Movements.InterruptFood", false);
+        _displayEquipment               = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.Enable", true);
+        _showCloak                      = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowCloak", true);
+        _showHelm                       = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowHelm", false);
+        _sendEquipListItems             = sConfigMgr->GetBoolDefault("NpcBot.Gossip.ShowEquipmentListItems", false);
+        _enableBotGearBank              = sConfigMgr->GetBoolDefault("NpcBot.GearBank.Enable", true);
+        _gearBankCapacity               = sConfigMgr->GetIntDefault("NpcBot.GearBank.Capacity", 40);
+        _gearBankEquipmentSetsCount     = sConfigMgr->GetIntDefault("NpcBot.GearBank.EquipmentSets", 0);
+        _transmog_enable                = sConfigMgr->GetBoolDefault("NpcBot.Transmog.Enable", false);
+        _transmog_mixArmorClasses       = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixArmorClasses", false);
+        _transmog_mixWeaponClasses      = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponClasses", false);
+        _transmog_mixWeaponInvTypes     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponInventoryTypes", false);
+        _transmog_useEquipmentSlots     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.UseEquipmentSlots", false);
+        _enableclass_warrior            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Warrior.Enable", true);
+        _enableclass_paladin            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Paladin.Enable", true);
+        _enableclass_hunter             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Hunter.Enable", true);
+        _enableclass_rogue              = sConfigMgr->GetBoolDefault("NpcBot.Classes.Rogue.Enable", true);
+        _enableclass_priest             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Priest.Enable", true);
+        _enableclass_deathknight        = sConfigMgr->GetBoolDefault("NpcBot.Classes.DeathKnight.Enable", true);
+        _enableclass_shaman             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Shaman.Enable", true);
+        _enableclass_mage               = sConfigMgr->GetBoolDefault("NpcBot.Classes.Mage.Enable", true);
+        _enableclass_warlock            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Warlock.Enable", true);
+        _enableclass_druid              = sConfigMgr->GetBoolDefault("NpcBot.Classes.Druid.Enable", true);
+        _enableclass_blademaster        = sConfigMgr->GetBoolDefault("NpcBot.Classes.Blademaster.Enable", false);
+        _enableclass_sphynx             = sConfigMgr->GetBoolDefault("NpcBot.Classes.ObsidianDestroyer.Enable", true);
+        _enableclass_archmage           = sConfigMgr->GetBoolDefault("NpcBot.Classes.Archmage.Enable", true);
+        _enableclass_dreadlord          = sConfigMgr->GetBoolDefault("NpcBot.Classes.Dreadlord.Enable", true);
+        _enableclass_spellbreaker       = sConfigMgr->GetBoolDefault("NpcBot.Classes.SpellBreaker.Enable", true);
+        _enableclass_darkranger         = sConfigMgr->GetBoolDefault("NpcBot.Classes.DarkRanger.Enable", true);
+        _enableclass_necromancer        = sConfigMgr->GetBoolDefault("NpcBot.Classes.Necromancer.Enable", true);
+        _enableclass_seawitch           = sConfigMgr->GetBoolDefault("NpcBot.Classes.SeaWitch.Enable", true);
+        _enableclass_cryptlord          = sConfigMgr->GetBoolDefault("NpcBot.Classes.CryptLord.Enable", true);
+        _enableclass_wander_warrior     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Warrior.Enable", true);
+        _enableclass_wander_paladin     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Paladin.Enable", true);
+        _enableclass_wander_hunter      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Hunter.Enable", true);
+        _enableclass_wander_rogue       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Rogue.Enable", true);
+        _enableclass_wander_priest      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Priest.Enable", true);
+        _enableclass_wander_deathknight = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.DeathKnight.Enable", true);
+        _enableclass_wander_shaman      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Shaman.Enable", true);
+        _enableclass_wander_mage        = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Mage.Enable", true);
+        _enableclass_wander_warlock     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Warlock.Enable", true);
+        _enableclass_wander_druid       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Druid.Enable", true);
+        _enableclass_wander_blademaster = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Blademaster.Enable", false);
+        _enableclass_wander_sphynx      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.ObsidianDestroyer.Enable", true);
+        _enableclass_wander_archmage    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Archmage.Enable", true);
+        _enableclass_wander_dreadlord   = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Dreadlord.Enable", true);
+        _enableclass_wander_spellbreaker= sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.SpellBreaker.Enable", true);
+        _enableclass_wander_darkranger  = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.DarkRanger.Enable", true);
+        _enableclass_wander_necromancer = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Necromancer.Enable", true);
+        _enableclass_wander_seawitch    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.SeaWitch.Enable", true);
+        _enableclass_wander_cryptlord   = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.CryptLord.Enable", true);
+        _untarget_wnpc_questgiver       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Questgiver", false);
+        _untarget_wnpc_flightmaster     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Flightmaster", false);
+        _enrageOnDismiss                = sConfigMgr->GetBoolDefault("NpcBot.EnrageOnDismiss", true);
+        _botStatLimits                  = sConfigMgr->GetBoolDefault("NpcBot.Stats.Limits.Enable", false);
+        _botStatLimits_dodge            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Dodge", 95.0f);
+        _botStatLimits_parry            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Parry", 95.0f);
+        _botStatLimits_block            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Block", 95.0f);
+        _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
+        _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
+        _killrewardWandererMoneyBase    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.Money", 0);
+        _killrewardWandererItemCount    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemCount", 0);
+        _killrewardWandererItemQuality  = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemQuality", int(ITEM_QUALITY_RARE));
+        _mult_xpgain_wanderer           = sConfigMgr->GetFloatDefault("NpcBot.WanderingBots.Continents.XPGain", 1.0f);
+        _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
+        _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
+        _enableConfigLevelCapBGFirst    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevelByFirstPlayer", false);
+        _targetBGPlayersPerTeamCount_AV = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV", 30);
+        _targetBGPlayersPerTeamCount_WS = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS", 8);
+        _targetBGPlayersPerTeamCount_AB = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB", 12);
+        _targetBGPlayersPerTeamCount_EY = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY", 12);
+        _targetBGPlayersPerTeamCount_SA = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA", 0);
+        _targetBGPlayersPerTeamCount_IC = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC", 0);
+        _bothk_enable                   = sConfigMgr->GetBoolDefault("NpcBot.HK.Enable", true);
+        _bothk_message_enable           = sConfigMgr->GetBoolDefault("NpcBot.HK.Message.Enable", false);
+        _bothk_achievements_enable      = sConfigMgr->GetBoolDefault("NpcBot.HK.Achievements.Enable", false);
+        _bothk_rate_honor               = sConfigMgr->GetFloatDefault("NpcBot.HK.Rate.Honor", 1.0);
+
+        if (reload)
+            BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0));
+
+        _max_npcbots = {};
+        std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");
+        std::vector<std::string_view> toks0 = Bcore::Tokenize(max_npcbots_by_levels, ',', false);
+        ASSERT(toks0.size() == BRACKETS_COUNT, "NpcBot.MaxBots must have exactly %u values", uint32(BRACKETS_COUNT));
+        for (decltype(toks0)::size_type i = 0; i != toks0.size(); ++i)
+        {
+            Optional<uint8> val = Bcore::StringTo<uint8>(toks0[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.MaxBots contains invalid uint8 value '{}', set to default", toks0[i]);
+            uint8 uval = val.value_or(uint8(0));
+            if (i > 0)
+            {
+                uint8 prev = _max_npcbots[i - 1];
+                if (prev > uval)
+                {
+                    BOT_LOG_WARN("server.loading", "NpcBot.MaxBots value at offset {} is {} which is lower than previous value {}!", uint32(i), uint32(uval), uint32(prev));
+                    //uval = prev;
+                }
+                if (uval >= MAX_RAID_SIZE)
+                {
+                    BOT_LOG_ERROR("server.loading", "NpcBot.MaxBots value at offset {} is {} > 39, enforcing max value!", uint32(i), uint32(uval));
+                    uval = uint8(MAX_RAID_SIZE - 1);
+                }
+            }
+            _max_npcbots[i] = uval;
+        }
+
+        _mult_dmg_levels.clear();
+        std::string mult_dps_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+        std::vector<std::string_view> toks1 = Bcore::Tokenize(mult_dps_by_levels, ',', false);
+        ASSERT(toks1.size() >= BRACKETS_COUNT, "NpcBot.Mult.Damage.Levels must have at least %u values", uint32(BRACKETS_COUNT));
+        for (decltype(toks1)::size_type i = 0; i != toks1.size(); ++i)
+        {
+            Optional<float> val = Bcore::StringTo<float>(toks1[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid float value '{}', set to default", toks1[i]);
+            float fval = val.value_or(1.0f);
+            RoundToInterval(fval, 0.1f, 10.f);
+            _mult_dmg_levels.push_back(fval);
+        }
+
+        _mult_heal_levels.clear();
+        std::string mult_healing_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Healing.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+        std::vector<std::string_view> toks5 = Bcore::Tokenize(mult_healing_by_levels, ',', false);
+        ASSERT(toks5.size() >= BRACKETS_COUNT, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BRACKETS_COUNT));
+        for (decltype(toks5)::size_type i = 0; i != toks5.size(); ++i)
+        {
+            Optional<float> val = Bcore::StringTo<float>(toks5[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.Mult.Healing.Levels contains invalid float value '{}', set to default", toks5[i]);
+            float fval = val.value_or(1.0f);
+            RoundToInterval(fval, 0.1f, 10.f);
+            _mult_heal_levels.push_back(fval);
+        }
+
+        _mult_hp_levels.clear();
+        std::string mult_hp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.HP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+        std::vector<std::string_view> toks6 = Bcore::Tokenize(mult_hp_by_levels, ',', false);
+        ASSERT(toks6.size() >= BRACKETS_COUNT, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
+        for (decltype(toks6)::size_type i = 0; i != toks6.size(); ++i)
+        {
+            Optional<float> val = Bcore::StringTo<float>(toks6[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.Mult.HP.Levels contains invalid float value '{}', set to default", toks6[i]);
+            float fval = val.value_or(1.0f);
+            RoundToInterval(fval, 0.1f, 10.f);
+            _mult_hp_levels.push_back(fval);
+        }
+
+        _mult_mp_levels.clear();
+        std::string mult_mp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.MP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+        std::vector<std::string_view> toks7 = Bcore::Tokenize(mult_mp_by_levels, ',', false);
+        ASSERT(toks7.size() >= BRACKETS_COUNT, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
+        for (decltype(toks7)::size_type i = 0; i != toks7.size(); ++i)
+        {
+            Optional<float> val = Bcore::StringTo<float>(toks7[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.Mult.MP.Levels contains invalid float value '{}', set to default", toks7[i]);
+            float fval = val.value_or(1.0f);
+            RoundToInterval(fval, 0.1f, 10.f);
+            _mult_mp_levels.push_back(fval);
+        }
+
+        _botwanderer_pct_level_brackets = {};
+        std::string wanderers_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Levels", "20,15,15,10,10,15,15,0,0");
+        std::vector<std::string_view> toks2 = Bcore::Tokenize(wanderers_by_levels, ',', false);
+        ASSERT(toks2.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.Continents.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
+        uint32 total_pct = 0;
+        for (decltype(toks2)::size_type i = 0; i != toks2.size(); ++i)
+        {
+            Optional<uint32> val = Bcore::StringTo<uint32>(toks2[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Levels contains invalid uint32 value '{}', set to default", toks2[i]);
+            uint32 uval = val.value_or(uint32(0));
+            total_pct += uval;
+            _botwanderer_pct_level_brackets[i] = uval;
+        }
+        ASSERT(total_pct == 100u, "NpcBot.WanderingBots.Continents.Levels sum of values must be exactly 100!");
+
+        _enabled_wander_node_maps.clear();
+        std::string enabled_wander_node_maps = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Maps", "0,1,530,571");
+        std::vector<std::string_view> toks3 = Bcore::Tokenize(enabled_wander_node_maps, ',', false);
+        for (decltype(toks3)::size_type i = 0; i != toks3.size(); ++i)
+        {
+            Optional<uint32> val = Bcore::StringTo<uint32>(toks3[i]);
+            if (val == std::nullopt)
+            {
+                BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps contains invalid uint32 value '{}', skipped", toks3[i]);
+                continue;
+            }
+            uint32 uval = val.value_or(uint32(0));
+            MapEntry const* mapEntry = sMapStore.LookupEntry(uval);
+            if (!mapEntry || !mapEntry->IsContinent())
+            {
+                BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps contains invalid continent map id '{}', skipped", uval);
+                continue;
+            }
+            _enabled_wander_node_maps.push_back(uval);
+        }
+        if (_enabled_wander_node_maps.empty())
+        {
+            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps does not provide any valid maps! Wandering bots will not be spawned!");
+            _desiredWanderingBotsCount = 0;
+        }
+
+        _disabled_instance_maps.clear();
+        std::string disabled_instance_maps = sConfigMgr->GetStringDefault("NpcBot.DisableInstances", "");
+        std::vector<std::string_view> toks4 = Bcore::Tokenize(disabled_instance_maps, ',', false);
+        for (decltype(toks4)::size_type i = 0; i != toks4.size(); ++i)
+        {
+            Optional<uint32> val = Bcore::StringTo<uint32>(toks4[i]);
+            if (val == std::nullopt)
+            {
+                BOT_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid uint32 value '{}', skipped", toks4[i]);
+                continue;
+            }
+            uint32 uval = val.value_or(uint32(0));
+            MapEntry const* mapEntry = sMapStore.LookupEntry(uval);
+            if (!mapEntry || !mapEntry->IsDungeon())
+            {
+                BOT_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid instance map id '{}', skipped", uval);
+                continue;
+            }
+            _disabled_instance_maps.push_back(uval);
+        }
+
+        _botwanderer_itemlvl_level_brackets = {};
+        std::string itemlevel_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.MaxItemLevel.Levels", "0,0,0,0,0,0,0,0,0");
+        std::vector<std::string_view> tok8 = Bcore::Tokenize(itemlevel_by_levels, ',', false);
+        ASSERT(tok8.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
+        for (decltype(tok8)::size_type i = 0; i != tok8.size(); ++i)
+        {
+            Optional<uint32> val = Bcore::StringTo<uint32>(tok8[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.MaxItemLevel.Levels contains invalid uint32 value '{}', set to default", tok8[i]);
+            uint32 uval = val.value_or(uint32(0));
+            _botwanderer_itemlvl_level_brackets[i] = uval;
+        }
+
+        //limits
+        _mountLevel100 = std::max<uint8>(_mountLevel100, _mountLevel60);
+        RoundToInterval(_mult_dmg_physical, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_spell, 0.1f, 10.f);
+        RoundToInterval(_mult_healing, 0.1f, 10.f);
+        RoundToInterval(_mult_hp, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_wanderer, 0.1f, 10.f);
+        RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
+        RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
+        RoundToInterval(_mult_speed_wanderer, 0.1f, 10.f);
+        RoundToInterval(_mult_xpgain_wanderer, 0.0f, 100.f);
+        RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_rogue, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_priest, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_deathknight, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_shaman, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_mage, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_warlock, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_druid, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_blademaster, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_obsidiandestroyer, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_archmage, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_dreadlord, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_spellbreaker, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_darkranger, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_necromancer, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_seawitch, 0.1f, 10.f);
+        RoundToInterval(_mult_dmg_cryptlord, 0.1f, 10.f);
+        RoundToInterval(_bothk_rate_honor, 0.1f, 10.f);
+        RoundToInterval(_killrewardWandererItemCount, uint32(0), uint32(MAX_NR_LOOT_ITEMS));
+        RoundToInterval(_killrewardWandererItemQuality, uint32(ITEM_QUALITY_POOR), uint32(ITEM_QUALITY_HEIRLOOM));
+        RoundToInterval(_maxSharedOwners, uint8(0), uint8(MAX_RAID_SIZE - 1));
+
+        if ((_shared_ownership_options | SHARED_OWNER_OPTION_MASK_ALL) != SHARED_OWNER_OPTION_MASK_ALL)
+        {
+            BOT_LOG_ERROR("server.loading", "NpcBot.SharedOwnershipOptions contains unknown values outside of full mask {}! Disabled.", SHARED_OWNER_OPTION_MASK_ALL);
+            _shared_ownership_options = 0;
+        }
+
+        _resolveConfigConflicts();
+    }
+
+    static void _resolveConfigConflicts()
+    {
+        if (_gearBankEquipmentSetsCount > MAX_BOT_EQUIPMENT_SETS)
+        {
+            BOT_LOG_ERROR("server.loading", "NpcBot.GearBank.EquipmentSets can't be greater than {}, reduced (was {})!", uint32(MAX_BOT_EQUIPMENT_SETS), _gearBankEquipmentSetsCount);
+            _gearBankEquipmentSetsCount = MAX_BOT_EQUIPMENT_SETS;
+        }
+
+        uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
+        if (uint8 interFlags = (_noDpsTargetIconFlags & dpsFlags))
+        {
+            _noDpsTargetIconFlags &= ~interFlags;
+            BOT_LOG_ERROR("server.loading", "NpcBot.NoDPSTargetIconMask intersects with dps targets flags {:#X}! Removed, new mask: {:#X}",
+                uint32(interFlags), uint32(_noDpsTargetIconFlags));
+        }
+
+        if (!_enabled_wander_node_maps.empty())
+        {
+            uint8 minbotlevel = DEFAULT_MAX_LEVEL;
+            uint8 maxbotlevel = 0;
+            for (uint32 mapid : _enabled_wander_node_maps)
+            {
+                minbotlevel = std::min<uint8>(minbotlevel, BotDataMgr::GetMinLevelForMapId(mapid));
+                maxbotlevel = std::max<uint8>(maxbotlevel, BotDataMgr::GetMaxLevelForMapId(mapid));
+            }
+            for (int8 j = minbotlevel / 10 - 1; j >= 0; --j)
+            {
+                if (_botwanderer_pct_level_brackets[j] > 0)
+                {
+                    uint32 pct = _botwanderer_pct_level_brackets[j];
+                    _botwanderer_pct_level_brackets[minbotlevel / 10] += pct;
+                    _botwanderer_pct_level_brackets[j] = 0;
+                    BOT_LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
+                        uint32(j ? j * 10 : 1), uint32(j * 10 + 9), pct, std::max<uint32>(minbotlevel / 10 * 10, 1), uint32(minbotlevel / 10 * 10 + 9));
+                }
+            }
+            for (uint8 i = maxbotlevel / 10 + 1; i < _botwanderer_pct_level_brackets.size(); ++i)
+            {
+                if (_botwanderer_pct_level_brackets[i] > 0)
+                {
+                    uint32 pct = _botwanderer_pct_level_brackets[i];
+                    _botwanderer_pct_level_brackets[maxbotlevel / 10] += pct;
+                    _botwanderer_pct_level_brackets[i] = 0;
+                    BOT_LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
+                        uint32(i ? i * 10 : 1), uint32(i * 10 + 9), pct, std::max<uint32>(maxbotlevel, 1), uint32(maxbotlevel + 9));
+                }
+            }
+        }
+    }
+};
+
 BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracker())
 {
     _quickrecall = false;
@@ -305,7 +740,6 @@ void BotMgr::LoadData()
 
 void BotMgr::Initialize()
 {
-    LoadConfig();
     BotLogger::Log(NPCBOT_LOG_SYSTEM_START, uint32(0), std::string_view{ TRINITY_FILEVERSION_STR }.substr(0, MAX_BOT_LOG_PARAM_LENGTH));
 
     BotDataMgr::LoadNpcBots();
@@ -317,421 +751,11 @@ void BotMgr::Initialize()
     BotDataMgr::LoadNpcBotGearSets();
     BotDataMgr::LoadNpcBotMgrData();
     BotDataMgr::DeleteOldLogs();
-
-    ResolveConfigConflicts();
 }
 
 void BotMgr::ReloadConfig()
 {
-    LoadConfig(true);
-}
-
-void BotMgr::LoadConfig(bool reload)
-{
-    if (__firstload)
-        __firstload = false;
-    else if (!reload)
-        return;
-
-    _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
-    _logToDB                        = sConfigMgr->GetBoolDefault("NpcBot.LogToDB", true);
-    _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
-    _maxAccountNpcBots              = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerAccount", 0);
-    _filterRaces                    = sConfigMgr->GetBoolDefault("NpcBot.Botgiver.FilterRaces", false);
-    _shared_ownership_options       = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.Options", 0);
-    _maxSharedOwners                = sConfigMgr->GetIntDefault("NpcBot.SharedOwnership.MaxOwners", 0);
-    _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
-    _xpReductionEnable              = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Enable", false);
-    _xpReductionGroupOnly           = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.GroupOnly", false);
-    _xpReductionExtraAmount         = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.Amount", 0);
-    _xpReductionExtraStartingNumber = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Extra.StartingNumber", 2);
-    _honorReductionEnable           = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.Enable", false);
-    _honorReductionGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.HonorReduction.GroupOnly", false);
-    _moneyLootShareEnable           = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.Enable", false);
-    _moneyLootShareGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.GroupOnly", false);
-    _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
-    _mountLevel100                  = sConfigMgr->GetIntDefault("NpcBot.MountLevel.100", 40);
-    _healTargetIconFlags            = sConfigMgr->GetIntDefault("NpcBot.HealTargetIconMask", 0);
-    _tankingTargetIconFlags         = sConfigMgr->GetIntDefault("NpcBot.TankTargetIconMask", 0);
-    _offTankingTargetIconFlags      = sConfigMgr->GetIntDefault("NpcBot.OffTankTargetIconMask", 0);
-    _dpsTargetIconFlags             = sConfigMgr->GetIntDefault("NpcBot.DPSTargetIconMask", 0);
-    _rangedDpsTargetIconFlags       = sConfigMgr->GetIntDefault("NpcBot.RangedDPSTargetIconMask", 0);
-    _noDpsTargetIconFlags           = sConfigMgr->GetIntDefault("NpcBot.NoDPSTargetIconMask", 0);
-    _mult_dmg_physical              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Physical", 1.0f);
-    _mult_dmg_spell                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Spell", 1.0f);
-    _mult_healing                   = sConfigMgr->GetFloatDefault("NpcBot.Mult.Healing", 1.0f);
-    _mult_hp                        = sConfigMgr->GetFloatDefault("NpcBot.Mult.HP", 1.0f);
-    _mult_dmg_wanderer              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Damage", 1.0f);
-    _mult_healing_wanderer          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Healing", 1.0f);
-    _mult_hp_wanderer               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.HP", 1.0f);
-    _mult_speed_wanderer            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Wanderer.Speed", 1.0f);
-    _mult_dmg_warrior               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warrior", 1.0f);
-    _mult_dmg_paladin               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Paladin", 1.0f);
-    _mult_dmg_hunter                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Hunter", 1.0f);
-    _mult_dmg_rogue                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Rogue", 1.0f);
-    _mult_dmg_priest                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Priest", 1.0f);
-    _mult_dmg_deathknight           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DeathKnight", 1.0f);
-    _mult_dmg_shaman                = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Shaman", 1.0f);
-    _mult_dmg_mage                  = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Mage", 1.0f);
-    _mult_dmg_warlock               = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Warlock", 1.0f);
-    _mult_dmg_druid                 = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Druid", 1.0f);
-    _mult_dmg_blademaster           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Blademaster", 1.0f);
-    _mult_dmg_obsidiandestroyer     = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.ObsidianDestroyer", 1.0f);
-    _mult_dmg_archmage              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Archmage", 1.0f);
-    _mult_dmg_dreadlord             = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Dreadlord", 1.0f);
-    _mult_dmg_spellbreaker          = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SpellBreaker", 1.0f);
-    _mult_dmg_darkranger            = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.DarkRanger", 1.0f);
-    _mult_dmg_necromancer           = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.Necromancer", 1.0f);
-    _mult_dmg_seawitch              = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.SeaWitch", 1.0f);
-    _mult_dmg_cryptlord             = sConfigMgr->GetFloatDefault("NpcBot.Mult.Damage.CryptLord", 1.0f);
-    _enableNpcBotsDungeons          = sConfigMgr->GetBoolDefault("NpcBot.Enable.Dungeon", true);
-    _enableNpcBotsRaids             = sConfigMgr->GetBoolDefault("NpcBot.Enable.Raid", false);
-    _enableNpcBotsBGs               = sConfigMgr->GetBoolDefault("NpcBot.Enable.BG", false);
-    _enableNpcBotsArenas            = sConfigMgr->GetBoolDefault("NpcBot.Enable.Arena", false);
-    _enableDungeonFinder            = sConfigMgr->GetBoolDefault("NpcBot.Enable.DungeonFinder", true);
-    _enableNpcBotsPremade           = sConfigMgr->GetBoolDefault("NpcBot.Premade.Enable", false);
-    _limitNpcBotsDungeons           = sConfigMgr->GetBoolDefault("NpcBot.Limit.Dungeon", true);
-    _limitNpcBotsRaids              = sConfigMgr->GetBoolDefault("NpcBot.Limit.Raid", true);
-    _hideSpawns                     = sConfigMgr->GetBoolDefault("NpcBot.HideSpawns", false);
-    _botInfoPacketsLimit            = sConfigMgr->GetIntDefault("NpcBot.InfoPacketsLimit", -1);
-    _npcBotsCostHire                = sConfigMgr->GetIntDefault("NpcBot.Cost.Hire", 1000000);
-    _npcBotsCostRent                = sConfigMgr->GetIntDefault("NpcBot.Cost.Rent", 0);
-    _npcBotUpdateDelayBase          = sConfigMgr->GetIntDefault("NpcBot.UpdateDelay.Base", 0);
-    _npcBotEngageDelayDPS_default   = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.DPS", 0);
-    _npcBotEngageDelayHeal_default  = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.Heal", 0);
-    _npcBotOwnerExpireTime          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireTime", 0);
-    _npcBotOwnerExpireMode          = sConfigMgr->GetIntDefault("NpcBot.OwnershipExpireMode", 0);
-    _botPvP                         = sConfigMgr->GetBoolDefault("NpcBot.PvP", true);
-    _botMovementFoodInterrupt       = sConfigMgr->GetBoolDefault("NpcBot.Movements.InterruptFood", false);
-    _displayEquipment               = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.Enable", true);
-    _showCloak                      = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowCloak", true);
-    _showHelm                       = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowHelm", false);
-    _sendEquipListItems             = sConfigMgr->GetBoolDefault("NpcBot.Gossip.ShowEquipmentListItems", false);
-    _enableBotGearBank              = sConfigMgr->GetBoolDefault("NpcBot.GearBank.Enable", true);
-    _gearBankCapacity               = sConfigMgr->GetIntDefault("NpcBot.GearBank.Capacity", 40);
-    _gearBankEquipmentSetsCount     = sConfigMgr->GetIntDefault("NpcBot.GearBank.EquipmentSets", 0);
-    _transmog_enable                = sConfigMgr->GetBoolDefault("NpcBot.Transmog.Enable", false);
-    _transmog_mixArmorClasses       = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixArmorClasses", false);
-    _transmog_mixWeaponClasses      = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponClasses", false);
-    _transmog_mixWeaponInvTypes     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponInventoryTypes", false);
-    _transmog_useEquipmentSlots     = sConfigMgr->GetBoolDefault("NpcBot.Transmog.UseEquipmentSlots", false);
-    _enableclass_warrior            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Warrior.Enable", true);
-    _enableclass_paladin            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Paladin.Enable", true);
-    _enableclass_hunter             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Hunter.Enable", true);
-    _enableclass_rogue              = sConfigMgr->GetBoolDefault("NpcBot.Classes.Rogue.Enable", true);
-    _enableclass_priest             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Priest.Enable", true);
-    _enableclass_deathknight        = sConfigMgr->GetBoolDefault("NpcBot.Classes.DeathKnight.Enable", true);
-    _enableclass_shaman             = sConfigMgr->GetBoolDefault("NpcBot.Classes.Shaman.Enable", true);
-    _enableclass_mage               = sConfigMgr->GetBoolDefault("NpcBot.Classes.Mage.Enable", true);
-    _enableclass_warlock            = sConfigMgr->GetBoolDefault("NpcBot.Classes.Warlock.Enable", true);
-    _enableclass_druid              = sConfigMgr->GetBoolDefault("NpcBot.Classes.Druid.Enable", true);
-    _enableclass_blademaster        = sConfigMgr->GetBoolDefault("NpcBot.Classes.Blademaster.Enable", false);
-    _enableclass_sphynx             = sConfigMgr->GetBoolDefault("NpcBot.Classes.ObsidianDestroyer.Enable", true);
-    _enableclass_archmage           = sConfigMgr->GetBoolDefault("NpcBot.Classes.Archmage.Enable", true);
-    _enableclass_dreadlord          = sConfigMgr->GetBoolDefault("NpcBot.Classes.Dreadlord.Enable", true);
-    _enableclass_spellbreaker       = sConfigMgr->GetBoolDefault("NpcBot.Classes.SpellBreaker.Enable", true);
-    _enableclass_darkranger         = sConfigMgr->GetBoolDefault("NpcBot.Classes.DarkRanger.Enable", true);
-    _enableclass_necromancer        = sConfigMgr->GetBoolDefault("NpcBot.Classes.Necromancer.Enable", true);
-    _enableclass_seawitch           = sConfigMgr->GetBoolDefault("NpcBot.Classes.SeaWitch.Enable", true);
-    _enableclass_cryptlord          = sConfigMgr->GetBoolDefault("NpcBot.Classes.CryptLord.Enable", true);
-    _enableclass_wander_warrior     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Warrior.Enable", true);
-    _enableclass_wander_paladin     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Paladin.Enable", true);
-    _enableclass_wander_hunter      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Hunter.Enable", true);
-    _enableclass_wander_rogue       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Rogue.Enable", true);
-    _enableclass_wander_priest      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Priest.Enable", true);
-    _enableclass_wander_deathknight = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.DeathKnight.Enable", true);
-    _enableclass_wander_shaman      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Shaman.Enable", true);
-    _enableclass_wander_mage        = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Mage.Enable", true);
-    _enableclass_wander_warlock     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Warlock.Enable", true);
-    _enableclass_wander_druid       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Druid.Enable", true);
-    _enableclass_wander_blademaster = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Blademaster.Enable", false);
-    _enableclass_wander_sphynx      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.ObsidianDestroyer.Enable", true);
-    _enableclass_wander_archmage    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Archmage.Enable", true);
-    _enableclass_wander_dreadlord   = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Dreadlord.Enable", true);
-    _enableclass_wander_spellbreaker= sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.SpellBreaker.Enable", true);
-    _enableclass_wander_darkranger  = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.DarkRanger.Enable", true);
-    _enableclass_wander_necromancer = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Necromancer.Enable", true);
-    _enableclass_wander_seawitch    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.SeaWitch.Enable", true);
-    _enableclass_wander_cryptlord   = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.CryptLord.Enable", true);
-    _untarget_wnpc_questgiver       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Questgiver", false);
-    _untarget_wnpc_flightmaster     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Flightmaster", false);
-    _enrageOnDismiss                = sConfigMgr->GetBoolDefault("NpcBot.EnrageOnDismiss", true);
-    _botStatLimits                  = sConfigMgr->GetBoolDefault("NpcBot.Stats.Limits.Enable", false);
-    _botStatLimits_dodge            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Dodge", 95.0f);
-    _botStatLimits_parry            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Parry", 95.0f);
-    _botStatLimits_block            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Block", 95.0f);
-    _botStatLimits_crit             = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Crit", 95.0f);
-    _desiredWanderingBotsCount      = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.Continents.Count", 0);
-    _killrewardWandererMoneyBase    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.Money", 0);
-    _killrewardWandererItemCount    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemCount", 0);
-    _killrewardWandererItemQuality  = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemQuality", int(ITEM_QUALITY_RARE));
-    _mult_xpgain_wanderer           = sConfigMgr->GetFloatDefault("NpcBot.WanderingBots.Continents.XPGain", 1.0f);
-    _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
-    _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
-    _enableConfigLevelCapBGFirst    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevelByFirstPlayer", false);
-    _targetBGPlayersPerTeamCount_AV = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV", 30);
-    _targetBGPlayersPerTeamCount_WS = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS", 8);
-    _targetBGPlayersPerTeamCount_AB = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB", 12);
-    _targetBGPlayersPerTeamCount_EY = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY", 12);
-    _targetBGPlayersPerTeamCount_SA = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA", 0);
-    _targetBGPlayersPerTeamCount_IC = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC", 0);
-    _bothk_enable                   = sConfigMgr->GetBoolDefault("NpcBot.HK.Enable", true);
-    _bothk_message_enable           = sConfigMgr->GetBoolDefault("NpcBot.HK.Message.Enable", false);
-    _bothk_achievements_enable      = sConfigMgr->GetBoolDefault("NpcBot.HK.Achievements.Enable", false);
-    _bothk_rate_honor               = sConfigMgr->GetFloatDefault("NpcBot.HK.Rate.Honor", 1.0);
-
-    if (reload)
-        BotLogger::Log(NPCBOT_LOG_CONFIG_RELOAD, uint32(0));
-
-    _max_npcbots = {};
-    std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");
-    std::vector<std::string_view> toks0 = Bcore::Tokenize(max_npcbots_by_levels, ',', false);
-    ASSERT(toks0.size() == BRACKETS_COUNT, "NpcBot.MaxBots must have exactly %u values", uint32(BRACKETS_COUNT));
-    for (decltype(toks0)::size_type i = 0; i != toks0.size(); ++i)
-    {
-        Optional<uint8> val = Bcore::StringTo<uint8>(toks0[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.MaxBots contains invalid uint8 value '{}', set to default", toks0[i]);
-        uint8 uval = val.value_or(uint8(0));
-        if (i > 0)
-        {
-            uint8 prev = _max_npcbots[i - 1];
-            if (prev > uval)
-            {
-                BOT_LOG_WARN("server.loading", "NpcBot.MaxBots value at offset {} is {} which is lower than previous value {}!", uint32(i), uint32(uval), uint32(prev));
-                //uval = prev;
-            }
-            if (uval >= MAX_RAID_SIZE)
-            {
-                BOT_LOG_ERROR("server.loading", "NpcBot.MaxBots value at offset {} is {} > 39, enforcing max value!", uint32(i), uint32(uval));
-                uval = uint8(MAX_RAID_SIZE - 1);
-            }
-        }
-        _max_npcbots[i] = uval;
-    }
-
-    _mult_dmg_levels.clear();
-    std::string mult_dps_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
-    std::vector<std::string_view> toks1 = Bcore::Tokenize(mult_dps_by_levels, ',', false);
-    ASSERT(toks1.size() >= BRACKETS_COUNT, "NpcBot.Mult.Damage.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-    for (decltype(toks1)::size_type i = 0; i != toks1.size(); ++i)
-    {
-        Optional<float> val = Bcore::StringTo<float>(toks1[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid float value '{}', set to default", toks1[i]);
-        float fval = val.value_or(1.0f);
-        RoundToInterval(fval, 0.1f, 10.f);
-        _mult_dmg_levels.push_back(fval);
-    }
-
-    _mult_heal_levels.clear();
-    std::string mult_healing_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Healing.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
-    std::vector<std::string_view> toks5 = Bcore::Tokenize(mult_healing_by_levels, ',', false);
-    ASSERT(toks5.size() >= BRACKETS_COUNT, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-    for (decltype(toks5)::size_type i = 0; i != toks5.size(); ++i)
-    {
-        Optional<float> val = Bcore::StringTo<float>(toks5[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.Mult.Healing.Levels contains invalid float value '{}', set to default", toks5[i]);
-        float fval = val.value_or(1.0f);
-        RoundToInterval(fval, 0.1f, 10.f);
-        _mult_heal_levels.push_back(fval);
-    }
-
-    _mult_hp_levels.clear();
-    std::string mult_hp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.HP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
-    std::vector<std::string_view> toks6 = Bcore::Tokenize(mult_hp_by_levels, ',', false);
-    ASSERT(toks6.size() >= BRACKETS_COUNT, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-    for (decltype(toks6)::size_type i = 0; i != toks6.size(); ++i)
-    {
-        Optional<float> val = Bcore::StringTo<float>(toks6[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.Mult.HP.Levels contains invalid float value '{}', set to default", toks6[i]);
-        float fval = val.value_or(1.0f);
-        RoundToInterval(fval, 0.1f, 10.f);
-        _mult_hp_levels.push_back(fval);
-    }
-
-    _mult_mp_levels.clear();
-    std::string mult_mp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.MP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
-    std::vector<std::string_view> toks7 = Bcore::Tokenize(mult_mp_by_levels, ',', false);
-    ASSERT(toks7.size() >= BRACKETS_COUNT, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-    for (decltype(toks7)::size_type i = 0; i != toks7.size(); ++i)
-    {
-        Optional<float> val = Bcore::StringTo<float>(toks7[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.Mult.MP.Levels contains invalid float value '{}', set to default", toks7[i]);
-        float fval = val.value_or(1.0f);
-        RoundToInterval(fval, 0.1f, 10.f);
-        _mult_mp_levels.push_back(fval);
-    }
-
-    _botwanderer_pct_level_brackets = {};
-    std::string wanderers_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Levels", "20,15,15,10,10,15,15,0,0");
-    std::vector<std::string_view> toks2 = Bcore::Tokenize(wanderers_by_levels, ',', false);
-    ASSERT(toks2.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.Continents.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
-    uint32 total_pct = 0;
-    for (decltype(toks2)::size_type i = 0; i != toks2.size(); ++i)
-    {
-        Optional<uint32> val = Bcore::StringTo<uint32>(toks2[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Levels contains invalid uint32 value '{}', set to default", toks2[i]);
-        uint32 uval = val.value_or(uint32(0));
-        total_pct += uval;
-        _botwanderer_pct_level_brackets[i] = uval;
-    }
-    ASSERT(total_pct == 100u, "NpcBot.WanderingBots.Continents.Levels sum of values must be exactly 100!");
-
-    _enabled_wander_node_maps.clear();
-    std::string enabled_wander_node_maps = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Maps", "0,1,530,571");
-    std::vector<std::string_view> toks3 = Bcore::Tokenize(enabled_wander_node_maps, ',', false);
-    for (decltype(toks3)::size_type i = 0; i != toks3.size(); ++i)
-    {
-        Optional<uint32> val = Bcore::StringTo<uint32>(toks3[i]);
-        if (val == std::nullopt)
-        {
-            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps contains invalid uint32 value '{}', skipped", toks3[i]);
-            continue;
-        }
-        uint32 uval = val.value_or(uint32(0));
-        MapEntry const* mapEntry = sMapStore.LookupEntry(uval);
-        if (!mapEntry || !mapEntry->IsContinent())
-        {
-            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps contains invalid continent map id '{}', skipped", uval);
-            continue;
-        }
-        _enabled_wander_node_maps.push_back(uval);
-    }
-    if (_enabled_wander_node_maps.empty())
-    {
-        BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Maps does not provide any valid maps! Wandering bots will not be spawned!");
-        _desiredWanderingBotsCount = 0;
-    }
-
-    _disabled_instance_maps.clear();
-    std::string disabled_instance_maps = sConfigMgr->GetStringDefault("NpcBot.DisableInstances", "");
-    std::vector<std::string_view> toks4 = Bcore::Tokenize(disabled_instance_maps, ',', false);
-    for (decltype(toks4)::size_type i = 0; i != toks4.size(); ++i)
-    {
-        Optional<uint32> val = Bcore::StringTo<uint32>(toks4[i]);
-        if (val == std::nullopt)
-        {
-            BOT_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid uint32 value '{}', skipped", toks4[i]);
-            continue;
-        }
-        uint32 uval = val.value_or(uint32(0));
-        MapEntry const* mapEntry = sMapStore.LookupEntry(uval);
-        if (!mapEntry || !mapEntry->IsDungeon())
-        {
-            BOT_LOG_ERROR("server.loading", "NpcBot.DisableInstances contains invalid instance map id '{}', skipped", uval);
-            continue;
-        }
-        _disabled_instance_maps.push_back(uval);
-    }
-
-    _botwanderer_itemlvl_level_brackets = {};
-    std::string itemlevel_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.MaxItemLevel.Levels", "0,0,0,0,0,0,0,0,0");
-    std::vector<std::string_view> tok8 = Bcore::Tokenize(itemlevel_by_levels, ',', false);
-    ASSERT(tok8.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
-    for (decltype(tok8)::size_type i = 0; i != tok8.size(); ++i)
-    {
-        Optional<uint32> val = Bcore::StringTo<uint32>(tok8[i]);
-        if (val == std::nullopt)
-            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.MaxItemLevel.Levels contains invalid uint32 value '{}', set to default", tok8[i]);
-        uint32 uval = val.value_or(uint32(0));
-        _botwanderer_itemlvl_level_brackets[i] = uval;
-    }
-
-    //limits
-    _mountLevel100 = std::max<uint8>(_mountLevel100, _mountLevel60);
-    RoundToInterval(_mult_dmg_physical, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_spell, 0.1f, 10.f);
-    RoundToInterval(_mult_healing, 0.1f, 10.f);
-    RoundToInterval(_mult_hp, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_wanderer, 0.1f, 10.f);
-    RoundToInterval(_mult_healing_wanderer, 0.1f, 10.f);
-    RoundToInterval(_mult_hp_wanderer, 0.1f, 10.f);
-    RoundToInterval(_mult_speed_wanderer, 0.1f, 10.f);
-    RoundToInterval(_mult_xpgain_wanderer, 0.0f, 100.f);
-    RoundToInterval(_mult_dmg_warrior, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_paladin, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_hunter, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_rogue, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_priest, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_deathknight, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_shaman, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_mage, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_warlock, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_druid, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_blademaster, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_obsidiandestroyer, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_archmage, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_dreadlord, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_spellbreaker, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_darkranger, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_necromancer, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_seawitch, 0.1f, 10.f);
-    RoundToInterval(_mult_dmg_cryptlord, 0.1f, 10.f);
-    RoundToInterval(_bothk_rate_honor, 0.1f, 10.f);
-    RoundToInterval(_killrewardWandererItemCount, uint32(0), uint32(MAX_NR_LOOT_ITEMS));
-    RoundToInterval(_killrewardWandererItemQuality, uint32(ITEM_QUALITY_POOR), uint32(ITEM_QUALITY_HEIRLOOM));
-    RoundToInterval(_maxSharedOwners, uint8(0), uint8(MAX_RAID_SIZE - 1));
-
-    if ((_shared_ownership_options | SHARED_OWNER_OPTION_MASK_ALL) != SHARED_OWNER_OPTION_MASK_ALL)
-    {
-        BOT_LOG_ERROR("server.loading", "NpcBot.SharedOwnershipOptions contains unknown values outside of full mask {}! Disabled.", SHARED_OWNER_OPTION_MASK_ALL);
-        _shared_ownership_options = 0;
-    }
-}
-
-void BotMgr::ResolveConfigConflicts()
-{
-    if (_gearBankEquipmentSetsCount > MAX_BOT_EQUIPMENT_SETS)
-    {
-        BOT_LOG_ERROR("server.loading", "NpcBot.GearBank.EquipmentSets can't be greater than {}, reduced (was {})!", uint32(MAX_BOT_EQUIPMENT_SETS), _gearBankEquipmentSetsCount);
-        _gearBankEquipmentSetsCount = MAX_BOT_EQUIPMENT_SETS;
-    }
-
-    uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
-    if (uint8 interFlags = (_noDpsTargetIconFlags & dpsFlags))
-    {
-        _noDpsTargetIconFlags &= ~interFlags;
-        BOT_LOG_ERROR("server.loading", "NpcBot.NoDPSTargetIconMask intersects with dps targets flags {:#X}! Removed, new mask: {:#X}",
-            uint32(interFlags), uint32(_noDpsTargetIconFlags));
-    }
-
-    if (!_enabled_wander_node_maps.empty())
-    {
-        uint8 minbotlevel = DEFAULT_MAX_LEVEL;
-        uint8 maxbotlevel = 0;
-        for (uint32 mapid : _enabled_wander_node_maps)
-        {
-            minbotlevel = std::min<uint8>(minbotlevel, BotDataMgr::GetMinLevelForMapId(mapid));
-            maxbotlevel = std::max<uint8>(maxbotlevel, BotDataMgr::GetMaxLevelForMapId(mapid));
-        }
-        for (int8 j = minbotlevel / 10 - 1; j >= 0; --j)
-        {
-            if (_botwanderer_pct_level_brackets[j] > 0)
-            {
-                uint32 pct = _botwanderer_pct_level_brackets[j];
-                _botwanderer_pct_level_brackets[minbotlevel / 10] += pct;
-                _botwanderer_pct_level_brackets[j] = 0;
-                BOT_LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
-                    uint32(j ? j * 10 : 1), uint32(j * 10 + 9), pct, std::max<uint32>(minbotlevel / 10 * 10, 1), uint32(minbotlevel / 10 * 10 + 9));
-            }
-        }
-        for (uint8 i = maxbotlevel / 10 + 1; i < _botwanderer_pct_level_brackets.size(); ++i)
-        {
-            if (_botwanderer_pct_level_brackets[i] > 0)
-            {
-                uint32 pct = _botwanderer_pct_level_brackets[i];
-                _botwanderer_pct_level_brackets[maxbotlevel / 10] += pct;
-                _botwanderer_pct_level_brackets[i] = 0;
-                BOT_LOG_WARN("server.loading", "NpcBot.WanderingBots.Continents.Levels conflicts with NpcBot.WanderingBots.Continents.Maps: no map for levels {}-{}! Transferring extra {}% to levels {}-{}",
-                    uint32(i ? i * 10 : 1), uint32(i * 10 + 9), pct, std::max<uint32>(maxbotlevel, 1), uint32(maxbotlevel + 9));
-            }
-        }
-    }
+    NPCBotsConfigScript::ReloadConfig();
 }
 
 uint8 BotMgr::GetNpcBotsCount() const
@@ -3445,6 +3469,11 @@ void BotMgr::HandleDelayedTeleports()
     for (auto& func : delayed_bot_teleports)
         func();
     delayed_bot_teleports.clear();
+}
+
+void AddSC_botmgr_scripts()
+{
+    new NPCBotsConfigScript();
 }
 
 #ifdef _MSC_VER

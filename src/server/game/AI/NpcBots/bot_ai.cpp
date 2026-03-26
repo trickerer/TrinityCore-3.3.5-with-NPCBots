@@ -11402,15 +11402,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 case 9: //reload config
                 {
                     close = false;
-                    ChatHandler ch(player->GetSession());
-
-                    BOT_LOG_INFO("misc", "Re-Loading config settings...");
-                    sWorld->LoadConfigSettings(true);
-                    sMapMgr->InitializeVisibilityDistanceInfo();
-                    ch.SendGlobalGMSysMessage("World config settings reloaded.");
                     BotMgr::ReloadConfig();
-                    ch.SendGlobalGMSysMessage("NpcBot config settings reloaded.");
-
                     break;
                 }
                 default:
