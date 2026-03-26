@@ -2537,7 +2537,7 @@ public:
 /*misc*/uint32 _myaura;
 /*misc*/int32 _sacDamage;
 
-        typedef std::unordered_map<uint32 /*baseId*/, int32 /*amount*/> HealMap;
+        using HealMap = std::unordered_map<uint32 /*baseId*/, int32 /*amount*/>;
         HealMap _heals;
 
         //uint32 _getBlessingsMask(Unit const*) const

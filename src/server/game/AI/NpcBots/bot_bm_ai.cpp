@@ -82,7 +82,6 @@ public:
                 ObjectGuid _targetGuid;
                 bool _windwalk;
                 CalcDamageInfo* _dinfo;
-                DelayedMeleeDamageEvent(DelayedMeleeDamageEvent const&);
         };
 
         class EventTerminateEvent : public BasicEvent
@@ -99,7 +98,6 @@ public:
 
             private:
                 Creature* _bot;
-                EventTerminateEvent(EventTerminateEvent const&);
         };
 
         class IllusionUnsummonEvent : public BasicEvent
@@ -117,7 +115,6 @@ public:
 
             private:
                 Creature const* _bot;
-                IllusionUnsummonEvent(IllusionUnsummonEvent const&);
         };
 
         class DelayedIllusionSummonEvent : public BasicEvent
@@ -135,7 +132,6 @@ public:
 
             private:
                 Creature const* _bot;
-                DelayedIllusionSummonEvent(DelayedIllusionSummonEvent const&);
         };
 
         class DisappearEvent : public BasicEvent
@@ -153,7 +149,6 @@ public:
 
             private:
                 Creature* _bot;
-                DisappearEvent(DisappearEvent const&);
         };
 
         void _calcIllusionPositions()
@@ -926,7 +921,7 @@ public:
 
     private:
         DelayedMeleeDamageEvent* _dmdevent;
-        typedef std::set<Creature*> Summons;
+        using Summons = std::set<Creature*>;
         Summons _minions;
         Position _illusPos[MAX_ILLUSION_POSITIONS];
         ObjectGuid _summonerGUID;

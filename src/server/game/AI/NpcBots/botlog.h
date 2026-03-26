@@ -7,7 +7,7 @@
 
 class Creature;
 
-constexpr uint32 BOT_LOG_KEEP_DAYS = 30;
+inline constexpr uint32 BOT_LOG_KEEP_DAYS = 30;
 
 enum BotLogType : uint16
 {
@@ -27,9 +27,9 @@ enum BotLogType : uint16
 
 class BotLogger
 {
-    public:
-        static void Log(uint16 log_type, Creature const* bot, NPCBots::LoggableArguments auto&&... params);
-        static void Log(uint16 log_type, uint32 entry, NPCBots::LoggableArguments auto&&... params);
+public:
+    static void Log(uint16 log_type, Creature const* bot, NPCBots::LoggableArguments auto&&... params);
+    static void Log(uint16 log_type, uint32 entry, NPCBots::LoggableArguments auto&&... params);
 };
 
 #endif //BOTLOG_H_

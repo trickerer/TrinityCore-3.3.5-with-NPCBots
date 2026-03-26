@@ -747,7 +747,7 @@ public:
             return &Seawitch_spells_support;
         }
     private:
-        typedef std::set<Creature*> Summons;
+        using Summons = std::set<Creature*>;
         Summons _minions;
 
         bool _spell_preact{};

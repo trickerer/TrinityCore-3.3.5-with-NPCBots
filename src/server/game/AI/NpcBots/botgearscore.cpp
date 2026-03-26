@@ -10,7 +10,7 @@
 # pragma warning(push, 4)
 #endif
 
-constexpr float GS_scale = 1.8618f;
+static constexpr float GS_scale = 1.8618f;
 
 static const std::map<uint32, float> ItemSlotMods = {
     { INVTYPE_HEAD, 1.0f },
@@ -38,7 +38,7 @@ static const std::map<uint32, float> ItemSlotMods = {
     { INVTYPE_RELIC, 0.3164f }
 };
 
-constexpr std::pair<float, float> ItemLevelFactors[2][5] = {
+static constexpr std::pair<float, float> ItemLevelFactors[2][5] = {
     {
         { 0.0f,    1.0f },
         { 0.0f,    1.0f },

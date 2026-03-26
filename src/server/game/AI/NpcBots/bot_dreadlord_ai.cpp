@@ -99,7 +99,6 @@ public:
             private:
                 Creature const* _bot;
                 Position const* _pos;
-                DelayedPetSpawnEvent(DelayedPetSpawnEvent const&);
         };
 
     public:

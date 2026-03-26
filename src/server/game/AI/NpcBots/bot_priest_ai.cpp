@@ -2012,7 +2012,7 @@ public:
         uint32 Shackle_Timer, Mend_Timer, DispelcheckTimer, DevcheckTimer, ShackcheckTimer;
 /*Misc*/bool Devcheck, Shackcheck;
 
-        typedef std::unordered_map<uint32 /*baseId*/, int32 /*amount*/> HealMap;
+        using HealMap = std::unordered_map<uint32 /*baseId*/, int32 /*amount*/>;
         HealMap _heals;
     };
 };

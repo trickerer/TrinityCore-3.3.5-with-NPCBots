@@ -588,7 +588,7 @@ public:
         //}
     private:
         ObjectGuid _blackArrowKillGUID;
-        typedef std::set<Creature*> Summons;
+        using Summons = std::set<Creature*>;
         Summons _minions;
     };
 };

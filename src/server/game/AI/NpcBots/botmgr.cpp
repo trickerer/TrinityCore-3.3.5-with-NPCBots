@@ -1741,7 +1741,7 @@ void BotMgr::TrackDamage(Unit const* u, uint32 damage)
 
 uint32 BotMgr::GetDPSTaken(Unit const* u) const
 {
-    return _dpstracker->GetDPSTaken(u->GetGUID().GetRawValue());
+    return _dpstracker->GetDPSTaken(u->GetGUID());
 }
 
 int32 BotMgr::GetHPSTaken(Unit const* unit) const

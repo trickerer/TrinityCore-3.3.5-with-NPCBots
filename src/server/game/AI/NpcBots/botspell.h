@@ -1,5 +1,5 @@
-#ifndef _BOTSPELL_H
-#define _BOTSPELL_H
+#ifndef BOTSPELL_H
+#define BOTSPELL_H
 
 #include "Define.h"
 
@@ -304,7 +304,7 @@ enum BotMountSpells : uint32
     BOT_MOUNT_FLY_HORDE_280_2           = 32295,
     BOT_MOUNT_FLY_HORDE_280_3           = 32296
 };
-constexpr std::size_t NUM_MOUNTS_PER_SPEED = 3;
+inline constexpr std::size_t NUM_MOUNTS_PER_SPEED = 3;
 
 enum BotItemUseSpellTargeting : uint8
 {
@@ -319,4 +319,4 @@ SpellInfo const* AssertBotSpellInfoOverride(uint32 spellId);
 SpellProcEntry const* GetBotSpellProceEntryOverride(uint32 spellId);
 void GenerateBotCustomSpells();
 
-#endif //_BOTSPELL_H
+#endif //BOTSPELL_H

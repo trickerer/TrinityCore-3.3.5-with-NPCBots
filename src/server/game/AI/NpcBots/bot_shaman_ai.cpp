@@ -26,8 +26,8 @@ Unsummon elemental totems if Elementals are killed
 Aura application bug for bot in other subgroup, maybe caused by creatorGUID mismatch
 */
 
-constexpr uint8 MAX_WOLVES = 2;
-constexpr uint8 MAX_TOTEMS = 4;
+static constexpr uint8 MAX_WOLVES = 2;
+static constexpr uint8 MAX_TOTEMS = 4;
 
 enum ShamanBaseSpells
 {
@@ -2759,7 +2759,7 @@ public:
             float _effradius;
         };
 
-        typedef std::pair<ObjectGuid /*guid*/, BotTotemParam /*param*/> BotTotem;
+        using BotTotem = std::pair<ObjectGuid /*guid*/, BotTotemParam /*param*/>;
         BotTotem _totems[MAX_TOTEMS];
         uint32 TotemTimer[MAX_TOTEMS];
         //Wolves
@@ -2778,7 +2778,7 @@ public:
 
         bool canTremor;
 
-        typedef std::unordered_map<uint32 /*baseId*/, int32 /*amount*/> HealMap;
+        using HealMap = std::unordered_map<uint32 /*baseId*/, int32 /*amount*/>;
         HealMap _heals;
 
         uint32 _getTotemsMask(std::map<uint32 /*type*/, uint32 /*curId*/>& idMap) const

@@ -5,7 +5,6 @@
 
 #include <utility>
 
-class Creature;
 class Item;
 
 struct ItemTemplate;

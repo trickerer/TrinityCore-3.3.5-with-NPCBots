@@ -1,5 +1,5 @@
-#ifndef _BOTDATAMGR_H
-#define _BOTDATAMGR_H
+#ifndef BOTDATAMGR_H
+#define BOTDATAMGR_H
 
 #include "botcommon.h"
 #include "DatabaseEnvFwd.h"
@@ -28,8 +28,8 @@ struct PvPDifficultyEntry;
 
 enum LocaleConstant : uint8;
 
-constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
-constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
+inline constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
+inline constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
 
 struct NpcBotMgrData
 {
@@ -181,105 +181,101 @@ public:
     std::array<uint32, BOT_INVENTORY_SIZE> items;
 };
 
-typedef std::set<Creature const*> NpcBotRegistry;
+using NpcBotRegistry = std::set<Creature const*>;
 
 struct BotBankItemCompare{ bool operator()(Item const* item1, Item const* item2) const; };
-typedef std::multiset<Item*, BotBankItemCompare> BotBankItemContainer;
+using BotBankItemContainer = std::multiset<Item*, BotBankItemCompare>;
 
-constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
-constexpr uint8 LEVEL_STEPS = DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1;
-typedef std::vector<uint32> ItemIdVector;
-typedef std::array<NpcBotItemSet, MAX_BOT_EQUIPMENT_SETS> BotItemSetsArray;
-typedef std::array<ItemIdVector, LEVEL_STEPS> ItemLeveledArr;
-typedef std::array<ItemLeveledArr, BOT_INVENTORY_SIZE> ItemPerSlot;
-typedef std::array<ItemPerSlot, BOT_CLASS_END> ItemPerBotClassMap;
+inline constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
+inline constexpr uint8 LEVEL_STEPS = DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1;
+using ItemIdVector = std::vector<uint32>;
+using BotItemSetsArray = std::array<NpcBotItemSet, MAX_BOT_EQUIPMENT_SETS>;
+using ItemLeveledArr = std::array<ItemIdVector, LEVEL_STEPS>;
+using ItemPerSlot = std::array<ItemLeveledArr, BOT_INVENTORY_SIZE>;
+using ItemPerBotClassMap = std::array<ItemPerSlot, BOT_CLASS_END>;
 
 class BotDataMgr
 {
-    public:
-        static void Update(uint32 diff);
+public:
+    static void Update(uint32 diff);
 
-        static void LoadNpcBots(bool spawn = true);
-        static void LoadNpcBotGroupData();
-        static void LoadNpcBotGearStorage();
-        static void LoadNpcBotGearSets();
+    static void LoadNpcBots(bool spawn = true);
+    static void LoadNpcBotGroupData();
+    static void LoadNpcBotGearStorage();
+    static void LoadNpcBotGearSets();
 
-        static void LoadNpcBotMgrData();
+    static void LoadNpcBotMgrData();
 
-        static void DeleteOldLogs();
+    static void DeleteOldLogs();
 
-        static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
-        static NpcBotData const* SelectNpcBotData(uint32 entry);
-        static void UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType, void* data = nullptr);
-        static void UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType updateType, void* data = nullptr);
-        static void SaveNpcBotStats(NpcBotStats const& stats);
+    static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
+    static NpcBotData const* SelectNpcBotData(uint32 entry);
+    static void UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType, void* data = nullptr);
+    static void UpdateNpcBotDataAll(uint32 playerGuid, NpcBotDataUpdateType updateType, void* data = nullptr);
+    static void SaveNpcBotStats(NpcBotStats const& stats);
 
-        static NpcBotAppearanceData const* SelectNpcBotAppearance(uint32 entry);
-        static NpcBotExtras const* SelectNpcBotExtras(uint32 entry);
+    static NpcBotAppearanceData const* SelectNpcBotAppearance(uint32 entry);
+    static NpcBotExtras const* SelectNpcBotExtras(uint32 entry);
 
-        static NpcBotTransmogData const* SelectNpcBotTransmogs(uint32 entry);
-        static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, int32 fake_id, bool update_db = true);
-        static void ResetNpcBotTransmogData(uint32 entry, bool update_db = true);
+    static NpcBotTransmogData const* SelectNpcBotTransmogs(uint32 entry);
+    static void UpdateNpcBotTransmogData(uint32 entry, uint8 slot, uint32 item_id, int32 fake_id, bool update_db = true);
+    static void ResetNpcBotTransmogData(uint32 entry, bool update_db = true);
 
-        static bool AllBotsLoaded();
+    static bool AllBotsLoaded();
 
-        static void RegisterBot(Creature const* bot);
-        static void UnregisterBot(Creature const* bot);
-        static Creature const* FindBot(uint32 entry);
-        static Creature const* FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids = nullptr);
-        static NpcBotRegistry const& GetExistingNPCBots();
-        static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid, bool count_shared = false);
-        static ObjectGuid GetNPCBotGuid(uint32 entry);
-        static std::vector<uint32> GetExistingNPCBotIds();
-        static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0, bool count_shared = false);
-        static uint8 GetAccountBotsCount(uint32 account_id);
+    static void RegisterBot(Creature const* bot);
+    static void UnregisterBot(Creature const* bot);
+    static Creature const* FindBot(uint32 entry);
+    static Creature const* FindBot(std::string_view name, LocaleConstant loc, std::vector<uint32> const* not_ids = nullptr);
+    static NpcBotRegistry const& GetExistingNPCBots();
+    static void GetNPCBotGuidsByOwner(std::vector<ObjectGuid> &guids_vec, ObjectGuid owner_guid, bool count_shared = false);
+    static ObjectGuid GetNPCBotGuid(uint32 entry);
+    static std::vector<uint32> GetExistingNPCBotIds();
+    static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0, bool count_shared = false);
+    static uint8 GetAccountBotsCount(uint32 account_id);
 
-        static void DespawnWandererBot(uint32 entry);
-        static void LoadWanderMap(bool reload = false, bool force_all_maps = false);
-        static void GenerateWanderingBots();
-        static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
-        static void CreateWanderingBotsSortedGear();
-        static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
-        static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check);
-        static bool GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 spec);
-        static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
-        static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
+    static void DespawnWandererBot(uint32 entry);
+    static void LoadWanderMap(bool reload = false, bool force_all_maps = false);
+    static void GenerateWanderingBots();
+    static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
+    static void CreateWanderingBotsSortedGear();
+    static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
+    static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check);
+    static bool GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 spec);
+    static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
+    static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
 
-        static uint8 GetLevelBonusForBotRank(uint32 rank);
-        static uint8 GetMinLevelForMapId(uint32 mapId);
-        static uint8 GetMaxLevelForMapId(uint32 mapId);
-        static uint8 GetMinLevelForBotClass(uint8 m_class);
-        static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
-        static uint32 GetDefaultFactionForBotRaceClass(uint8 bot_class, uint8 bot_race);
-        static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
-        static uint32 GetTeamForFaction(uint32 factionTemplateId);
+    static uint8 GetLevelBonusForBotRank(uint32 rank);
+    static uint8 GetMinLevelForMapId(uint32 mapId);
+    static uint8 GetMaxLevelForMapId(uint32 mapId);
+    static uint8 GetMinLevelForBotClass(uint8 m_class);
+    static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
+    static uint32 GetDefaultFactionForBotRaceClass(uint8 bot_class, uint8 bot_race);
+    static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
+    static uint32 GetTeamForFaction(uint32 factionTemplateId);
 
-        static bool CanDepositBotBankItemsCount(ObjectGuid playerGuid, uint32 items_count);
-        static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);
-        static uint32 GetBotBankItemsCount(ObjectGuid playerGuid);
-        static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);
-        static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
-        static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
+    static bool CanDepositBotBankItemsCount(ObjectGuid playerGuid, uint32 items_count);
+    static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);
+    static uint32 GetBotBankItemsCount(ObjectGuid playerGuid);
+    static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);
+    static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
+    static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
-        static uint32 GetBotItemSetsCount(ObjectGuid playerGuid);
-        static BotItemSetsArray const* GetBotItemSets(ObjectGuid playerGuid);
-        static NpcBotItemSet const* GetBotItemSet(ObjectGuid playerGuid, uint8 set_id);
-        static NpcBotItemSet& CreateNewBotItemSet(ObjectGuid playerGuid);
-        static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string const& set_name);
-        static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, uint8 slot, uint32 item_id);
-        static void DeleteBotItemSet(ObjectGuid playerGuid, uint8 set_id);
-        static void SaveNpcBotItemSets(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
+    static uint32 GetBotItemSetsCount(ObjectGuid playerGuid);
+    static BotItemSetsArray const* GetBotItemSets(ObjectGuid playerGuid);
+    static NpcBotItemSet const* GetBotItemSet(ObjectGuid playerGuid, uint8 set_id);
+    static NpcBotItemSet& CreateNewBotItemSet(ObjectGuid playerGuid);
+    static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string const& set_name);
+    static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, uint8 slot, uint32 item_id);
+    static void DeleteBotItemSet(ObjectGuid playerGuid, uint8 set_id);
+    static void SaveNpcBotItemSets(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
-        static NpcBotMgrData* SelectOrCreateNpcBotMgrData(ObjectGuid playerGuid);
-        static void EraseNpcBotMgrData(ObjectGuid playerGuid);
-        static void RemoveNpcBotMgrDataFromDB(ObjectGuid playerGuid);
-        static void SaveNpcBotMgrData(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
+    static NpcBotMgrData* SelectOrCreateNpcBotMgrData(ObjectGuid playerGuid);
+    static void EraseNpcBotMgrData(ObjectGuid playerGuid);
+    static void RemoveNpcBotMgrDataFromDB(ObjectGuid playerGuid);
+    static void SaveNpcBotMgrData(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
-        static std::shared_mutex* GetLock();
-
-    private:
-        BotDataMgr() {}
-        BotDataMgr(BotDataMgr const&);
+    static std::shared_mutex* GetLock();
 };
 
 #endif

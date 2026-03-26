@@ -9,7 +9,7 @@ namespace NPCBots
 {
 
 template<typename ST, ST Size>
-constexpr std::array<ST, Size> index_array = ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<ST, Size>{});
+inline constexpr std::array<ST, Size> index_array = ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<ST, Size>{});
 
 namespace StringConvert
 {

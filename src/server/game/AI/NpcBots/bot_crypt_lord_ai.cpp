@@ -814,9 +814,9 @@ public:
         uint32 _carrionBeetlesCheckTimer;
         uint32 _locustSwarmCheckTimer;
 
-        typedef std::set<Creature*> Summons;
+        using Summons = std::set<Creature*>;
         Summons _minions;
-        typedef std::array<ObjectGuid, MAX_LOCUSTS_MAXLEVEL> Swarm;
+        using Swarm = std::array<ObjectGuid, MAX_LOCUSTS_MAXLEVEL>;
         Swarm _locusts{};
     };
 };

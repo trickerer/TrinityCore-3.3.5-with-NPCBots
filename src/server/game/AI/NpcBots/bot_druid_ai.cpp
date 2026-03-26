@@ -22,7 +22,7 @@ TODO: Resolve remaining bugs with wrong power type after death
 TODO2: PvP behaviour revamp (again, it's like 5th time?)
 */
 
-constexpr uint8 MAX_TREANTS = 3;
+static constexpr uint8 MAX_TREANTS = 3;
 
 enum DruidBaseSpells
 {
@@ -2978,7 +2978,7 @@ public:
         uint32 hiberyCheckTimer;
 /*Misc*/int32 rage, energy;
 
-        typedef std::unordered_map<uint32 /*baseId*/, int32 /*amount*/> HealMap;
+        using HealMap = std::unordered_map<uint32 /*baseId*/, int32 /*amount*/>;
         HealMap _heals;
     };
 };

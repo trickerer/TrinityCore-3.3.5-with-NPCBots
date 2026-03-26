@@ -38,33 +38,33 @@ NpcBots DB Data management
 # pragma warning(push, 4)
 #endif
 
-typedef std::unordered_map<ObjectGuid /*player_guid*/, NpcBotMgrData*> NpcBotMgrDataMap;
-NpcBotMgrDataMap _botMgrsData;
+using NpcBotMgrDataMap = std::unordered_map<ObjectGuid /*player_guid*/, NpcBotMgrData*>;
+static NpcBotMgrDataMap _botMgrsData;
 
-typedef std::unordered_map<uint32 /*entry*/, NpcBotData*> NpcBotDataMap;
-typedef std::unordered_map<uint32 /*entry*/, NpcBotAppearanceData*> NpcBotAppearanceDataMap;
-typedef std::unordered_map<uint32 /*entry*/, NpcBotExtras*> NpcBotExtrasMap;
-typedef std::unordered_map<uint32 /*entry*/, NpcBotTransmogData*> NpcBotTransmogDataMap;
-NpcBotDataMap _botsData;
-NpcBotAppearanceDataMap _botsAppearanceData;
-NpcBotExtrasMap _botsExtras;
-NpcBotTransmogDataMap _botsTransmogData;
-NpcBotRegistry _existingBots;
+using NpcBotDataMap = std::unordered_map<uint32 /*entry*/, NpcBotData*>;
+using NpcBotAppearanceDataMap = std::unordered_map<uint32 /*entry*/, NpcBotAppearanceData*>;
+using NpcBotExtrasMap = std::unordered_map<uint32 /*entry*/, NpcBotExtras*>;
+using NpcBotTransmogDataMap = std::unordered_map<uint32 /*entry*/, NpcBotTransmogData*>;
+static NpcBotDataMap _botsData;
+static NpcBotAppearanceDataMap _botsAppearanceData;
+static NpcBotExtrasMap _botsExtras;
+static NpcBotTransmogDataMap _botsTransmogData;
+static NpcBotRegistry _existingBots;
 
-std::map<uint32, uint8> _wpMinSpawnLevelPerMapId;
-std::map<uint32, uint8> _wpMaxSpawnLevelPerMapId;
-std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
-CreatureTemplateContainer _botsWanderCreatureTemplates;
-std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
-std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
-std::set<uint32> _botsWanderCreaturesToDespawn;
+static std::map<uint32, uint8> _wpMinSpawnLevelPerMapId;
+static std::map<uint32, uint8> _wpMaxSpawnLevelPerMapId;
+static std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
+static CreatureTemplateContainer _botsWanderCreatureTemplates;
+static std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
+static std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
+static std::set<uint32> _botsWanderCreaturesToDespawn;
 
-ItemPerBotClassMap _botsWanderCreaturesSortedGear;
+static ItemPerBotClassMap _botsWanderCreaturesSortedGear;
 
-typedef std::unordered_map<ObjectGuid /*playerGuid*/, BotBankItemContainer> BotGearStorageMap;
-BotGearStorageMap _botStoredGearMap;
-typedef std::unordered_map<ObjectGuid /*playerGuid*/, BotItemSetsArray> BotGearSetStorageMap;
-BotGearSetStorageMap _botStoredGearSetMap;
+using BotGearStorageMap = std::unordered_map<ObjectGuid /*playerGuid*/, BotBankItemContainer>;
+static BotGearStorageMap _botStoredGearMap;
+using BotGearSetStorageMap = std::unordered_map<ObjectGuid /*playerGuid*/, BotItemSetsArray>;
+static BotGearSetStorageMap _botStoredGearSetMap;
 
 static bool allBotsLoaded = false;
 

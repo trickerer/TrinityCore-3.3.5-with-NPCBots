@@ -740,7 +740,7 @@ public:
         uint32 _corpseExplosionCheckTimer;
         uint32 _raiseDeadCheckTimer;
 
-        typedef std::set<Creature*> Summons;
+        using Summons = std::set<Creature*>;
         Summons _minions;
     };
 };
