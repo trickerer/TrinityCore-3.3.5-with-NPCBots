@@ -295,10 +295,10 @@ public:
 
     static void ReloadConfig()
     {
-        TC_LOG_INFO("misc", "Re-Loading config settings...");
+        BOT_LOG_INFO("misc", "Re-Loading config settings...");
         sWorld->LoadConfigSettings(true);
         sMapMgr->InitializeVisibilityDistanceInfo();
-        TC_LOG_INFO("misc", "World config settings reloaded.");
+        BOT_LOG_INFO("misc", "World config settings reloaded.");
     }
 
 private:
@@ -306,10 +306,10 @@ private:
     {
         _loadConfig(reload);
 
-        TC_LOG_INFO("server.loading", ">> NPCBots config {}.", reload ? "re-loaded" : "loaded");
+        BOT_LOG_INFO("server.loading", ">> NPCBots config {}.", reload ? "re-loaded" : "loaded");
 
         if (_enableNpcBots)
-            TC_LOG_INFO("server.loading", ">> NPCBots system enabled");
+            BOT_LOG_INFO("server.loading", ">> NPCBots system enabled");
     }
 
     static void _loadConfig(bool reload)
