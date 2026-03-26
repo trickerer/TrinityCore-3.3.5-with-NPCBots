@@ -42,7 +42,7 @@
 #include "WorldSession.h"
 
 //npcbot
-#include "botcommon.h"
+#include "botconfig.h"
 #include "botmgr.h"
 #include "Chat.h"
 #include "Creature.h"
@@ -493,7 +493,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
                             continue;
 
                         //disabled in config
-                        if (!BotMgr::IsNpcBotDungeonFinderEnabled())
+                        if (!BotCfg::IsNpcBotDungeonFinderEnabled())
                         {
                             (ChatHandler(plrg->GetSession())).SendSysMessage("Using npcbots in Dungeon Finder is restricted. Contact your administration.");
 

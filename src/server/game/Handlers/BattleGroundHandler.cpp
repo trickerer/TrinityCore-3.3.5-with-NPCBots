@@ -40,6 +40,7 @@
 #include "World.h"
 
 //npcbot
+#include "botconfig.h"
 #include "botdatamgr.h"
 #include "botmgr.h"
 //end npcbot
@@ -222,7 +223,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPackets::Battleground::Batt
         err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0, errorGuid);
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
         //npcbot: check premade for bots
-        if (isPremade && !BotMgr::IsNpcBotsPremadeEnabled() && grp->GetFirstBotMember() != nullptr)
+        if (isPremade && !BotCfg::IsNpcBotsPremadeEnabled() && grp->GetFirstBotMember() != nullptr)
             isPremade = false;
         //end npcbot
 

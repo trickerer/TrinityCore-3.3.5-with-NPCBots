@@ -27,6 +27,7 @@
 #include "Player.h"
 
 //npcbot
+#include "botconfig.h"
 #include "botmgr.h"
 //end npcbot
 
@@ -118,7 +119,7 @@ inline void KillRewarder::_InitGroupData()
         //npcbot
         _bots_count_xp = 0;
         _bots_count_honor = 0;
-        if (BotMgr::IsNpcBotXpReductionEnabled() || BotMgr::IsNpcBotHonorReductionEnabled())
+        if (BotCfg::IsNpcBotXpReductionEnabled() || BotCfg::IsNpcBotHonorReductionEnabled())
         {
             const float reward_dist_sq = std::powf(sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE), 2.f);
             for (GroupReference const* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -134,8 +135,8 @@ inline void KillRewarder::_InitGroupData()
                     if (bot && bot->IsAlive() && bot->IsInMap(_victim) &&
                         (member->GetMap()->IsDungeon() || _victim->GetExactDistSq(bot) <= reward_dist_sq))
                     {
-                        const bool add_for_xp = BotMgr::IsNpcBotXpReductionEnabled() && (!BotMgr::IsNpcBotXpReductionGroupOnly() || _group->IsMember(kv.first));
-                        const bool add_for_honor = BotMgr::IsNpcBotHonorReductionEnabled() && (!BotMgr::IsNpcBotHonorReductionGroupOnly() || _group->IsMember(kv.first));
+                        const bool add_for_xp = BotCfg::IsNpcBotXpReductionEnabled() && (!BotCfg::IsNpcBotXpReductionGroupOnly() || _group->IsMember(kv.first));
+                        const bool add_for_honor = BotCfg::IsNpcBotHonorReductionEnabled() && (!BotCfg::IsNpcBotHonorReductionGroupOnly() || _group->IsMember(kv.first));
                         if (add_for_xp || add_for_honor)
                         {
                             if (add_for_xp)
@@ -176,7 +177,7 @@ inline void KillRewarder::_RewardHonor(Player* player)
 {
     // Rewarded player must be alive.
     //npcbot
-    if (BotMgr::IsNpcBotHonorReductionEnabled())
+    if (BotCfg::IsNpcBotHonorReductionEnabled())
     {
         if (player->IsAlive())
             player->RewardHonor(_victim, _count + _bots_count_honor, -1, true);
@@ -209,8 +210,8 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
 
         //npcbot 4.2.2.1. Apply NpcBot XP reduction
-        const uint8 xp_reduction = BotMgr::GetNpcBotXpReductionExtraAmount();
-        const uint8 xp_reduction_start = BotMgr::GetNpcBotXpReductionExtraStartingNumber();
+        const uint8 xp_reduction = BotCfg::GetNpcBotXpReductionExtraAmount();
+        const uint8 xp_reduction_start = BotCfg::GetNpcBotXpReductionExtraStartingNumber();
         if (xp_reduction_start > 0 && xp_reduction > 0 && _bots_count_xp >= xp_reduction_start)
         {
             const uint32 ratePct = static_cast<uint32>(std::max<int32>(100 - ((_bots_count_xp - (xp_reduction_start - 1)) * xp_reduction), 10));

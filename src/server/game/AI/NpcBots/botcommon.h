@@ -19,10 +19,11 @@ constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
 constexpr std::size_t MAX_BOT_ITEM_SET_NAME_LENGTH = 30;
 constexpr uint8 BOT_GOSSIP_MAX_ITEMS = 32; // Client limitation 3.3.5 code confirmed
 
+constexpr size_t BRACKETS_COUNT = DEFAULT_MAX_LEVEL / 10 + 1; //0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80-83
+
 struct Position;
 
-typedef std::vector<std::pair<Position, float> > AoeSpotsVec;
-typedef std::vector<Position> AoeSafeSpotsVec;
+using AoeSpotsVec = std::vector<std::pair<Position, float> >;
 
 enum BotCommonValues
 {

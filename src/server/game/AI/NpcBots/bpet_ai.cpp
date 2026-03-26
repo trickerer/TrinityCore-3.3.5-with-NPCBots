@@ -1,5 +1,6 @@
 #include "bpet_ai.h"
 #include "bot_GridNotifiers.h"
+#include "botconfig.h"
 #include "botmgr.h"
 #include "Containers.h"
 #include "LFGMgr.h"
@@ -1439,8 +1440,8 @@ bool bot_pet_ai::IsInBotParty(Unit const* unit) const
             return true;
         //pointed target case
         for (uint8 i = 0; i != TARGET_ICONS_COUNT; ++i)
-            if (BotMgr::GetHealTargetIconFlags() & GroupIconsFlags[i] &&
-                !((BotMgr::GetOffTankTargetIconFlags() | BotMgr::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
+            if (BotCfg::GetHealTargetIconFlags() & GroupIconsFlags[i] &&
+                !((BotCfg::GetOffTankTargetIconFlags() | BotCfg::GetDPSTargetIconFlags()) & GroupIconsFlags[i]))
                 if (gr->GetTargetIcons()[i] == unit->GetGUID())
                     return true;
     }
@@ -2351,7 +2352,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         return false;
     }
 
-    if (!BotMgr::IsNpcBotModEnabled())
+    if (!BotCfg::IsNpcBotModEnabled())
         return false;
 
     ReduceCD(diff);

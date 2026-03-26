@@ -60,7 +60,7 @@
 #include <zlib.h>
 
 //npcbot
-#include "botmgr.h"
+#include "botconfig.h"
 //end npcbot
 
 namespace {
@@ -1662,8 +1662,8 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         //npcbot: prevent kicks when too many bots spawned in one spot
         case CMSG_GET_MIRRORIMAGE_DATA:
         {
-            if (BotMgr::GetBotInfoPacketsLimit() > -1)
-                maxPacketCounterAllowed = BotMgr::GetBotInfoPacketsLimit();
+            if (BotCfg::GetBotInfoPacketsLimit() > -1)
+                maxPacketCounterAllowed = BotCfg::GetBotInfoPacketsLimit();
             else
                 maxPacketCounterAllowed = 100;
             break;

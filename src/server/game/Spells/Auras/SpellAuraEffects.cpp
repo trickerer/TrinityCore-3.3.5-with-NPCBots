@@ -45,6 +45,7 @@
 #include <numeric>
 
 //npcbot
+#include "botconfig.h"
 #include "botmgr.h"
 //end npcbot
 
@@ -5200,9 +5201,9 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         caster->ToCreature()->ApplyBotDamageMultiplierSpell(idamage, damageInfo, m_spellInfo, BASE_ATTACK, crit);
         damage = std::max<int32>(idamage, 0);
         if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NORMAL)
-            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModPhysical();
+            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotCfg::GetBotWandererDamageMod() : BotCfg::GetBotDamageModPhysical();
         else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_MAGIC)
-            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModSpell();
+            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotCfg::GetBotWandererDamageMod() : BotCfg::GetBotDamageModSpell();
     }
     //End NpcBot
 

@@ -41,8 +41,8 @@
 
 //npcbot
 #include "bot_ai.h"
+#include "botconfig.h"
 #include "botdatamgr.h"
-#include "botmgr.h"
 //end npcbot
 
 void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
@@ -686,8 +686,8 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
                 uint8 slot = botItemSlots[i];
                 //Items not displayed on bot: tabard, head, back
                 if (slot == 0 ||
-                    (slot == BOT_SLOT_HEAD && BotMgr::ShowEquippedHelm() == false) ||
-                    (slot == BOT_SLOT_BACK && BotMgr::ShowEquippedCloak() == false))
+                    (slot == BOT_SLOT_HEAD && BotCfg::ShowEquippedHelm() == false) ||
+                    (slot == BOT_SLOT_BACK && BotCfg::ShowEquippedCloak() == false))
                 {
                     data << uint32(0);
                     continue;
