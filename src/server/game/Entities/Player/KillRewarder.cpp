@@ -121,7 +121,7 @@ inline void KillRewarder::_InitGroupData()
         _bots_count_honor = 0;
         if (BotCfg::IsNpcBotXpReductionEnabled() || BotCfg::IsNpcBotHonorReductionEnabled())
         {
-            const float reward_dist_sq = std::powf(sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE), 2.f);
+            const float reward_dist_sq = std::pow(sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE), 2.f);
             for (GroupReference const* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player const* member = itr->GetSource();
