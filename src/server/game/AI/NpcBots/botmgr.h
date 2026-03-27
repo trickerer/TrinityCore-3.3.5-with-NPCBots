@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <mutex>
+#include <string_view>
 
 class bot_ai;
 class Battleground;
@@ -150,7 +151,7 @@ public:
 
     Creature* GetBot(ObjectGuid guid) const;
     Creature* GetBotByName(std::string_view name) const;
-    std::list<Creature*> GetAllBotsByClass(uint8 botclass) const;
+    std::vector<Creature*> GetAllBotsByClass(uint8 botclass) const;
 
     bool HaveBot() const { return !_bots.empty(); }
     uint8 GetNpcBotsCount() const;
@@ -171,7 +172,7 @@ public:
     bool HasBotPetType(uint32 petType) const;
     bool IsBeingResurrected(WorldObject const* corpse) const;
 
-    static uint8 BotClassByClassName(std::string const& className);
+    static uint8 BotClassByClassName(std::string_view className);
     static uint8 GetBotPlayerClass(uint8 bot_class);
     static uint8 GetBotPlayerRace(uint8 bot_class, uint8 bot_race);
     static uint8 GetBotPlayerClass(Creature const* bot);
@@ -255,7 +256,7 @@ public:
     AoeSpotsVec const& GetAoeSpots() const { return _aoespots; }
     AoeSpotsVec& GetAoeSpots() { return _aoespots; }
 
-    void UpdateTargetIconName(uint8 id, std::string const& name);
+    void UpdateTargetIconName(uint8 id, std::string_view name);
     void ResetTargetIconNames();
 
     static std::vector<Unit*> GetAllGroupMembers(Group const* group);
@@ -284,7 +285,7 @@ private:
 
     AoeSpotsVec _aoespots;
 
-    std::array<std::string, TARGET_ICON_NAMES_CACHE_SIZE> _targetIconNamesCache;
+    std::array<std::string_view, TARGET_ICON_NAMES_CACHE_SIZE> _targetIconNamesCache;
 };
 
 #endif

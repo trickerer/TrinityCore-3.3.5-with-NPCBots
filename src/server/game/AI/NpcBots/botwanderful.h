@@ -153,7 +153,7 @@ public:
     static size_t GetMapWPsCount(uint32 mapId);
     static size_t GetWPMapsCount();
 
-    WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, float o, uint32 zoneId, uint32 areaId, std::string const& name);
+    WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, float o, uint32 zoneId, uint32 areaId, std::string&& name);
     ~WanderNode();
 
     static void RemoveAllWPs();

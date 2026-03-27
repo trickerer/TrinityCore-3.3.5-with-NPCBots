@@ -721,13 +721,13 @@ public:
                 amount = 1.f / amount;
             }
 
+            uint32 text_id = amount_is_mana ? BOT_TEXT_MANA_PER_DAMAGE : BOT_TEXT_DAMAGE_PER_MANA;
             std::ostringstream amount_sstr;
             amount_sstr.setf(std::ios_base::fixed);
             amount_sstr.precision(1);
-            amount_sstr << amount;
-            uint32 text_id = amount_is_mana ? BOT_TEXT_MANA_PER_DAMAGE : BOT_TEXT_DAMAGE_PER_MANA;
+            amount_sstr << LocalizedNpcText(player, text_id) << ": " << amount;
 
-            specList.push_back(LocalizedNpcText(player, text_id) + ": " + amount_sstr.str());
+            specList.push_back(amount_sstr.str());
         }
 
         std::vector<uint32> const* GetDamagingSpellsList() const override

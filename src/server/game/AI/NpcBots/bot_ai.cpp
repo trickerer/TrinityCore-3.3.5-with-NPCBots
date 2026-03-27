@@ -264,7 +264,7 @@ void bot_ai::InitializeAI()
     Reset();
 }
 
-void bot_ai::BotSay(const std::string &text, Player const* target) const
+void bot_ai::BotSay(std::string_view text, Player const* target) const
 {
     if (!target && master->GetTypeId() == TYPEID_PLAYER)
         target = master;
@@ -273,47 +273,17 @@ void bot_ai::BotSay(const std::string &text, Player const* target) const
 
     me->Say(text, LANG_UNIVERSAL, target);
 }
-void bot_ai::BotWhisper(const std::string &text, Player const* target) const
+void bot_ai::BotWhisper(std::string_view text, Player const* target) const
 {
     if (!target && master->GetTypeId() == TYPEID_PLAYER)
         target = master;
     if (!target)
         return;
 
-    Player* playerTarget = const_cast<Player*>(target);
-
-    me->Whisper(text, LANG_UNIVERSAL, playerTarget);
+    //Problem : Unit::Whisper target argument is non-const for no reason
+    me->Whisper(text, LANG_UNIVERSAL, const_cast<Player*>(target));
 }
-void bot_ai::BotYell(const std::string &text, Player const* /*target*/) const
-{
-    //if (!target && master->GetTypeId() == TYPEID_PLAYER)
-    //    target = master;
-    //if (!target)
-    //    return;
-
-    me->Yell(text, LANG_UNIVERSAL);
-}
-void bot_ai::BotSay(std::string&& text, Player const* target) const
-{
-    if (!target && master->GetTypeId() == TYPEID_PLAYER)
-        target = master;
-    if (!target)
-        return;
-
-    me->Say(text, LANG_UNIVERSAL, target);
-}
-void bot_ai::BotWhisper(std::string&& text, Player const* target) const
-{
-    if (!target && master->GetTypeId() == TYPEID_PLAYER)
-        target = master;
-    if (!target)
-        return;
-
-    Player* playerTarget = const_cast<Player*>(target);
-
-    me->Whisper(text, LANG_UNIVERSAL, playerTarget);
-}
-void bot_ai::BotYell(std::string&& text, Player const* /*target*/) const
+void bot_ai::BotYell(std::string_view text, Player const* /*target*/) const
 {
     me->Yell(text, LANG_UNIVERSAL);
 }
@@ -1692,13 +1662,12 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
         Player const* targetOwner = target->ToCreature()->GetBotOwner();
         if (targetOwner != master)
         {
-            std::string rezstr1 =
-                LocalizedNpcText(targetOwner, BOT_TEXT_REZZING_) + target->GetName() + " (" + LocalizedNpcText(targetOwner, BOT_TEXT_YOUR_BOT) + ")";
-            std::string rezstr2 =
-                LocalizedNpcText(master, BOT_TEXT_REZZING_) + target->GetName() + " (" + targetOwner->GetName() + LocalizedNpcText(master, BOT_TEXT__S_BOT) + ")";
-
-            BotWhisper(std::move(rezstr1), targetOwner);
-            BotWhisper(std::move(rezstr2));
+            std::ostringstream rezstr;
+            rezstr << LocalizedNpcText(targetOwner, BOT_TEXT_REZZING_) << target->GetName() << " (" << LocalizedNpcText(targetOwner, BOT_TEXT_YOUR_BOT) << ")";
+            BotWhisper(rezstr.view(), targetOwner);
+            rezstr.str("");
+            rezstr << LocalizedNpcText(master, BOT_TEXT_REZZING_) << target->GetName() << " (" << targetOwner->GetName() << LocalizedNpcText(master, BOT_TEXT__S_BOT) << ")";
+            BotWhisper(rezstr.view());
         }
         else
             BotWhisper(LocalizedNpcText(master, BOT_TEXT_REZZING_) + target->GetName());
@@ -1985,7 +1954,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         spellInfo = spellInfo->TryGetSpellInfoOverride(me);
         uint32 id = spellInfo->Id;
         SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->_effects[0].TriggerSpell);
-        const std::string name = spellInfo->SpellName[locale];
+        std::string_view name{ spellInfo->SpellName[locale] };
         botstring << "\n" << id << " - |cffffffff|Hspell:" << id << "|h[" << name;
         botstring << ' ' << localeNames[locale] << "]|h|r";
         uint32 talentcost = GetTalentSpellCost(id);
@@ -2211,7 +2180,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         //}
     }
 
-    ch.SendSysMessage(botstring.str());
+    ch.SendSysMessage(botstring.view());
 }
 //SetStats
 // Health, Armor, Powers, Combat Ratings, and global update setup
@@ -3502,7 +3471,7 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
 
             me->BotStopMovement();
             me->TextEmote(LocalizedNpcText(player, BOT_TEXT_BOT_TICKLED));
-            ChatHandler(player->GetSession()).SendSysMessage(report.str());
+            ChatHandler(player->GetSession()).SendSysMessage(report.view());
             break;
         }
         default:
@@ -8970,12 +8939,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 //msg << " in slot " << uint32(i) << " (" << _getNameForSlot(i + 1) << ')';
                 if (i <= BOT_SLOT_RANGED && einfo->ItemEntry[i] == item->GetEntry())
                     msg << " |cffe6cc80|h[!" << LocalizedNpcText(player, BOT_TEXT_VISUALONLY) << "!]|h|r";
-                BotWhisper(msg.str(), player);
+                BotWhisper(msg.view(), player);
             }
 
             std::ostringstream msg2;
             msg2 << "GS: " << uint32(GetBotGearScores().first);
-            BotWhisper(msg2.str(), player);
+            BotWhisper(msg2.view(), player);
 
             break;
         }
@@ -9021,8 +8990,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             {
                 std::ostringstream msg;
                 _AddItemTemplateLink(player, proto, msg);
-
-                BotWhisper(msg.str(), player);
+                BotWhisper(msg.view(), player);
             }
 
             //break; //no break here - return to menu
@@ -9209,7 +9177,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             msg << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
 
-            BotWhisper(msg.str(), player);
+            BotWhisper(msg.view(), player);
 
             //break; //no break here - return to menu
         }
@@ -9368,7 +9336,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                 _AddItemLink(player, item, name);
                                 name << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
                                 if (BotCfg::SendEquipListItems())
-                                    BotWhisper(name.str(), player);
+                                    BotWhisper(name.view(), player);
                                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                 ++counter;
                                 found = true;
@@ -9392,7 +9360,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                         _AddItemLink(player, item, name);
                                         name << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
                                         if (BotCfg::SendEquipListItems())
-                                            BotWhisper(name.str(), player);
+                                            BotWhisper(name.view(), player);
                                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                         ++counter;
                                         found = true;
@@ -9657,7 +9625,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             std::ostringstream name;
                             _AddItemLink(player, item, name);
                             if (BotCfg::SendEquipListItems())
-                                BotWhisper(name.str(), player);
+                                BotWhisper(name.view(), player);
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                             ++counter;
                             found = true;
@@ -9694,7 +9662,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     std::ostringstream name;
                                     _AddItemLink(player, item, name);
                                     if (BotCfg::SendEquipListItems())
-                                        BotWhisper(name.str(), player);
+                                        BotWhisper(name.view(), player);
                                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                     ++counter;
                                     found = true;
@@ -9926,7 +9894,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 std::ostringstream istr;
                 _AddItemLink(player, item, istr, false);
                 ChatHandler ch(player->GetSession());
-                ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str());
+                ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.view().data());
 
                 item->SetOwnerGUID(player->GetGUID());
 
@@ -10159,7 +10127,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 msg << " (" << LocalizedNpcText(player, BOT_TEXT_MISSING) << ')';
             }
 
-            BotWhisper(msg.str(), player);
+            BotWhisper(msg.view(), player);
             //break;
             action = GOSSIP_ACTION_INFO_DEF + set_id;
         }
@@ -10364,8 +10332,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
             std::list<std::string> specList;
             FillAbilitiesSpecifics(player, specList);
-            for (std::list<std::string>::const_iterator itr = specList.begin(); itr != specList.end(); ++itr)
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, *itr, GOSSIP_SENDER_ABILITIES, GOSSIP_ACTION_INFO_DEF);
+            for (std::string const& spec : specList)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, spec, GOSSIP_SENDER_ABILITIES, GOSSIP_ACTION_INFO_DEF);
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_ABILITIES, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -10688,7 +10656,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     //    ostr << name;
                     //else
                     //    ostr << "unknown (" << _botData->owner << ')';
-                    //BotWhisper(ostr.str().c_str(), player);
+                    //BotWhisper(ostr.view(), player);
                     ChatHandler ch(player->GetSession());
                     ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName());
                     break;
@@ -10770,7 +10738,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             ostr << name;
                         else
                             ostr << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) + " (" << _botData->owner << ')';
-                        BotWhisper(ostr.str().c_str(), player);
+                        BotWhisper(ostr.view(), player);
                         ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName());
                         break;
                     }
@@ -10780,10 +10748,10 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         break;
                     case 3: //not enough money
                     {
-                        std::string str = LocalizedNpcText(player, BOT_TEXT_HIREFAIL_COST) + " (";
-                        str += BotCfg::GetNpcBotCostStr(player->GetLevel(), _botclass);
-                        str += ")!";
-                        ch.SendSysMessage(str);
+                        std::ostringstream ostr;
+                        ostr << LocalizedNpcText(player, BOT_TEXT_HIREFAIL_COST) << " ("
+                            << BotCfg::GetNpcBotCostStr(player->GetLevel(), _botclass) << ")!";
+                        ch.SendSysMessage(ostr.view());
                         player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
                         BotSay("...", player);
                         break;
@@ -11177,7 +11145,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 //}
                 //else
                 //    msg << "Unknown unit";
-                //BotWhisper(msg.str().c_str());
+                //BotWhisper(msg.view());
 
                 me->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
                 break;
@@ -11364,7 +11332,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             << ", cd: " << itr->second->cooldown << ", base: " << std::max<uint32>(spellInfo->RecoveryTime, spellInfo->CategoryRecoveryTime);
                         if (itr->second->enabled == false)
                             sstr << " (disabled)";
-                        ch.PSendSysMessage("%u) %s", counter, sstr.str());
+                        ch.PSendSysMessage("%u) %s", counter, sstr.view().data());
                     }
                     break;
                 }
@@ -11432,7 +11400,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             else
                 ostr << "none";
 
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, ostr.str().c_str(), GOSSIP_SENDER_DEBUG_ACTION, GOSSIP_ACTION_INFO_DEF + 0);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, ostr.str(), GOSSIP_SENDER_DEBUG_ACTION, GOSSIP_ACTION_INFO_DEF + 0);
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "<Reset Owner>", GOSSIP_SENDER_DEBUG_ACTION, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "<Reset Stats>", GOSSIP_SENDER_DEBUG_ACTION, GOSSIP_ACTION_INFO_DEF + 2);
@@ -13435,7 +13403,7 @@ BotEquipResult bot_ai::_unequip(uint8 slot, ObjectGuid receiver, bool store_to_b
                 std::ostringstream istr;
                 _AddItemLink(master, item, istr, false);
                 ChatHandler ch(master->GetSession());
-                ch.PSendSysMessage(LocalizedNpcText(master, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str());
+                ch.PSendSysMessage(LocalizedNpcText(master, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.view().data());
 
                 item->SetOwnerGUID(master->GetGUID());
 
@@ -13458,7 +13426,7 @@ BotEquipResult bot_ai::_unequip(uint8 slot, ObjectGuid receiver, bool store_to_b
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             item->FSetState(ITEM_CHANGED);
             item->SaveToDB(trans);
-            static const std::string subject = LocalizedNpcText(nullptr, BOT_TEXT_OWNERSHIP_EXPIRED);
+            const std::string& subject = LocalizedNpcText(nullptr, BOT_TEXT_OWNERSHIP_EXPIRED);
             MailDraft(subject, "").AddItem(item).SendMailTo(trans, MailReceiver(receiver.GetCounter()), MailSender(me));
             CharacterDatabase.CommitTransaction(trans);
         }
@@ -15702,7 +15670,7 @@ void bot_ai::InitEquips()
                 gss << " [" << uint32(i) << "] " << _equips[i]->GetTemplate()->Name1 << " (" << _equips[i]->GetEntry() << ')';
             }
         }
-        BOT_LOG_TRACE("npcbots", "{}", gss.str());
+        BOT_LOG_TRACE("npcbots", "{}", gss.view());
     }
     else
     {
@@ -15990,7 +15958,7 @@ void bot_ai::_AddItemLink(Player const* forPlayer, Item const* item, std::ostrin
     uint32 g1 = 0, g2 = 0, g3 = 0;
     //uint32 bpoints = 0;
     std::string name = proto->Name1;
-    std::string suffix = "";
+    std::string suffix{};
 
     //icon
     if (addIcon)
@@ -16118,9 +16086,9 @@ void bot_ai::_LocalizeItem(Player const* forPlayer, std::string &itemName, uint3
 
     if (itemInfo->Name.size() > loc && !itemInfo->Name[loc].empty())
     {
-        const std::string name = itemInfo->Name[loc];
+        std::string name = itemInfo->Name[loc];
         if (Utf8FitTo(name, wnamepart))
-            itemName = name;
+            itemName = std::move(name);
     }
 }
 
@@ -16198,9 +16166,9 @@ void bot_ai::_LocalizeCreature(Player const* forPlayer, std::string &creatureNam
 
     if (creatureInfo->Name.size() > loc && !creatureInfo->Name[loc].empty())
     {
-        const std::string title = creatureInfo->Name[loc];
+        std::string title = creatureInfo->Name[loc];
         if (Utf8FitTo(title, wnamepart))
-            creatureName = title;
+            creatureName = std::move(title);
     }
 }
 
@@ -16215,9 +16183,9 @@ void bot_ai::_LocalizeGameObject(Player const* forPlayer, std::string &gameobjec
 
     if (gameObjectInfo->Name.size() > loc && !gameObjectInfo->Name[loc].empty())
     {
-        const std::string title = gameObjectInfo->Name[loc];
+        std::string title = gameObjectInfo->Name[loc];
         if (Utf8FitTo(title, wnamepart))
-            gameobjectName = title;
+            gameobjectName = std::move(title);
     }
 }
 
@@ -16235,7 +16203,7 @@ void bot_ai::_LocalizeSpell(Player const* forPlayer, std::string &spellName, uin
 
     std::string title = spellInfo->SpellName[loc];
     if (Utf8FitTo(title, wnamepart))
-        spellName = title;
+        spellName = std::move(title);
     else
         spellName = spellInfo->SpellName[sWorld->GetDefaultDbcLocale()];
 }
@@ -18317,7 +18285,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             {
                 //std::ostringstream msg;
                 //msg << "Something changed my faction (now " << me->GetFaction() << "), changing back to " << fac << "!";
-                //BotWhisper(msg.str().c_str());
+                //BotWhisper(msg.view());
                 me->SetFaction(fac);
             }
         }
@@ -18507,7 +18475,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                         _LocalizeGameObject(master, name, wo->GetEntry());
                         msg << name << "!";
                     }
-                    BotWhisper(msg.str().c_str());
+                    BotWhisper(msg.view());
 
                     if (me->GetDistance(wo) > INTERACTION_DISTANCE * 0.5f)
                     {
@@ -18555,7 +18523,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 std::string name = un->GetName();
                 _LocalizeCreature(master, name, un->GetEntry());
                 msg << LocalizedNpcText(master, BOT_TEXT_LOOTING) << ' ' << name;
-                BotWhisper(msg.str().c_str());
+                BotWhisper(msg.view());
 
                 _autoLootCreature(un->ToCreature());
 

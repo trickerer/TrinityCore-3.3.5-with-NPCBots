@@ -265,7 +265,7 @@ public:
     static BotItemSetsArray const* GetBotItemSets(ObjectGuid playerGuid);
     static NpcBotItemSet const* GetBotItemSet(ObjectGuid playerGuid, uint8 set_id);
     static NpcBotItemSet& CreateNewBotItemSet(ObjectGuid playerGuid);
-    static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string const& set_name);
+    static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string&& set_name);
     static void UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, uint8 slot, uint32 item_id);
     static void DeleteBotItemSet(ObjectGuid playerGuid, uint8 set_id);
     static void SaveNpcBotItemSets(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);

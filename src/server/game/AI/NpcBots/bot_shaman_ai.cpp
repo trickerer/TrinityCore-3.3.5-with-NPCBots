@@ -2295,7 +2295,7 @@ public:
             //{
             //    std::ostringstream msg;
             //    msg << "Summoned " << summon->GetName() << " by basespell: " << createSpell;
-            //    BotWhisper(msg.str().c_str());
+            //    BotWhisper(msg.view());
             //}
             uint32 btype;
             switch (createSpell)

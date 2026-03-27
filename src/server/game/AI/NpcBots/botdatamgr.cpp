@@ -642,7 +642,7 @@ void BotDataMgr::Update(uint32 diff)
             _botsWanderCreaturesToDespawn.erase(bot_despawn_id);
 
             uint32 origEntry = _botsWanderCreatureTemplates.at(bot_despawn_id).KillCredit[0];
-            std::string botName = bot->GetName();
+            std::string_view botName = bot->GetName();
 
             _spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
 
@@ -971,7 +971,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         for (uint32 bot_id : invalid_ids)
             ss << Bcore::ToString(bot_id) << ", ";
         ss << "\nFix your DB contents and retry";
-        ABORT_MSG(ss.str().c_str());
+        ABORT_MSG(ss.view().data());
     };
 
     for (CreatureDataContainer::value_type const& kv : sObjectMgr->GetAllCreatureData())
@@ -1104,7 +1104,7 @@ void BotDataMgr::LoadNpcBotGearSets()
 
         ObjectGuid player_guid = ObjectGuid::Create<HighGuid::Player>(player_guidlow);
 
-        UpdateBotItemSet(player_guid, set_id, set_name);
+        UpdateBotItemSet(player_guid, set_id, std::move(set_name));
 
         player_guids.insert(player_guidlow);
         set_guids.insert(make_set_guid(player_guidlow, set_id));
@@ -1428,7 +1428,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             continue;
         }
 
-        WanderNode* wp = new WanderNode(id, mapId, x, y, z, o, zoneId, areaId, name);
+        WanderNode* wp = new WanderNode(id, mapId, x, y, z, o, zoneId, areaId, std::move(name));
         wp->SetLevels(minLevel, maxLevel);
         wp->SetFlags(BotWPFlags(flags));
         wp->SetWaitTime(minwaittime, maxwaittime);
@@ -1658,7 +1658,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
                         ss << '-';
                 }
                 ss << " is isolated!";
-                BOT_LOG_INFO("server.loading", "{}", ss.str());
+                BOT_LOG_INFO("server.loading", "{}", ss.view());
             }
         }
     });
@@ -2725,7 +2725,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
 
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_SHARED_OWNERS);
             //"UPDATE characters_npcbot SET shared_owners = ? WHERE entry = ?", CONNECTION_ASYNC
-            bstmt->setString(0, ss.str());
+            bstmt->setStringView(0, ss.view());
             bstmt->setUInt32(1, entry);
             CharacterDatabase.Execute(bstmt);
             break;
@@ -2739,7 +2739,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
 
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_DISABLED_SPELLS);
             //"UPDATE characters_npcbot SET spells_disabled = ? WHERE entry = ?", CONNECTION_ASYNCH
-            bstmt->setString(0, ss.str());
+            bstmt->setStringView(0, ss.view());
             bstmt->setUInt32(1, entry);
             CharacterDatabase.Execute(bstmt);
             break;
@@ -2753,7 +2753,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
 
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_MISCVALUES);
             //"UPDATE characters_npcbot SET miscvalues = ? WHERE entry = ?", CONNECTION_ASYNCH
-            bstmt->setString(0, ss.str());
+            bstmt->setStringView(0, ss.view());
             bstmt->setUInt32(1, entry);
             CharacterDatabase.Execute(bstmt);
             break;
@@ -3375,9 +3375,9 @@ NpcBotItemSet& BotDataMgr::CreateNewBotItemSet(ObjectGuid playerGuid)
     return _botStoredGearSetMap[playerGuid][max_offset];
 }
 
-void BotDataMgr::UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string const& set_name)
+void BotDataMgr::UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, std::string&& set_name)
 {
-    _botStoredGearSetMap[playerGuid][set_id].name = set_name;
+    _botStoredGearSetMap[playerGuid][set_id].name = std::move(set_name);
 }
 
 void BotDataMgr::UpdateBotItemSet(ObjectGuid playerGuid, uint8 set_id, uint8 slot, uint32 item_id)

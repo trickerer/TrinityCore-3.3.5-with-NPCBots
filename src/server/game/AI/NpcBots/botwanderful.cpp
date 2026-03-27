@@ -174,10 +174,9 @@ size_t WanderNode::GetWPMapsCount()
     return ALL_WPS_PER_MAP.size();
 }
 
-WanderNode::WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, float o, uint32 zoneId, uint32 areaId, std::string const& name)
-    : Position(x, y, z, o),
-    _wpId(wpId), _mapId(mapId), _zoneId(zoneId), _areaId(areaId), _name(name), _minLevel(1u), _maxLevel(DEFAULT_MAX_LEVEL), _flags(0), _to_links_count(0),
-    _creature(nullptr)
+WanderNode::WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, float o, uint32 zoneId, uint32 areaId, std::string&& name)
+    : Position(x, y, z, o), _wpId(wpId), _mapId(mapId), _zoneId(zoneId), _areaId(areaId),
+    _name(std::move(name)), _minLevel(1u), _maxLevel(DEFAULT_MAX_LEVEL), _flags(0), _to_links_count(0), _creature(nullptr)
 {
     ASSERT(!!sMapStore.LookupEntry(_mapId), "WanderNode::Ctr(): Invalid value for _mapId");
     ASSERT(!!sAreaTableStore.LookupEntry(_zoneId), "WanderNode::Ctr(): Invalid value for _zoneId");

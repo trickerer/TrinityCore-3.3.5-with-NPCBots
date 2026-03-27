@@ -66,7 +66,7 @@ void BotLogger::Log(uint16 log_type, uint32 entry,  NPCBots::LoggableArguments a
             std::stringstream ss;
             using compounder = int[];
             (void)compounder { 0, ((void)(ss << ' ' << params), 0) ... };
-            BOT_LOG_DEBUG("npcbots", "Logging unregistered bot entry {}: type {} params:{}", entry, log_type, ss.str());
+            BOT_LOG_DEBUG("npcbots", "Logging unregistered bot entry {}: type {} params:{}", entry, log_type, ss.view());
         }
         BotLogImpl(log_type, entry, -1, -1, -1, -1, std::forward<decltype(params)>(params)...);
     }

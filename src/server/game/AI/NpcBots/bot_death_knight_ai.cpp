@@ -288,7 +288,7 @@ public:
             //        if (_runes[j].CurrentRune == i && _runes[j].Cooldown <= 0)
             //            runesLeft[i]++;
             //str << " left" << " " << runesLeft[0] << " " << runesLeft[1] << " " << runesLeft[2] << " " << runesLeft[3];
-            //BotWhisper(str.str().c_str());
+            //BotWhisper(str.view());
 
             me->ModifyPower(POWER_RUNIC_POWER, int32(src->RunicPower * runicpowerIncomeMult));
 

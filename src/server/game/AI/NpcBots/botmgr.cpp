@@ -41,6 +41,8 @@ TODO: Move creature hooks here
 # pragma warning(push, 4)
 #endif
 
+using namespace std::string_view_literals;
+
 static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
 
 BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracker())
@@ -490,7 +492,7 @@ Creature* BotMgr::GetBotByName(std::string_view name) const
             if (!itr->second)
                 continue;
 
-            std::string basename = itr->second->GetName();
+            std::string_view basename = itr->second->GetName();
             if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale(itr->second->GetEntry()))
             {
                 uint32 loc = _owner->GetSession()->GetSessionDbLocaleIndex();
@@ -511,10 +513,11 @@ Creature* BotMgr::GetBotByName(std::string_view name) const
     return nullptr;
 }
 
-std::list<Creature*> BotMgr::GetAllBotsByClass(uint8 botclass) const
+std::vector<Creature*> BotMgr::GetAllBotsByClass(uint8 botclass) const
 {
-    std::list<Creature*> foundBots;
-    for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
+    std::vector<Creature*> foundBots;
+    foundBots.reserve(_bots.size());
+    for (BotMap::const_iterator itr = _bots.cbegin(); itr != _bots.cend(); ++itr)
     {
         if (!itr->second || !itr->second->IsInWorld() || !itr->second->IsAlive())
             continue;
@@ -902,10 +905,10 @@ BotAddResult BotMgr::AddBot(Creature* bot)
         if (!_owner->HasEnoughMoney(cost))
         {
             ChatHandler ch(_owner->GetSession());
-            std::string str = bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_HIREFAIL_COST) + " (";
-            str += BotCfg::GetNpcBotCostStr(_owner->GetLevel(), bot->GetBotClass());
-            str += ")!";
-            ch.SendSysMessage(str);
+            std::ostringstream mss;
+            mss << bot_ai::LocalizedNpcText(GetOwner(), BOT_TEXT_HIREFAIL_COST) << " ("
+                << BotCfg::GetNpcBotCostStr(_owner->GetLevel(), bot->GetBotClass()) << ")!";
+            ch.SendSysMessage(mss.view());
             return BOT_ADD_CANT_AFFORD;
         }
 
@@ -1042,38 +1045,38 @@ bool BotMgr::RemoveAllBotsFromGroup()
     return true;
 }
 
-uint8 BotMgr::BotClassByClassName(std::string const& className)
+uint8 BotMgr::BotClassByClassName(std::string_view className)
 {
-    static const std::map<std::string, uint8> BotClassNamesMap = {
-        { "warrior", BOT_CLASS_WARRIOR },
-        { "paladin", BOT_CLASS_PALADIN },
-        { "hunter", BOT_CLASS_HUNTER },
-        { "rogue", BOT_CLASS_ROGUE },
-        { "priest", BOT_CLASS_PRIEST },
-        { "deathknight", BOT_CLASS_DEATH_KNIGHT },
-        { "death_knight", BOT_CLASS_DEATH_KNIGHT },
-        { "shaman", BOT_CLASS_SHAMAN },
-        { "mage", BOT_CLASS_MAGE },
-        { "warlock", BOT_CLASS_WARLOCK },
-        { "druid", BOT_CLASS_DRUID },
-        { "blademaster", BOT_CLASS_BM },
-        { "blade_master", BOT_CLASS_BM },
-        { "sphynx", BOT_CLASS_SPHYNX },
-        { "obsidiandestroyer", BOT_CLASS_SPHYNX },
-        { "obsidian_destroyer", BOT_CLASS_SPHYNX },
-        { "destroyer", BOT_CLASS_SPHYNX },
-        { "archmage", BOT_CLASS_ARCHMAGE },
-        { "dreadlord", BOT_CLASS_DREADLORD },
-        { "spellbreaker", BOT_CLASS_SPELLBREAKER },
-        { "spell_breaker", BOT_CLASS_SPELLBREAKER },
-        { "darkranger", BOT_CLASS_DARK_RANGER },
-        { "dark_ranger", BOT_CLASS_DARK_RANGER },
-        { "necromancer", BOT_CLASS_NECROMANCER },
-        { "necro", BOT_CLASS_NECROMANCER },
-        { "seawitch", BOT_CLASS_SEA_WITCH },
-        { "sea_witch", BOT_CLASS_SEA_WITCH },
-        { "cryptlord", BOT_CLASS_CRYPT_LORD},
-        { "crypt_lord", BOT_CLASS_CRYPT_LORD }
+    static const std::map<std::string_view, uint8> BotClassNamesMap = {
+        { "warrior"sv, BOT_CLASS_WARRIOR },
+        { "paladin"sv, BOT_CLASS_PALADIN },
+        { "hunter"sv, BOT_CLASS_HUNTER },
+        { "rogue"sv, BOT_CLASS_ROGUE },
+        { "priest"sv, BOT_CLASS_PRIEST },
+        { "deathknight"sv, BOT_CLASS_DEATH_KNIGHT },
+        { "death_knight"sv, BOT_CLASS_DEATH_KNIGHT },
+        { "shaman"sv, BOT_CLASS_SHAMAN },
+        { "mage"sv, BOT_CLASS_MAGE },
+        { "warlock"sv, BOT_CLASS_WARLOCK },
+        { "druid"sv, BOT_CLASS_DRUID },
+        { "blademaster"sv, BOT_CLASS_BM },
+        { "blade_master"sv, BOT_CLASS_BM },
+        { "sphynx"sv, BOT_CLASS_SPHYNX },
+        { "obsidiandestroyer"sv, BOT_CLASS_SPHYNX },
+        { "obsidian_destroyer"sv, BOT_CLASS_SPHYNX },
+        { "destroyer"sv, BOT_CLASS_SPHYNX },
+        { "archmage"sv, BOT_CLASS_ARCHMAGE },
+        { "dreadlord"sv, BOT_CLASS_DREADLORD },
+        { "spellbreaker"sv, BOT_CLASS_SPELLBREAKER },
+        { "spell_breaker"sv, BOT_CLASS_SPELLBREAKER },
+        { "darkranger"sv, BOT_CLASS_DARK_RANGER },
+        { "dark_ranger"sv, BOT_CLASS_DARK_RANGER },
+        { "necromancer"sv, BOT_CLASS_NECROMANCER },
+        { "necro"sv, BOT_CLASS_NECROMANCER },
+        { "seawitch"sv, BOT_CLASS_SEA_WITCH },
+        { "sea_witch"sv, BOT_CLASS_SEA_WITCH },
+        { "cryptlord"sv, BOT_CLASS_CRYPT_LORD},
+        { "crypt_lord"sv, BOT_CLASS_CRYPT_LORD }
     };
 
     //std::transform(className.begin(), className.end(), className.begin(), std::tolower);
@@ -1219,7 +1222,7 @@ std::string BotMgr::GetTargetIconString(uint8 icon_idx) const
 
     return ss.str();
 }
-void BotMgr::UpdateTargetIconName(uint8 id, std::string const& name)
+void BotMgr::UpdateTargetIconName(uint8 id, std::string_view name)
 {
     if (id >= TARGET_ICON_NAMES_CACHE_SIZE)
         return;
