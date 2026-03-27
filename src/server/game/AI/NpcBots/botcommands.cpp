@@ -2228,13 +2228,11 @@ public:
                 return true;
             }
 
-            cBots.erase(std::remove_if(cBots.begin(), cBots.end(),
-                [=](Creature const* tbot) {
-                    if (tbot->GetBotAI()->GetOrdersCount() >= MAX_BOT_ORDERS_QUEUE_SIZE)
-                        return true;
-                    return !canBotUseSpell(tbot, base_spell);
-                }),
-                cBots.end());
+            std::erase_if(cBots, [=](Creature const* tbot) {
+                if (tbot->GetBotAI()->GetOrdersCount() >= MAX_BOT_ORDERS_QUEUE_SIZE)
+                    return true;
+                return !canBotUseSpell(tbot, base_spell);
+            });
 
             decltype(cBots) ccBots;
             for (decltype(cBots)::const_iterator it = cBots.begin(); it != cBots.end();)

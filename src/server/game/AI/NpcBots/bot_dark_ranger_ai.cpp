@@ -246,7 +246,7 @@ public:
 
             std::list<Unit*> targets;
             GetNearbyTargetsList(targets, 50, 0);
-            targets.remove_if(BOTAI_PRED::AuraedTargetExcludeByCaster(BLACK_ARROW_1, me->GetGUID()));
+            std::erase_if(targets, BOTAI_PRED::AuraedTargetExcludeByCaster(BLACK_ARROW_1, me->GetGUID()));
             if (Unit* target = !targets.empty() ? Bcore::Containers::SelectRandomContainerElement(targets) : nullptr)
             {
                 if (doCast(target, GetSpell(BLACK_ARROW_1)))

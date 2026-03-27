@@ -308,7 +308,7 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
                         {
                             if (mslot.group == owner_subgroup)
                             {
-                                decltype(members)::const_iterator it = std::find_if(members.cbegin(), members.cend(), [&](Unit const* unit) { return mslot.guid == unit->GetGUID(); });
+                                decltype(members)::const_iterator it = std::ranges::find_if(members, [&](Unit const* unit) { return mslot.guid == unit->GetGUID(); });
                                 if (it != members.cend() && (*it)->IsInMap(_owner))
                                     ++sub_members_inside;
                                 if (++sub_members >= max_members)
@@ -795,7 +795,7 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
         return;
     }
     else if (!_delayedRemoveList.empty())
-        _delayedRemoveList.remove_if([=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
+        std::erase_if(_delayedRemoveList, [=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
 
     CleanupsBeforeBotDelete(guid, removetype);
 

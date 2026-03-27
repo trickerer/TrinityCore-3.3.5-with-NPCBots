@@ -1309,8 +1309,8 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
 
         std::list<Unit*> targets2;
         GetNearbyFriendlyTargetsList(targets2, 30);
-        targets2.remove_if(BOTAI_PRED::BuffTargetExclude());
-        targets2.remove_if([this](Unit const* unit) {
+        std::erase_if(targets2, BOTAI_PRED::BuffTargetExclude());
+        std::erase_if(targets2, [this](Unit const* unit) {
             return unit->GetTypeId() != TYPEID_PLAYER && !(IsWanderer() && unit->IsNPCBot() && unit->ToCreature()->GetBotAI()->IsWanderer());
         });
         if (!targets2.empty() && BuffTarget(targets2.size() == 1 ? targets2.front() : Bcore::Containers::SelectRandomContainerElement(targets2), diff))
@@ -4523,7 +4523,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                 }
             }
 
-            unitList.remove_if([this](Unit const* unit) -> bool {
+            std::erase_if(unitList, [this](Unit const* unit) {
                 if (!unit->IsInCombatWith(me) && !(unit->IsNPCBot() && unit->ToCreature()->IsWandererBot()))
                 {
                     if (unit->IsPlayer())
@@ -4749,7 +4749,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> searcher(me, goList, check);
             Cell::VisitAllObjects(me, searcher, max_range);
 
-            goList.remove_if([](GameObject const* gobject) { return gobject->HasFlag(GO_FLAG_NOT_SELECTABLE); });
+            std::erase_if(goList, [](GameObject const* gobject) { return gobject->HasFlag(GO_FLAG_NOT_SELECTABLE); });
 
             if (GameObject* device = goList.empty() ? nullptr : goList.size() == 1u ? goList.front() : Bcore::Containers::SelectRandomContainerElement(goList))
             {
@@ -4778,7 +4778,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             Cell::VisitAllObjects(me, searcher, 30.f);
 
             //Dark Fiends do not die instantly, remove purged ones
-            cList.remove_if(Bcore::UnitAuraCheck(false, 45934)); // "Dark Fiend"
+            std::erase_if(cList, Bcore::UnitAuraCheck(false, 45934)); // "Dark Fiend"
 
             if (Unit* fiend = cList.empty() ? nullptr : cList.size() == 1u ? cList.front() :
                 Bcore::Containers::SelectRandomContainerElement(cList))
@@ -4925,11 +4925,11 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                 return c;
             };
 
-            gList.remove_if([&cList](GameObject const* gobject) {
+            std::erase_if(gList, [&cList](GameObject const* gobject) {
                 Creature const* c = get_shield_creature(gobject, cList);
                 return !c || c->GetCurrentSpell(CURRENT_CHANNELED_SPELL) == nullptr;
             });
-            cList.remove_if([](Creature const* creature) {
+            std::erase_if(cList, [](Creature const* creature) {
                 return creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL) == nullptr;
             });
 
@@ -5898,7 +5898,7 @@ uint32 bot_ai::_selectMountSpell() const
         //Select AQ40 mount
         static const std::array<uint32, 4> QirajiMountSpellIds = { QIRAJI_BATTLE_TANK_1, QIRAJI_BATTLE_TANK_2, QIRAJI_BATTLE_TANK_3, QIRAJI_BATTLE_TANK_4 };
         //Count Black Qiraji Battle Tank too
-        if (masterMountSpellId == 26656 || std::find(QirajiMountSpellIds.cbegin(), QirajiMountSpellIds.cend(), masterMountSpellId) != QirajiMountSpellIds.cend())
+        if (masterMountSpellId == 26656 || std::ranges::find(QirajiMountSpellIds, masterMountSpellId) != QirajiMountSpellIds.cend())
             myMountSpellId = QirajiMountSpellIds[me->GetEntry() % QirajiMountSpellIds.size()];
     }
 
@@ -6569,7 +6569,7 @@ Unit* bot_ai::FindPolyTarget(float dist) const
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -6589,7 +6589,7 @@ Unit* bot_ai::FindFearTarget(float dist) const
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -6609,7 +6609,7 @@ Unit* bot_ai::FindStunTarget(float dist) const
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -6632,7 +6632,7 @@ Unit* bot_ai::FindUndeadCCTarget(float dist, uint32 spellId, bool unattacked) co
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -6655,7 +6655,7 @@ Unit* bot_ai::FindRootTarget(float dist, uint32 spellId) const
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -6676,7 +6676,7 @@ Unit* bot_ai::FindCastingTarget(float maxdist, float mindist, uint32 spellId, ui
         return nullptr;
     if (unitList.size() == 1)
         return *unitList.begin();
-    decltype(unitList)::const_iterator it = std::find_if(unitList.cbegin(), unitList.cend(), [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
+    decltype(unitList)::const_iterator it = std::ranges::find_if(unitList, [this](Unit const* u) { return IsPointedNoDPSTarget(u); });
     if (it != unitList.cend())
         return *it;
 
@@ -9907,7 +9907,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             ObjectGuid::LowType itemGuidLow = action - GOSSIP_ACTION_INFO_DEF;
 
             //BotBankItemContainer const& botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
-            //Item const* item = std::find_if(std::cbegin(botBankItems), std::cend(botBankItems), [guidLow = itemGuidLow](Item const* item) {
+            //Item const* item = std::ranges::find_if(botBankItems, [guidLow = itemGuidLow](Item const* item) {
             //    return item->GetGUID().GetCounter() == guidLow;
             //});
             Item* item = BotDataMgr::WithdrawBotBankItem(player->GetGUID(), itemGuidLow);
@@ -14626,7 +14626,7 @@ float bot_ai::_getItemGearStatScore(ItemTemplate const* iproto, uint8 forslot, I
 
     //BOT_LOG_ERROR("scripts", "_getItemGearScore for {} - {}", proto->ItemId, proto->Name1);
 
-    std::remove_cvref_t<decltype(_stats[BOT_SLOT_MAINHAND])> istats{};
+    std::remove_cvref_t<decltype(*std::cbegin(_stats))> istats{};
     //for (uint8 i = 0; i != MAX_BOT_ITEM_MOD; ++i)
     //    BOT_LOG_ERROR("scripts", "_getItemGearScore at {} {}", uint32(i), istats[i]);
 
@@ -17183,7 +17183,7 @@ void bot_ai::DoSkytalonVehicleStrats(uint32 diff)
                 else
                 {
                     std::vector<Unit*> vec = BotMgr::GetAllGroupMembers(master);
-                    cast = std::any_of(vec.cbegin(), vec.cend(), [drake = drake](Unit const* member) {
+                    cast = std::ranges::any_of(vec, [drake = drake](Unit const* member) {
                         return drake->GetMap() == member->FindMap() && member->GetVehicle() &&
                             member->GetVehicleBase()->GetHealthPct() < 90.0f && member->GetVehicleBase()->GetDistance(drake) < 60;
                     });
@@ -17266,7 +17266,7 @@ void bot_ai::DoSkytalonVehicleStrats(uint32 diff)
                         minhppct = hppct;
 
             if (minhppct <= 75)
-                targets1.remove_if(BOTAI_PRED::HpPctAboveExclude(float(minhppct + 10)));
+                std::erase_if(targets1, BOTAI_PRED::HpPctAboveExclude(float(minhppct + 10)));
 
             if (!targets1.empty())
                 target = Bcore::Containers::SelectRandomContainerElement(targets1);
@@ -17471,7 +17471,7 @@ void bot_ai::DoEmeraldDrakeVehicleStrats(uint32 diff)
                     minhppct = hppct;
 
         if (minhppct <= 50)
-            targets1.remove_if(BOTAI_PRED::HpPctAboveExclude(float(minhppct + 20)));
+            std::erase_if(targets1, BOTAI_PRED::HpPctAboveExclude(float(minhppct + 20)));
 
         if (!targets1.empty())
             target = Bcore::Containers::SelectRandomContainerElement(targets1);
@@ -17499,10 +17499,10 @@ void bot_ai::DoEmeraldDrakeVehicleStrats(uint32 diff)
             Bcore::UnitListSearcher <Bcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(drake, targets, check);
             //drake->VisitNearbyObject(60.f, searcher);
             Cell::VisitAllObjects(drake, searcher, 60.f);
-            targets.remove_if(BOTAI_PRED::UnitExclude(opponent));
-            targets.remove_if(BOTAI_PRED::UnitCombatStateExclude(false));
-            targets.remove_if(BOTAI_PRED::AuraedTargetExcludeByCaster(drakespell, drake->GetGUID(), 3));
-            targets.remove_if(BOTAI_PRED::AuraedTargetExclude(49836, 5)); //Shock Charge 1-shots
+            std::erase_if(targets, BOTAI_PRED::UnitExclude(opponent));
+            std::erase_if(targets, BOTAI_PRED::UnitCombatStateExclude(false));
+            std::erase_if(targets, BOTAI_PRED::AuraedTargetExcludeByCaster(drakespell, drake->GetGUID(), 3));
+            std::erase_if(targets, BOTAI_PRED::AuraedTargetExclude(49836, 5)); //Shock Charge 1-shots
 
             if (!targets.empty())
                 target = Bcore::Containers::SelectRandomContainerElement(targets);
@@ -17588,7 +17588,7 @@ void bot_ai::DoAmberDrakeVehicleStrats(uint32 diff)
             Bcore::UnitListSearcher <Bcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(drake, targets, check);
             //drake->VisitNearbyObject(60.f, searcher);
             Cell::VisitAllObjects(drake, searcher, 60.f);
-            targets.remove_if(BOTAI_PRED::UnitExclude(opponent));
+            std::erase_if(targets, BOTAI_PRED::UnitExclude(opponent));
 
             if (!targets.empty())
                 target = Bcore::Containers::SelectRandomContainerElement(targets);
@@ -17998,7 +17998,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         {
             if (bg->GetStatus() == STATUS_WAIT_LEAVE)
             {
-                if (std::find_if(bg->GetPlayers().cbegin(), bg->GetPlayers().cend(), [](auto const& kv) { return kv.first.IsPlayer(); }) == bg->GetPlayers().cend())
+                if (std::ranges::find_if(bg->GetPlayers(), [](auto const& kv) { return kv.first.IsPlayer(); }) == bg->GetPlayers().cend())
                     bg->RemoveBotAtLeave(me->GetGUID());
                 return false;
             }
@@ -18079,7 +18079,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 Bcore::AnyPlayerInPositionRangeCheck pcheck(me, 15.0f, false);
                 Bcore::PlayerListSearcher<decltype(pcheck)> searcher(me, plist, pcheck);
                 Cell::VisitWorldObjects(me, searcher, 20.f);
-                _canAppearInWorld = std::any_of(plist.cbegin(), plist.cend(), [](Player const* pl) { return pl->GetSession()->GetSecurity() > SEC_PLAYER; });
+                _canAppearInWorld = std::ranges::any_of(plist, [](Player const* pl) { return pl->GetSession()->GetSecurity() > SEC_PLAYER; });
                 if (!CanAppearInWorld() && !IsDuringTeleport())
                     BotMgr::TeleportBot(me, mymap, me, true);
             }
@@ -19504,7 +19504,7 @@ WanderNode const* bot_ai::GetNextWanderNode(Position const* fromPos, uint8 lvl, 
             llinks.push_back(&wpl);
     }
     if (llinks.size() > 1 && _travel_node_last && !_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-        llinks.remove_if([this](WanderNodeLink const* wpl) { return wpl->wp == _travel_node_last; });
+        std::erase_if(llinks, [this](WanderNodeLink const* wpl) { return wpl->wp == _travel_node_last; });
     if (!llinks.empty())
     {
         WanderNodeLink const* wpl = llinks.size() == 1u ? llinks.front() : *Bcore::Containers::SelectRandomWeightedContainerElement(llinks, LinkWeightExtractor());
@@ -19555,7 +19555,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
         if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, me->GetFaction(), false))
             links.push_back(wpl);
     if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-        links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+        std::erase_if(links, [this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
 
     switch (bg->GetTypeID())
     {
@@ -19836,10 +19836,10 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 });
                 if (!assdlist.empty())
                 {
-                    if (std::find(assdlist.cbegin(), assdlist.cend(), curNode) != assdlist.cend())
+                    if (std::ranges::find(assdlist, curNode) != assdlist.cend())
                         return curNode;
                     //remove non-empty points
-                    assdlist.remove_if([&team_members, except_wp = curNode](WanderNode const* wp) {
+                    std::erase_if(assdlist, [&team_members, except_wp = curNode](WanderNode const* wp) {
                         if (wp != except_wp)
                             for (Unit const* member : team_members)
                                 if (member->IsAlive() && (member->GetExactDist2d(wp) < 40.0f || (member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == wp)))

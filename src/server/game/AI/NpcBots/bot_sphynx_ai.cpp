@@ -236,7 +236,7 @@ public:
 
             std::list<Unit*> targets;
             GetNearbyFriendlyTargetsList(targets, 40);
-            targets.remove_if(BOTAI_PRED::DrainTargetExclude());
+            std::erase_if(targets, BOTAI_PRED::DrainTargetExclude());
 
             if (targets.empty())
                 return;

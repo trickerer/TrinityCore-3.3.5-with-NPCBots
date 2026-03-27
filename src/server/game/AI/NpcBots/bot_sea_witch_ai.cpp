@@ -277,9 +277,9 @@ public:
 
             std::list<Unit*> targets;
             GetNearbyTargetsList(targets, 40.f, 0);
-            targets.erase(std::remove_if(targets.begin(), targets.end(), [healthThreshold = uint32(me->GetMaxHealth() / 4 * 3)](Unit const* u) {
+            std::erase_if(targets, [healthThreshold = uint32(me->GetMaxHealth() / 4 * 3)](Unit const* u) {
                 return u->GetHealth() < healthThreshold;
-            }), targets.end());
+            });
 
             size_t targets_count = (IAmFree() || !master->GetGroup()) ? TORNADO_MIN_TARGETS : std::max<size_t>(master->GetGroup()->GetMemberSlots().size() / 3, TORNADO_MIN_TARGETS);
             if (targets.size() >= targets_count)

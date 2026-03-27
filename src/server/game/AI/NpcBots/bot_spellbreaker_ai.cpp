@@ -417,11 +417,8 @@ public:
                 {
                     if (chance/*roll_chance_i(chance)*/)
                     {
-                        auto successItr = std::find_if(success_list.begin(), success_list.end(), [&itr](DispelableAura& dispelAura) -> bool
-                        {
-                            if (dispelAura.GetAura()->GetId() == itr->GetAura()->GetId() && dispelAura.GetAura()->GetCaster() == itr->GetAura()->GetCaster())
-                                return true;
-                            return false;
+                        auto successItr = std::ranges::find_if(success_list, [&itr](DispelableAura& dispelAura) {
+                            return dispelAura.GetAura()->GetId() == itr->GetAura()->GetId() && dispelAura.GetAura()->GetCaster() == itr->GetAura()->GetCaster();
                         });
 
                         if (successItr == success_list.end())
@@ -498,7 +495,7 @@ public:
             {
                 //if target has stealed aura we should skip him if possible
                 std::list<Unit*> targetsCopy = targets;
-                targets.remove_if(BOTAI_PRED::AuraedTargetExclude(success_list.front().GetAura()->GetId()));
+                std::erase_if(targets, BOTAI_PRED::AuraedTargetExclude(success_list.front().GetAura()->GetId()));
 
                 randomTarget = Bcore::Containers::SelectRandomContainerElement(!targets.empty() ? targets : targetsCopy);
             }

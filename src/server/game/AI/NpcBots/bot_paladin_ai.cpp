@@ -401,7 +401,7 @@ public:
                 {
                     std::list<Unit*> targets;
                     GetNearbyFriendlyTargetsList(targets, 40.0f);
-                    targets.remove_if([](Unit const* unit) {
+                    std::erase_if(targets, [](Unit const* unit) {
                         return (!unit->IsInCombat() && unit->getAttackers().empty()) || unit->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 0x0, 0x80000, 0x0);
                     });
                     if (!targets.empty())

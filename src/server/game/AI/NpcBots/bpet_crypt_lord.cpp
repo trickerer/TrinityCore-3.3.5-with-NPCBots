@@ -256,11 +256,11 @@ public:
                     Bcore::UnitListSearcher searcher(petOwner, targets, check);
                     Cell::VisitAllObjects(petOwner, searcher, LOCUST_SWARM_EFFECTIVE_RADIUS);
 
-                    targets.remove_if([poguid = petOwner->GetGUID(), combat = petOwner->IsInCombat(), max_attackers = _attackers](Unit const* unit) {
+                    std::erase_if(targets, [poguid = petOwner->GetGUID(), combat = petOwner->IsInCombat(), max_attackers = _attackers](Unit const* unit) {
                         Unit::AttackerSet const& attackers = unit->getAttackers();
                         if (!(unit->IsInCombat() || (combat && !attackers.empty())))
                             return true;
-                        return max_attackers <= std::count_if(std::cbegin(attackers), std::cend(attackers), [oguid = poguid](Unit const* attacker) {
+                        return max_attackers <= std::ranges::count_if(attackers, [oguid = poguid](Unit const* attacker) {
                             return attacker->GetEntry() == BOT_PET_LOCUST_SWARM && attacker->GetOwnerGUID() == oguid;
                         });
                     });

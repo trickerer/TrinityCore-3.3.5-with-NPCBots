@@ -169,7 +169,7 @@ public:
                 TeamId teamId = BotDataMgr::GetTeamIdForFaction(bot->GetFaction());
                 BotMgr::TeleportBot(const_cast<Creature*>(bot), bgMap, bg->GetTeamStartPosition(teamId), true, false);
             }
-            else if (std::any_of(queue.m_QueuedPlayers.cbegin(), queue.m_QueuedPlayers.cend(), [=](BattlegroundQueue::QueuedPlayersMap::value_type const& qpm_pair) {
+            else if (std::ranges::any_of(queue.m_QueuedPlayers, [=](BattlegroundQueue::QueuedPlayersMap::value_type const& qpm_pair) {
                 return qpm_pair.first.IsPlayer() && qpm_pair.second.GroupInfo->IsInvitedToBGInstanceGUID == my_gqi->IsInvitedToBGInstanceGUID;
             }))
                 botBGJoinEvents.at(_playerGUID).AddEventAtOffset(new BotBattlegroundEnterEvent(_playerGUID, _botGUID, _bgQueueTypeId, _removeTime), 2s);
@@ -1936,7 +1936,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
         switch (proto.Quality)
         {
             case ITEM_QUALITY_NORMAL:
-                if (std::any_of(proto.Spells.cbegin(), proto.Spells.cend(), [](_Spell const& spell) { return !!spell.SpellId; }))
+                if (std::ranges::any_of(proto.Spells, [](_Spell const& spell) { return !!spell.SpellId; }))
                     skip = true;
                 if (proto.RequiredLevel > 14)
                     skip = true;
@@ -1970,7 +1970,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
             continue;
         }
 
-        if (proto.StatsCount > 0 && std::any_of(proto.ItemStat.cbegin(), proto.ItemStat.cend(), [](_ItemStat const& stat) {
+        if (proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return (stat.ItemStatType == ITEM_MOD_DEFENSE_SKILL_RATING || stat.ItemStatType == ITEM_MOD_DODGE_RATING ||
                 stat.ItemStatType == ITEM_MOD_PARRY_RATING || stat.ItemStatType == ITEM_MOD_BLOCK_VALUE) &&
                 stat.ItemStatValue > 0;
@@ -1978,15 +1978,15 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
             continue;
 
         uint8 reqLstep = (((proto.RequiredLevel == 1) ? 0 : proto.RequiredLevel) + ITEM_SORTING_LEVEL_STEP - 1) / ITEM_SORTING_LEVEL_STEP;
-        bool is_caster_item = proto.StatsCount > 0 && std::any_of(proto.ItemStat.cbegin(), proto.ItemStat.cend(), [](_ItemStat const& stat) {
+        bool is_caster_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return (stat.ItemStatType == ITEM_MOD_INTELLECT || stat.ItemStatType == ITEM_MOD_SPELL_POWER ||
                 stat.ItemStatType == ITEM_MOD_SPELL_PENETRATION || stat.ItemStatType == ITEM_MOD_MANA_REGENERATION) &&
                 stat.ItemStatValue > 0;
         });
-        bool is_strength_item = proto.StatsCount > 0 && std::any_of(proto.ItemStat.cbegin(), proto.ItemStat.cend(), [](_ItemStat const& stat) {
+        bool is_strength_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return stat.ItemStatType == ITEM_MOD_STRENGTH && stat.ItemStatValue > 0;
         });
-        bool is_agility_item = proto.StatsCount > 0 && std::any_of(proto.ItemStat.cbegin(), proto.ItemStat.cend(), [](_ItemStat const& stat) {
+        bool is_agility_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
         });
 
@@ -3050,13 +3050,13 @@ Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc, s
     {
         wstrToLower(wname);
         std::shared_lock<std::shared_mutex> lock(*GetLock());
-        for (NpcBotRegistry::const_iterator ci = _existingBots.cbegin(); ci != _existingBots.cend(); ++ci)
+        for (Creature const* bot : _existingBots)
         {
-            if (not_ids && std::find(not_ids->cbegin(), not_ids->cend(), (*ci)->GetEntry()) != not_ids->cend())
+            if (not_ids && std::ranges::find(*not_ids, bot->GetEntry()) != not_ids->cend())
                 continue;
 
-            std::string basename = (*ci)->GetName();
-            if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale((*ci)->GetEntry()))
+            std::string_view basename = bot->GetName();
+            if (CreatureLocale const* creatureInfo = sObjectMgr->GetCreatureLocale(bot->GetEntry()))
             {
                 if (creatureInfo->Name.size() > loc && !creatureInfo->Name[loc].empty())
                     basename = creatureInfo->Name[loc];
@@ -3068,7 +3068,7 @@ Creature const* BotDataMgr::FindBot(std::string_view name, LocaleConstant loc, s
 
             wstrToLower(wbname);
             if (wbname == wname)
-                return *ci;
+                return bot;
         }
     }
 

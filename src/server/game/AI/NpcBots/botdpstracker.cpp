@@ -68,7 +68,7 @@ void DPSTracker::_Release()
         //    itr->first, _trackTimer, dmgs[0], total_damage, _DPSes[itr->first]);
 
         //shift
-        std::copy_backward(damage_array.begin(), damage_array.end() - 1, damage_array.end());
+        std::copy_backward(damage_array.begin(), std::prev(damage_array.end()), damage_array.end());
         damage_array[0] = 0;
     }
 }

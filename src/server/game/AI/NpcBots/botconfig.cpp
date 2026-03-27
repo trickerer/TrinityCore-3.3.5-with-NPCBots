@@ -14,6 +14,10 @@
 Npc Bot Config by Trickerer (onlysuffering@gmail.com)
 */
 
+#ifdef _MSC_VER
+# pragma warning(push, 4)
+#endif
+
 #ifdef AC_COMPILER
 # define GetBoolDefault GetOption<bool>
 # define GetIntDefault GetOption<int32>
@@ -1334,3 +1338,7 @@ void AddSC_botconfig_scripts()
 {
     new NPCBotsConfigScript();
 }
+
+#ifdef _MSC_VER
+# pragma warning(pop)
+#endif
