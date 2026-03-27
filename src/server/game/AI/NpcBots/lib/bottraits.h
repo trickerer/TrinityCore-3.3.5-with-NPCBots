@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "SpellAuraEffects.h"
 
+#include <algorithm>
 #include <array>
 #include <ranges>
 #include <tuple>
