@@ -8,6 +8,7 @@
 #include "SpellAuraEffects.h"
 
 #include <array>
+#include <ranges>
 #include <tuple>
 
 namespace NPCBots
