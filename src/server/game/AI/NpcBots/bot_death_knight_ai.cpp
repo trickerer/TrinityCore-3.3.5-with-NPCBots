@@ -496,7 +496,7 @@ public:
         void BreakCC(uint32 diff) override
         {
             if (IsSpellReady(LICHBORNE_1, diff, false) && Rand() < 45 &&
-                me->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
+                me->HasAuraWithMechanic((1u<<MECHANIC_CHARM)|(1u<<MECHANIC_FEAR)|(1u<<MECHANIC_SLEEP)))
             {
                 if (doCast(me, GetSpell(LICHBORNE_1)))
                     return;
@@ -767,9 +767,9 @@ public:
 
             //CHAINS OF ICE
             if (IsSpellReady(CHAINS_OF_ICE_1, diff) && Rand() < 65 && dist < CalcSpellMaxRange(CHAINS_OF_ICE_1) && mytar->isMoving() &&
-                !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_SNARE-1)))) &&
+                !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u<<(MECHANIC_SNARE-1)))) &&
                 HaveRunes(CHAINS_OF_ICE_1) && !CCed(mytar, true) && (!u || (!IsTank(u) && IsInBotParty(u))) &&
-                !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
             {
                 if (doCast(mytar, GetSpell(CHAINS_OF_ICE_1)))
                     return;
@@ -788,7 +788,7 @@ public:
             }
 
             //Diseases in general
-            bool noDiseases = (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1))));
+            bool noDiseases = (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u<<(MECHANIC_INFECTED-1))));
             AuraEffect const* blop = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
             AuraEffect const* frof = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
             AuraEffect const* ebop = (noDiseases || GetSpec() != BOT_SPEC_DK_UNHOLY) ? nullptr : mytar->GetAuraEffect(SPELL_AURA_LINKED, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x800, 0x0, me->GetGUID());
@@ -1099,7 +1099,7 @@ public:
                 pctbonus += 0.1f;
 
             //Glyph of Blood Strike: 20% bonus damage for Blood Strike on snared targets
-            if (baseId == BLOOD_STRIKE_1 && damageinfo.target->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+            if (baseId == BLOOD_STRIKE_1 && damageinfo.target->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
                 pctbonus += 0.2f;
             //Glyph of Death Strike: 1% bonus damage for every runic power point (max 25) for Death Strike
             if (baseId == DEATH_STRIKE_1 && runicpower >= 10)

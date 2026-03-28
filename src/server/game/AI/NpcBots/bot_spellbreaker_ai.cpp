@@ -352,7 +352,7 @@ public:
             DispelChargesList steal_list;
 
             bool const isFriend = IsInBotParty(target) || target->IsFriendlyTo(me);
-            static const uint32 sbDispelMask  = (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE);
+            static const uint32 sbDispelMask  = (1u<<DISPEL_MAGIC) | (1u<<DISPEL_CURSE);
             static const uint8 max_dispelled = 1;
 
             //BOT_LOG_ERROR("entities.unit", "ProcessSpellsteal: on {}, fr={}", target->GetName(), uint32(isFriend));
@@ -539,9 +539,9 @@ public:
                         {
                             baseDamage[i] = aura->GetEffect(i)->GetBaseAmount();
                             damage[i] = aura->GetEffect(i)->GetAmount();
-                            effMask |= (1<<i);
+                            effMask |= (1u<<i);
                             if (aura->GetEffect(i)->CanBeRecalculated())
-                                recalculateMask |= (1<<i);
+                                recalculateMask |= (1u<<i);
                         }
                         else
                         {

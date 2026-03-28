@@ -96,7 +96,7 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
         {
             for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
             {
-                if (immune_mask & (1 << i))
+                if (immune_mask & (1u << i))
                 {
                     arr_iter_type ri = std::ranges::find(results, std::pair{ SpellSchools(i), true });
                     if (ri != results.end())
@@ -112,7 +112,7 @@ CanAffectVictimSchools(Unit const* target, Schools... schools)
         {
             for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
             {
-                if (immune_mask & (1 << i))
+                if (immune_mask & (1u << i))
                 {
                     arr_iter_type ri = std::ranges::find(results, std::pair{ SpellSchools(i), true });
                     if (ri != results.end())

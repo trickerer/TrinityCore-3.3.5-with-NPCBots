@@ -625,7 +625,7 @@ public:
                 if (spellInfo->Attributes & SPELL_ATTR0_HIDDEN_CLIENTSIDE) continue;
                 //if (spellInfo->AttributesEx & SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR) continue;
                 if (spellInfo->GetSpellMechanicMaskByEffectMask(app->GetEffectMask()) &
-                    ((1<<MECHANIC_SNARE) | (1<<MECHANIC_ROOT) | (!canUnstun ? 0 : (1<<MECHANIC_STUN))))
+                    ((1u<<MECHANIC_SNARE) | (1u<<MECHANIC_ROOT) | (!canUnstun ? 0 : (1u<<MECHANIC_STUN))))
                 {
                     uint32 dispel = spellInfo->Dispel;
                     uint32 spell;
@@ -798,7 +798,7 @@ public:
 
         void BreakCC(uint32 diff) override
         {
-            if (me->GetLevel() >= 35 && GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION && IsSpellReady(HAND_OF_FREEDOM_1, diff) && Rand() < 30 && me->HasAuraWithMechanic(1<<MECHANIC_STUN))
+            if (me->GetLevel() >= 35 && GetSpec() == BOT_SPEC_PALADIN_RETRIBUTION && IsSpellReady(HAND_OF_FREEDOM_1, diff) && Rand() < 30 && me->HasAuraWithMechanic(1u<<MECHANIC_STUN))
             {
                 if (me->IsMounted())
                     me->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -925,7 +925,7 @@ public:
                 {
                     Creature const* cre = victim->ToCreature();
                     if (cre && cre->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL &&
-                        (cre->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_STUN-1))))
+                        (cre->GetCreatureTemplate()->MechanicImmuneMask & (1u<<(MECHANIC_STUN-1))))
                         JUSTICE = 0;
                 }
                 SEAL = COMMAND ? COMMAND : JUSTICE ? JUSTICE : RIGHT;

@@ -829,7 +829,7 @@ public:
                 }
                 //WING CLIP
                 if (IsSpellReady(WING_CLIP_1, diff) && (!IsTank() || mytar->isMoving()) &&
-                    Rand() < 80 && !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                    Rand() < 80 && !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
                 {
                     if (doCast(mytar, GetSpell(WING_CLIP_1)))
                         return;
@@ -878,7 +878,7 @@ public:
 
             //CONCUSSIVE SHOT
             if (IsSpellReady(CONCUSSIVE_SHOT_1, diff) && can_do_arcane && Rand() < 35 &&
-                !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                !CCed(mytar, true) && !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
             {
                 if (doCast(mytar, GetSpell(CONCUSSIVE_SHOT_1)))
                     return;

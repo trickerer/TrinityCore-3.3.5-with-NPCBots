@@ -3820,7 +3820,7 @@ public:
         uint8 bot_spec = bot_ai::SelectSpecForClass(_botExtras->bclass);
         BotDataMgr::AddNpcBotData(id, bot_ai::DefaultRolesForClass(_botExtras->bclass, bot_spec), bot_spec, creature->GetCreatureTemplate()->faction);
 
-        creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
+        creature->SaveToDB(map->GetId(), (uint8(1) << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
 
         uint32 db_guid = creature->GetSpawnId();
         if (!creature->LoadBotCreatureFromDB(db_guid, map))
@@ -3932,7 +3932,7 @@ public:
         std::array<std::string, BOT_CLASS_END> bot_class_names{};
         std::string dummy{};
         for (uint8 bclass : NPCBots::index_array<uint8, BOT_CLASS_END>)
-            if ((1 << bclass) & ALL_BOT_CLASSES_MASK)
+            if ((1u << bclass) & ALL_BOT_CLASSES_MASK)
                 GetBotClassNameAndColor(bclass, dummy, bot_class_names[bclass]);
 
         std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
@@ -3965,7 +3965,7 @@ public:
 
             static_assert(std::size(bot_count_by_class) == std::size(bot_class_names));
             for (uint8 i = 0; i < bot_class_names.size(); ++i)
-                if (!!bot_count_by_class[i] && !!((1 << i) & ALL_BOT_CLASSES_MASK))
+                if (!!bot_count_by_class[i] && !!((1u << i) & ALL_BOT_CLASSES_MASK))
                     ss << "\n " << bot_class_names[i] << ": " << bot_count_by_class[i] << " bots";
             ss << '\n';
 

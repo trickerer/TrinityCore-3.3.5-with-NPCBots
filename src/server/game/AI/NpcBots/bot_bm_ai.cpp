@@ -296,7 +296,7 @@ public:
 
         void BreakCC(uint32 diff) override
         {
-            if (me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
+            if (me->HasAuraWithMechanic((1u<<MECHANIC_SNARE)|(1u<<MECHANIC_ROOT)))
             {
                 if (IsSpellReady(WINDWALK_1, diff) && !IsTank(me) && Rand() < 30 &&
                     doCast(me, GetSpell(WINDWALK_1)))

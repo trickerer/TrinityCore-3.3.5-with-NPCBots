@@ -491,7 +491,7 @@ public:
                             !member->IsAlive() || me->GetDistance(member) > 20 ||
                             (member->IsPlayer() ? member->ToPlayer()->GetSubGroup() : member->ToCreature()->GetSubGroup()) != subgr ||
                             (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
-                            !member->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
+                            !member->HasAuraWithMechanic((1u<<MECHANIC_CHARM)|(1u<<MECHANIC_FEAR)|(1u<<MECHANIC_SLEEP)))
                             continue;
                         ++count;
                     }
@@ -2331,7 +2331,7 @@ public:
             }
             _totems[slot].first = summon->GetGUID();
             _totems[slot].second._pos.Relocate(*summon);
-            _totems[slot].second._effradius = !((1<<btype) & BOT_TOTEM_MASK_SUMMONS) ? radius : SIZE_OF_GRIDS;
+            _totems[slot].second._effradius = !((1u<<btype) & BOT_TOTEM_MASK_SUMMONS) ? radius : SIZE_OF_GRIDS;
             _totems[slot].second._type = btype;
             me->m_SummonSlot[slot+1] = _totems[slot].first; //needed for scripts handlers
 

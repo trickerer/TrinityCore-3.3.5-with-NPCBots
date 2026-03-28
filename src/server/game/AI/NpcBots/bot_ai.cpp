@@ -599,13 +599,13 @@ SpellCastResult bot_ai::CheckBotCast(Unit const* victim, uint32 spellId) const
     {
         if (spellInfo->EquippedItemInventoryTypeMask != 0)
         {
-            if ((spellInfo->EquippedItemInventoryTypeMask & (1<<INVTYPE_WEAPONMAINHAND)) &&
+            if ((spellInfo->EquippedItemInventoryTypeMask & (1u<<INVTYPE_WEAPONMAINHAND)) &&
                 !me->CanUseAttackType(BASE_ATTACK))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
-            if ((spellInfo->EquippedItemInventoryTypeMask & (1<<INVTYPE_WEAPONOFFHAND)) &&
+            if ((spellInfo->EquippedItemInventoryTypeMask & (1u<<INVTYPE_WEAPONOFFHAND)) &&
                 !me->CanUseAttackType(OFF_ATTACK))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
-            if ((spellInfo->EquippedItemInventoryTypeMask & ((1<<INVTYPE_RANGED)|(1<<INVTYPE_RANGEDRIGHT)|(1<<INVTYPE_THROWN))) &&
+            if ((spellInfo->EquippedItemInventoryTypeMask & ((1u<<INVTYPE_RANGED)|(1u<<INVTYPE_RANGEDRIGHT)|(1u<<INVTYPE_THROWN))) &&
                 !me->CanUseAttackType(RANGED_ATTACK))
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
         }
@@ -703,15 +703,15 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             {
                 if (m_botSpellInfo->_effects[i].IsAura())
-                    approximateAuraEffectMask |= 1 << i;
+                    approximateAuraEffectMask |= 1u << i;
                 else if (m_botSpellInfo->_effects[i].IsEffect())
-                    nonAuraEffectMask |= 1 << i;
+                    nonAuraEffectMask |= 1u << i;
             }
 
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             {
                 // check if target already has the same type, but more powerful aura
-                if (!nonAuraEffectMask && (approximateAuraEffectMask & (1 << i)))
+                if (!nonAuraEffectMask && (approximateAuraEffectMask & (1u << i)))
                     if (!victim->IsHighestExclusiveAuraEffect(m_botSpellInfo, AuraType(m_botSpellInfo->_effects[i].ApplyAuraName),
                         m_botSpellInfo->_effects[i].CalcValue(me, &m_botSpellInfo->_effects[i].BasePoints), approximateAuraEffectMask, false))
                         return false;
@@ -1819,7 +1819,7 @@ bool bot_ai::_canCureTarget(Unit const* target, uint32 cureSpell) const
 
     //SpellBreaker addins
     if (cureSpell == SPELL_STEAL_MAGIC)
-        dispelMask |= (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE);
+        dispelMask |= (1u<<DISPEL_MAGIC) | (1u<<DISPEL_CURSE);
 
     if (dispelMask == 0)
         return false;
@@ -1833,9 +1833,9 @@ bool bot_ai::_canCureTarget(Unit const* target, uint32 cureSpell) const
 void bot_ai::_getBotDispellableAuraList(Unit const* target, uint32 dispelMask, std::list<Aura const*> &dispelList) const
 {
     //Unholy Blight prevents diseases from being dispelled
-    if ((dispelMask & (1<<DISPEL_DISEASE)) &&
+    if ((dispelMask & (1u<<DISPEL_DISEASE)) &&
         target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 1494, 0))
-        dispelMask &= ~(1<<DISPEL_DISEASE);
+        dispelMask &= ~(1u<<DISPEL_DISEASE);
 
     Unit::AuraMap const& auras = target->GetOwnedAuras();
     for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
@@ -2663,7 +2663,7 @@ void bot_ai::SetStats(bool force)
     value = 0.f;
 
     tempval = std::max<float>(_getTotalBotStat(BOT_STAT_MOD_CRIT_TAKEN_MELEE_RATING), std::max<float>(_getTotalBotStat(BOT_STAT_MOD_CRIT_TAKEN_RANGED_RATING), _getTotalBotStat(BOT_STAT_MOD_CRIT_TAKEN_SPELL_RATING)));
-    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_CRIT_TAKEN_MELEE) | (1 << CR_CRIT_TAKEN_RANGED) | (1 << CR_CRIT_TAKEN_SPELL));
+    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_CRIT_TAKEN_MELEE) | (1u << CR_CRIT_TAKEN_RANGED) | (1u << CR_CRIT_TAKEN_SPELL));
     value += tempval * std::max<float>(_getRatingMultiplier(CR_CRIT_TAKEN_MELEE), std::max<float>(_getRatingMultiplier(CR_CRIT_TAKEN_RANGED), _getRatingMultiplier(CR_CRIT_TAKEN_SPELL)));
 
     resilience = value;
@@ -2684,7 +2684,7 @@ void bot_ai::SetStats(bool force)
 
     //25.5 HR = 1% haste at 80
     tempval = _getTotalBotStat(BOT_STAT_MOD_HASTE_MELEE_RATING) + _getTotalBotStat(BOT_STAT_MOD_HASTE_RANGED_RATING) + _getTotalBotStat(BOT_STAT_MOD_HASTE_SPELL_RATING) + _getTotalBotStat(BOT_STAT_MOD_HASTE_RATING);
-    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_HASTE_MELEE) | (1 << CR_HASTE_RANGED) | (1 << CR_HASTE_SPELL));
+    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_HASTE_MELEE) | (1u << CR_HASTE_RANGED) | (1u << CR_HASTE_SPELL));
 
     if (_botclass == BOT_CLASS_WARLOCK)
     {
@@ -2775,7 +2775,7 @@ void bot_ai::SetStats(bool force)
         value = float(IAmFree() ? mylevel / 8 : 0); // +10%/+0% at 80
         //32.5 HR = 1% hit at 80
         tempval = _getTotalBotStat(BOT_STAT_MOD_HIT_MELEE_RATING) + _getTotalBotStat(BOT_STAT_MOD_HIT_RANGED_RATING) + _getTotalBotStat(BOT_STAT_MOD_HIT_SPELL_RATING) + _getTotalBotStat(BOT_STAT_MOD_HIT_RATING);
-        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_HIT_MELEE) | (1 << CR_HIT_RANGED) | (1 << CR_HIT_SPELL));
+        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_HIT_MELEE) | (1u << CR_HIT_RANGED) | (1u << CR_HIT_SPELL));
         value += tempval * (_botclass == BOT_CLASS_HUNTER ? _getRatingMultiplier(CR_HIT_RANGED) : std::max<float>(_getRatingMultiplier(CR_HIT_MELEE), _getRatingMultiplier(CR_HIT_SPELL)));
 
         //class-specific
@@ -2816,7 +2816,7 @@ void bot_ai::SetStats(bool force)
     value = float(IAmFree() ? 5 + mylevel / 4 : 0); // 25%/0% at 80
     //? APR = 1% armor ignored at 80
     tempval = _getTotalBotStat(BOT_STAT_MOD_ARMOR_PENETRATION_RATING);
-    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_ARMOR_PENETRATION));
+    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_ARMOR_PENETRATION));
     value += tempval * _getRatingMultiplier(CR_ARMOR_PENETRATION);
 
     //class-specific
@@ -2833,7 +2833,7 @@ void bot_ai::SetStats(bool force)
     value = float(IAmFree() ? mylevel / 2 : 0); // -10%/-0% at 80
     //~8.0 ER = 1 expertise at 80
     tempval = _getTotalBotStat(BOT_STAT_MOD_EXPERTISE_RATING);
-    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_EXPERTISE));
+    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_EXPERTISE));
     value += tempval * _getRatingMultiplier(CR_EXPERTISE);
 
     //class-specific
@@ -2894,7 +2894,7 @@ void bot_ai::SetStats(bool force)
 
         //45 CR = 1% crit at 80
         tempval = _getTotalBotStat(BOT_STAT_MOD_CRIT_MELEE_RATING) + _getTotalBotStat(BOT_STAT_MOD_CRIT_RANGED_RATING) + _getTotalBotStat(BOT_STAT_MOD_CRIT_SPELL_RATING) + _getTotalBotStat(BOT_STAT_MOD_CRIT_RATING);
-        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_CRIT_MELEE) | (1 << CR_CRIT_RANGED) | (1 << CR_CRIT_SPELL));
+        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_CRIT_MELEE) | (1u << CR_CRIT_RANGED) | (1u << CR_CRIT_SPELL));
 
         //Molten Armor: 35% spirit to crit rating (+40% double-glyphed + 15% T9P2 bonus)
         if (_botclass == BOT_CLASS_MAGE && me->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RATING_FROM_STAT, SPELLFAMILY_MAGE, 0x40000))
@@ -3016,7 +3016,7 @@ void bot_ai::SetStats(bool force)
     //DEFENSE
     value = 0.f;
     tempval = _getTotalBotStat(BOT_STAT_MOD_DEFENSE_SKILL_RATING);
-    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_DEFENSE_SKILL));
+    tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_DEFENSE_SKILL));
     value += tempval * _getRatingMultiplier(CR_DEFENSE_SKILL);
     value += me->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_SKILL, SKILL_DEFENSE);
     defense = mylevel * 5 + uint32(value); //truncate
@@ -3032,7 +3032,7 @@ void bot_ai::SetStats(bool force)
         {
             //67 PR = 1% parry at 80
             tempval = _getTotalBotStat(BOT_STAT_MOD_PARRY_RATING);
-            tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_PARRY));
+            tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_PARRY));
 
             //Forceful Deflection: 25% of strength goes to parry rating
             if (_botclass == BOT_CLASS_DEATH_KNIGHT/* && mylevel >= 55*/)
@@ -3075,7 +3075,7 @@ void bot_ai::SetStats(bool force)
         {
             //53 DR = 1% dodge at 80
             tempval = _getTotalBotStat(BOT_STAT_MOD_DODGE_RATING);
-            tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_DODGE));
+            tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_DODGE));
             value += tempval * _getRatingMultiplier(CR_DODGE);
             //125 DR = 1% block/parry/dodge at 80
             value += defbonus * 0.04f;
@@ -3124,7 +3124,7 @@ void bot_ai::SetStats(bool force)
 
         //16.5 BR = 1% block at 80
         tempval = _getTotalBotStat(BOT_STAT_MOD_BLOCK_RATING);
-        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1 << CR_BLOCK));
+        tempval += me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_RATING, (1u << CR_BLOCK));
         value += tempval * _getRatingMultiplier(CR_BLOCK);
         //125 DR = 1% block/parry/dodge at 80
         value += defbonus * 0.04f;
@@ -6465,7 +6465,7 @@ WorldObject* bot_ai::GetNearbyRezTarget(float dist) const
 Unit* bot_ai::FindImmunityShieldDispelTarget(float dist) const
 {
     //not checking range
-    if (me->GetVictim() && me->GetVictim()->HasAuraWithMechanic(1<<MECHANIC_IMMUNE_SHIELD))
+    if (me->GetVictim() && me->GetVictim()->HasAuraWithMechanic(1u<<MECHANIC_IMMUNE_SHIELD))
         return me->GetVictim();
 
     Unit* unit = nullptr;
@@ -10563,7 +10563,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 if (ItemTemplate const* proto = item ? item->GetTemplate() : nullptr)
                 {
                     if (!(proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR &&
-                        (proto->AllowableClass == 0 || (proto->AllowableClass & (1 << (bot->GetBotClass() - 1)))) &&
+                        (proto->AllowableClass == 0 || (proto->AllowableClass & (1u << (bot->GetBotClass() - 1)))) &&
                         proto->RequiredSkill == 0 && proto->RequiredSpell == 0 && bot->GetLevel() >= proto->RequiredLevel))
                         return false;
                     bool has_spell = false;
@@ -11694,7 +11694,7 @@ void bot_ai::BreakCC(uint32 diff)
         (me->IsInCombat() || !me->getAttackers().empty()) && CCed(me) &&
         Rand() < 10 && !me->HasAuraType(SPELL_AURA_MOD_STEALTH) && !IsCasting() &&
         (me->GetLevel() < 60 || !IsSpellReady(PVPTRINKET, diff, false)) &&
-        me->HasAuraWithMechanic((1<<MECHANIC_CHARM)|(1<<MECHANIC_FEAR)|(1<<MECHANIC_SLEEP)))
+        me->HasAuraWithMechanic((1u<<MECHANIC_CHARM)|(1u<<MECHANIC_FEAR)|(1u<<MECHANIC_SLEEP)))
     {
         if (doCast(me, RACIAL_WILL_OF_THE_FORSAKEN))
             return;
@@ -11704,7 +11704,7 @@ void bot_ai::BreakCC(uint32 diff)
         !me->HasAuraType(SPELL_AURA_MOD_STEALTH) &&
         (me->IsInCombat() || !me->getAttackers().empty()) && Rand() < 40 && !IsCasting() &&
         (me->GetLevel() < 60 || !IsSpellReady(PVPTRINKET, diff, false)) &&
-        me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
+        me->HasAuraWithMechanic((1u<<MECHANIC_SNARE)|(1u<<MECHANIC_ROOT)))
     {
         if (doCast(me, RACIAL_ESCAPE_ARTIST))
             return;
@@ -11745,7 +11745,7 @@ void bot_ai::CheckRacials(uint32 diff)
     {
         //Unholy Blight prevents diseases from being dispelled
         uint32 const dispelMask = me->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 1494, 0) ?
-            (1<<DISPEL_POISON) : (1<<DISPEL_DISEASE)|(1<<DISPEL_POISON);
+            (1u<<DISPEL_POISON) : (1u<<DISPEL_DISEASE)|(1u<<DISPEL_POISON);
         uint8 count = 0;
         Unit::AuraMap const& auras = me->GetOwnedAuras();
         for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
@@ -11953,17 +11953,17 @@ uint32 bot_ai::_getLootQualityMask() const
     uint32 lootMask = 0;
 
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_POOR)
-        lootMask |= (1 << ITEM_QUALITY_POOR);
+        lootMask |= (1u << ITEM_QUALITY_POOR);
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_COMMON)
-        lootMask |= (1 << ITEM_QUALITY_NORMAL);
+        lootMask |= (1u << ITEM_QUALITY_NORMAL);
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_UNCOMMON)
-        lootMask |= (1 << ITEM_QUALITY_UNCOMMON);
+        lootMask |= (1u << ITEM_QUALITY_UNCOMMON);
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_RARE)
-        lootMask |= (1 << ITEM_QUALITY_RARE);
+        lootMask |= (1u << ITEM_QUALITY_RARE);
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_EPIC)
-        lootMask |= (1 << ITEM_QUALITY_EPIC);
+        lootMask |= (1u << ITEM_QUALITY_EPIC);
     if (lootRoleMask & BOT_ROLE_AUTOLOOT_LEGENDARY)
-        lootMask |= (1 << ITEM_QUALITY_LEGENDARY);
+        lootMask |= (1u << ITEM_QUALITY_LEGENDARY);
 
     return lootMask;
 }
@@ -12054,7 +12054,7 @@ bool bot_ai::_canLootCreatureForPlayer(Player* player, Creature* creature, uint3
             continue;
         }
 
-        if (!((1 << itemProto->Quality) & lootQualityMask))
+        if (!((1u << itemProto->Quality) & lootQualityMask))
         {
             //BOT_LOG_ERROR("scripts", "item {} lootQualityMask mismatch", i->itemid);
             continue;
@@ -12096,7 +12096,7 @@ bool bot_ai::_canLootCreatureForPlayer(Player* player, Creature* creature, uint3
                     continue;
                 }
 
-                if (!((1 << itemProto->Quality) & lootQualityMask))
+                if (!((1u << itemProto->Quality) & lootQualityMask))
                 {
                     //BOT_LOG_ERROR("scripts", "item {} lootQualityMask mismatch", i->itemid);
                     continue;
@@ -12143,7 +12143,7 @@ bool bot_ai::_canLootCreature(Creature* creature) const
             continue;
         }
 
-        if ((1 << itemProto->Quality) & lootQualityMask)
+        if ((1u << itemProto->Quality) & lootQualityMask)
         {
             canLootQuality = true;
             break;
@@ -12166,7 +12166,7 @@ bool bot_ai::_canLootCreature(Creature* creature) const
                 continue;
             }
 
-            if ((1 << itemProto->Quality) & lootQualityMask)
+            if ((1u << itemProto->Quality) & lootQualityMask)
             {
                 canLootQuality = true;
                 break;
@@ -12300,7 +12300,7 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
 
         if (itemProto->Quality >= lootThreshold)
             continue;
-        if (!((1 << itemProto->Quality) & lootQualityMask))
+        if (!((1u << itemProto->Quality) & lootQualityMask))
             continue;
 
         if (_canLootItemForPlayer(receiver, creature, slot - 1) && i->AllowedForPlayer(receiver))
@@ -12335,7 +12335,7 @@ void bot_ai::_autoLootCreatureItems(Player* receiver, Creature* creature, uint32
 
             if (itemProto->Quality >= lootThreshold)
                 continue;
-            if (!((1 << itemProto->Quality) & lootQualityMask))
+            if (!((1u << itemProto->Quality) & lootQualityMask))
                 continue;
 
             //if (!receiver->HasQuestForItem(i->itemid))
@@ -12511,7 +12511,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
         return false;
 
     //class requirements
-    if (_botclass < BOT_CLASS_EX_START && !(newProto->AllowableClass & (1<<(_botclass-1))))
+    if (_botclass < BOT_CLASS_EX_START && !(newProto->AllowableClass & (1u<<(_botclass-1))))
         return false;
 
     //skip race requirements
@@ -18205,7 +18205,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                     spell->GetCastTime() < spell->GetTimer() * 3 && // >=33% cast time remains
                     !me->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::M2))
                     interrupt = true; //LoS
-                else if (info->Id == 64382 && !target->HasAuraWithMechanic(1<<MECHANIC_IMMUNE_SHIELD))
+                else if (info->Id == 64382 && !target->HasAuraWithMechanic(1u<<MECHANIC_IMMUNE_SHIELD))
                     interrupt = true; //Shattering Throw wasting
             }
             if (!interrupt && !(target == master && me->GetDistance(target) < INTERACTION_DISTANCE) &&
@@ -21077,7 +21077,7 @@ int32 bot_ai::GetBotResistanceBonus(SpellSchoolMask mask) const
 {
     int32 resist = 0;
     for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
-        if ((mask & (1 << i)) && (resist == 0 || resist > resistbonus[i-1]))
+        if ((mask & (1u << i)) && (resist == 0 || resist > resistbonus[i-1]))
             resist = resistbonus[i-1];
 
     return resist;

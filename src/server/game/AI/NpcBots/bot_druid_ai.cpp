@@ -1165,7 +1165,7 @@ public:
         void BreakCC(uint32 diff) override
         {
             if (GC_Timer <= diff && Rand() < 25 && GetManaPCT(me) > 15 &&
-                (me->IsPolymorphed() || me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT))))
+                (me->IsPolymorphed() || me->HasAuraWithMechanic((1u<<MECHANIC_SNARE)|(1u<<MECHANIC_ROOT))))
             {
                 uint32 sshift;
                 switch (_form)
@@ -1189,7 +1189,7 @@ public:
                     return;
                 }
             }
-            if (IsSpellReady(BERSERK_1, diff) && Rand() < 10 && me->HasAuraWithMechanic(1<<MECHANIC_FEAR))
+            if (IsSpellReady(BERSERK_1, diff) && Rand() < 10 && me->HasAuraWithMechanic(1u<<MECHANIC_FEAR))
             {
                 if (doCast(me, GetSpell(BERSERK_1)))
                     return;

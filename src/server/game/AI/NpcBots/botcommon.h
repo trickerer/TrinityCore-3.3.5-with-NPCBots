@@ -652,4 +652,6 @@ enum BotVehicleStrats
     BOT_VEH_STRAT_GENERIC
 };
 
+inline constexpr uint32 USABLE_CORPSE_CREATURE_TYPE_MASK = (1u << (CREATURE_TYPE_BEAST-1)) | (1u << (CREATURE_TYPE_DRAGONKIN-1)) | (1u << (CREATURE_TYPE_HUMANOID-1));
+
 #endif

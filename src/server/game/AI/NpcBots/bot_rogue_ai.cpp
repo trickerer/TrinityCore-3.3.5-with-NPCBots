@@ -430,7 +430,7 @@ public:
                 Rand() < 50 && dist < 25 && energy >= ecost(SHADOWSTEP_1) &&
                 (mytar->GetTypeId() != TYPEID_PLAYER || dist > 12 || CCed(me, true)) &&
                 (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetVictim() != me) &&
-                ((!stealthed && !shadowdance) || me->HasAuraWithMechanic(1<<MECHANIC_SNARE)))
+                ((!stealthed && !shadowdance) || me->HasAuraWithMechanic(1u<<MECHANIC_SNARE)))
             {
                 if (doCast(mytar, GetSpell(SHADOWSTEP_1)))
                     getenergy();
@@ -732,7 +732,7 @@ public:
             {
                 bool canVanish = IsSpellReady(VANISH_1, diff, false) && !IsFlagCarrier(me);
                 bool canSprint = (GetSpec() == BOT_SPEC_ROGUE_COMBAT) && me->GetLevel() >= 25 && !HasBotCommandState(BOT_COMMAND_STAY) && IsSpellReady(SPRINT_1, diff, false);
-                if ((canVanish || canSprint) && me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
+                if ((canVanish || canSprint) && me->HasAuraWithMechanic((1u<<MECHANIC_SNARE)|(1u<<MECHANIC_ROOT)))
                 {
                     uint32 Spanish = canSprint ? SPRINT_1 : VANISH_1;
                     if (doCast(me, GetSpell(Spanish)))

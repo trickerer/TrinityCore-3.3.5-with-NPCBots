@@ -296,7 +296,7 @@ public:
         void BreakCC(uint32 diff) override
         {
             if (IsSpellReady(HEROIC_FURY_1, diff) && Rand() < 55 &&
-                (CCed(me, true) || me->HasAuraWithMechanic(1<<MECHANIC_SNARE)))
+                (CCed(me, true) || me->HasAuraWithMechanic(1u<<MECHANIC_SNARE)))
             {
                 if (doCast(me, GetSpell(HEROIC_FURY_1)))
                     return;
@@ -304,7 +304,7 @@ public:
             if (IsSpellReady(BERSERKER_RAGE_1, diff) && Rand() < 45 &&
                 !me->GetAuraEffect(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_WARRIOR, 0x0, 0x20000, 0x0) &&
                 /*!me->HasAura(ENRAGED_REGENERATION_1)*/
-                me->HasAuraWithMechanic((1<<MECHANIC_FEAR)|(1<<MECHANIC_SAPPED)|(1<<MECHANIC_KNOCKOUT)))
+                me->HasAuraWithMechanic((1u<<MECHANIC_FEAR)|(1u<<MECHANIC_SAPPED)|(1u<<MECHANIC_KNOCKOUT)))
             {
                 if (doCast(me, GetSpell(BERSERKER_RAGE_1)))
                     return;
@@ -711,7 +711,7 @@ public:
             if (IsSpellReady(HAMSTRING_1, diff) && can_do_normal && Rand() < 70 && (_inStance(5) || stancetimer <= diff) &&
                 (!GetSpell(PIERCING_HOWL_1) || mytar->GetTypeId() == TYPEID_PLAYER) &&
                 (mytar->isMoving() || mytar->GetTypeId() == TYPEID_PLAYER) && dist < 5 && rage >= rcost(HAMSTRING_1) &&
-                !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
             {
                 if (_inStance(5) || (me->GetLevel() >= 15 && stanceChange(diff, 5)))
                     if (doCast(mytar, GetSpell(HAMSTRING_1)))
@@ -719,7 +719,7 @@ public:
             }
             //PIERCING HOWL
             if (IsSpellReady(PIERCING_HOWL_1, diff) && can_do_normal && mytar->isMoving() && Rand() < 80 &&
-                dist < 9 && rage >= rcost(PIERCING_HOWL_1) && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                dist < 9 && rage >= rcost(PIERCING_HOWL_1) && !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
             {
                 if (doCast(me, GetSpell(PIERCING_HOWL_1)))
                     return;
@@ -834,7 +834,7 @@ public:
                 (isArms || mytar->GetClass() == CLASS_ROGUE || mytar->GetShapeshiftForm() == FORM_CAT) &&
                 dist < 5 && rage >= rcost(REND_1) && mytar->GetCreatureType() != CREATURE_TYPE_MECHANICAL &&
                 !(mytar->GetTypeId() == TYPEID_UNIT &&
-                (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_BLEED-1)))) &&
+                (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u<<(MECHANIC_BLEED-1)))) &&
                 !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARRIOR, 0x20, 0x0, 0x0, me->GetGUID()) &&
                 (_inStance(4) || (me->GetLevel() >= 15 && stanceChange(diff, 4))))
             {
@@ -875,7 +875,7 @@ public:
                mytar->IsControlledByPlayer()) &&
                (Rand() < 50 || me->HasAuraTypeWithFamilyFlags(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARRIOR, 0x10)
                /*me->HasAura(RECKLESSNESS_1)*/) &&
-               (me->GetMap()->IsDungeon() || mytar->GetMaxHealth() > me->GetMaxHealth() * 8 || CCed(mytar, true) || mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE)))
+               (me->GetMap()->IsDungeon() || mytar->GetMaxHealth() > me->GetMaxHealth() * 8 || CCed(mytar, true) || mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE)))
             {
                 if (doCast(me, GetSpell(BLADESTORM_1)))
                     return;

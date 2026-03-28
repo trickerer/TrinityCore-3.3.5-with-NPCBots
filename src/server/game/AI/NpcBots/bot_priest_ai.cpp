@@ -379,7 +379,7 @@ public:
         {
             //Improved Shadowform: Fade
             if (IsSpellReady(FADE_1, diff) && me->GetShapeshiftForm() == FORM_SHADOW && me->GetLevel() >= 45 &&
-                Rand() < 35 && me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
+                Rand() < 35 && me->HasAuraWithMechanic((1u<<MECHANIC_SNARE)|(1u<<MECHANIC_ROOT)))
             {
                 if (doCast(me, GetSpell(FADE_1)))
                     return;
@@ -540,7 +540,7 @@ public:
                 if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 100 &&
                     (GetSpec() == BOT_SPEC_PRIEST_SHADOW || mytar->IsControlledByPlayer()) &&
                     mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
-                    !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&
+                    !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u<<(MECHANIC_INFECTED-1)))) &&
                     !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_LEECH, SPELLFAMILY_PRIEST, 0x02000000, 0x0, 0x0, me->GetGUID()) &&
                     doCast(mytar, GetSpell(DEVOURING_PLAGUE_1)))
                     return;
@@ -801,7 +801,7 @@ public:
 
             if (Unit* target = FindHostileDispelTarget(CalcSpellMaxRange(DISPEL_MAGIC_1)))
             {
-                uint32 dm = DM && !target->HasAuraWithMechanic(1<<MECHANIC_IMMUNE_SHIELD) ? DM : MD;
+                uint32 dm = DM && !target->HasAuraWithMechanic(1u<<MECHANIC_IMMUNE_SHIELD) ? DM : MD;
                 if (dm && doCast(target, dm))
                     return;
             }
@@ -1061,7 +1061,7 @@ public:
             if ((me->getAttackers().size() > 3 && !IsSpellReady(FADE_1, diff, false) && GetHealthPCT(me) < 90) ||
                 (GetHealthPCT(me) < 20 && (me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) || !me->getAttackers().empty())) ||
                 (GetManaPCT(me) < 35 && !IsPotionReady()) ||
-                (me->getAttackers().size() > 1 && (CCed(me, true) || me->HasAuraWithMechanic(1<<MECHANIC_SNARE))))
+                (me->getAttackers().size() > 1 && (CCed(me, true) || me->HasAuraWithMechanic(1u<<MECHANIC_SNARE))))
             {
                 if (doCast(me, GetSpell(DISPERSION_1)))
                     return;

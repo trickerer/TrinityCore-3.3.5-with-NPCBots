@@ -145,7 +145,7 @@ uint32 BotMgr::GetAllNpcBotsClassMask() const
 {
     uint32 classMask = 0;
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
-        classMask |= (1 << (BotMgr::GetBotEquipmentClass(itr->second->GetBotClass()) - 1));
+        classMask |= (1u << (BotMgr::GetBotEquipmentClass(itr->second->GetBotClass()) - 1));
 
     return classMask;
 }
@@ -1454,8 +1454,9 @@ void BotMgr::BuildBotPartyMemberStatsChangedPacket(Creature const* bot, WorldPac
         mask |= (GROUP_UPDATE_FLAG_PET_CUR_POWER | GROUP_UPDATE_FLAG_PET_MAX_POWER);
 
     uint32 byteCount = 0;
-    for (int i = 1; i < GROUP_UPDATE_FLAGS_COUNT; ++i)
-        if (mask & (1 << i))
+    uint8 flags_count = GROUP_UPDATE_FLAGS_COUNT;
+    for (uint8 i = 1; i < flags_count; ++i)
+        if (mask & (1u << i))
             byteCount += GroupUpdateLength[i];
 
     data->Initialize(SMSG_PARTY_MEMBER_STATS, size_t(8 + 4 + byteCount));

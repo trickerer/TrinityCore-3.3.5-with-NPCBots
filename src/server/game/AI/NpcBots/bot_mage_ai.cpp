@@ -714,7 +714,7 @@ public:
             }
             if (!cast && me->IsInCombat() && !me->getAttackers().empty() && HasRole(BOT_ROLE_RANGED))
             {
-                cast = me->HasAuraWithMechanic((1<<MECHANIC_STUN)|(1<<MECHANIC_ROOT));
+                cast = me->HasAuraWithMechanic((1u<<MECHANIC_STUN)|(1u<<MECHANIC_ROOT));
                 if (!cast)
                 {
                     u = me->SelectNearestTarget(7);

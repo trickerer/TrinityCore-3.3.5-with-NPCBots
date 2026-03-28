@@ -1915,7 +1915,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
             if (c == BOT_CLASS_SPHYNX &&
                 (itt.InventoryType == INVTYPE_FINGER || itt.InventoryType == INVTYPE_TRINKET || itt.InventoryType == INVTYPE_CLOAK || itt.InventoryType == INVTYPE_NECK || itt.InventoryType == INVTYPE_SHIELD))
                 continue;
-            if (!itt.AllowableClass || itt.AllowableClass >= ((1u << MAX_CLASSES) - 1) || !!(itt.AllowableClass & (1 << (c - 1))))
+            if (!itt.AllowableClass || itt.AllowableClass >= ((1u << MAX_CLASSES) - 1) || !!(itt.AllowableClass & (1u << (c - 1))))
                 _botsWanderCreaturesSortedGear[c][slot][lstep].push_back(itt.ItemId);
         }
     };
@@ -2423,7 +2423,7 @@ bool BotDataMgr::GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 
     static const auto is_enchantable = [](ItemTemplate const* p, SpellInfo const* s) {
         SpellEffectInfo const& e = s->GetEffect(EFFECT_0);
         return e.Effect == SPELL_EFFECT_ENCHANT_ITEM && s->EquippedItemClass == int32(p->Class) && s->BaseLevel <= p->RequiredLevel && e.MiscValue > 0 &&
-            (s->EquippedItemClass == ITEM_CLASS_WEAPON ? !!(s->EquippedItemSubClassMask & (1 << p->SubClass)) : !!(s->EquippedItemInventoryTypeMask & (1 << p->InventoryType))) &&
+            (s->EquippedItemClass == ITEM_CLASS_WEAPON ? !!(s->EquippedItemSubClassMask & (1u << p->SubClass)) : !!(s->EquippedItemInventoryTypeMask & (1u << p->InventoryType))) &&
             sSpellItemEnchantmentStore.LookupEntry(uint32(e.MiscValue));
     };
 

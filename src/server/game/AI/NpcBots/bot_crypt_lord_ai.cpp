@@ -801,12 +801,9 @@ public:
 
         bool _isUsableCorpse(Creature const* c) const
         {
-            static const uint32 ViableCreatureTypesMask =
-                (1 << (CREATURE_TYPE_BEAST-1)) | (1 << (CREATURE_TYPE_DRAGONKIN-1)) | (1 << (CREATURE_TYPE_HUMANOID-1));
-
             return c->getDeathState() == DeathState::CORPSE && c->GetDisplayId() == c->GetNativeDisplayId() &&
                 !c->IsVehicle() && !c->isWorldBoss() && !c->IsDungeonBoss() &&
-                ((1 << (c->GetCreatureType()-1)) & ViableCreatureTypesMask) &&
+                ((1u << (c->GetCreatureType()-1)) & USABLE_CORPSE_CREATURE_TYPE_MASK) &&
                 !c->IsControlledByPlayer() && !c->IsNPCBot();
         }
 

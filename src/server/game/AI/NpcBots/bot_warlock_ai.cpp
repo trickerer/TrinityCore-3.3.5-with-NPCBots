@@ -876,7 +876,7 @@ public:
                             return;
                     }
                     if (!(curses & CURSE_MASK_EXHAUSTION) && GetSpell(CURSE_OF_EXHAUSTION_1) && !CCed(mytar, true) &&
-                        mytar->IsControlledByPlayer() && !mytar->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                        mytar->IsControlledByPlayer() && !mytar->HasAuraWithMechanic(1u<<MECHANIC_SNARE))
                     {
                         if (doCast(mytar, GetSpell(CURSE_OF_EXHAUSTION_1)))
                             return;

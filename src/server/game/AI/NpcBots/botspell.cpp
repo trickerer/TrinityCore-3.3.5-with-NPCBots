@@ -108,7 +108,7 @@ void GenerateBotCustomSpellProcs()
             if (!isTriggerAura[auraName])
             {
                 // explicitly disable non proccing auras to avoid losing charges on self proc
-                nonProcMask |= 1 << spellEffectInfo.EffectIndex;
+                nonProcMask |= 1u << spellEffectInfo.EffectIndex;
                 continue;
             }
 
