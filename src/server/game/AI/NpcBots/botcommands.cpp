@@ -50,250 +50,275 @@ Category: commandscripts/custom/
 # pragma warning(push, 4)
 #endif
 
-static bool isWPSpawnWarningGiven = false;
-
 using namespace std::string_view_literals;
 using namespace Bcore::ChatCommands;
 
+static bool isWPSpawnWarningGiven = false;
 static uint32 last_model_id = 0;
+
+static constexpr size_t SOUND_SETS_COUNT = 3;
+static constexpr size_t GENDERS_COUNT = 2;
+static constexpr size_t RACES_COUNT = 10;
+
+// model ids with different sound sets tied to them
+enum SoundSetModels : uint32
+{
+    SOUNDSETMODEL_HUMAN_MALE_1          = 1492,
+    SOUNDSETMODEL_HUMAN_MALE_2          = 1290,
+    SOUNDSETMODEL_HUMAN_MALE_3          = 1699,
+    SOUNDSETMODEL_HUMAN_FEMALE_1        = 1295,
+    SOUNDSETMODEL_HUMAN_FEMALE_2        = 1296,
+    SOUNDSETMODEL_HUMAN_FEMALE_3        = 1297,
+    SOUNDSETMODEL_DWARF_MALE_1          = 1280,
+    SOUNDSETMODEL_DWARF_MALE_2          = 1354,
+    SOUNDSETMODEL_DWARF_MALE_3          = 1362,
+    SOUNDSETMODEL_DWARF_FEMALE_1        = 1286,
+    SOUNDSETMODEL_DWARF_FEMALE_2        = 1407,
+    SOUNDSETMODEL_DWARF_FEMALE_3        = 2585,
+    SOUNDSETMODEL_NIGHTELF_MALE_1       = 1285,
+    SOUNDSETMODEL_NIGHTELF_MALE_2       = 1704,
+    SOUNDSETMODEL_NIGHTELF_MALE_3       = 1706,
+    SOUNDSETMODEL_NIGHTELF_FEMALE_1     = 1681,
+    SOUNDSETMODEL_NIGHTELF_FEMALE_2     = 1682,
+    SOUNDSETMODEL_NIGHTELF_FEMALE_3     = 1719,
+    SOUNDSETMODEL_GNOME_MALE_1          = 1832,
+    SOUNDSETMODEL_GNOME_MALE_2          = 4287,
+    SOUNDSETMODEL_GNOME_MALE_3          = 4717,
+    SOUNDSETMODEL_GNOME_FEMALE_1        = 3124,
+    SOUNDSETMODEL_GNOME_FEMALE_2        = 5378,
+    SOUNDSETMODEL_GNOME_FEMALE_3        = 3108,
+    SOUNDSETMODEL_DRAENEI_MALE_1        = 16226,
+    SOUNDSETMODEL_DRAENEI_MALE_2        = 16589,
+    SOUNDSETMODEL_DRAENEI_MALE_3        = 16224,
+    SOUNDSETMODEL_DRAENEI_FEMALE_1      = 16222,
+    SOUNDSETMODEL_DRAENEI_FEMALE_2      = 16202,
+    SOUNDSETMODEL_DRAENEI_FEMALE_3      = 16636,
+    SOUNDSETMODEL_ORC_MALE_1            = 1275,
+    SOUNDSETMODEL_ORC_MALE_2            = 1326,
+    SOUNDSETMODEL_ORC_MALE_3            = 1368,
+    SOUNDSETMODEL_ORC_FEMALE_1          = 1325,
+    SOUNDSETMODEL_ORC_FEMALE_2          = 1868,
+    SOUNDSETMODEL_ORC_FEMALE_3          = 1874,
+    SOUNDSETMODEL_UNDEAD_MALE_1         = 1278,
+    SOUNDSETMODEL_UNDEAD_MALE_2         = 1562,
+    SOUNDSETMODEL_UNDEAD_MALE_3         = 1578,
+    SOUNDSETMODEL_UNDEAD_FEMALE_1       = 1592,
+    SOUNDSETMODEL_UNDEAD_FEMALE_2       = 1593,
+    SOUNDSETMODEL_UNDEAD_FEMALE_3       = 1603,
+    SOUNDSETMODEL_TAUREN_MALE_1         = 2083,
+    SOUNDSETMODEL_TAUREN_MALE_2         = 2087,
+    SOUNDSETMODEL_TAUREN_MALE_3         = 2096,
+    SOUNDSETMODEL_TAUREN_FEMALE_1       = 2113,
+    SOUNDSETMODEL_TAUREN_FEMALE_2       = 2112,
+    SOUNDSETMODEL_TAUREN_FEMALE_3       = 2127,
+    SOUNDSETMODEL_TROLL_MALE_1          = 3608,
+    SOUNDSETMODEL_TROLL_MALE_2          = 4047,
+    SOUNDSETMODEL_TROLL_MALE_3          = 4068,
+    SOUNDSETMODEL_TROLL_FEMALE_1        = 4085,
+    SOUNDSETMODEL_TROLL_FEMALE_2        = 4231,
+    SOUNDSETMODEL_TROLL_FEMALE_3        = 4524,
+    SOUNDSETMODEL_BLOODELF_MALE_1       = 15532,
+    SOUNDSETMODEL_BLOODELF_MALE_2       = 16700,
+    SOUNDSETMODEL_BLOODELF_MALE_3       = 16699,
+    SOUNDSETMODEL_BLOODELF_FEMALE_1     = 15514,
+    SOUNDSETMODEL_BLOODELF_FEMALE_2     = 15518,
+    SOUNDSETMODEL_BLOODELF_FEMALE_3     = 15520
+};
+
+static constexpr size_t RaceToRaceOffset[MAX_RACES] = {
+    RACE_NONE,
+    0, //RACE_HUMAN
+    5, //RACE_ORC
+    1, //RACE_DWARF
+    2, //RACE_RACE_NIGHTELF
+    6, //RACE_RACE_UNDEAD_PLAYER
+    7, //RACE_TAUREN
+    3, //RACE_GNOME
+    8, //RACE_TROLL
+    RACE_NONE,
+    9, //RACE_BLOODELF
+    4, //RACE_DRAENEI
+};
+
+static constexpr uint32 SoundSetModelsArray[RACES_COUNT][GENDERS_COUNT][SOUND_SETS_COUNT] = {
+    {{SOUNDSETMODEL_HUMAN_MALE_1, SOUNDSETMODEL_HUMAN_MALE_2, SOUNDSETMODEL_HUMAN_MALE_3}, {SOUNDSETMODEL_HUMAN_FEMALE_1, SOUNDSETMODEL_HUMAN_FEMALE_2, SOUNDSETMODEL_HUMAN_FEMALE_3}},
+    {{SOUNDSETMODEL_DWARF_MALE_1, SOUNDSETMODEL_DWARF_MALE_2, SOUNDSETMODEL_DWARF_MALE_3}, {SOUNDSETMODEL_DWARF_FEMALE_1, SOUNDSETMODEL_DWARF_FEMALE_2, SOUNDSETMODEL_DWARF_FEMALE_3}},
+    {{SOUNDSETMODEL_NIGHTELF_MALE_1, SOUNDSETMODEL_NIGHTELF_MALE_2, SOUNDSETMODEL_NIGHTELF_MALE_3}, {SOUNDSETMODEL_NIGHTELF_FEMALE_1, SOUNDSETMODEL_NIGHTELF_FEMALE_2, SOUNDSETMODEL_NIGHTELF_FEMALE_3}},
+    {{SOUNDSETMODEL_GNOME_MALE_1, SOUNDSETMODEL_GNOME_MALE_2, SOUNDSETMODEL_GNOME_MALE_3}, {SOUNDSETMODEL_GNOME_FEMALE_1, SOUNDSETMODEL_GNOME_FEMALE_2, SOUNDSETMODEL_GNOME_FEMALE_3}},
+    {{SOUNDSETMODEL_DRAENEI_MALE_1, SOUNDSETMODEL_DRAENEI_MALE_2, SOUNDSETMODEL_DRAENEI_MALE_3}, {SOUNDSETMODEL_DRAENEI_FEMALE_1, SOUNDSETMODEL_DRAENEI_FEMALE_2, SOUNDSETMODEL_DRAENEI_FEMALE_3}},
+    {{SOUNDSETMODEL_ORC_MALE_1, SOUNDSETMODEL_ORC_MALE_2, SOUNDSETMODEL_ORC_MALE_3}, {SOUNDSETMODEL_ORC_FEMALE_1, SOUNDSETMODEL_ORC_FEMALE_2, SOUNDSETMODEL_ORC_FEMALE_3}},
+    {{SOUNDSETMODEL_UNDEAD_MALE_1, SOUNDSETMODEL_UNDEAD_MALE_2, SOUNDSETMODEL_UNDEAD_MALE_3}, {SOUNDSETMODEL_UNDEAD_FEMALE_1, SOUNDSETMODEL_UNDEAD_FEMALE_2, SOUNDSETMODEL_UNDEAD_FEMALE_3}},
+    {{SOUNDSETMODEL_TAUREN_MALE_1, SOUNDSETMODEL_TAUREN_MALE_2, SOUNDSETMODEL_TAUREN_MALE_3}, {SOUNDSETMODEL_TAUREN_FEMALE_1, SOUNDSETMODEL_TAUREN_FEMALE_2, SOUNDSETMODEL_TAUREN_FEMALE_3}},
+    {{SOUNDSETMODEL_TROLL_MALE_1, SOUNDSETMODEL_TROLL_MALE_2, SOUNDSETMODEL_TROLL_MALE_3}, {SOUNDSETMODEL_TROLL_FEMALE_1, SOUNDSETMODEL_TROLL_FEMALE_2, SOUNDSETMODEL_TROLL_FEMALE_3}},
+    {{SOUNDSETMODEL_BLOODELF_MALE_1, SOUNDSETMODEL_BLOODELF_MALE_2, SOUNDSETMODEL_BLOODELF_MALE_3}, {SOUNDSETMODEL_BLOODELF_FEMALE_1, SOUNDSETMODEL_BLOODELF_FEMALE_2, SOUNDSETMODEL_BLOODELF_FEMALE_3}}
+};
+
+enum class PlayerVisuals : size_t
+{
+    Skins,
+    Faces,
+    HairStyles,
+    HairColors,
+    Features
+};
+
+template<PlayerVisuals E, Races R, Gender G>
+static consteval uint8 GetMaxVisual()
+{
+#define MV_PRED9(skinm,skinf,facem,facef,hairm,hairf,hairc,featm,featf) \
+    if      constexpr (E == PlayerVisuals::Skins)      return M ? skinm : skinf; \
+    else if constexpr (E == PlayerVisuals::Faces)      return M ? facem : facef; \
+    else if constexpr (E == PlayerVisuals::HairStyles) return M ? hairm : hairf; \
+    else if constexpr (E == PlayerVisuals::HairColors) return M ? hairc : hairc; \
+    else if constexpr (E == PlayerVisuals::Features)   return M ? featm : featf
+
+    constexpr bool M = G == GENDER_MALE;
+    if constexpr (R == RACE_HUMAN)         { MV_PRED9(9,9, 11,14, 16,23, 9,  8,6); }
+    if constexpr (R == RACE_DWARF)         { MV_PRED9(8,8,   9,9, 15,18, 9, 10,5); }
+    if constexpr (R == RACE_NIGHTELF)      { MV_PRED9(8,8,   8,8, 11,11, 7,  5,9); }
+    if constexpr (R == RACE_GNOME)         { MV_PRED9(4,4,   6,6, 11,11, 8,  7,6); }
+    if constexpr (R == RACE_DRAENEI)       { MV_PRED9(13,13, 9,9, 13,15, 6,  7,6); }
+    if constexpr (R == RACE_ORC)           { MV_PRED9(8,8,   8,8, 11,12, 7, 10,6); }
+    if constexpr (R == RACE_UNDEAD_PLAYER) { MV_PRED9(5,5,   9,9, 14,14, 9, 16,7); }
+    if constexpr (R == RACE_TAUREN)        { MV_PRED9(18,10, 4,3, 12,11, 2,  6,4); }
+    if constexpr (R == RACE_TROLL)         { MV_PRED9(5,5,   4,5,   9,9, 9, 10,5); }
+    if constexpr (R == RACE_BLOODELF)      { MV_PRED9(9,9,   9,9, 15,18, 9, 9,10); }
+    return 0;
+#undef MV_PRED9
+}
+
+#if !defined(PLAYER_VIS_ARRS) && !defined(PLAYER_VIS_ARR)
+#define PLAYER_VIS_ARR(r,g) \
+    GetMaxVisual<PlayerVisuals::Skins, Races(r), g>(), \
+    GetMaxVisual<PlayerVisuals::Faces, Races(r), g>(), \
+    GetMaxVisual<PlayerVisuals::HairStyles, Races(r), g>(), \
+    GetMaxVisual<PlayerVisuals::HairColors, Races(r), g>(), \
+    GetMaxVisual<PlayerVisuals::Features, Races(r), g>()
+
+#define PLAYER_VIS_ARRS(r) PLAYER_VIS_ARR(r, GENDER_MALE), PLAYER_VIS_ARR(r, GENDER_FEMALE)
+static constinit const uint8 MAX_PLAYER_VISUALS[MAX_RACES][GENDERS_COUNT][5] {
+    PLAYER_VIS_ARRS(0),
+    PLAYER_VIS_ARRS(1),
+    PLAYER_VIS_ARRS(2),
+    PLAYER_VIS_ARRS(3),
+    PLAYER_VIS_ARRS(4),
+    PLAYER_VIS_ARRS(5),
+    PLAYER_VIS_ARRS(6),
+    PLAYER_VIS_ARRS(7),
+    PLAYER_VIS_ARRS(8),
+    PLAYER_VIS_ARRS(9),
+    PLAYER_VIS_ARRS(10),
+    PLAYER_VIS_ARRS(11)
+};
+#undef PLAYER_VIS_ARR
+#undef PLAYER_VIS_ARRS
+#endif // !defined(PLAYER_VIS_ARRS) && !defined(PLAYER_VIS_ARR)
+
+static_assert(std::size(MAX_PLAYER_VISUALS) == MAX_RACES);
+static_assert(std::ranges::all_of(MAX_PLAYER_VISUALS, [](auto const& c) {
+    return std::size(c) == GENDERS_COUNT;
+}));
+static_assert(std::ranges::all_of(MAX_PLAYER_VISUALS, [](auto const& c) {
+    return std::ranges::all_of(c, [](auto const& cc) { return std::size(cc) == 5; });
+}));
+static_assert(sizeof(MAX_PLAYER_VISUALS) == 120);
+
+static void ReportVisualRanges(ChatHandler* handler)
+{
+#define VISUAL_REPORT_VALUE_G(r,g,v) static_cast<uint32>((MAX_PLAYER_VISUALS[r][g][AsUnderlyingType(v)]))
+#define FILL_VISUALS_REPORT2G(s,r) s \
+    << GetRaceName(r, loc) << " Male:" \
+    << " skin 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_MALE, PlayerVisuals::Skins) \
+    << " face 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_MALE, PlayerVisuals::Faces) \
+    << " hairstyle 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_MALE, PlayerVisuals::HairStyles) \
+    << " haircolor 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_MALE, PlayerVisuals::HairColors) \
+    << " features 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_MALE, PlayerVisuals::Features) \
+    << "\n" << GetRaceName(r, loc) << " Female:" \
+    << " skin 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_FEMALE, PlayerVisuals::Skins) \
+    << " face 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_FEMALE, PlayerVisuals::Faces) \
+    << " hairstyle 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_FEMALE, PlayerVisuals::HairStyles) \
+    << " haircolor 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_FEMALE, PlayerVisuals::HairColors) \
+    << " features 0-" << VISUAL_REPORT_VALUE_G(r, GENDER_FEMALE, PlayerVisuals::Features)
+
+    LocaleConstant loc = handler->GetSessionDbcLocale();
+    handler->SendSysMessage("Ranges:");
+    for (uint8 race : { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME, RACE_DRAENEI, RACE_ORC, RACE_UNDEAD_PLAYER, RACE_TAUREN, RACE_TROLL, RACE_BLOODELF })
+    {
+        std::ostringstream stream;
+        switch (race)
+        {
+            case RACE_HUMAN:         FILL_VISUALS_REPORT2G(stream, RACE_HUMAN);         break;
+            case RACE_DWARF:         FILL_VISUALS_REPORT2G(stream, RACE_DWARF);         break;
+            case RACE_NIGHTELF:      FILL_VISUALS_REPORT2G(stream, RACE_NIGHTELF);      break;
+            case RACE_GNOME:         FILL_VISUALS_REPORT2G(stream, RACE_GNOME);         break;
+            case RACE_DRAENEI:       FILL_VISUALS_REPORT2G(stream, RACE_DRAENEI);       break;
+            case RACE_ORC:           FILL_VISUALS_REPORT2G(stream, RACE_ORC);           break;
+            case RACE_UNDEAD_PLAYER: FILL_VISUALS_REPORT2G(stream, RACE_UNDEAD_PLAYER); break;
+            case RACE_TAUREN:        FILL_VISUALS_REPORT2G(stream, RACE_TAUREN);        break;
+            case RACE_TROLL:         FILL_VISUALS_REPORT2G(stream, RACE_TROLL);         break;
+            case RACE_BLOODELF:      FILL_VISUALS_REPORT2G(stream, RACE_BLOODELF);      break;
+            default:                                                                    break;
+        }
+
+        handler->SendSysMessage(stream.view());
+    }
+#undef FILL_VISUALS_REPORT2G
+#undef VISUAL_REPORT_VALUE_G
+}
+
+inline static uint32 GetMaxPlayerVisual(Races race, Gender gender, PlayerVisuals visual_type)
+{
+    return static_cast<uint32>((MAX_PLAYER_VISUALS[race][gender][AsUnderlyingType(visual_type)]));
+}
+
+static bool IsValidVisual(uint8 race, uint8 gender, uint8 skin, uint8 face, uint8 hairs, uint8 hairc, uint8 features)
+{
+    return (
+        race < RACES_COUNT &&
+        gender < GENDERS_COUNT &&
+        skin <= GetMaxPlayerVisual(Races(race), Gender(gender), PlayerVisuals::Skins) &&
+        face <= GetMaxPlayerVisual(Races(race), Gender(gender), PlayerVisuals::Faces) &&
+        hairs <= GetMaxPlayerVisual(Races(race), Gender(gender), PlayerVisuals::HairStyles) &&
+        hairc <= GetMaxPlayerVisual(Races(race), Gender(gender), PlayerVisuals::HairColors) &&
+        features <= GetMaxPlayerVisual(Races(race), Gender(gender), PlayerVisuals::Features)
+    );
+}
+
+struct BotClassColor
+{
+    std::string_view name;
+    std::string_view color;
+};
+
+static constexpr std::array BotColors {
+    BotClassColor{ .name="Unknown"sv, .color="ffffffff"sv },
+    BotClassColor{ .name="Warrior"sv, .color="ffc79c6e"sv },
+    BotClassColor{ .name="Paladin"sv, .color="fff58cba"sv },
+    BotClassColor{ .name="Hunter"sv, .color="ffabd473"sv },
+    BotClassColor{ .name="Rogue"sv, .color="fffff569"sv },
+    BotClassColor{ .name="Priest"sv, .color="ffffffff"sv },
+    BotClassColor{ .name="Death Knight"sv, .color="ffc41f3b"sv },
+    BotClassColor{ .name="Shaman"sv, .color="ff0070de"sv },
+    BotClassColor{ .name="Mage"sv, .color="ff69ccf0"sv },
+    BotClassColor{ .name="Warlock"sv, .color="ff9482c9"sv },
+    BotClassColor{ .name="Unknown"sv, .color="ffffffff"sv },
+    BotClassColor{ .name="Druid"sv, .color="ffff7d0a"sv },
+    BotClassColor{ .name="Blademaster"sv, .color="ffa10015"sv },
+    BotClassColor{ .name="Obsidian Destroyer"sv, .color="ff29004a"sv },
+    BotClassColor{ .name="Archmage"sv, .color="ff028a99"sv },
+    BotClassColor{ .name="Dreadlord"sv, .color="ff534161"sv },
+    BotClassColor{ .name="Spellbreaker"sv, .color="ffcf3c1f"sv },
+    BotClassColor{ .name="Dark Ranger"sv, .color="ff3e255e"sv },
+    BotClassColor{ .name="Necromancer"sv, .color="ff9900cc"sv },
+    BotClassColor{ .name="Sea Witch"sv, .color="ff40d7a9"sv },
+    BotClassColor{ .name="Crypt Lord"sv, .color="ff19782b"sv }
+};
+
+static_assert(std::size(BotColors) == BOT_CLASS_END);
+static_assert(BotColors[BOT_CLASS_CRYPT_LORD].name == "Crypt Lord"sv);
 
 class script_bot_commands : public CommandScript
 {
-private:
-    static constexpr size_t SOUND_SETS_COUNT = 3;
-    static constexpr size_t GENDERS_COUNT = 2;
-    static constexpr size_t RACES_COUNT = 10;
-
-    // model ids with different sound sets tied to them
-    enum SoundSetModels : uint32
-    {
-        SOUNDSETMODEL_HUMAN_MALE_1          = 1492,
-        SOUNDSETMODEL_HUMAN_MALE_2          = 1290,
-        SOUNDSETMODEL_HUMAN_MALE_3          = 1699,
-        SOUNDSETMODEL_HUMAN_FEMALE_1        = 1295,
-        SOUNDSETMODEL_HUMAN_FEMALE_2        = 1296,
-        SOUNDSETMODEL_HUMAN_FEMALE_3        = 1297,
-        SOUNDSETMODEL_DWARF_MALE_1          = 1280,
-        SOUNDSETMODEL_DWARF_MALE_2          = 1354,
-        SOUNDSETMODEL_DWARF_MALE_3          = 1362,
-        SOUNDSETMODEL_DWARF_FEMALE_1        = 1286,
-        SOUNDSETMODEL_DWARF_FEMALE_2        = 1407,
-        SOUNDSETMODEL_DWARF_FEMALE_3        = 2585,
-        SOUNDSETMODEL_NIGHTELF_MALE_1       = 1285,
-        SOUNDSETMODEL_NIGHTELF_MALE_2       = 1704,
-        SOUNDSETMODEL_NIGHTELF_MALE_3       = 1706,
-        SOUNDSETMODEL_NIGHTELF_FEMALE_1     = 1681,
-        SOUNDSETMODEL_NIGHTELF_FEMALE_2     = 1682,
-        SOUNDSETMODEL_NIGHTELF_FEMALE_3     = 1719,
-        SOUNDSETMODEL_GNOME_MALE_1          = 1832,
-        SOUNDSETMODEL_GNOME_MALE_2          = 4287,
-        SOUNDSETMODEL_GNOME_MALE_3          = 4717,
-        SOUNDSETMODEL_GNOME_FEMALE_1        = 3124,
-        SOUNDSETMODEL_GNOME_FEMALE_2        = 5378,
-        SOUNDSETMODEL_GNOME_FEMALE_3        = 3108,
-        SOUNDSETMODEL_DRAENEI_MALE_1        = 16226,
-        SOUNDSETMODEL_DRAENEI_MALE_2        = 16589,
-        SOUNDSETMODEL_DRAENEI_MALE_3        = 16224,
-        SOUNDSETMODEL_DRAENEI_FEMALE_1      = 16222,
-        SOUNDSETMODEL_DRAENEI_FEMALE_2      = 16202,
-        SOUNDSETMODEL_DRAENEI_FEMALE_3      = 16636,
-        SOUNDSETMODEL_ORC_MALE_1            = 1275,
-        SOUNDSETMODEL_ORC_MALE_2            = 1326,
-        SOUNDSETMODEL_ORC_MALE_3            = 1368,
-        SOUNDSETMODEL_ORC_FEMALE_1          = 1325,
-        SOUNDSETMODEL_ORC_FEMALE_2          = 1868,
-        SOUNDSETMODEL_ORC_FEMALE_3          = 1874,
-        SOUNDSETMODEL_UNDEAD_MALE_1         = 1278,
-        SOUNDSETMODEL_UNDEAD_MALE_2         = 1562,
-        SOUNDSETMODEL_UNDEAD_MALE_3         = 1578,
-        SOUNDSETMODEL_UNDEAD_FEMALE_1       = 1592,
-        SOUNDSETMODEL_UNDEAD_FEMALE_2       = 1593,
-        SOUNDSETMODEL_UNDEAD_FEMALE_3       = 1603,
-        SOUNDSETMODEL_TAUREN_MALE_1         = 2083,
-        SOUNDSETMODEL_TAUREN_MALE_2         = 2087,
-        SOUNDSETMODEL_TAUREN_MALE_3         = 2096,
-        SOUNDSETMODEL_TAUREN_FEMALE_1       = 2113,
-        SOUNDSETMODEL_TAUREN_FEMALE_2       = 2112,
-        SOUNDSETMODEL_TAUREN_FEMALE_3       = 2127,
-        SOUNDSETMODEL_TROLL_MALE_1          = 3608,
-        SOUNDSETMODEL_TROLL_MALE_2          = 4047,
-        SOUNDSETMODEL_TROLL_MALE_3          = 4068,
-        SOUNDSETMODEL_TROLL_FEMALE_1        = 4085,
-        SOUNDSETMODEL_TROLL_FEMALE_2        = 4231,
-        SOUNDSETMODEL_TROLL_FEMALE_3        = 4524,
-        SOUNDSETMODEL_BLOODELF_MALE_1       = 15532,
-        SOUNDSETMODEL_BLOODELF_MALE_2       = 16700,
-        SOUNDSETMODEL_BLOODELF_MALE_3       = 16699,
-        SOUNDSETMODEL_BLOODELF_FEMALE_1     = 15514,
-        SOUNDSETMODEL_BLOODELF_FEMALE_2     = 15518,
-        SOUNDSETMODEL_BLOODELF_FEMALE_3     = 15520,
-    };
-
-    static constexpr size_t RaceToRaceOffset[MAX_RACES] = {
-        RACE_NONE,
-        0, //RACE_HUMAN
-        5, //RACE_ORC
-        1, //RACE_DWARF
-        2, //RACE_RACE_NIGHTELF
-        6, //RACE_RACE_UNDEAD_PLAYER
-        7, //RACE_TAUREN
-        3, //RACE_GNOME
-        8, //RACE_TROLL
-        RACE_NONE,
-        9, //RACE_BLOODELF
-        4, //RACE_DRAENEI
-    };
-
-    static constexpr uint32 SoundSetModelsArray[RACES_COUNT][GENDERS_COUNT][SOUND_SETS_COUNT] = {
-        {{SOUNDSETMODEL_HUMAN_MALE_1, SOUNDSETMODEL_HUMAN_MALE_2, SOUNDSETMODEL_HUMAN_MALE_3}, {SOUNDSETMODEL_HUMAN_FEMALE_1, SOUNDSETMODEL_HUMAN_FEMALE_2, SOUNDSETMODEL_HUMAN_FEMALE_3}},
-        {{SOUNDSETMODEL_DWARF_MALE_1, SOUNDSETMODEL_DWARF_MALE_2, SOUNDSETMODEL_DWARF_MALE_3}, {SOUNDSETMODEL_DWARF_FEMALE_1, SOUNDSETMODEL_DWARF_FEMALE_2, SOUNDSETMODEL_DWARF_FEMALE_3}},
-        {{SOUNDSETMODEL_NIGHTELF_MALE_1, SOUNDSETMODEL_NIGHTELF_MALE_2, SOUNDSETMODEL_NIGHTELF_MALE_3}, {SOUNDSETMODEL_NIGHTELF_FEMALE_1, SOUNDSETMODEL_NIGHTELF_FEMALE_2, SOUNDSETMODEL_NIGHTELF_FEMALE_3}},
-        {{SOUNDSETMODEL_GNOME_MALE_1, SOUNDSETMODEL_GNOME_MALE_2, SOUNDSETMODEL_GNOME_MALE_3}, {SOUNDSETMODEL_GNOME_FEMALE_1, SOUNDSETMODEL_GNOME_FEMALE_2, SOUNDSETMODEL_GNOME_FEMALE_3}},
-        {{SOUNDSETMODEL_DRAENEI_MALE_1, SOUNDSETMODEL_DRAENEI_MALE_2, SOUNDSETMODEL_DRAENEI_MALE_3}, {SOUNDSETMODEL_DRAENEI_FEMALE_1, SOUNDSETMODEL_DRAENEI_FEMALE_2, SOUNDSETMODEL_DRAENEI_FEMALE_3}},
-        {{SOUNDSETMODEL_ORC_MALE_1, SOUNDSETMODEL_ORC_MALE_2, SOUNDSETMODEL_ORC_MALE_3}, {SOUNDSETMODEL_ORC_FEMALE_1, SOUNDSETMODEL_ORC_FEMALE_2, SOUNDSETMODEL_ORC_FEMALE_3}},
-        {{SOUNDSETMODEL_UNDEAD_MALE_1, SOUNDSETMODEL_UNDEAD_MALE_2, SOUNDSETMODEL_UNDEAD_MALE_3}, {SOUNDSETMODEL_UNDEAD_FEMALE_1, SOUNDSETMODEL_UNDEAD_FEMALE_2, SOUNDSETMODEL_UNDEAD_FEMALE_3}},
-        {{SOUNDSETMODEL_TAUREN_MALE_1, SOUNDSETMODEL_TAUREN_MALE_2, SOUNDSETMODEL_TAUREN_MALE_3}, {SOUNDSETMODEL_TAUREN_FEMALE_1, SOUNDSETMODEL_TAUREN_FEMALE_2, SOUNDSETMODEL_TAUREN_FEMALE_3}},
-        {{SOUNDSETMODEL_TROLL_MALE_1, SOUNDSETMODEL_TROLL_MALE_2, SOUNDSETMODEL_TROLL_MALE_3}, {SOUNDSETMODEL_TROLL_FEMALE_1, SOUNDSETMODEL_TROLL_FEMALE_2, SOUNDSETMODEL_TROLL_FEMALE_3}},
-        {{SOUNDSETMODEL_BLOODELF_MALE_1, SOUNDSETMODEL_BLOODELF_MALE_2, SOUNDSETMODEL_BLOODELF_MALE_3}, {SOUNDSETMODEL_BLOODELF_FEMALE_1, SOUNDSETMODEL_BLOODELF_FEMALE_2, SOUNDSETMODEL_BLOODELF_FEMALE_3}}
-    };
-
-    static void GetBotClassNameAndColor(uint8 botclass, std::string& bot_color_str, std::string& bot_class_str)
-    {
-        switch (botclass)
-        {
-            case BOT_CLASS_WARRIOR:     bot_color_str = "ffc79c6e"; bot_class_str = "Warrior";            break;
-            case BOT_CLASS_PALADIN:     bot_color_str = "fff58cba"; bot_class_str = "Paladin";            break;
-            case BOT_CLASS_HUNTER:      bot_color_str = "ffabd473"; bot_class_str = "Hunter";             break;
-            case BOT_CLASS_ROGUE:       bot_color_str = "fffff569"; bot_class_str = "Rogue";              break;
-            case BOT_CLASS_PRIEST:      bot_color_str = "ffffffff"; bot_class_str = "Priest";             break;
-            case BOT_CLASS_DEATH_KNIGHT:bot_color_str = "ffc41f3b"; bot_class_str = "Death Knight";       break;
-            case BOT_CLASS_SHAMAN:      bot_color_str = "ff0070de"; bot_class_str = "Shaman";             break;
-            case BOT_CLASS_MAGE:        bot_color_str = "ff69ccf0"; bot_class_str = "Mage";               break;
-            case BOT_CLASS_WARLOCK:     bot_color_str = "ff9482c9"; bot_class_str = "Warlock";            break;
-            case BOT_CLASS_DRUID:       bot_color_str = "ffff7d0a"; bot_class_str = "Druid";              break;
-            case BOT_CLASS_BM:          bot_color_str = "ffa10015"; bot_class_str = "Blademaster";        break;
-            case BOT_CLASS_SPHYNX:      bot_color_str = "ff29004a"; bot_class_str = "Obsidian Destroyer"; break;
-            case BOT_CLASS_ARCHMAGE:    bot_color_str = "ff028a99"; bot_class_str = "Archmage";           break;
-            case BOT_CLASS_DREADLORD:   bot_color_str = "ff534161"; bot_class_str = "Dreadlord";          break;
-            case BOT_CLASS_SPELLBREAKER:bot_color_str = "ffcf3c1f"; bot_class_str = "Spellbreaker";       break;
-            case BOT_CLASS_DARK_RANGER: bot_color_str = "ff3e255e"; bot_class_str = "Dark Ranger";        break;
-            case BOT_CLASS_NECROMANCER: bot_color_str = "ff9900cc"; bot_class_str = "Necromancer";        break;
-            case BOT_CLASS_SEA_WITCH:   bot_color_str = "ff40d7a9"; bot_class_str = "Sea Witch";          break;
-            case BOT_CLASS_CRYPT_LORD:  bot_color_str = "ff19782b"; bot_class_str = "Crypt Lord";         break;
-            default:                    bot_color_str = "ffffffff"; bot_class_str = "Unknown";            break;
-        }
-    }
-
-    struct PlayerVisuals
-    {
-        struct PlayerVisualsBase{};
-        struct Skins:PlayerVisualsBase{};
-        struct Faces:PlayerVisualsBase{};
-        struct HairStyles:PlayerVisualsBase{};
-        struct HairColors:PlayerVisualsBase{};
-        struct Features:PlayerVisualsBase{};
-    };
-
-    template<typename E, Races R, Gender G>
-    static constexpr uint8 GetMaxVisual()
-    {
-        static_assert(std::is_base_of_v<PlayerVisuals::PlayerVisualsBase, E>, "GetMaxVisual() must check PlayerVisuals enums");
-
-#define MV_PRED9(skinm,skinf,facem,facef,hairm,hairf,hairc,featm,featf) \
-    if      constexpr (std::is_same_v<E, PlayerVisuals::Skins>)      return !F ? skinm : skinf; \
-    else if constexpr (std::is_same_v<E, PlayerVisuals::Faces>)      return !F ? facem : facef; \
-    else if constexpr (std::is_same_v<E, PlayerVisuals::HairStyles>) return !F ? hairm : hairf; \
-    else if constexpr (std::is_same_v<E, PlayerVisuals::HairColors>) return !F ? hairc : hairc; \
-    else if constexpr (std::is_same_v<E, PlayerVisuals::Features>)   return !F ? featm : featf
-
-        constexpr bool F = G == GENDER_FEMALE;
-        if constexpr (R == RACE_HUMAN)         { MV_PRED9(9,9, 11,14, 16,23, 9,  8,6); }
-        if constexpr (R == RACE_DWARF)         { MV_PRED9(8,8,   9,9, 15,18, 9, 10,5); }
-        if constexpr (R == RACE_NIGHTELF)      { MV_PRED9(8,8,   8,8, 11,11, 7,  5,9); }
-        if constexpr (R == RACE_GNOME)         { MV_PRED9(4,4,   6,6, 11,11, 8,  7,6); }
-        if constexpr (R == RACE_DRAENEI)       { MV_PRED9(13,13, 9,9, 13,15, 6,  7,6); }
-        if constexpr (R == RACE_ORC)           { MV_PRED9(8,8,   8,8, 11,12, 7, 10,6); }
-        if constexpr (R == RACE_UNDEAD_PLAYER) { MV_PRED9(5,5,   9,9, 14,14, 9, 16,7); }
-        if constexpr (R == RACE_TAUREN)        { MV_PRED9(18,10, 4,3, 12,11, 2,  6,4); }
-        if constexpr (R == RACE_TROLL)         { MV_PRED9(5,5,   4,5,   9,9, 9, 10,5); }
-        if constexpr (R == RACE_BLOODELF)      { MV_PRED9(9,9,   9,9, 15,18, 9, 9,10); }
-
-#undef MV_PRED9
-        return 0;
-    }
-
-    static bool IsValidVisual(uint8 race, uint8 gender, uint8 skin, uint8 face, uint8 hairs, uint8 hairc, uint8 features)
-    {
-#define VISUALS_PRED1(r) (gender == GENDER_FEMALE) ? ( \
-    skin <= GetMaxVisual<PlayerVisuals::Skins, r, GENDER_FEMALE>() && \
-    face <= GetMaxVisual<PlayerVisuals::Faces, r, GENDER_FEMALE>() && \
-    hairs <= GetMaxVisual<PlayerVisuals::HairStyles, r, GENDER_FEMALE>() && \
-    hairc <= GetMaxVisual<PlayerVisuals::HairColors, r, GENDER_FEMALE>() && \
-    features <= GetMaxVisual<PlayerVisuals::Features, r, GENDER_FEMALE>()) : ( \
-    skin <= GetMaxVisual<PlayerVisuals::Skins, r, GENDER_MALE>() && \
-    face <= GetMaxVisual<PlayerVisuals::Faces, r, GENDER_MALE>() && \
-    hairs <= GetMaxVisual<PlayerVisuals::HairStyles, r, GENDER_MALE>() && \
-    hairc <= GetMaxVisual<PlayerVisuals::HairColors, r, GENDER_MALE>() && \
-    features <= GetMaxVisual<PlayerVisuals::Features, r, GENDER_MALE>())
-
-        switch (race)
-        {
-            case RACE_HUMAN:         return VISUALS_PRED1(RACE_HUMAN);
-            case RACE_DWARF:         return VISUALS_PRED1(RACE_DWARF);
-            case RACE_NIGHTELF:      return VISUALS_PRED1(RACE_NIGHTELF);
-            case RACE_GNOME:         return VISUALS_PRED1(RACE_GNOME);
-            case RACE_DRAENEI:       return VISUALS_PRED1(RACE_DRAENEI);
-            case RACE_ORC:           return VISUALS_PRED1(RACE_ORC);
-            case RACE_UNDEAD_PLAYER: return VISUALS_PRED1(RACE_UNDEAD_PLAYER);
-            case RACE_TAUREN:        return VISUALS_PRED1(RACE_TAUREN);
-            case RACE_TROLL:         return VISUALS_PRED1(RACE_TROLL);
-            case RACE_BLOODELF:      return VISUALS_PRED1(RACE_BLOODELF);
-            default: return false;
-        }
-#undef VISUALS_PRED1
-    }
-
-    static void ReportVisualRanges(ChatHandler* handler)
-    {
-#define FILL_VISUALS_REPORT2(s,r) s \
-    << GetRaceName(r, loc) << " Male:" \
-    << " skin 0-" << uint32(GetMaxVisual<PlayerVisuals::Skins, r, GENDER_MALE>()) \
-    << " face 0-" << uint32(GetMaxVisual<PlayerVisuals::Faces, r, GENDER_MALE>()) \
-    << " hairstyle 0-" << uint32(GetMaxVisual<PlayerVisuals::HairStyles, r, GENDER_MALE>()) \
-    << " haircolor 0-" << uint32(GetMaxVisual<PlayerVisuals::HairColors, r, GENDER_MALE>()) \
-    << " features 0-" << uint32(GetMaxVisual<PlayerVisuals::Features, r, GENDER_MALE>()) \
-    << "\n" << GetRaceName(r, loc) << " Female:" \
-    << " skin 0-" << uint32(GetMaxVisual<PlayerVisuals::Skins, r, GENDER_FEMALE>()) \
-    << " face 0-" << uint32(GetMaxVisual<PlayerVisuals::Faces, r, GENDER_FEMALE>()) \
-    << " hairstyle 0-" << uint32(GetMaxVisual<PlayerVisuals::HairStyles, r, GENDER_FEMALE>()) \
-    << " haircolor 0-" << uint32(GetMaxVisual<PlayerVisuals::HairColors, r, GENDER_FEMALE>()) \
-    << " features 0-" << uint32(GetMaxVisual<PlayerVisuals::Features, r, GENDER_FEMALE>())
-
-        LocaleConstant loc = handler->GetSessionDbcLocale();
-        handler->SendSysMessage("Ranges:");
-        for (uint8 race : { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME, RACE_DRAENEI, RACE_ORC, RACE_UNDEAD_PLAYER, RACE_TAUREN, RACE_TROLL, RACE_BLOODELF })
-        {
-            std::ostringstream stream;
-            switch (race)
-            {
-                case RACE_HUMAN:         FILL_VISUALS_REPORT2(stream, RACE_HUMAN);         break;
-                case RACE_DWARF:         FILL_VISUALS_REPORT2(stream, RACE_DWARF);         break;
-                case RACE_NIGHTELF:      FILL_VISUALS_REPORT2(stream, RACE_NIGHTELF);      break;
-                case RACE_GNOME:         FILL_VISUALS_REPORT2(stream, RACE_GNOME);         break;
-                case RACE_DRAENEI:       FILL_VISUALS_REPORT2(stream, RACE_DRAENEI);       break;
-                case RACE_ORC:           FILL_VISUALS_REPORT2(stream, RACE_ORC);           break;
-                case RACE_UNDEAD_PLAYER: FILL_VISUALS_REPORT2(stream, RACE_UNDEAD_PLAYER); break;
-                case RACE_TAUREN:        FILL_VISUALS_REPORT2(stream, RACE_TAUREN);        break;
-                case RACE_TROLL:         FILL_VISUALS_REPORT2(stream, RACE_TROLL);         break;
-                case RACE_BLOODELF:      FILL_VISUALS_REPORT2(stream, RACE_BLOODELF);      break;
-                default:                                                                   break;
-            }
-
-            handler->SendSysMessage(stream.view());
-        }
-#undef FILL_VISUALS_REPORT2
-    }
-
     static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId)
     {
         //Only maps 0 and 1 are covered
@@ -1621,8 +1646,8 @@ public:
 
     static bool HandleNpcBotDebugWBEquipsCommand(ChatHandler* handler, Optional<uint32> bc, Optional<uint32> bs, Optional<EXACT_SEQUENCE("ids")> ids)
     {
-        const std::array<char const*, BOT_INVENTORY_SIZE> snames {
-            "MHAND", "OHAND", "RANGED", "HEAD", "SHOULDERS", "CHEST", "WAIST", "LEGS", "FEET", "WRIST", "HANDS", "BACK", "BODY", "FINGER", "FINGER", "TRINKET", "TRINKET", "NECK"
+        const std::array<std::string_view, BOT_INVENTORY_SIZE> snames {
+            "MHAND"sv, "OHAND"sv, "RANGED"sv, "HEAD"sv, "SHOULDERS"sv, "CHEST"sv, "WAIST"sv, "LEGS"sv, "FEET"sv, "WRIST"sv, "HANDS"sv, "BACK"sv, "BODY"sv, "FINGER"sv, "FINGER"sv, "TRINKET"sv, "TRINKET"sv, "NECK"sv
         };
 
         if (!bc || !bs || *bc >= BOT_CLASS_END || *bs >= BOT_INVENTORY_SIZE)
@@ -1638,8 +1663,7 @@ public:
         {
             if (c != *bc)
                 continue;
-            std::string cname, dummy;
-            GetBotClassNameAndColor(c, dummy, cname);
+            auto cname = BotColors.at(c).name;
             ItemPerBotClassMap const& bot_gear = BotDataMgr::GetWanderingBotsSortedGearMap();
             ItemPerSlot const& ips_arr = bot_gear.at(c);
             for (uint32 s = BOT_SLOT_MAINHAND; s < BOT_INVENTORY_SIZE; ++s)
@@ -3839,7 +3863,7 @@ public:
 
     static bool HandleNpcBotSpawnedCommandImpl(ChatHandler* handler, Optional<std::string> area_str, Optional<std::string> class_str, Optional<uint32> level_min, Optional<uint32> level_max, bool is_free)
     {
-        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
@@ -3861,9 +3885,7 @@ public:
             std::ostringstream bss;
             for (Creature const* bot : found_bots)
             {
-                std::string bot_color_str;
-                std::string bot_class_str;
-                GetBotClassNameAndColor(bot->GetBotClass(), bot_color_str, bot_class_str);
+                auto [bot_color_str, bot_class_str] = BotColors.at(bot->GetBotClass());
 
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
                 std::string zone_name = zone ? zone->AreaName[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
@@ -3929,13 +3951,8 @@ public:
         std::array<uint32, BRACKETS_COUNT> bot_levels{ 1, 10, 20, 30, 40, 50, 60, 70, 80 };
         std::array<uint32, BRACKETS_COUNT> bot_count_by_level{};
         std::array<uint32, BOT_CLASS_END> bot_count_by_class{};
-        std::array<std::string, BOT_CLASS_END> bot_class_names{};
-        std::string dummy{};
-        for (uint8 bclass : NPCBots::index_array<uint8, BOT_CLASS_END>)
-            if ((1u << bclass) & ALL_BOT_CLASSES_MASK)
-                GetBotClassNameAndColor(bclass, dummy, bot_class_names[bclass]);
 
-        std::shared_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+        std::shared_lock lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
         std::vector<NpcBotRegistry::value_type> found_bots;
         found_bots.reserve(all_bots.size());
@@ -3954,19 +3971,15 @@ public:
             for (Creature const* bot : found_bots)
             {
                 uint32 bot_level = uint32(bot->GetLevel());
-
-                decltype(bot_class_names)::const_iterator cit = std::ranges::find(bot_class_names, bot_class_names[bot->GetBotClass()]);
-                ASSERT(cit != bot_class_names.cend());
-                bot_count_by_class[std::distance(bot_class_names.cbegin(), cit)]++;
-
                 static_assert(std::is_same_v<decltype(bot_level / 10u), decltype(bot_count_by_level)::value_type>);
+
+                bot_count_by_class[bot->GetBotClass()]++;
                 bot_count_by_level[std::min<uint32>(bot_level / 10u, bot_count_by_level.size() - 1)]++;
             }
 
-            static_assert(std::size(bot_count_by_class) == std::size(bot_class_names));
-            for (uint8 i = 0; i < bot_class_names.size(); ++i)
-                if (!!bot_count_by_class[i] && !!((1u << i) & ALL_BOT_CLASSES_MASK))
-                    ss << "\n " << bot_class_names[i] << ": " << bot_count_by_class[i] << " bots";
+            for (std::size_t i{}; i < bot_count_by_class.size(); ++i)
+                if (bot_count_by_class[i])
+                    ss << "\n " << BotColors.at(i).name << ": " << bot_count_by_class[i] << " bots";
             ss << '\n';
 
             static_assert(std::size(bot_levels) == std::size(bot_count_by_level));
@@ -4397,18 +4410,18 @@ public:
             {
                 for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
                 {
-                    if (Creature* cre = itr->second)
+                    if (Creature const* cre = itr->second)
                     {
                         if (cre->GetBotClass() == i)
                         {
-                            std::string ccolor, cname;
-                            GetBotClassNameAndColor(i, ccolor, cname);
+                            std::ostringstream nss;
+                            nss << "|c" << BotColors.at(i).color << BotColors.at(i).name << "|r";
                             std::string_view base_name = cre->GetName();
                             if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(cre->GetEntry()))
                                 if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
                                     base_name = creatureLocale->Name[loc];
 
-                            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, cre->GetEntry(), "|c" + ccolor + cname + "|r", uint32(cre->IsAlive()));
+                            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, cre->GetEntry(), nss.view(), uint32(cre->IsAlive()));
                         }
                     }
                 }
@@ -4419,13 +4432,14 @@ public:
         for (ObjectGuid guid : guidvec)
         {
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
-            std::string ccolor, cname;
-            GetBotClassNameAndColor(bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE), ccolor, cname);
+            uint8 bot_class = bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE);
+            std::ostringstream nss;
+            nss << "|c" << BotColors.at(bot_class).color << BotColors.at(bot_class).name << "|r";
             std::string_view base_name = bot ? std::string_view{ bot->GetName() } : std::string_view{ "Unknown" };
             if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(guid.GetEntry()))
                 if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
                     base_name = creatureLocale->Name[loc];
-            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, guid.GetEntry(), "|c" + ccolor + cname + "|r", bot ? uint32(bot->IsAlive()) : uint32(0));
+            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, guid.GetEntry(), nss.view(), bot ? uint32(bot->IsAlive()) : uint32(0));
         }
 
         return true;

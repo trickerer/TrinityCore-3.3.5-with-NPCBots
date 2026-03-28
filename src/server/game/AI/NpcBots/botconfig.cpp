@@ -678,7 +678,7 @@ private:
                         uint32(j ? j * 10 : 1), uint32(j * 10 + 9), pct, std::max<uint32>(minbotlevel / 10 * 10, 1), uint32(minbotlevel / 10 * 10 + 9));
                 }
             }
-            for (uint8 i = maxbotlevel / 10 + 1; i < _botwanderer_pct_level_brackets.size(); ++i)
+            for (std::size_t i = std::size_t(maxbotlevel) / 10 + 1; i < _botwanderer_pct_level_brackets.size(); ++i)
             {
                 if (_botwanderer_pct_level_brackets[i] > 0)
                 {
