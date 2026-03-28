@@ -1368,7 +1368,7 @@ public:
             << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
             << ',' << wpFlags << ",'" << wpName << "','" << wp->FormatLinks() << "')";
 
-        WorldDatabase.Execute(ss.view().data());
+        WorldDatabase.Execute(ss.str().c_str());
 
         handler->PSendSysMessage("Created WP %u '%s' levels %u-%u flags %u", wpId, wpName, uint32(minl), uint32(maxl), wpFlags);
 
@@ -1635,9 +1635,9 @@ public:
                 << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
                 << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
         });
-        std::string_view val_str = ss.view();
-        val_str.remove_suffix(1);
-        trans->Append(val_str.data());
+        std::string val_str = ss.str();
+        val_str.resize(val_str.size() - 1u);
+        trans->Append(val_str.c_str());
         WorldDatabase.CommitTransaction(trans);
 
         handler->SendSysMessage("Reid complete.");

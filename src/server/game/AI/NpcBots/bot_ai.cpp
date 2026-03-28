@@ -15670,7 +15670,7 @@ void bot_ai::InitEquips()
                 gss << " [" << uint32(i) << "] " << _equips[i]->GetTemplate()->Name1 << " (" << _equips[i]->GetEntry() << ')';
             }
         }
-        BOT_LOG_TRACE("npcbots", "{}", gss.view());
+        BOT_LOG_TRACE("npcbots", "{}", gss.str());
     }
     else
     {
