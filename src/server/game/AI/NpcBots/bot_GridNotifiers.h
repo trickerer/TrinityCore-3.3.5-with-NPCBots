@@ -36,26 +36,26 @@ struct Unit2LastSearcher
 
     void Visit(CreatureMapType &m)
     {
-        for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+        for (auto const& d : m)
         {
-            switch ((uint32)i_check(itr->GetSource()))
+            switch (static_cast<uint32>(i_check(d.GetSource())))
             {
-                case 1: i_result1 = itr->GetSource(); break;
-                case 2: i_result2 = itr->GetSource(); break;
-                default:                              break;
+                case 1: i_result1 = d.GetSource(); break;
+                case 2: i_result2 = d.GetSource(); break;
+                default:                           break;
             }
         }
     }
 
     void Visit(PlayerMapType &m)
     {
-        for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+        for (auto const& d : m)
         {
-            switch ((uint32)i_check(itr->GetSource()))
+            switch (static_cast<uint32>(i_check(d.GetSource())))
             {
-                case 1: i_result1 = itr->GetSource(); break;
-                case 2: i_result2 = itr->GetSource(); break;
-                default:                              break;
+                case 1: i_result1 = d.GetSource(); break;
+                case 2: i_result2 = d.GetSource(); break;
+                default:                           break;
             }
         }
     }
@@ -130,7 +130,7 @@ class NearestHostileUnitCheck
             //    return false;
             if (!AttackCCed && (u->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE)))
                 return INVALID;//do not allow CCed units if checked
-            //if (u->HasUnitState(UNIT_STATE_CASTING) && (u->GetTypeId() == TYPEID_PLAYER || u->IsPet()))
+            //if (u->HasUnitState(UNIT_STATE_CASTING) && (u->IsPlayer() || u->IsPet()))
             //    for (uint8 i = 0; i != CURRENT_MAX_SPELL; ++i)
             //        if (Spell* spell = u->GetCurrentSpell(i))
             //            if (ai->IsInBotParty(spell->m_targets.GetUnitTarget()))
@@ -238,17 +238,14 @@ class HostileDispelTargetCheck
                 //        return false; //immune to dispel magic
                 //}
 
-                Unit::AuraApplicationMap const &AurApps = u->GetAppliedAuras();
-                SpellInfo const* Info;
-                uint32 id;
-                for (Unit::AuraApplicationMap::const_iterator itr = AurApps.begin(); itr != AurApps.end(); ++itr)
+                for (auto const& [_, auraApp] : u->GetAppliedAuras())
                 {
-                    Info = itr->second->GetBase()->GetSpellInfo();
-                    if (itr->second->IsPositive() && Info->Dispel == DISPEL_MAGIC &&
+                   SpellInfo const*  Info = auraApp->GetBase()->GetSpellInfo();
+                    if (auraApp->IsPositive() && Info->Dispel == DISPEL_MAGIC &&
                         !(Info->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) &&
                         !(checksteal && (Info->AttributesEx4 & SPELL_ATTR4_NOT_STEALABLE)))
                     {
-                        id = Info->Id;
+                        uint32 id = Info->Id;
                         if (id != 20050 && id != 20052 && id != 20053 && //Vengeance
                             id != 50447 && id != 50448 && id != 50449) //Bloody Vengeance
                             return true;
@@ -298,19 +295,17 @@ class AffectedTargetCheck
             if (!checker->IsWithinDistInMap(u, m_range))
                 return false;
             if (needhostile == 0 && !u->IsHostileTo(checker)) return false;
-            //else if (needhostile == 1 && !(gr && gr->IsMember(u->GetGUID()) && u->GetTypeId() == TYPEID_PLAYER)) return false;
+            //else if (needhostile == 1 && !(gr && gr->IsMember(u->GetGUID()) && u->IsPlayer())) return false;
             //else if (needhostile == 2 && !(gr && gr->IsMember(u->GetGUID()))) return false;
             else if (needhostile == 3 && !u->IsFriendlyTo(checker)) return false;
-            else if (needhostile == 4 && !(u->GetTypeId() == TYPEID_PLAYER && u->IsFriendlyTo(checker))) return false;
+            else if (needhostile == 4 && !(u->IsPlayer() && u->IsFriendlyTo(checker))) return false;
 
             //if (u->HasAura(spell, caster)
             //    return true;
 
-            Unit::AuraApplicationMap const &Auras = u->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+            for (auto const& [spell_id, auraApp] : u->GetAppliedAuras())
             {
-                AuraApplication const* auraApp = itr->second;
-                if (itr->first == spell)
+                if (spell_id == spell)
                     if (caster.IsEmpty() || auraApp->GetBase()->GetCasterGUID() == caster)
                         return true;
             }
@@ -677,7 +672,7 @@ class CastingUnitCheck
                 if (u->IsImmunedToSpell(spellInfo, me))
                     return false;
 
-                if (me->GetTypeId() == TYPEID_UNIT && me->ToCreature()->GetBotAI() && me->ToCreature()->GetBotAI()->IsPointedNoDPSTarget(u) &&
+                if (me->IsCreature() && me->ToCreature()->GetBotAI() && me->ToCreature()->GetBotAI()->IsPointedNoDPSTarget(u) &&
                     bot_ai::IsDamagingSpell(spellInfo))
                     return false;
 
@@ -692,7 +687,7 @@ class CastingUnitCheck
         {
             if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST) && spellInfo->GetFirstRankSpell()->Id != 853) //hammer of justice
             {
-                if (u->GetTypeId() == TYPEID_UNIT &&
+                if (u->IsCreature() &&
                     (u->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u << (MECHANIC_INTERRUPT - 1))))
                     return false;
 
@@ -723,7 +718,7 @@ class CastingUnitCheck
             }
             if (silenceSpell)
             {
-                if (u->GetTypeId() == TYPEID_UNIT &&
+                if (u->IsCreature() &&
                     (u->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1u << (MECHANIC_SILENCE - 1))))
                     return false;
 
@@ -801,18 +796,15 @@ class TranquilTargetCheck
             {
                 if (u->IsImmunedToSpell(sSpellMgr->GetSpellInfo(19801), me))
                     return false;//immune to tranquilizing shot
-                Unit::AuraMap const &Auras = u->GetOwnedAuras();
-                for (Unit::AuraMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
+                for (auto const& [_, aura] : u->GetOwnedAuras())
                 {
-                    SpellInfo const* Info = itr->second->GetSpellInfo();
+                    SpellInfo const* Info = aura->GetSpellInfo();
                     if (Info->Dispel != DISPEL_MAGIC && Info->Dispel != DISPEL_ENRAGE) continue;
                     if (Info->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) continue;
                     //if (Info->AttributesEx & SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR) continue;
-                    AuraApplication const* aurApp = itr->second->GetApplicationOfTarget(u->GetGUID());
+                    AuraApplication const* aurApp = aura->GetApplicationOfTarget(u->GetGUID());
                     if (aurApp && aurApp->IsPositive())
-                    {
                         return true;
-                    }
                 }
             }
 
@@ -1047,7 +1039,7 @@ class ManaDrainUnitCheck
                 return false;
             if (!u->InSamePhase(me))
                 return false;
-            if (u->GetTypeId() == TYPEID_PLAYER && !u->HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_STUNNED|UNIT_STATE_FLEEING|UNIT_STATE_DISTRACTED|UNIT_STATE_CONFUSED_MOVE))
+            if (u->IsPlayer() && !u->HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_STUNNED|UNIT_STATE_FLEEING|UNIT_STATE_DISTRACTED|UNIT_STATE_CONFUSED_MOVE))
                 return false;
             //if (u->IsControlledByPlayer())
             //    return false;
@@ -1090,7 +1082,7 @@ class NearbyRezTargetCheck
         {
             if (u == me)
                 return false;
-            if (u->GetTypeId() != TYPEID_PLAYER && u->GetTypeId() != TYPEID_CORPSE)
+            if (!u->IsPlayer() && !u->IsCorpse())
                 return false;
             if (!u->InSamePhase(me))
                 return false;
@@ -1148,7 +1140,7 @@ public:
     { ASSERT(_unit->isType(TYPEMASK_UNIT)); }
     bool operator()(Unit* u)
     {
-        if (u->GetTypeId() == TYPEID_UNIT && u->IsVehicle() && u->IsAlive() && u != _exveh &&
+        if (u->IsCreature() && u->IsVehicle() && u->IsAlive() && u != _exveh &&
             u->GetVehicleKit()->GetAvailableSeatCount() > 0 && _unit->IsWithinDistInMap(u, _range))
         {
             _range = _unit->GetExactDist(u);
@@ -1167,7 +1159,7 @@ class NearbyObjectBySkillCheck
 {
 public:
     NearbyObjectBySkillCheck(WorldObject const* checker, float const range, uint32 skillMask) :
-      _checker(checker), _range(range), _skillMask(skillMask) { ASSERT(_checker->GetTypeId() == TYPEID_PLAYER); }
+      _checker(checker), _range(range), _skillMask(skillMask) { ASSERT(_checker->IsPlayer()); }
 
     bool operator()(WorldObject const* ob)
     {
@@ -1241,7 +1233,7 @@ class NearbyLootableCreatureCheck
 {
 public:
     NearbyLootableCreatureCheck(WorldObject* checker, float const range) : _checker(checker), _range(range)
-    { ASSERT(_checker->GetTypeId() == TYPEID_PLAYER); }
+    { ASSERT(_checker->IsPlayer()); }
 
     bool operator()(Unit const* unit)
     {

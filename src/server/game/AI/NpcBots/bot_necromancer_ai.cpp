@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "bot_GridNotifiers.h"
+#include "botlogtraits.h"
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottext.h"
@@ -265,8 +266,10 @@ public:
                 if (Group const* gr = !IAmFree() ? master->GetGroup() : GetGroup())
                 {
                     std::vector<Unit*> members = BotMgr::GetAllGroupMembers(gr);
-                    for (uint8 i = 0; i < 2 && !targets.empty(); ++i)
+                    for (auto i : NPCBots::index_array<uint8, 2>)
                     {
+                        if (!targets.empty())
+                            break;
                         for (Unit* member : members)
                         {
                             if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
@@ -285,7 +288,7 @@ public:
 
             if (target && doCast(target, GetSpell(UNHOLY_FRENZY_1)))
             {
-                if (target->GetTypeId() == TYPEID_PLAYER)
+                if (target->IsPlayer())
                     ReportSpellCast(UNHOLY_FRENZY_1, LocalizedNpcText(target->ToPlayer(), BOT_TEXT__ON_YOU), target->ToPlayer());
                 return;
             }
@@ -367,7 +370,7 @@ public:
             if (IsSpellReady(CRIPPLE_1, diff) && me->GetDistance(mytar) < 30 &&
                 me->GetLevel() >= 50 && me->GetPower(POWER_MANA) >= CRIPPLE_COST &&
                 mytar->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) >= 0 &&
-                (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetHealth() > me->GetMaxHealth() * 3))
+                (mytar->IsPlayer() || mytar->GetHealth() > me->GetMaxHealth() * 3))
             {
                 if (doCast(mytar, GetSpell(CRIPPLE_1)))
                     return;
@@ -478,7 +481,7 @@ public:
                 {
                     ASSERT(!IsInBotParty(target));
                     //Two skeletons
-                    for (uint8 i = 0; i < 2; ++i)
+                    for ([[maybe_unused]] auto i : NPCBots::index_array<uint8, 2>)
                         SummonBotPet(target);
                     //visuals
                     if (!target->IsPet() && !target->IsVehicle() && !target->ToCreature()->isWorldBoss() && !target->ToCreature()->IsDungeonBoss())
@@ -490,7 +493,7 @@ public:
 
                 if (baseId == UNHOLY_FRENZY_1)
                 {
-                    if (target->GetEntry() == BOT_PET_NECROSKELETON && _minions.find(target->ToCreature()) != _minions.end())
+                    if (target->GetEntry() == BOT_PET_NECROSKELETON && _minions.contains(target->ToCreature()))
                     {
                         //get 80% mana back if casting on a skeleton
                         me->EnergizeBySpell(me, UNHOLY_FRENZY_1, UNHOLY_FRENZY_REFUND, POWER_MANA);
@@ -499,7 +502,7 @@ public:
 
                 if (baseId == CRIPPLE_1)
                 {
-                    if (target->GetTypeId() == TYPEID_PLAYER || target->GetLevel() > 80)
+                    if (target->IsPlayer() || target->GetLevel() > 80)
                     {
                         if (Aura* crip = target->GetAura(spell->Id, me->GetGUID()))
                         {
@@ -547,9 +550,9 @@ public:
         uint8 GetPetPositionNumber(Creature const* summon) const override
         {
             uint8 i = 0;
-            for (Summons::const_iterator citr = _minions.begin(); citr != _minions.end(); ++citr)
+            for (Unit const* s : _minions)
             {
-                if ((*citr)->GetGUID() == summon->GetGUID())
+                if (s->GetGUID() == summon->GetGUID())
                     return i;
                 ++i;
             }
@@ -563,24 +566,24 @@ public:
                 Unit* u = nullptr;
                 //try 1: by minimal level
                 uint8 minlevel = me->GetLevel();
-                for (Summons::const_iterator itr = _minions.begin(); itr != _minions.end(); ++itr)
+                for (Unit* s : _minions)
                 {
-                    if ((*itr)->GetLevel() < minlevel)
+                    if (s->GetLevel() < minlevel)
                     {
-                        minlevel = (*itr)->GetLevel();
-                        u = *itr;
+                        minlevel = s->GetLevel();
+                        u = s;
                     }
                 }
                 //try 2: by minimal duration (if expiring already)
                 if (!u)
                 {
                     uint32 minduration = static_cast<uint32>((*_minions.begin())->GetAI()->GetData(BOTPETAI_MISC_DURATION_MAX) * 3 / 4);
-                    for (Summons::const_iterator itr = _minions.begin(); itr != _minions.end(); ++itr)
+                    for (Unit* s : _minions)
                     {
-                        if ((*itr)->GetAI()->GetData(BOTPETAI_MISC_DURATION) > minduration)
+                        if (s->GetAI()->GetData(BOTPETAI_MISC_DURATION) > minduration)
                         {
-                            minduration = (*itr)->GetAI()->GetData(BOTPETAI_MISC_DURATION);
-                            u = *itr;
+                            minduration = s->GetAI()->GetData(BOTPETAI_MISC_DURATION);
+                            u = s;
                         }
                     }
                 }
@@ -637,7 +640,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            if (_minions.find(summon) != _minions.end())
+            if (_minions.contains(summon))
                 _minions.erase(summon);
         }
 

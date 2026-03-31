@@ -101,7 +101,7 @@ public:
 
             if (IsSpellReady(LEAP_1, diff) &&
                 !HasBotCommandState(BOT_COMMAND_STAY) &&
-                !(opponent->GetTypeId() == TYPEID_UNIT && opponent->ToCreature()->isWorldBoss()) &&
+                !(opponent->IsCreature() && opponent->ToCreature()->isWorldBoss()) &&
                 dist > 5 && dist < 30)
             {
                 me->CastSpell(opponent, GetSpell(LEAP_1), false);

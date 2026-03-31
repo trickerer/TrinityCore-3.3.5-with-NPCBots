@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "bot_GridNotifiers.h"
+#include "botlogtraits.h"
 #include "botspell.h"
 #include "Containers.h"
 #include "Creature.h"
@@ -256,7 +257,7 @@ public:
                     {
                         int32 basepoints = int32(burned);
                         //reduce amount againts ex bots
-                        if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->GetBotClass() >= BOT_CLASS_EX_START)
+                        if (victim->IsCreature() && victim->ToCreature()->GetBotClass() >= BOT_CLASS_EX_START)
                             basepoints /= 10;
 
                         CastSpellExtraArgs args(true);
@@ -357,11 +358,8 @@ public:
 
             //BOT_LOG_ERROR("entities.unit", "ProcessSpellsteal: on {}, fr={}", target->GetName(), uint32(isFriend));
 
-            Unit::AuraMap const& auras = target->GetOwnedAuras();
-            for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            for (auto const& [_, aura] : target->GetOwnedAuras())
             {
-                Aura* aura = itr->second;
-
                 if (aura->IsPassive() || !(aura->GetSpellInfo()->GetDispelMask() & sbDispelMask) ||
                     (aura->GetSpellInfo()->AttributesEx4 & SPELL_ATTR4_NOT_STEALABLE))
                     continue;
@@ -500,19 +498,20 @@ public:
                 randomTarget = Bcore::Containers::SelectRandomContainerElement(!targets.empty() ? targets : targetsCopy);
             }
 
-            for (DispelChargesList::iterator itr = success_list.begin(); itr != success_list.end(); ++itr)
+            for (DispelableAura const& daura : success_list)
             {
-                dataSuccess << uint32(itr->GetAura()->GetId());          // Spell Id
+                Aura const* aura = daura.GetAura();
+                dataSuccess << uint32(aura->GetId());          // Spell Id
                 dataSuccess << uint8(0);                    // 0 - steals !=0 transfers
 
                 if (randomTarget)
                 {
                     //target->RemoveAurasDueToSpellBySteal(itr->first, itr->second, randomTarget);
-                    TransferAura(itr->GetAura()->GetId(), itr->GetAura()->GetCasterGUID(), target, randomTarget);
+                    TransferAura(aura->GetId(), aura->GetCasterGUID(), target, randomTarget);
                     randomTarget->CastSpell(randomTarget, SPELLSTEAL_VISUAL_1, true);
                 }
                 else
-                    target->RemoveAurasDueToSpellByDispel(itr->GetAura()->GetId(), SPELLSTEAL_1, itr->GetAura()->GetCasterGUID(), me, uint8(-1));
+                    target->RemoveAurasDueToSpellByDispel(aura->GetId(), SPELLSTEAL_1, aura->GetCasterGUID(), me, uint8(-1));
             }
             me->CastSpell(target, SPELLSTEAL_VISUAL_2, true);
 
@@ -533,7 +532,7 @@ public:
                     uint8 effMask = 0;
                     uint8 recalculateMask = 0;
                     Unit* caster = aura->GetCaster();
-                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                    for (auto i : NPCBots::index_array<uint8, MAX_SPELL_EFFECTS>)
                     {
                         if (aura->GetEffect(i))
                         {

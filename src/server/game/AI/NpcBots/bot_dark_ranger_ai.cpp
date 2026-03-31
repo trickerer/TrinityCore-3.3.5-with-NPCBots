@@ -367,7 +367,7 @@ public:
         void OnBotDamageDealt(Unit* victim, uint32 damage, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* spellInfo) override
         {
             //black arrow affection -> spawn skeleton (mark)
-            if (damage && me->IsAlive() && victim->GetTypeId() == TYPEID_UNIT && damage >= victim->GetHealth() &&
+            if (damage && me->IsAlive() && victim->IsCreature() && damage >= victim->GetHealth() &&
                 (victim->GetCreatureType() == CREATURE_TYPE_BEAST ||
                 victim->GetCreatureType() == CREATURE_TYPE_DRAGONKIN ||
                 victim->GetCreatureType() == CREATURE_TYPE_HUMANOID) &&
@@ -417,24 +417,24 @@ public:
                 Unit* u = nullptr;
                 //try 1: by minimal level
                 uint8 minlevel = me->GetLevel();
-                for (Summons::const_iterator itr = _minions.begin(); itr != _minions.end(); ++itr)
+                for (Unit* s : _minions)
                 {
-                    if ((*itr)->GetLevel() < minlevel)
+                    if (s->GetLevel() < minlevel)
                     {
-                        minlevel = (*itr)->GetLevel();
-                        u = *itr;
+                        minlevel = s->GetLevel();
+                        u = s;
                     }
                 }
                 //try 2: by minimal duration (if expiring already)
                 if (!u)
                 {
                     uint32 minduration = static_cast<uint32>((*_minions.begin())->GetAI()->GetData(BOTPETAI_MISC_DURATION_MAX) * 3 / 4);
-                    for (Summons::const_iterator itr = _minions.begin(); itr != _minions.end(); ++itr)
+                    for (Unit* s : _minions)
                     {
-                        if ((*itr)->GetAI()->GetData(BOTPETAI_MISC_DURATION) > minduration)
+                        if (s->GetAI()->GetData(BOTPETAI_MISC_DURATION) > minduration)
                         {
-                            minduration = (*itr)->GetAI()->GetData(BOTPETAI_MISC_DURATION);
-                            u = *itr;
+                            minduration = s->GetAI()->GetData(BOTPETAI_MISC_DURATION);
+                            u = s;
                         }
                     }
                 }
@@ -511,7 +511,7 @@ public:
         {
             //all darkranger bot pets despawn at death or manually (gossip, teleport, etc.)
             //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: {}'s {}", me->GetName(), summon->GetName());
-            if (_minions.find(summon) != _minions.end())
+            if (_minions.contains(summon))
                 _minions.erase(summon);
         }
 

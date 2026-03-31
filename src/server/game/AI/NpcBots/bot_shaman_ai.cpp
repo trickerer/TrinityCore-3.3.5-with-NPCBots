@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botlogtraits.h"
 #include "botmgr.h"
 #include "bottext.h"
 #include "bottraits.h"
@@ -381,7 +382,7 @@ public:
             //environment conditions
             Unit const* u = me->GetVictim();
             Creature const* cre = u ? u->ToCreature() : nullptr;
-            if (!(u && (u->GetHealth() > me->GetMaxHealth() * 10 || u->GetTypeId() == TYPEID_PLAYER ||
+            if (!(u && (u->GetHealth() > me->GetMaxHealth() * 10 || u->IsPlayer() ||
                 (cre && (cre->IsDungeonBoss() || cre->isWorldBoss())) ||
                 me->getAttackers().size() + master->getAttackers().size() >= 8)))
                 return;
@@ -389,11 +390,10 @@ public:
             //BLOODLUST = GetSpell(BLOODLUST); //not ranked
 
             uint32 sateSpell = (me->GetRaceMask() & RACEMASK_ALLIANCE) ? EXHAUSTION_AURA : SATED_AURA;
-            Unit::AuraEffectList const& dummies = me->GetAuraEffectsByType(SPELL_AURA_DUMMY);
-            for (Unit::AuraEffectList::const_iterator itr = dummies.begin(); itr != dummies.end(); ++itr)
+            for (AuraEffect const* aeff : me->GetAuraEffectsByType(SPELL_AURA_DUMMY))
             {
-                if ((*itr)->GetEffIndex() != 0) continue;
-                SpellInfo const* spellInfo = (*itr)->GetSpellInfo();
+                if (aeff->GetEffIndex() != 0) continue;
+                SpellInfo const* spellInfo = aeff->GetSpellInfo();
                 if (spellInfo->SpellFamilyName != SPELLFAMILY_GENERIC || spellInfo->SpellIconID != 44) continue;
                 if (spellInfo->Id == sateSpell)
                     return; //can't cast my type of bloodlust
@@ -412,7 +412,7 @@ public:
             TotemsCheckTimer = urand(1500, 2000) + (!IAmFree() ? 100 * master->GetNpcBotsCount() / 2 : 0);
 
             //Unsummon
-            for (uint8 i = 0; i != MAX_TOTEMS; ++i)
+            for (auto i : NPCBots::index_array<uint8, MAX_TOTEMS>)
             {
                 if (_totems[i].first != ObjectGuid::Empty &&
                     (!master->IsAlive() || master->GetDistance(_totems[i].second._pos) > _totems[i].second._effradius) &&
@@ -422,7 +422,7 @@ public:
                     if (!me->GetVictim()/* && GetManaPCT(me) < 90*/ && IsSpellReady(TOTEMIC_RECALL_1, diff))
                     {
                         uint8 count = 0;
-                        for (uint8 j = 0; j != MAX_TOTEMS; ++j)
+                        for (auto j : NPCBots::index_array<uint8, MAX_TOTEMS>)
                         {
                             if (j == i || _totems[j].first == ObjectGuid::Empty) continue;
                             if (me->GetDistance(_totems[j].second._pos) > 20.f)
@@ -443,7 +443,7 @@ public:
                     }
                     to->ToTotem()->UnSummon();
                     //reset summon check timer;
-                    TotemTimer[i] = 0;
+                    _totemTimer[i] = 0;
                 }
             }
             //global cooldown is not performed below, intead there is a special condition for Calls
@@ -461,7 +461,7 @@ public:
 
             //EARTH
             //EARTHsituative1 : tremor
-            if (TotemTimer[T_EARTH] <= diff && me->IsInCombat() && !IAmFree() &&
+            if (_totemTimer[T_EARTH] <= diff && me->IsInCombat() && !IAmFree() &&
                 IsSpellReady(TREMOR_TOTEM_1, diff, false) && _totems[T_EARTH].second._type != BOT_TOTEM_TREMOR)
             {
                 //Tremor no cd
@@ -508,7 +508,7 @@ public:
                     SetSpellCooldown(TREMOR_TOTEM_1, 3000); //fail
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && TotemTimer[T_EARTH] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimer[T_EARTH] <= diff && me->IsInCombat())
             {
                 //EARTHsituative2 : earthbind
                 if (GetSpell(EARTHBIND_TOTEM_1)/* && _totems[T_EARTH].second.type != BOT_TOTEM_EARTHBIND*/)
@@ -547,7 +547,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && TotemTimer[T_EARTH] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimer[T_EARTH] <= diff && me->IsInCombat())
             {
                 //EARTHmain : strength of earth
                 uint32 SoE = GetSpell(STRENGTH_OF_EARTH_TOTEM_1); //tripple check
@@ -574,7 +574,7 @@ public:
 
             //FIRE
             //FIREsituative1 : magma
-            if (TotemTimer[T_FIRE] <= diff && me->IsInCombat() && !IAmFree() && HasRole(BOT_ROLE_DPS) &&
+            if (_totemTimer[T_FIRE] <= diff && me->IsInCombat() && !IAmFree() && HasRole(BOT_ROLE_DPS) &&
                 GetSpell(MAGMA_TOTEM_1)/* && _totems[T_FIRE].second.type != BOT_TOTEM_MAGMA*/)
             {
                 //magma no cd 8 yd, 2 sec delay before first tick
@@ -608,7 +608,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && TotemTimer[T_FIRE] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimer[T_FIRE] <= diff)
             {
                 //FIREMain : wrath or flametongue no cd
                 //aura is exclusive so check mask
@@ -640,7 +640,7 @@ public:
                 //}
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && TotemTimer[T_FIRE] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimer[T_FIRE] <= diff)
             {
                 //FIRElastresort : frostres (3 shamans of same level req)
                 uint32 frostRes = GetSpell(FROST_RESISTANCE_TOTEM_1);
@@ -655,7 +655,7 @@ public:
 
             //WATER
             //WATERsituative1 : manatide
-            if (TotemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
+            if (_totemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
                 IsSpellReady(MANA_TIDE_TOTEM_1, diff, false))
             {
                 //5 min cd, party members only, instant effect +4 ticks in 12 secs
@@ -694,7 +694,7 @@ public:
             //WATERsituative2 : cleansing
             //REMOVED CHECKS ARE TOO HEAVY
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && TotemTimer[T_WATER] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimer[T_WATER] <= diff)
             {
                 //WATERmain : manaspring
                 uint32 MSpring = GetSpell(MANA_SPRING_TOTEM_1); //tripple check
@@ -729,11 +729,11 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && TotemTimer[T_WATER] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimer[T_WATER] <= diff)
             {
                 //WATERlastresort : fireres (2-3 shamans of same level req)
                 uint32 fireRes = GetSpell(FIRE_RESISTANCE_TOTEM_1);
-                if (fireRes && TotemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
+                if (fireRes && _totemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
                     (!(mask & BOT_TOTEM_MASK_RESISTANCE_FIRE) || idMap[FIRE_RESISTANCE_TOTEM_1] < fireRes))
                 {
                     if (doCast(me, fireRes, CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
@@ -744,7 +744,7 @@ public:
 
             //AIR
             //AIRsituative1 : grounding
-            if (TotemTimer[T_AIR] <= diff && me->IsInCombat() &&/* !IAmFree() &&*/
+            if (_totemTimer[T_AIR] <= diff && me->IsInCombat() &&/* !IAmFree() &&*/
                 IsSpellReady(GROUNDING_TOTEM_1, diff, false))
             {
                 //grounding 15 sec cd, party members only (and bot and master of course)
@@ -770,7 +770,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && TotemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRmain1 : wrathofair - if windfury is disabled or me and master both casters
                 if (!(mask & BOT_TOTEM_MASK_WRATH_OF_AIR) && GetSpell(WRATH_OF_AIR_TOTEM_1))
@@ -794,7 +794,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && TotemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRmain2 : windfury
                 if (!(mask & BOT_TOTEM_MASK_WINDFURY) && GetSpell(WINDFURY_TOTEM_1))
@@ -818,7 +818,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && TotemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRlastresort : natureres (3-4 shamans of same level req)
                 uint32 natureRes = GetSpell(NATURE_RESISTANCE_TOTEM_1);
@@ -868,11 +868,11 @@ public:
                 return;
 
             uint8 tCount = 0;
-            for (Unit::AttackerSet::const_iterator iter = b_attackers.begin(); iter != b_attackers.end(); ++iter)
+            for (Unit const* attacker : b_attackers)
             {
-                if (!(*iter)) continue;
-                if (me->GetDistance((*iter)) > 9) continue;
-                if (me->IsValidAttackTarget(*iter))
+                if (!attacker) continue;
+                if (me->GetDistance(attacker) > 9) continue;
+                if (me->IsValidAttackTarget(attacker))
                 {
                     ++tCount;
                     break;
@@ -1252,7 +1252,7 @@ public:
                     return true;
                 }
                 //bots don't need water breathing
-                if (GetSpell(WATER_BREATHING_1) && target->GetTypeId() == TYPEID_PLAYER &&
+                if (GetSpell(WATER_BREATHING_1) && target->IsPlayer() &&
                     !target->HasAuraType(SPELL_AURA_WATER_BREATHING) &&
                     doCast(target, GetSpell(WATER_BREATHING_1)))
                 {
@@ -1284,10 +1284,9 @@ public:
 
                 if (!IAmFree())
                 {
-                    BotMap const* map = master->GetBotMgr()->GetBotMap();
-                    for (BotMap::const_iterator it = map->begin(); it != map->end(); ++it)
+                    for (auto const& [_, bot] : *master->GetBotMgr()->GetBotMap())
                     {
-                        Unit* u = it->second;
+                        Unit* u = bot;
                         if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->InSamePhase(me))
                             continue;
                         if (IsTank(u) && can_affect(me, u) && doCast(u, GetSpell(EARTH_SHIELD_1)))
@@ -1366,7 +1365,7 @@ public:
             if (IsSpellReady(NATURES_SWIFTNESS_1, diff, false) && Rand() < 80 &&
                 (me->IsInCombat() || target->IsInCombat()) &&//may just revive
                 hp <= 20 && xppct <= 0 && xphploss > _heals[HEALING_WAVE_1] / 2 &&
-                (target->GetTypeId() == TYPEID_PLAYER || IsTank(target) || target->IsInCombat() || !target->getAttackers().empty()))
+                (target->IsPlayer() || IsTank(target) || target->IsInCombat() || !target->getAttackers().empty()))
             {
                 me->InterruptNonMeleeSpells(false);
                 if (doCast(me, GetSpell(NATURES_SWIFTNESS_1)))
@@ -1862,49 +1861,49 @@ public:
 
             //autouse totems
             if (baseId == EARTHBIND_TOTEM_1 || baseId == STRENGTH_OF_EARTH_TOTEM_1)
-                TotemTimer[T_EARTH] = 5000;
+                _totemTimer[T_EARTH] = 5000;
             if (baseId == TREMOR_TOTEM_1)
-                TotemTimer[T_EARTH] = 12000;
+                _totemTimer[T_EARTH] = 12000;
             if (baseId == MAGMA_TOTEM_1)
-                TotemTimer[T_FIRE] = 12000;
+                _totemTimer[T_FIRE] = 12000;
             if (baseId == TOTEM_OF_WRATH_1 || baseId == FLAMETONGUE_TOTEM_1)
-                TotemTimer[T_FIRE] = 5000;
+                _totemTimer[T_FIRE] = 5000;
             if (baseId == FROST_RESISTANCE_TOTEM_1)
-                TotemTimer[T_FIRE] = 120000;
+                _totemTimer[T_FIRE] = 120000;
             if (baseId == MANA_TIDE_TOTEM_1)
-                TotemTimer[T_WATER] = 12000;
+                _totemTimer[T_WATER] = 12000;
             if (baseId == MANA_SPRING_TOTEM_1)
-                TotemTimer[T_WATER] = 5000;
+                _totemTimer[T_WATER] = 5000;
             if (baseId == FIRE_RESISTANCE_TOTEM_1)
-                TotemTimer[T_WATER] = 120000;
+                _totemTimer[T_WATER] = 120000;
             if (baseId == GROUNDING_TOTEM_1)
-                TotemTimer[T_AIR] = me->GetLevel() >= 15 ? 13000 : 15000;
+                _totemTimer[T_AIR] = me->GetLevel() >= 15 ? 13000 : 15000;
             if (baseId == WRATH_OF_AIR_TOTEM_1 || baseId == WINDFURY_TOTEM_1)
-                TotemTimer[T_AIR] = 5000;
+                _totemTimer[T_AIR] = 5000;
             if (baseId == NATURE_RESISTANCE_TOTEM_1)
-                TotemTimer[T_AIR] = 120000;
+                _totemTimer[T_AIR] = 120000;
             //other (manual use)
             if (baseId == STONECLAW_TOTEM_1)
-                TotemTimer[T_EARTH] = 15000;
+                _totemTimer[T_EARTH] = 15000;
             if (baseId == STONESKIN_TOTEM_1)
-                TotemTimer[T_EARTH] = 300000;
+                _totemTimer[T_EARTH] = 300000;
             if (baseId == EARTH_ELEMENTAL_TOTEM_1)
-                TotemTimer[T_EARTH] = 120000;
+                _totemTimer[T_EARTH] = 120000;
             if (baseId == SEARING_TOTEM_1)
-                TotemTimer[T_FIRE] = 60000;
+                _totemTimer[T_FIRE] = 60000;
             if (baseId == FIRE_ELEMENTAL_TOTEM_1)
-                TotemTimer[T_FIRE] = 120000;
+                _totemTimer[T_FIRE] = 120000;
             if (baseId == CLEANSING_TOTEM_1)
-                TotemTimer[T_WATER] = 300000;
+                _totemTimer[T_WATER] = 300000;
             if (baseId == HEALING_STREAM_TOTEM_1)
-                TotemTimer[T_WATER] = 300000;
+                _totemTimer[T_WATER] = 300000;
 
             //Totemic Recall totems resummon helper
             if (baseId == TOTEMIC_RECALL_1)
             {
                 TotemsCheckTimer = GC_Timer;
-                for (uint8 i = 0; i != MAX_TOTEMS; ++i)
-                    TotemTimer[i] = 0;
+                for (auto i : NPCBots::index_array<uint8, MAX_TOTEMS>)
+                    _totemTimer[i] = 0;
             }
 
             if (maelUseUp)
@@ -2091,7 +2090,7 @@ public:
 
         uint8 GetPetPositionNumber(Creature const* summon) const override
         {
-            for (uint8 i = 0; i != MAX_WOLVES; ++i)
+            for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
                 if (_wolves[i] == summon->GetGUID())
                     return i;
 
@@ -2104,7 +2103,7 @@ public:
 
             uint32 entry = BOT_PET_SPIRIT_WOLF;
 
-            for (uint8 i = 0; i != MAX_WOLVES; ++i)
+            for ([[maybe_unused]] auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
             {
                 //Position pos;
 
@@ -2133,7 +2132,7 @@ public:
             if (summon->GetEntry() == BOT_PET_SPIRIT_WOLF)
             {
                 bool found = false;
-                for (uint8 i = 0; i != MAX_WOLVES; ++i)
+                for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
                 {
                     if (!_wolves[i])
                     {
@@ -2158,7 +2157,7 @@ public:
             if (summon->GetEntry() == BOT_PET_SPIRIT_WOLF)
             {
                 //bool found = false;
-                for (uint8 i = 0; i != MAX_WOLVES; ++i)
+                for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
                 {
                     if (_wolves[i] == summon->GetGUID())
                     {
@@ -2177,7 +2176,7 @@ public:
 
         void UnsummonWolves()
         {
-            for (uint8 i = 0; i != MAX_WOLVES; ++i)
+            for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
             {
                 if (!_wolves[i].IsEmpty())
                 {
@@ -2193,7 +2192,7 @@ public:
         {
             UnsummonWolves();
 
-            for (uint8 i = 0; i != MAX_TOTEMS; ++i)
+            for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
             {
                 if (_totems[i].first != ObjectGuid::Empty)
                 {
@@ -2245,7 +2244,7 @@ public:
             //here we reset totem category cd (not totem spell cd) if totem is destroyed
             //BOT_LOG_ERROR("entities.player", "OnBotDespawn(): {} despawned ({} : {})", summon->GetName(), summon->IsAlive() ? "alive" : summon->isDying() ? "justdied" : "unk", (uint32)summon->getDeathState());
             if (!summon->IsAlive()) // alive here means totem is being replaced or unsummoned through other means
-                TotemTimer[slot] = 0;
+                _totemTimer[slot] = 0;
 
             _totems[slot].first = ObjectGuid::Empty;
             _totems[slot].second._type = BOT_TOTEM_NONE;
@@ -2440,10 +2439,9 @@ public:
         void Reset() override
         {
             UnsummonAll(false);
-            for (uint8 i = 0; i != MAX_WOLVES; ++i)
-                _wolves[i] = ObjectGuid::Empty;
-            for (uint8 i = 0; i != MAX_TOTEMS; ++i)
-                TotemTimer[i] = 0;
+
+            _wolves = {};
+            _totemTimer = {};
 
             removeShapeshiftForm();
 
@@ -2469,9 +2467,9 @@ public:
 
         void ReduceCD(uint32 diff) override
         {
-            for (uint8 i = 0; i != MAX_TOTEMS; ++i)
-                if (TotemTimer[i] > diff)
-                    TotemTimer[i] -= diff;
+            for (auto& ttimer : _totemTimer)
+                if (ttimer > diff)
+                    ttimer -= diff;
 
             if (TotemsCheckTimer > diff)        TotemsCheckTimer -= diff;
 
@@ -2760,10 +2758,10 @@ public:
         };
 
         using BotTotem = std::pair<ObjectGuid /*guid*/, BotTotemParam /*param*/>;
-        BotTotem _totems[MAX_TOTEMS];
-        uint32 TotemTimer[MAX_TOTEMS];
+        std::array<BotTotem, MAX_TOTEMS> _totems;
+        std::array<uint32, MAX_TOTEMS> _totemTimer;
         //Wolves
-        ObjectGuid _wolves[MAX_WOLVES];
+        std::array<ObjectGuid, MAX_WOLVES> _wolves;
         //Spells
         uint32 CURE_TOXINS;
         //Timers
@@ -2790,12 +2788,11 @@ public:
             uint32 baseId;
             bool isTotem;
             int8 mytype = -1;
-            Unit::AuraApplicationMap const& aurapps = me->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::const_iterator itr = aurapps.begin(); itr != aurapps.end(); ++itr)
+            for (auto const& [_, auraApp] : me->GetAppliedAuras())
             {
                 //from totem aura extract base spell it could be summoned by
-                if (itr->second->GetBase()->GetType() != UNIT_AURA_TYPE) continue;
-                cre = itr->second->GetBase()->GetUnitOwner();
+                if (auraApp->GetBase()->GetType() != UNIT_AURA_TYPE) continue;
+                cre = auraApp->GetBase()->GetUnitOwner();
                 //DEBUG
                 //uint32 base = cre->GetUInt32Value(UNIT_CREATED_BY_SPELL);
                 //if (base)
@@ -2844,9 +2841,9 @@ public:
                 if (isTotem)
                 {
                     idMap[baseId] = sumonSpell;
-                    for (uint8 i = 0; i != MAX_TOTEMS; ++i)
+                    for (auto i : NPCBots::index_array<uint8, MAX_TOTEMS>)
                     {
-                        if (itr->second->GetBase()->GetCasterGUID() == me->m_SummonSlot[i+1])
+                        if (auraApp->GetBase()->GetCasterGUID() == me->m_SummonSlot[i+1])
                         {
                             //mask |= BOT_TOTEM_MASK_MY_TOTEM;
                             switch (mytype)

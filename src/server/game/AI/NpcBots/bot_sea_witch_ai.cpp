@@ -636,7 +636,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: {}'s {}", me->GetName(), summon->GetName());
-            if (_minions.find(summon) != _minions.end())
+            if (_minions.contains(summon))
                 _minions.erase(summon);
         }
 

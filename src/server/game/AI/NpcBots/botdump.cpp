@@ -14,6 +14,7 @@
 
 #include "botdump.h"
 #include "botdatamgr.h"
+#include "botlogtraits.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -97,9 +98,9 @@ static constexpr const TableImportData TableImportDatas[IMPORT_TABLES_COUNT] =
       ") VALUES ", 11, 0, 0 }
 };
 
-ImportDataTableType GetImportDataTableType(std::string const& name)
+static ImportDataTableType GetImportDataTableType(std::string const& name)
 {
-    for (uint8 i = TABLE_TYPE_CHARACTERS_NPCBOT; i != IMPORT_TABLES_COUNT; ++i)
+    for (auto i : NPCBots::index_array<uint32, IMPORT_TABLES_COUNT>)
     {
         //BOT_LOG_ERROR("scripts", "import: GetImportDataTableType");
         if (!TableImportDatas[i].name.compare(name))
@@ -109,7 +110,7 @@ ImportDataTableType GetImportDataTableType(std::string const& name)
     return IMPORT_TABLE_INVALID;
 }
 
-uint8 GetImportLineParamsCount(std::string const& line)
+static uint8 GetImportLineParamsCount(std::string const& line)
 {
     static std::string const ParamSeparator = "','";
     uint8 count = 0;
@@ -123,7 +124,7 @@ uint8 GetImportLineParamsCount(std::string const& line)
     return count + 1; //separators count is params count - 1
 }
 
-void FixNULLBotFields(std::string& line)
+static void FixNULLBotFields(std::string& line)
 {
     static std::string const NullString = "'NULL'";
     size_t pos = line.find(NullString);
@@ -136,7 +137,7 @@ void FixNULLBotFields(std::string& line)
 }
 
 template<typename T>
-void StringToVal(std::string const& /*line*/, T& /*v*/, size_t /*begin_pos*/, size_t /*end_pos*/)
+static void StringToVal(std::string const& /*line*/, T& /*v*/, size_t /*begin_pos*/, size_t /*end_pos*/)
 {
     BOT_LOG_ERROR("scripts", "StringToVal misuse");
 }
@@ -149,7 +150,7 @@ void StringToVal(std::string const& line, float& v, size_t begin_pos, size_t end
 }
 */
 template<>
-void StringToVal(std::string const& line, uint32& v, size_t begin_pos, size_t end_pos)
+static void StringToVal(std::string const& line, uint32& v, size_t begin_pos, size_t end_pos)
 {
     using v_type = std::remove_cvref_t<decltype(v)>;
 
@@ -197,7 +198,7 @@ bool ExtractValueFromString(std::string const& line, T& v, size_t offset)
     return false;
 }
 
-bool ReGuidBotEquip(std::string& line, size_t ne_guid_offset)
+static bool ReGuidBotEquip(std::string& line, size_t ne_guid_offset)
 {
     /*
     INSERT INTO `characters_npcbot` (`entry`,`owner`,`roles`,`spec`,`faction`,`spell
@@ -268,7 +269,7 @@ bool ReGuidBotEquip(std::string& line, size_t ne_guid_offset)
 
     return reguidDone;
 }
-bool ReGuidBotEquips(std::string& line)
+static bool ReGuidBotEquips(std::string& line)
 {
     constexpr size_t ne_guid_offset_s = TableImportDatas[TABLE_TYPE_CHARACTERS_NPCBOT].guidOffsetBegin;
     constexpr size_t ne_guid_offset_e = TableImportDatas[TABLE_TYPE_CHARACTERS_NPCBOT].guidOffsetEnd;
@@ -283,7 +284,7 @@ bool ReGuidBotEquips(std::string& line)
     return true;
 }
 
-bool ReGuidItemInstance(std::string& line, uint32& nextGuid)
+static bool ReGuidItemInstance(std::string& line, uint32& nextGuid)
 {
     /*
     INSERT INTO `item_instance` (`creatorGuid`,`giftCreatorGuid`,`count`,`duration`,
@@ -363,7 +364,7 @@ bool ReGuidItemInstance(std::string& line, uint32& nextGuid)
     return true;
 }
 
-bool ReGuidCreature(std::string& line)
+static bool ReGuidCreature(std::string& line)
 {
     /*
     INSERT INTO `item_instance` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position
@@ -570,14 +571,14 @@ BotDataDumpResult NPCBotsDump::LoadDump(std::ifstream& input)
             switch (curImportDataTableType)
             {
                 case TABLE_TYPE_CHARACTERS_NPCBOT:
-                    if (ExistingNPCBots.find(checkVal) != ExistingNPCBots.end())
+                    if (ExistingNPCBots.contains(checkVal))
                     {
                         BOT_LOG_ERROR("scripts", "import: NPCBot id {} already exists in `characters_npcbot` or `creature` table! Aborting", checkVal);
                         return BOT_DUMP_FAIL_DATA_OCCUPIED;
                     }
                     break;
                 case TABLE_TYPE_NPCBOT_TRANSMOG:
-                    if (ExistingNPCBotTransmogs.find(checkVal) != ExistingNPCBotTransmogs.end())
+                    if (ExistingNPCBotTransmogs.contains(checkVal))
                     {
                         BOT_LOG_ERROR("scripts", "import: NPCBot id {} already exists in `characters_npcbot_transmog` table! Aborting", checkVal);
                         return BOT_DUMP_FAIL_DATA_OCCUPIED;
@@ -784,20 +785,20 @@ BotDataVerificationResult NPCBotsDump::VerifyWriteData(uint32 entry) const
 }
 
 template<typename T>
-inline void AppendEscapedValue(std::ostringstream& ss, T&& val, bool end = false)
+inline static void AppendEscapedValue(std::ostringstream& ss, T&& val, bool end = false)
 {
     ss << '\'' << std::forward<T>(val) << '\'';
     if (!end)
         ss << ',';
 }
-inline void AppendNULL(std::ostringstream& ss, bool end = false)
+inline static void AppendNULL(std::ostringstream& ss, bool end = false)
 {
     AppendEscapedValue(ss, "NULL", end);
     //ss << "NULL";
     //if (!end)
     //    ss << ',';
 }
-std::string EscapedString(char const* cstr)
+static std::string EscapedString(char const* cstr)
 {
     std::string s = cstr;
     CharacterDatabase.EscapeString(s);
@@ -831,8 +832,8 @@ void NPCBotsDump::AppendBotNPCBotData(BotStringTransaction* trans, uint32 entry)
         AppendEscapedValue(ss, ssds.view());
     }
 
-    for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
-        AppendEscapedValue(ss, botData->equips[i], i == BOT_INVENTORY_SIZE-1);
+    for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+        AppendEscapedValue(ss, botData->equips[i], i == static_cast<BotEquipSlot>(BOT_INVENTORY_SIZE-1));
 
     ss << ");\n";
 
@@ -861,7 +862,7 @@ void NPCBotsDump::AppendBotNPCBotTransmogData(BotStringTransaction* trans, uint3
 
         ss << '(';
 
-        for (uint8 i = 0; i != transmog_fields_count; ++i)
+        for (auto i : NPCBots::index_array<uint32, transmog_fields_count>)
         {
             bool end = i == transmog_fields_count - 1;
             switch (i)
@@ -900,7 +901,7 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
     //"SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, guid, itemEntry, owner_guid "
     //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
-    for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
+    for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
         stmt->setUInt32(i, botData->equips[i]);
 
     PreparedQueryResult iiresult = CharacterDatabase.Query(stmt);
@@ -920,7 +921,7 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
 
         ss << '(';
 
-        for (uint8 i = 0; i != item_instance_fields_count; ++i)
+        for (auto i : NPCBots::index_array<uint8, item_instance_fields_count>)
         {
             bool end = i == item_instance_fields_count-1;
             switch (i)
@@ -976,7 +977,7 @@ void NPCBotsDump::AppendBotCreatureData(BotStringTransaction* trans, uint32 entr
 
     Field* fields = cresult->Fetch();
 
-    for (uint8 i = 0; i != creature_fields_count; ++i)
+    for (auto i : NPCBots::index_array<uint8, creature_fields_count>)
     {
         bool end = i == creature_fields_count-1;
         switch (i)

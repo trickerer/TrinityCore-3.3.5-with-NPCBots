@@ -20,9 +20,6 @@ inline constexpr std::size_t MAX_DAMAGES = MAX_DPS_TRACK_TIME / DPS_UPDATE_TIMER
 class DPSTracker
 {
 public:
-    DPSTracker();
-    ~DPSTracker();
-
     void Update(uint32 diff);
 
     void TrackDamage(Unit const* victim, uint32 damage);

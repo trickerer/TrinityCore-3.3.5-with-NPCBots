@@ -80,4 +80,4 @@ template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32
 template void BotLogger::Log(uint16, Creature const*, uint32&&, uint32&&, uint32&&, uint32&&, uint32&&);
 template void BotLogger::Log(uint16, uint32);
 template void BotLogger::Log(uint16, uint32, std::string_view&&);
-template void BotLogger::Log(uint16, uint32, std::string&, std::string&, std::string&, std::string&, std::string&);
+template void BotLogger::Log(uint16, uint32, std::string_view&&, std::string_view&&, std::string_view&&, std::string_view&&, std::string_view&&);

@@ -610,14 +610,13 @@ public:
                 if (mtar && me->GetDistance(mtar) > 5 && me->GetDistance(mtar) < CalcSpellMaxRange(TRANQ_SHOT_1) &&
                     !mtar->IsImmunedToSpell(sSpellMgr->GetSpellInfo(TRANQ_SHOT_1), me))
                 {
-                    Unit::AuraMap const& auras = mtar->GetOwnedAuras();
-                    for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                    for (auto const& [_, aura] : mtar->GetOwnedAuras())
                     {
-                        SpellInfo const* spellInfo = itr->second->GetSpellInfo();
+                        SpellInfo const* spellInfo = aura->GetSpellInfo();
                         if (spellInfo->Dispel != DISPEL_MAGIC && spellInfo->Dispel != DISPEL_ENRAGE) continue;
                         if (spellInfo->Attributes & (SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) continue;
                         //if (spellInfo->AttributesEx & SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR) continue;
-                        AuraApplication const* aurApp = itr->second->GetApplicationOfTarget(mtar->GetGUID());
+                        AuraApplication const* aurApp = aura->GetApplicationOfTarget(mtar->GetGUID());
                         if (aurApp && aurApp->IsPositive())
                         {
                             if (doCast(mtar, GetSpell(TRANQ_SHOT_1)))
@@ -785,7 +784,7 @@ public:
 
             //scatter pvp
             if (IsSpellReady(SCATTER_SHOT_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) &&
-                mytar->GetTypeId() == TYPEID_PLAYER && dist < 10 && Rand() < 60)
+                mytar->IsPlayer() && dist < 10 && Rand() < 60)
             {
                 if (doCast(mytar, GetSpell(SCATTER_SHOT_1)))
                 {
@@ -911,8 +910,7 @@ public:
             }
             //RAPID FIRE
             if (IsSpellReady(RAPID_FIRE_1, diff, false) && can_do_normal && HasRole(BOT_ROLE_DPS) && !me->isMoving() && Rand() < 55 &&
-                (mytar->GetHealth() > me->GetMaxHealth() * (1 + mytar->getAttackers().size()) ||
-                mytar->GetTypeId() == TYPEID_PLAYER) &&
+                (mytar->GetHealth() > me->GetMaxHealth() * (1 + mytar->getAttackers().size()) || mytar->IsPlayer()) &&
                 !me->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RANGED_HASTE, SPELLFAMILY_HUNTER, 0x20))
             {
                 if (doCast(me, GetSpell(RAPID_FIRE_1)))
@@ -939,7 +937,7 @@ public:
                 else if (mytar->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0, me->GetGUID()))
                 {
                     if (!mytar->HasAuraType(SPELL_AURA_MOD_DISARM) &&
-                        (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID)))
+                        (mytar->IsPlayer() || mytar->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID)))
                     {
                         if (doCast(mytar, GetSpell(CHIMERA_SHOT_1)))
                             return;
@@ -953,7 +951,7 @@ public:
             {
                 uint32 STING = 0;
                 AuraEffect const* sting = nullptr;
-                if (GetSpell(SCORPID_STING_1) && mytar->GetTypeId() == TYPEID_UNIT &&
+                if (GetSpell(SCORPID_STING_1) && mytar->IsCreature() &&
                     mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)
                 {
                     sting = mytar->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0);
@@ -961,7 +959,7 @@ public:
                         STING = SCORPID_STING_1;
                 }
                 //VIPER STING: pvp only
-                if (!STING && GetSpell(VIPER_STING_1) && mytar->GetTypeId() == TYPEID_PLAYER &&
+                if (!STING && GetSpell(VIPER_STING_1) && mytar->IsPlayer() &&
                     mytar->GetPowerType() == POWER_MANA && mytar->GetHealth() > me->GetMaxHealth()/2 &&
                     mytar->GetMaxPower(POWER_MANA) > me->GetMaxPower(POWER_MANA))
                 {
@@ -1511,17 +1509,15 @@ public:
             }
             if (baseId == READINESS_1)
             {
-                SpellInfo const* cdInfo;
-                BotSpellMap const& myspells = GetSpellMap();
-                for (BotSpellMap::const_iterator itr = myspells.begin(); itr != myspells.end(); ++itr)
+                for (auto& [rank1_id, spell] : GetSpellMap())
                 {
-                    if (itr->first == spellInfo->Id || itr->first == BESTIAL_WRATH_1 || itr->first == GIFT_OF_NAARU_HUNTER)
+                    if (rank1_id == spellInfo->Id || rank1_id == BESTIAL_WRATH_1 || rank1_id == GIFT_OF_NAARU_HUNTER)
                         continue;
-                    if (itr->second->spellId != 0 && itr->second->cooldown > 0)
+                    if (spell.spellId != 0 && spell.cooldown > 0)
                     {
-                        cdInfo = sSpellMgr->GetSpellInfo(itr->first);
+                        SpellInfo const* cdInfo = sSpellMgr->GetSpellInfo(rank1_id);
                         if (cdInfo && cdInfo->SpellFamilyName == SPELLFAMILY_HUNTER && cdInfo->GetRecoveryTime() > 0)
-                            ResetSpellCooldown(itr->first);
+                            spell.cooldown = 0;
                     }
                 }
             }
@@ -1623,7 +1619,7 @@ public:
             {
                 //zzzOLD Improved Wing Clip (only on creatures): 30% to root target with Wing Clip
                 //normal creatures are rooted for 10 sec, elites+ for 6 sec
-                if (target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsCreature())
                 {
                     if (urand(1,100) <= 30)
                     {
@@ -2188,11 +2184,10 @@ public:
         {
             uint32 mask = 0;
 
-            Unit::AuraApplicationMap const& aurapps = me->GetAppliedAuras();
-            for (Unit::AuraApplicationMap::const_iterator itr = aurapps.begin(); itr != aurapps.end(); ++itr)
+            for (auto const& [spellId, auraApp] : me->GetAppliedAuras())
             {
                 bool isAspect = true;
-                uint32 baseId = itr->second->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
+                uint32 baseId = auraApp->GetBase()->GetSpellInfo()->GetFirstRankSpell()->Id;
                 switch (baseId)
                 {
                     //case ASPECT_OF_THE_MONKEY_1:
@@ -2226,8 +2221,8 @@ public:
 
                 if (isAspect)
                 {
-                    idMap[baseId] = itr->first;
-                    if (itr->second->GetBase()->GetCasterGUID() == me->GetGUID())
+                    idMap[baseId] = spellId;
+                    if (auraApp->GetBase()->GetCasterGUID() == me->GetGUID())
                         mask |= SPECIFIC_ASPECT_MY_ASPECT;
                 }
             }

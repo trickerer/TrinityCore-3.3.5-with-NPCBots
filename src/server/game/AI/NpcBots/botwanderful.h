@@ -42,6 +42,8 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_NOT_A_START_POINT            = 0x00080000, // a bot can not teleport to this node, its a waypoint for moving only.
     BOTWP_FLAG_END                          = 0x00100000,
 
+    BOTWP_FLAGS_ALL_VALID                   = BOTWP_FLAG_END - 1,
+
     BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY       = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY,
     BOTWP_FLAG_ALLIANCE_SPAWN_POINT         = BOTWP_FLAG_SPAWN | BOTWP_FLAG_ALLIANCE_ONLY,
     BOTWP_FLAG_HORDE_SPAWN_POINT            = BOTWP_FLAG_SPAWN | BOTWP_FLAG_HORDE_ONLY,
@@ -60,6 +62,8 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_WS_PICKUP_RESTORATION        = BOTWP_FLAG_BG_OPTIONAL_PICKUP_1 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_3,
     BOTWP_FLAG_WS_PICKUP_BERSERKING         = BOTWP_FLAG_BG_OPTIONAL_PICKUP_2 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_4,
 };
+
+DEFINE_ENUM_FLAG(BotWPFlags);
 
 enum class BotWPLevel : uint32
 {
@@ -100,25 +104,17 @@ private:
     using node_check_ftype_c = std::function<bool(WanderNode const*)>;
     using node_proc_ltype = std::function<void(WanderNodeLink const&)>;
 
-    using mutex_type = std::recursive_mutex;
-    using lock_type = std::unique_lock<mutex_type>;
+    using mutex_type = std::shared_mutex;
 
     static node_ltype ALL_WPS;
     static node_mtype ALL_WPS_PER_MAP;
     static node_mtype ALL_WPS_PER_ZONE;
     static node_mtype ALL_WPS_PER_AREA;
 
-    template<class T, typename = void>
-    struct is_container : std::false_type {};
-    template<class T>
-    struct is_container<T, std::void_t<decltype(std::declval<typename T::const_iterator>()), decltype(std::declval<T>().size())>> : std::true_type {};
-    template<class T>
-    static constexpr bool is_container_v = is_container<T>::value;
+    static mutex_type* GetLock();
 
 public:
     static uint32 nextWPId;
-
-    static mutex_type* GetLock();
 
     static WanderNode* FindInAllWPs(uint32 wpId);
     static WanderNode* FindInAllWPs(Creature const* creature);
@@ -129,23 +125,24 @@ public:
     static WanderNode* FindInAreaWPs(uint32 areaId, node_check_ftype_c const& pred);
 
     template<typename Func>
+    requires (std::is_convertible_v<Func, node_proc_ltype>)
     static void DoForContainerWPLinks(WanderNode::node_lltype const& c, Func&& func) {
-        static_assert(std::is_convertible_v<Func, node_proc_ltype>);
         for (auto const& wl : c)
             func(wl);
     }
 
     template<typename Container, typename Func>
+    requires (
+        std::is_convertible_v<Func, node_proc_ftype_c> &&
+        std::is_same_v<std::decay_t<std::remove_pointer_t<typename Container::value_type>>, WanderNode> &&
+        std::input_or_output_iterator<typename Container::iterator>
+    )
     static void DoForContainerWPs(Container const& c, Func&& func) {
-        static_assert(WanderNode::is_container_v<Container>);
-        static_assert(std::is_same_v<std::decay_t<std::remove_pointer_t<typename Container::value_type>>, WanderNode>);
-        static_assert(std::is_convertible_v<Func, node_proc_ftype>);
-        //lock_type lock(*GetLock());
         for (auto* wp : c)
             func(wp);
     }
 
-    static void DoForAllWPs(node_proc_ftype&& func);
+    static void DoForAllWPs(node_proc_ftype_c&& func);
     static void DoForAllMapWPs(uint32 mapId, node_proc_ftype_c&& func);
     static void DoForAllZoneWPs(uint32 zoneId, node_proc_ftype_c&& func);
     static void DoForAllAreaWPs(uint32 areaId, node_proc_ftype_c&& func);

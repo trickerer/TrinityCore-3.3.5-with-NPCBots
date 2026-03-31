@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botlogtraits.h"
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottraits.h"
@@ -430,7 +431,7 @@ public:
             //ICY VEINS (no GCD)
             if (IsSpellReady(ICY_VEINS_1, diff, false) && me->IsInCombat() && GetManaPCT(me) > 20 &&
                 (mytar->GetMaxHealth() > master->GetMaxHealth() * 2 ||
-                (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
+                (mytar->IsCreature() && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
                 Rand() < 45)
             {
                 if (doCast(me, GetSpell(ICY_VEINS_1)))
@@ -439,7 +440,7 @@ public:
             //ARCANE POWER (no GCD, not with PoM)
             if (IsSpellReady(ARCANE_POWER_1, diff, false) && me->IsInCombat() && GetManaPCT(me) > 50 &&
                 (mytar->GetMaxHealth() > master->GetMaxHealth() * 2 ||
-                (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
+                (mytar->IsCreature() && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
                 Rand() < 75 && !me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 0x0, 0x20, 0x0))
             {
                 if (doCast(me, GetSpell(ARCANE_POWER_1)))
@@ -483,8 +484,8 @@ public:
             }
             //MIRROR IMAGE
             if (IsSpellReady(MIRROR_IMAGE_1, diff) &&
-                (mytar->GetTypeId() == TYPEID_PLAYER ||
-                (mytar->GetTypeId() == TYPEID_UNIT && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
+                (mytar->IsPlayer() ||
+                (mytar->IsCreature() && mytar->ToCreature()->GetCreatureTemplate()->rank != CREATURE_ELITE_NORMAL)) &&
                 Rand() < 25)
             {
                 if (doCast(me, GetSpell(MIRROR_IMAGE_1)))
@@ -772,8 +773,10 @@ public:
             if (Group const* gr = master->GetGroup())
             {
                 std::vector<Unit*> members = BotMgr::GetAllGroupMembers(gr);
-                for (uint8 i = 0; i < 3 && !targets.empty(); ++i)
+                for (auto i : NPCBots::index_array<uint8, 3>)
                 {
+                    if (!targets.empty())
+                        break;
                     for (Unit* member : members)
                     {
                         if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
@@ -1348,18 +1351,16 @@ public:
             //Handle Cold Snap
             if (baseId == COLD_SNAP_1)
             {
-                SpellInfo const* cdInfo;
-                BotSpellMap const& myspells = GetSpellMap();
-                for (BotSpellMap::const_iterator itr = myspells.begin(); itr != myspells.end(); ++itr)
+                for (auto& [rank1_id, spell] : GetSpellMap())
                 {
-                    if (itr->first == baseId)
+                    if (rank1_id == baseId)
                         continue;
-                    if (itr->second->spellId != 0 && itr->second->cooldown > 0)
+                    if (spell.spellId != 0 && spell.cooldown > 0)
                     {
-                        cdInfo = sSpellMgr->GetSpellInfo(itr->first);
+                        SpellInfo const* cdInfo = sSpellMgr->GetSpellInfo(rank1_id);
                         if (cdInfo && cdInfo->SpellFamilyName == SPELLFAMILY_MAGE && cdInfo->GetRecoveryTime() > 0 &&
                             (cdInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
-                            ResetSpellCooldown(itr->first);
+                            spell.cooldown = 0;
                     }
                 }
             }
@@ -1391,7 +1392,7 @@ public:
                     return;
 
                 //handle effects
-                for (uint8 i = 0; i != MAX_SPELL_EFFECTS; ++i)
+                for (auto i : NPCBots::index_array<uint8, MAX_SPELL_EFFECTS>)
                 {
                     switch (spell->_effects[i].Effect)
                     {

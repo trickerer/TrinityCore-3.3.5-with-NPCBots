@@ -19,9 +19,9 @@ class Unit;
 class bot_pet_ai : public CreatureAI
 {
 public:
-    virtual ~bot_pet_ai();
+    virtual ~bot_pet_ai() {}
 
-    bool canUpdate;
+    bool canUpdate{true};
 
     void InitializeAI() override { Reset(); }
     void Reset() override {}
@@ -47,8 +47,8 @@ public:
     void KillEvents(bool force);
     void SetBotCommandState(uint32 st, bool force = false, Position* newpos = nullptr);
     void RemoveBotCommandState(uint32 st);
-    bool HasBotCommandState(uint32 st) const { return (m_botCommandState & st); }
-    uint8 GetBotCommandState() const { return m_botCommandState; }
+    bool HasBotCommandState(uint32 st) const { return (_botCommandState & st); }
+    uint8 GetBotCommandState() const { return _botCommandState; }
     bool IsInBotParty(Unit const* unit) const;
     virtual void ApplyBotPetSpellRadiusMods(SpellInfo const* /*spellInfo*/, float& /*radius*/) const {}
     bool IsTank(Unit const* unit) const;
@@ -146,11 +146,10 @@ protected:
     static uint8 GetHealthPCT(Unit const* u);
     static uint8 GetManaPCT(Unit const* u);
 
-    Unit* opponent;
-    Creature* petOwner;
-    //EventProcessor _petEvents;
-    uint32 GC_Timer;
-    uint32 myType;
+    Unit* opponent{};
+    Creature* petOwner{};
+    uint32 GC_Timer{};
+    uint32 myType{};
 
 private:
     bool _canCureTarget(Unit const* target, uint32 cureSpell) const;
@@ -163,38 +162,38 @@ private:
     bool _checkImmunities(Unit const* target, SpellInfo const* spellInfo) const;
     static inline float _getAttackDistance(float distance) { return distance*0.72f; }
 
-    Position movepos, attackpos;
-    uint32 m_botCommandState;
+    Position movepos{}, attackpos{};
+    uint32 _botCommandState{};
 
     //timers
-    uint32 lastdiff, checkAurasTimer, regenTimer, _updateTimerMedium, _updateTimerEx1;
-    uint32 waitTimer;
-    uint32 _moveBehindTimer;
-    uint32 indoorsTimer;
-    uint32 outdoorsTimer;
+    uint32 lastdiff{}, checkAurasTimer{}, regenTimer{}, _updateTimerMedium{}, _updateTimerEx1{};
+    uint32 _moveBehindTimer{};
+    uint32 waitTimer{};
+    uint32 indoorsTimer{}, outdoorsTimer{};
+
+    uint64 _auraRaidUpdateMask{};
+
+    float _energyFraction{};
+
+    bool shouldUpdateStats{};
 
     //wandering bots
-    bool _wanderer;
-
-    uint64 _auraRaidUpdateMask;
-
-    float _energyFraction;
-
-    bool shouldUpdateStats;
+    bool _wanderer{};
 
     struct BotPetSpell
     {
-        explicit BotPetSpell() : spellId(0), cooldown(0), enabled(true) {}
+        explicit BotPetSpell() {}
         BotPetSpell(BotPetSpell const&) = delete;
+        BotPetSpell(BotPetSpell&&) = delete;
         BotPetSpell& operator=(BotPetSpell const&) = delete;
+        BotPetSpell& operator=(BotPetSpell&&) = delete;
 
-        uint32 spellId;
-        uint32 cooldown;
-        bool enabled;
+        uint32 spellId = 0;
+        uint32 cooldown = 0;
+        bool enabled = true;
     };
 
-    using BotPetSpellMap = std::unordered_map<uint32 /*firstrankspellid*/, BotPetSpell* /*spell*/>;
-    BotPetSpellMap const& GetSpellMap() const { return _spells; }
+    using BotPetSpellMap = std::unordered_map<uint32 /*firstrankspellid*/, BotPetSpell /*spell*/>;
     BotPetSpellMap _spells;
 };
 

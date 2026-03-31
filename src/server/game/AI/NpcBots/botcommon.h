@@ -491,8 +491,13 @@ enum BotEquipSlot : uint8
     BOT_SLOT_TRINKET1           = 15,
     BOT_SLOT_TRINKET2           = 16,
     BOT_SLOT_NECK               = 17,
-    BOT_INVENTORY_SIZE
+    BOT_INVENTORY_SIZE,
+
+    BOT_FIRST_NON_MELEE_SLOT   = BOT_SLOT_RANGED,
+    BOT_FIRST_NON_WEAPON_SLOT   = BOT_SLOT_RANGED + 1,
 };
+
+inline constexpr uint32 BOT_SLOT_MASK_FINGER1_OR_TRINKET1 = (1<<BOT_SLOT_FINGER1)|(1<<BOT_SLOT_TRINKET1);
 
 inline constexpr uint8 BOT_TRANSMOG_INVENTORY_SIZE = 13; // BOT_SLOT_BODY + 1
 inline constexpr uint8 MAX_BOT_EQUIPMENT_SETS = BOT_GOSSIP_MAX_ITEMS - 2;
@@ -653,5 +658,17 @@ enum BotVehicleStrats
 };
 
 inline constexpr uint32 USABLE_CORPSE_CREATURE_TYPE_MASK = (1u << (CREATURE_TYPE_BEAST-1)) | (1u << (CREATURE_TYPE_DRAGONKIN-1)) | (1u << (CREATURE_TYPE_HUMANOID-1));
+
+inline constexpr uint8 GroupIconsFlags[] =
+{
+    /*STAR        = */0x001,
+    /*CIRCLE      = */0x002,
+    /*DIAMOND     = */0x004,
+    /*TRIANGLE    = */0x008,
+    /*MOON        = */0x010,
+    /*SQUARE      = */0x020,
+    /*CROSS       = */0x040,
+    /*SKULL       = */0x080
+};
 
 #endif

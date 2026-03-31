@@ -317,130 +317,148 @@ static constexpr std::array BotColors {
 static_assert(std::size(BotColors) == BOT_CLASS_END);
 static_assert(BotColors[BOT_CLASS_CRYPT_LORD].name == "Crypt Lord"sv);
 
+static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId)
+{
+    //Only maps 0 and 1 are covered
+    switch (zoneId)
+    {
+        case 1: // Dun Morogh
+        case 12: // Elwynn Forest
+        case 14: // Durotar
+        case 85: // Tirisfal Glades
+        case 141: // Teldrassil
+        case 215: // Mulgore
+        case 3430: // Eversong Woods
+        case 3524: // Azuremyst Isle
+            return { 1, 10 };
+        case 38: // Loch Modan
+        case 40: // Westfall
+        case 130: // Silverpine Woods
+        case 148: // Darkshore
+        case 3433: // Ghostlands
+        case 3525: // Bloodmyst Isle
+        case 721: // Gnomeregan
+            return { 8, 20 };
+        case 17: // Barrens
+            return { 8, 25 };
+        case 44: // Redridge Mountains
+        case 406: // Stonetalon Mountains
+            return { 13, 25 };
+        case 10: // Duskwood
+        case 11: // Wetlands
+        case 267: // Hillsbrad Foothills
+        case 331: // Ashenvale
+            return { 18, 30 };
+        case 400: // Thousand Needles
+            return { 23, 35 };
+        case 36: // Alterac Mountains
+        case 45: // Arathi Highlands
+        case 405: // Desolace
+            return { 28, 40 };
+        case 33: // Stranglethorn Valley
+        case 3: // Badlands
+        case 8: // Swamp of Sorrows
+        case 15: // Dustwallow Marsh
+            return { 33, 45 };
+        case 47: // Hinterlands
+        case 357: // Feralas
+        case 440: // Tanaris
+            return { 38, 50 };
+        case 4: // Blasted Lands
+        case 16: // Azshara
+        case 51: // Searing Gorge
+            return { 43, 54 };
+        case 490: // Un'Goro Crater
+        case 361: // Felwood
+            return { 46, 56 };
+        case 28: // Western Plaguelands
+        case 46: // Burning Steppes
+            return { 48, 56 };
+        case 41: // Deadwind Pass
+            return { 50, 60 };
+        case 1377: // Silithus
+        case 2017: // Stratholme
+        case 139: // Eastern Plaguelands
+        case 618: // Winterspring
+            return { 53, 60 };
+        case 25: // BlackrockMountain
+        case 493: // Moonglade
+            return { 46, 60 };
+        default:
+            BOT_LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
+            return { 1, 60 };
+    }
+}
+
+static bool IsNoWPZone(uint32 zoneId)
+{
+    //Only maps 0 and 1 are covered
+    switch (zoneId)
+    {
+        case 1477: // Moonglade
+        case 1519: // Stormwind
+        case 1537: // Ironforge
+        case 1637: // Orgrimmar
+        case 1638: // Thunder Bluff
+        case 1657: // Darnassus
+        case 3487: // Silvermoon
+        case 3557: // Exodar
+        case 493: // Moonglade
+            return true;
+        default:
+            return false;
+    }
+}
+
+static uint32 GetZoneIdOverride(uint32 zoneId)
+{
+    switch (zoneId)
+    {
+        case 718: // Wailing Caverns
+            return 17; // Barrens
+        case 1337: // Uldaman
+            return 3; // Badlands
+        case 2057: // Scholomance
+            return 139; // EPL
+        case 2100: // Maraudon
+            return 405; // Desolace
+        case 1581: // Deadmines
+            return 40; // Westfall
+        default:
+            return zoneId;
+    }
+}
+
+struct BotInfo
+{
+    BotInfo(uint32 Id, std::string_view&& Name, uint8 Race) : id(Id), name(std::move(Name)), race(Race) {}
+    uint32 id;
+    std::string_view name;
+    uint8 race;
+
+    inline constexpr bool operator==(BotInfo const& other) const noexcept { return id == other.id; }
+    inline constexpr std::strong_ordering operator<=>(BotInfo const& other) const noexcept { return id <=> other.id; }
+};
+
+template <typename C, typename Fn>
+requires
+std::random_access_iterator<typename C::iterator> &&
+std::is_same_v<std::string, typename C::value_type> &&
+std::is_convertible_v<Fn, std::function<void(std::string const&)>>
+static void DoForAllNamesNormalizedIn(C& names, Fn&& func)
+{
+    for (std::string& name : names)
+    {
+        for (std::size_t i{}; i < name.size(); ++i)
+            if (name[i] == '_')
+                name[i] = ' ';
+
+        std::invoke(std::move(func), name);
+    }
+}
+
 class script_bot_commands : public CommandScript
 {
-    static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId)
-    {
-        //Only maps 0 and 1 are covered
-        switch (zoneId)
-        {
-            case 1: // Dun Morogh
-            case 12: // Elwynn Forest
-            case 14: // Durotar
-            case 85: // Tirisfal Glades
-            case 141: // Teldrassil
-            case 215: // Mulgore
-            case 3430: // Eversong Woods
-            case 3524: // Azuremyst Isle
-                return { 1, 10 };
-            case 38: // Loch Modan
-            case 40: // Westfall
-            case 130: // Silverpine Woods
-            case 148: // Darkshore
-            case 3433: // Ghostlands
-            case 3525: // Bloodmyst Isle
-            case 721: // Gnomeregan
-                return { 8, 20 };
-            case 17: // Barrens
-                return { 8, 25 };
-            case 44: // Redridge Mountains
-            case 406: // Stonetalon Mountains
-                return { 13, 25 };
-            case 10: // Duskwood
-            case 11: // Wetlands
-            case 267: // Hillsbrad Foothills
-            case 331: // Ashenvale
-                return { 18, 30 };
-            case 400: // Thousand Needles
-                return { 23, 35 };
-            case 36: // Alterac Mountains
-            case 45: // Arathi Highlands
-            case 405: // Desolace
-                return { 28, 40 };
-            case 33: // Stranglethorn Valley
-            case 3: // Badlands
-            case 8: // Swamp of Sorrows
-            case 15: // Dustwallow Marsh
-                return { 33, 45 };
-            case 47: // Hinterlands
-            case 357: // Feralas
-            case 440: // Tanaris
-                return { 38, 50 };
-            case 4: // Blasted Lands
-            case 16: // Azshara
-            case 51: // Searing Gorge
-                return { 43, 54 };
-            case 490: // Un'Goro Crater
-            case 361: // Felwood
-                return { 46, 56 };
-            case 28: // Western Plaguelands
-            case 46: // Burning Steppes
-                return { 48, 56 };
-            case 41: // Deadwind Pass
-                return { 50, 60 };
-            case 1377: // Silithus
-            case 2017: // Stratholme
-            case 139: // Eastern Plaguelands
-            case 618: // Winterspring
-                return { 53, 60 };
-            case 25: // BlackrockMountain
-            case 493: // Moonglade
-                return { 46, 60 };
-            default:
-                BOT_LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
-                return { 1, 60 };
-        }
-    }
-
-    static bool IsNoWPZone(uint32 zoneId)
-    {
-        //Only maps 0 and 1 are covered
-        switch (zoneId)
-        {
-            case 1477: // Moonglade
-            case 1519: // Stormwind
-            case 1537: // Ironforge
-            case 1637: // Orgrimmar
-            case 1638: // Thunder Bluff
-            case 1657: // Darnassus
-            case 3487: // Silvermoon
-            case 3557: // Exodar
-            case 493: // Moonglade
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    static uint32 GetZoneIdOverride(uint32 zoneId)
-    {
-        switch (zoneId)
-        {
-            case 718: // Wailing Caverns
-                return 17; // Barrens
-            case 1337: // Uldaman
-                return 3; // Badlands
-            case 2057: // Scholomance
-                return 139; // EPL
-            case 2100: // Maraudon
-                return 405; // Desolace
-            case 1581: // Deadmines
-                return 40; // Westfall
-            default:
-                return zoneId;
-        }
-    }
-
-    struct BotInfo
-    {
-        BotInfo(uint32 Id, std::string_view&& Name, uint8 Race) : id(Id), name(std::move(Name)), race(Race) {}
-        uint32 id;
-        std::string_view name;
-        uint8 race;
-
-        inline constexpr bool operator==(BotInfo const& other) const noexcept { return id == other.id; }
-        inline constexpr std::strong_ordering operator<=>(BotInfo const& other) const noexcept { return id <=> other.id; }
-    };
 public:
     script_bot_commands() : CommandScript("script_bot_commands") { }
 
@@ -681,7 +699,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotLogTestWriteCommand(ChatHandler* handler, Optional<std::underlying_type_t<BotLogType>> log_type, Optional<uint32> entry, Optional<std::vector<std::string>> extra)
+    static bool HandleNpcBotLogTestWriteCommand(ChatHandler* handler, Optional<std::underlying_type_t<BotLogType>> log_type, Optional<uint32> entry, Optional<std::vector<std::string_view>> extra)
     {
         if (!log_type || !entry)
         {
@@ -691,9 +709,9 @@ public:
             return false;
         }
 
-        decltype(extra)::value_type extras{ extra.value_or(decltype(extra)::value_type{}) };
-        extras.resize(MAX_BOT_LOG_PARAMS, "");
-        BotLogger::Log(*log_type, *entry, extras[0], extras[1], extras[2], extras[3], extras[4]);
+        decltype(extra)::value_type extras = std::move(extra.value_or({}));
+        extras.resize(MAX_BOT_LOG_PARAMS, {});
+        BotLogger::Log(*log_type, *entry, std::move(extras[0]), std::move(extras[1]), std::move(extras[2]), std::move(extras[3]), std::move(extras[4]));
         return true;
     }
 
@@ -768,15 +786,18 @@ public:
 
         auto const& links = wp->GetLinks();
 
+        std::vector<WanderNode const*> to_links;
+        to_links.reserve(links.size());
+        WanderNode::DoForAllMapWPs(wp->GetMapId(), [=, &to_links](WanderNode const* mwp) {
+            if (mwp != wp) [[likely]]
+                if (mwp->HasLink(wp)) [[unlikely]]
+                    to_links.push_back(mwp);
+        });
+
+        uint32 counter = 0;
         std::ostringstream ss;
         ss.setf(std::ios_base::fixed);
         ss.precision(2);
-        std::vector<WanderNode const*> to_links;
-        WanderNode::DoForAllMapWPs(wp->GetMapId(), [=, &to_links](WanderNode const* mwp) {
-            if (mwp != wp && mwp->HasLink(wp))
-                to_links.push_back(mwp);
-        });
-        uint32 counter = 0;
         ss << uint32(to_links.size()) << " WPs have a link to WP " << wp->GetWPId() << ':';
         WanderNode::DoForContainerWPs(to_links, [&ss, &counter, wp = wp](WanderNode const* lwp) {
             ss << "\n" << ++counter << ") <- " << lwp->ToString() << " (dist2d: " << lwp->GetExactDist2d(wp) << ")";
@@ -789,7 +810,7 @@ public:
 
         handler->SendSysMessage(ss.view());
 
-        std::array vis_spell_ids = { static_cast<uint32>(2400u), 41637u };
+        const std::array<uint32, 2> vis_spell_ids = { 2400, 41637 };
         WanderNode::DoForContainerWPs(to_links, [=](WanderNode const* lwp) {
             if (!lwp->GetCreature())
             {
@@ -1254,7 +1275,7 @@ public:
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
 
-        WanderNode* wp = (wpc && wpc->GetTypeId() == TYPEID_UNIT) ? WanderNode::FindInAllWPs(wpc->ToCreature()) :
+        WanderNode* wp = (wpc && wpc->IsCreature()) ? WanderNode::FindInAllWPs(wpc->ToCreature()) :
             wpId ? WanderNode::FindInAllWPs(*wpId) : nullptr;
         if (!wp)
         {
@@ -1433,7 +1454,7 @@ public:
     }
     static bool HandleNpcBotWPListAllCommand(ChatHandler* handler)
     {
-        WanderNode::DoForAllWPs([handler = handler](WanderNode* wp) {
+        WanderNode::DoForAllWPs([handler = handler](WanderNode const* wp) {
             handler->SendSysMessage(wp->ToString());
         });
 
@@ -1564,9 +1585,9 @@ public:
             BotDataMgr::LoadWanderMap(true, true);
         }
 
-        std::vector<WanderNode*> wander_nodes_copy;
+        std::vector<WanderNode const*> wander_nodes_copy;
         wander_nodes_copy.reserve(WanderNode::GetAllWPsCount());
-        WanderNode::DoForAllWPs([&wander_nodes_copy](WanderNode* wp) { wander_nodes_copy.push_back(wp); });
+        WanderNode::DoForAllWPs([&wander_nodes_copy](WanderNode const* wp) { wander_nodes_copy.push_back(wp); });
         std::ranges::sort(wander_nodes_copy, [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
 
         uint32 startid = *start_id;
@@ -1592,7 +1613,7 @@ public:
         std::set<uint32> checked_map_ids;
         std::vector<uint32> wander_node_deletes;
         std::vector<WanderNode const*> wander_node_inserts;
-        for (WanderNode* wp : wander_nodes_copy)
+        for (WanderNode const* wp : wander_nodes_copy)
         {
             if (wp->GetWPId() >= startid && wp->GetWPId() <= endid)
             {
@@ -1605,7 +1626,7 @@ public:
                     });
                 }
                 uint32 prev_id = wp->GetWPId();
-                wp->SetId(target_startid++);
+                const_cast<WanderNode*>(wp)->SetId(target_startid++);
                 handler->PSendSysMessage("%u => %u", prev_id, wp->GetWPId());
             }
         }
@@ -1854,15 +1875,14 @@ public:
         memset((void*)subBots, 0, (MAX_RAID_SUBGROUPS)*sizeof(uint8));
         std::ostringstream sstr;
         BotMap const* map = owner->GetBotMgr()->GetBotMap();
-        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+        for (auto const& [guid, bot] : *map)
         {
-            Creature* bot = itr->second;
-            if (!bot || !gr->IsMember(itr->second->GetGUID()))
+            if (!bot || !gr->IsMember(guid))
                 continue;
 
-            uint8 subGroup = gr->GetMemberGroup(itr->second->GetGUID());
+            uint8 subGroup = gr->GetMemberGroup(guid);
             ++subBots[subGroup];
-            sstr << uint32(++counter) << ": " << bot->GetGUID().GetCounter() << " " << bot->GetName()
+            sstr << uint32(++counter) << ": " << guid.GetCounter() << " " << bot->GetName()
                 << " subgr: " << uint32(subGroup + 1) << "\n";
         }
 
@@ -2029,11 +2049,11 @@ public:
             return true;
         }
 
-        for (std::decay_t<decltype(*bot_name)>::size_type i = 0u; i < bot_name->size(); ++i)
+        for (std::size_t i{}; i < bot_name->size(); ++i)
             if ((*bot_name)[i] == '_')
                 (*bot_name)[i] = ' ';
 
-        Creature* bot = owner->GetBotMgr()->GetBotByName(*bot_name);
+        Creature const* bot = owner->GetBotMgr()->GetBotByName(*bot_name);
         if (bot)
         {
             if (!bot->IsInWorld())
@@ -2055,13 +2075,10 @@ public:
         else
         {
             auto const& class_name = *bot_name;
-            for (auto const c : class_name)
+            if (!std::ranges::all_of(class_name, [](char c) { return std::islower(c); }))
             {
-                if (!std::islower(c))
-                {
-                    handler->SendSysMessage("Bot class name must be in lower case!");
-                    return true;
-                }
+                handler->SendSysMessage("Bot class name must be in lower case!");
+                return true;
             }
 
             uint8 bot_class = BotMgr::BotClassByClassName(class_name);
@@ -2172,11 +2189,11 @@ public:
             return true;
         }
 
-        for (std::decay_t<decltype(*spell_name)>::size_type i = 0u; i < spell_name->size(); ++i)
+        for (std::size_t i{}; i < spell_name->size(); ++i)
             if ((*spell_name)[i] == '_')
                 (*spell_name)[i] = ' ';
 
-        for (std::decay_t<decltype(*bot_name)>::size_type i = 0u; i < bot_name->size(); ++i)
+        for (std::size_t i{}; i < bot_name->size(); ++i)
             if ((*bot_name)[i] == '_')
                 (*bot_name)[i] = ' ';
 
@@ -2215,13 +2232,10 @@ public:
         else
         {
             auto const& class_name = *bot_name;
-            for (auto const c : class_name)
+            if (!std::ranges::all_of(class_name, [](char c) { return std::islower(c); }))
             {
-                if (!std::islower(c))
-                {
-                    handler->SendSysMessage("Bot class name must be in lower case!");
-                    return true;
-                }
+                handler->SendSysMessage("Bot class name must be in lower case!");
+                return true;
             }
 
             uint8 bot_class = BotMgr::BotClassByClassName(class_name);
@@ -2265,7 +2279,7 @@ public:
             {
                 if (!(*it)->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && !(*it)->IsNonMeleeSpellCast(false, false, true, false, false))
                 {
-                    ccBots.push_back(*it);
+                    ccBots.emplace_back(*it);
                     it = cBots.erase(it);
                 }
                 else
@@ -2381,13 +2395,13 @@ public:
         if (owner->HaveBot())
         {
             bmap = owner->GetBotMgr()->GetBotMap();
-            for (BotMap::const_iterator ci = bmap->begin(); ci != bmap->end(); ++ci)
+            for (const auto& [_, bot] : *bmap)
             {
-                if (ci->second && ci->second->GetVehicle())
+                if (bot && bot->GetVehicle())
                 {
                     if (!hasBotsInVehicles)
                         hasBotsInVehicles = true;
-                    if (!botsInSelVehicle && target && target->IsVehicle() && target->GetVehicleKit()->GetSeatForPassenger(ci->second))
+                    if (!botsInSelVehicle && target && target->IsVehicle() && target->GetVehicleKit()->GetSeatForPassenger(bot))
                         botsInSelVehicle = true;
                 }
                 if (hasBotsInVehicles && botsInSelVehicle)
@@ -2397,9 +2411,8 @@ public:
 
         if (bmap && hasBotsInVehicles)
         {
-            for (BotMap::const_iterator ci = bmap->begin(); ci != bmap->end(); ++ci)
+            for (const auto& [_, bot] : *bmap)
             {
-                Creature* bot = ci->second;
                 if (bot && bot->GetVehicle())
                 {
                     bool doeject = false;
@@ -2724,19 +2737,14 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, &count](std::string const& name) {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->SetBotAwaitState(BOT_AWAIT_SEND);
             }
-        }
+        });
 
         if (count == 0)
         {
@@ -2785,19 +2793,14 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, &count](std::string const& name) {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->MoveToLastSendPosition();
             }
-        }
+        });
 
         if (count == 0)
         {
@@ -2845,19 +2848,14 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, point_id, &count](std::string const& name) {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive())
             {
                 ++count;
                 bot->GetBotAI()->MarkSendPosition(*point_id - 1);
             }
-        }
+        });
 
         if (count == 0)
         {
@@ -2906,19 +2904,14 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, point_id, &count](std::string const& name) {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && bot->IsAlive() && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_FULLSTOP))
             {
                 ++count;
                 bot->GetBotAI()->MoveToSendPosition(*point_id - 1);
             }
-        }
+        });
 
         if (count == 0)
         {
@@ -3033,7 +3026,7 @@ public:
     {
         Player* chr = handler->GetSession()->GetPlayer();
         Unit* unit = chr->GetSelectedUnit();
-        if (!unit || unit->GetTypeId() != TYPEID_UNIT || !flag)
+        if (!unit || !unit->IsCreature() || !flag)
         {
             handler->SendSysMessage(".npcbot toggle flags #flag");
             handler->SendSysMessage("This is a debug command");
@@ -3262,13 +3255,10 @@ public:
         handler->PSendSysMessage("Looking for bots of class %u...", uint32(*botclass));
 
         uint8 localeIndex = handler->GetSessionDbLocaleIndex();
-        CreatureTemplateContainer const& ctc = sObjectMgr->GetCreatureTemplates();
         using BotList = std::vector<BotInfo>;
         BotList botlist;
-        for (CreatureTemplateContainer::const_iterator itr = ctc.begin(); itr != ctc.end(); ++itr)
+        for (const auto& [id, ct] : sObjectMgr->GetCreatureTemplates())
         {
-            uint32 id = itr->second.Entry;
-
             if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
                 continue;
 
@@ -3299,10 +3289,10 @@ public:
                 }
             }
 
-            if (itr->second.Name.empty())
+            if (ct.Name.empty())
                 continue;
 
-            botlist.emplace_back(id, std::string_view{ itr->second.Name }, race);
+            botlist.emplace_back(id, std::string_view{ ct.Name }, race);
         }
 
         if (botlist.empty())
@@ -3314,9 +3304,9 @@ public:
 
         std::ranges::sort(botlist);
 
-        for (BotList::const_iterator itr = botlist.begin(); itr != botlist.end(); ++itr)
+        for (BotInfo const& bot_info : botlist)
         {
-            uint8 race = itr->race;
+            uint8 race = bot_info.race;
             if (race >= MAX_RACES)
                 race = RACE_NONE;
 
@@ -3337,7 +3327,7 @@ public:
                 default:                raceName = "Unknown";   break;
             }
 
-            handler->PSendSysMessage("%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r %s", itr->id, itr->id, itr->name, raceName);
+            handler->PSendSysMessage("%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r %s", bot_info.id, bot_info.id, bot_info.name, raceName);
         }
 
         return true;
@@ -3637,7 +3627,7 @@ public:
         if (!bclass || !name)
             return ret_err(handler, name && *name == "ranges");
 
-        for (std::decay_t<decltype(*name)>::size_type i = 0u; i < name->size(); ++i)
+        for (std::size_t i{}; i < name->size(); ++i)
             if ((*name)[i] == '_')
                 (*name)[i] = ' ';
 
@@ -3885,7 +3875,7 @@ public:
             std::ostringstream bss;
             for (Creature const* bot : found_bots)
             {
-                auto [bot_color_str, bot_class_str] = BotColors.at(bot->GetBotClass());
+                auto const& [bot_color_str, bot_class_str] = BotColors.at(bot->GetBotClass());
 
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
                 std::string zone_name = zone ? zone->AreaName[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
@@ -3983,7 +3973,7 @@ public:
             ss << '\n';
 
             static_assert(std::size(bot_levels) == std::size(bot_count_by_level));
-            for (size_t i = 0; i < bot_levels.size(); ++i)
+            for (size_t i{}; i < bot_levels.size(); ++i)
             {
                 ss << "\n Levels " << bot_levels[i];
                 if (i + 1 < bot_levels.size())
@@ -4160,14 +4150,14 @@ public:
                 spellname = spellname.substr(1, spellname.size() - 2);
 
             LocaleConstant locale = handler->GetSession()->GetSessionDbcLocale();
-            for (auto const& kv : player->GetSpellMap())
+            for (auto const& [spellid, pspell] : player->GetSpellMap())
             {
-                if (kv.second.state != PLAYERSPELL_REMOVED && kv.second.active && !kv.second.disabled)
+                if (pspell.state != PLAYERSPELL_REMOVED && pspell.active && !pspell.disabled)
                 {
-                    SpellInfo const* info = sSpellMgr->GetSpellInfo(kv.first);
+                    SpellInfo const* info = sSpellMgr->GetSpellInfo(spellid);
                     if (info && info->SpellName[locale] == spellname)
                     {
-                        spellId = info->Id;
+                        spellId = spellid;
                         break;
                     }
                 }
@@ -4185,7 +4175,7 @@ public:
         // silently cancel
         Unit* mover = handler->GetSession()->GetGameClient()->GetActivelyMovedUnit();
         if (spellInfo->IsPassive() || !spellInfo->IsPositive() || player->isPossessing() || player->IsInFlight() ||
-            !mover || (mover != player && mover->GetTypeId() == TYPEID_PLAYER))
+            !mover || (mover != player && mover->IsPlayer()))
             return true;
 
         SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(target->GetLevel());
@@ -4254,7 +4244,7 @@ public:
             {
                 if (Bag* pBag = player->GetBagByPos(i))
                 {
-                    for (uint32 j = 0; j < pBag->GetBagSize() && !item; ++j)
+                    for (uint32 j{}; j < pBag->GetBagSize() && !item; ++j)
                     {
                         Item* pItem = player->GetItemByPos(i, j);
                         if (!pItem || pItem->IsInTrade())
@@ -4337,7 +4327,7 @@ public:
         // silently cancel
         Unit* mover = handler->GetSession()->GetGameClient()->GetActivelyMovedUnit();
         if (spellInfo->IsPassive() || !spellInfo->IsPositive() || player->isPossessing() || player->IsInFlight() ||
-            !mover || (mover != player && mover->GetTypeId() == TYPEID_PLAYER))
+            !mover || (mover != player && mover->IsPlayer()))
             return true;
 
         SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(target->GetLevel());
@@ -4408,21 +4398,18 @@ public:
         {
             for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
             {
-                for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+                for (auto const& [_, bot] : *map)
                 {
-                    if (Creature const* cre = itr->second)
+                    if (bot && bot->GetBotClass() == i)
                     {
-                        if (cre->GetBotClass() == i)
-                        {
-                            std::ostringstream nss;
-                            nss << "|c" << BotColors.at(i).color << BotColors.at(i).name << "|r";
-                            std::string_view base_name = cre->GetName();
-                            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(cre->GetEntry()))
-                                if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
-                                    base_name = creatureLocale->Name[loc];
+                        std::ostringstream nss;
+                        nss << "|c" << BotColors.at(i).color << BotColors.at(i).name << "|r";
+                        std::string_view base_name = bot->GetName();
+                        if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(bot->GetEntry()))
+                            if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
+                                base_name = creatureLocale->Name[loc];
 
-                            handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, cre->GetEntry(), nss.view(), uint32(cre->IsAlive()));
-                        }
+                        handler->PSendSysMessage("%s (%u): %s (alive: %u)", base_name, bot->GetEntry(), nss.view(), uint32(bot->IsAlive()));
                     }
                 }
             }
@@ -4722,16 +4709,11 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, mgr, &return_fail, &count](std::string const& name) {
             std::vector<uint32> bot_ids;
             bot_ids.reserve(owner->GetBotMgr()->GetNpcBotsCount());
-            for (auto const& kv : *owner->GetBotMgr()->GetBotMap())
-                bot_ids.push_back(kv.first.GetEntry());
+            for (auto const& [_, ebot] : *owner->GetBotMgr()->GetBotMap())
+                bot_ids.push_back(ebot->GetEntry());
 
             Creature const* bot = BotDataMgr::FindBot(name, owner->GetSession()->GetSessionDbLocaleIndex(), &bot_ids);
             if (bot && bot->IsNPCBot() && !bot->IsTempBot() && !mgr->GetBot(bot->GetGUID()) && bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND) &&
@@ -4740,11 +4722,11 @@ public:
                 if (BotAddResult res = mgr->RebindBot(const_cast<Creature*>(bot)); res != BOT_ADD_SUCCESS)
                 {
                     return_fail(res, { name });
-                    continue;
+                    return;
                 }
                 ++count;
             }
-        }
+        });
 
         if (count == 0)
             return return_fail({}, { uint32(names->size()) });
@@ -4787,19 +4769,14 @@ public:
         }
 
         uint32 count = 0;
-        for (decltype(names)::value_type::value_type name : *names)
-        {
-            for (decltype(name)::size_type i = 0u; i < name.size(); ++i)
-                if (name[i] == '_')
-                    name[i] = ' ';
-
+        DoForAllNamesNormalizedIn(*names, [owner, &count](std::string const& name) {
             Creature const* bot = owner->GetBotMgr()->GetBotByName(name);
             if (bot && !bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_UNBIND))
             {
                 ++count;
                 owner->GetBotMgr()->UnbindBot(bot->GetGUID());
             }
-        }
+        });
 
         if (count == 0)
         {
@@ -4918,7 +4895,7 @@ public:
         Player* owner = handler->GetSession()->GetPlayer();
         Unit* cre = owner->GetSelectedUnit();
 
-        if (!cre || cre->GetTypeId() != TYPEID_UNIT)
+        if (!cre || !cre->IsCreature())
         {
             handler->SendSysMessage(".npcbot add");
             handler->SendSysMessage("Allows to hire selected uncontrolled bot");

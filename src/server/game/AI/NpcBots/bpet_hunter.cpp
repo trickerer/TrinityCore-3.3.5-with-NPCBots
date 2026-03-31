@@ -246,7 +246,7 @@ public:
 
             if (IsSpellReady(BESTIAL_WRATH_1, diff, false) && canDPS && dist < 10 &&
                 (opponent->GetHealth() > petOwner->GetMaxHealth()/4 * (1 + opponent->getAttackers().size()) ||
-                opponent->GetTypeId() == TYPEID_PLAYER))
+                opponent->IsPlayer()))
             {
                 if (petOwner->AddAura(GetSpell(BESTIAL_WRATH_1), me))
                 {
@@ -354,7 +354,7 @@ public:
             {
                 if (IsSpellReady(SNATCH_1, diff, false) && canDPS && focus >= 20 &&
                     me->IsWithinMeleeRange(opponent) && !opponent->HasAuraType(SPELL_AURA_MOD_DISARM) &&
-                    ((opponent->GetTypeId() == TYPEID_PLAYER) ? opponent->ToPlayer()->GetWeaponForAttack(BASE_ATTACK) != nullptr :
+                    ((opponent->IsPlayer()) ? opponent->ToPlayer()->GetWeaponForAttack(BASE_ATTACK) != nullptr :
                     opponent->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) != 0))
                 {
                     me->CastSpell(opponent, GetSpell(SNATCH_1), false);
@@ -651,7 +651,7 @@ public:
 
             uint32 CHARGE = IsPetTypeSpell(SWOOP_1) ? SWOOP_1 : IsPetTypeSpell(CHARGE_1) ? CHARGE_1 : 0;
             if (CHARGE && GetSpell(CHARGE) && IsSpellReady(CHARGE, diff, false) && !CCed(opponent, true) && !me->HasStealthAura() &&
-                !(opponent->GetTypeId() == TYPEID_UNIT && opponent->ToCreature()->isWorldBoss()) &&
+                !(opponent->IsCreature() && opponent->ToCreature()->isWorldBoss()) &&
                 !HasBotCommandState(BOT_COMMAND_STAY) &&
                 dist > 8 && dist < 25)
             {

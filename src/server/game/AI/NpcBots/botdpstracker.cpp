@@ -10,16 +10,6 @@ Comment: dps taken tracker for NPCBot system by Trickerer (onlysuffering@gmail.c
 DPS trackers may collect data from different bot owners if in party but this overdoing has no significance whatsoever
 */
 
-DPSTracker::DPSTracker()
-{
-}
-
-DPSTracker::~DPSTracker()
-{
-    _damages.clear();
-    _DPSes.clear();
-}
-
 void DPSTracker::Update(uint32 diff)
 {
     if (_active)
@@ -63,7 +53,7 @@ void DPSTracker::_Release()
     {
         uint32 total_damage = std::accumulate(damage_array.cbegin(), damage_array.cend(), 0u);
 
-        _DPSes[guid] = uint32(total_damage / (0.001f * std::max<uint32>(1 * IN_MILLISECONDS, std::min<uint32>(_trackTimer, MAX_DPS_TRACK_TIME))));
+        _DPSes.insert_or_assign(guid, uint32(total_damage / (0.001f * std::max<uint32>(1 * IN_MILLISECONDS, std::min<uint32>(_trackTimer, MAX_DPS_TRACK_TIME)))));
         //BOT_LOG_ERROR("entities.player", "DPSTracker::Release(): guidlow = {}, time = {}, tick damage {}, total {}, dps = {}",
         //    itr->first, _trackTimer, dmgs[0], total_damage, _DPSes[itr->first]);
 
@@ -75,7 +65,7 @@ void DPSTracker::_Release()
 
 void DPSTracker::_AccumulateDamage(ObjectGuid guid, uint32 damage)
 {
-    DamageTakenMap::iterator itr = _damages.find(guid);
+    decltype(_damages)::iterator itr = _damages.find(guid);
 
     if (itr == _damages.end())
     {
@@ -103,7 +93,7 @@ void DPSTracker::_SetActive()
 
 uint32 DPSTracker::GetDPSTaken(ObjectGuid guid) const
 {
-    DPSTakenMap::const_iterator itr = _DPSes.find(guid);
+    decltype(_DPSes)::const_iterator itr = _DPSes.find(guid);
     //BOT_LOG_ERROR("entities.player", "DPSTracker::GetDPSTaken(): from {}, damage {}", guid, itr != _DPSes.end() ? itr->second : 0);
     return itr != _DPSes.end() ? itr->second : 0;
 }

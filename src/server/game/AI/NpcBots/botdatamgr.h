@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <map>
+#include <ranges>
 #include <set>
 #include <shared_mutex>
 
@@ -33,7 +34,6 @@ inline constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f
 
 struct NpcBotMgrData
 {
-    friend class BotDataMgr;
 public:
     uint8 dist_follow;
     uint8 dist_attack;
@@ -43,14 +43,17 @@ public:
     uint32 engage_delay_heal;
     uint32 flags;
 
-    inline void SetFlag(uint32 flags_) { flags |= flags_; }
-    inline void RemoveFlag(uint32 flags_) { flags &= ~flags_; }
-    inline bool HasFlag(uint32 flags_) const { return !!(flags & flags_); }
+    void SetFlag(uint32 flags_) { flags |= flags_; }
+    void RemoveFlag(uint32 flags_) { flags &= ~flags_; }
+    bool HasFlag(uint32 flags_) const { return !!(flags & flags_); }
 
-private:
     NpcBotMgrData(uint8 idist_follow, uint8 idist_attack, uint8 iattack_range_mode, uint8 iattack_angle_mode, uint32 iengage_delay_dps, uint32 iengage_delay_heal, uint32 iflags) :
         dist_follow(idist_follow), dist_attack(idist_attack), attack_range_mode(iattack_range_mode), attack_angle_mode(iattack_angle_mode),
         engage_delay_dps(iengage_delay_dps), engage_delay_heal(iengage_delay_heal), flags(iflags) { }
+    NpcBotMgrData(NpcBotMgrData const&) = delete;
+    NpcBotMgrData(NpcBotMgrData&&) = delete;
+    NpcBotMgrData& operator=(NpcBotMgrData const&) = delete;
+    NpcBotMgrData& operator=(NpcBotMgrData&&) = delete;
 };
 
 enum NpcBotDataUpdateType
@@ -74,25 +77,19 @@ struct NpcBotData
     using MiscValuesContainer = std::map<uint32, uint32>;
     using SharedOwnersContainer = std::set<uint32>;
 
-    friend class BotDataMgr;
-    friend struct WanderingBotsGenerator;
-public:
     uint32 owner;
     uint64 hire_time;
     uint32 roles;
     uint32 faction;
     uint8 spec;
-    uint32 equips[BOT_INVENTORY_SIZE];
+    std::array<uint32, BOT_INVENTORY_SIZE> equips = {};
     DisabledSpellsContainer disabled_spells;
     MiscValuesContainer miscvalues;
     SharedOwnersContainer shared_owners;
 
-private:
-    NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)
-    {
-        for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
-            equips[i] = 0;
-    }
+    NpcBotData(uint32 bowner, uint64 bhire_time, uint32 broles, uint32 bfaction, uint8 bspec)
+        : owner(bowner), hire_time(bhire_time), roles(broles), faction(bfaction), spec(bspec) {}
+    NpcBotData(uint32 broles, uint32 bfaction, uint8 bspec) : NpcBotData(0, 0, broles, bfaction, bspec) {}
     NpcBotData(NpcBotData const&) = delete;
     NpcBotData(NpcBotData&&) = delete;
     NpcBotData& operator=(NpcBotData const&) = delete;
@@ -117,15 +114,7 @@ struct NpcBotExtras
 
 struct NpcBotTransmogData
 {
-    friend class BotDataMgr;
-public:
-    std::pair<uint32 /*item_id*/, int32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
-private:
-    NpcBotTransmogData()
-    {
-        for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
-            transmogs[i] = { 0, -1 };
-    }
+    std::array<std::pair<uint32 /*item_id*/, int32 /*fake_id*/>, BOT_TRANSMOG_INVENTORY_SIZE> transmogs;
 };
 
 struct NpcBotStats
@@ -162,19 +151,14 @@ struct NpcBotStats
 struct NpcBotItemSet
 {
 public:
-    NpcBotItemSet() : name{}, items{} {}
+    NpcBotItemSet() : items{} {}
 
-    constexpr operator bool() const noexcept { return !empty(); }
-    constexpr bool empty() const noexcept { return items_count() == 0; }
+    constexpr operator bool() const { return !is_empty(); }
+    constexpr bool is_empty() const { return items_count() == 0; }
 
-    constexpr uint8 items_count() const noexcept {
-        uint8 count = 0;
-        for (uint8 i = 0; i < BOT_INVENTORY_SIZE; ++i)
-            if (!!items[i])
-                ++count;
-        return count;
+    constexpr uint8 items_count() const {
+        return BOT_INVENTORY_SIZE - static_cast<uint8>(std::ranges::count(items, 0u));
     }
-
     void clear() { items = {}; name.clear(); }
 
     std::string name;

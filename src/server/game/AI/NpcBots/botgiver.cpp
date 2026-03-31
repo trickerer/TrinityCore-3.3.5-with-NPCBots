@@ -100,7 +100,7 @@ public:
                     std::array<uint32, BOT_CLASS_END> npcbot_count_per_class{ 0 };
 
                     {
-                        std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
+                        std::shared_lock lock(*BotDataMgr::GetLock());
                         for (Creature const* bot : BotDataMgr::GetExistingNPCBots())
                         {
                             if (!bot->IsAlive() || bot->IsTempBot() || bot->IsWandererBot() || bot->GetBotAI()->GetBotOwnerGuid() || bot->HasAura(BERSERK))
@@ -120,11 +120,9 @@ public:
 
                         if (player->HaveBot() && BotCfg::GetMaxClassBots())
                         {
-                            uint8 count = 0;
-                            BotMap const* map = player->GetBotMgr()->GetBotMap();
-                            for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
-                                if (itr->second->GetBotClass() == botclass)
-                                    ++count;
+                            uint8 count = static_cast<uint8>(std::ranges::count_if(*player->GetBotMgr()->GetBotMap(), [=](BotMap::value_type const& kv) {
+                                return kv.second->GetBotClass() == botclass;
+                            }));
                             if (count >= BotCfg::GetMaxClassBots())
                                 continue;
                         }
@@ -191,47 +189,47 @@ public:
                     uint8 availCount = 0;
 
                     //go through bots map to find what bots are available
-                    std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
-                    NpcBotRegistry const& allBots = BotDataMgr::GetExistingNPCBots();
-                    for (NpcBotRegistry::const_iterator ci = allBots.begin(); ci != allBots.end(); ++ci)
                     {
-                        Creature const* bot = *ci;
-                        bot_ai const* ai = bot->GetBotAI();
-                        if (bot->GetBotClass() != botclass || !bot->IsAlive() || ai->IsTempBot() || bot->IsWandererBot() || ai->GetBotOwnerGuid() || bot->HasAura(BERSERK))
-                            continue;
-                        if (BotCfg::FilterRaces() && botclass < BOT_CLASS_EX_START && (bot->GetRaceMask() & RACEMASK_ALL_PLAYABLE) &&
-                            !(bot->GetRaceMask() & ((player->GetRaceMask() & RACEMASK_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE)))
-                            continue;
-
-                        std::ostringstream message1;
-                        message1 << bot_ai::LocalizedNpcText(player, BOT_TEXT_BOTGIVER_WISH_TO_HIRE_) << bot->GetName() << '?';
-
-                        std::ostringstream info_ostr;
-                        uint32 raceTextId;
-                        switch (bot->GetRace())
+                        std::shared_lock lock(*BotDataMgr::GetLock());
+                        for (Creature const* bot : BotDataMgr::GetExistingNPCBots())
                         {
-                            case RACE_HUMAN:        raceTextId = BOT_TEXT_RACE_HUMAN;   break;
-                            case RACE_ORC:          raceTextId = BOT_TEXT_RACE_ORC;     break;
-                            case RACE_DWARF:        raceTextId = BOT_TEXT_RACE_DWARF;   break;
-                            case RACE_NIGHTELF:     raceTextId = BOT_TEXT_RACE_NELF;    break;
-                            case RACE_UNDEAD_PLAYER:raceTextId = BOT_TEXT_RACE_UNDEAD;  break;
-                            case RACE_TAUREN:       raceTextId = BOT_TEXT_RACE_TAUREN;  break;
-                            case RACE_GNOME:        raceTextId = BOT_TEXT_RACE_GNOME;   break;
-                            case RACE_TROLL:        raceTextId = BOT_TEXT_RACE_TROLL;   break;
-                            case RACE_BLOODELF:     raceTextId = BOT_TEXT_RACE_BELF;    break;
-                            case RACE_DRAENEI:      raceTextId = BOT_TEXT_RACE_DRAENEI; break;
-                            default:                raceTextId = BOT_TEXT_RACE_UNKNOWN; break;
+                            bot_ai const* ai = bot->GetBotAI();
+                            if (bot->GetBotClass() != botclass || !bot->IsAlive() || ai->IsTempBot() || bot->IsWandererBot() || ai->GetBotOwnerGuid() || bot->HasAura(BERSERK))
+                                continue;
+                            if (BotCfg::FilterRaces() && botclass < BOT_CLASS_EX_START && (bot->GetRaceMask() & RACEMASK_ALL_PLAYABLE) &&
+                                !(bot->GetRaceMask() & ((player->GetRaceMask() & RACEMASK_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE)))
+                                continue;
+
+                            std::ostringstream message1;
+                            message1 << bot_ai::LocalizedNpcText(player, BOT_TEXT_BOTGIVER_WISH_TO_HIRE_) << bot->GetName() << '?';
+
+                            std::ostringstream info_ostr;
+                            uint32 raceTextId;
+                            switch (bot->GetRace())
+                            {
+                                case RACE_HUMAN:        raceTextId = BOT_TEXT_RACE_HUMAN;   break;
+                                case RACE_ORC:          raceTextId = BOT_TEXT_RACE_ORC;     break;
+                                case RACE_DWARF:        raceTextId = BOT_TEXT_RACE_DWARF;   break;
+                                case RACE_NIGHTELF:     raceTextId = BOT_TEXT_RACE_NELF;    break;
+                                case RACE_UNDEAD_PLAYER:raceTextId = BOT_TEXT_RACE_UNDEAD;  break;
+                                case RACE_TAUREN:       raceTextId = BOT_TEXT_RACE_TAUREN;  break;
+                                case RACE_GNOME:        raceTextId = BOT_TEXT_RACE_GNOME;   break;
+                                case RACE_TROLL:        raceTextId = BOT_TEXT_RACE_TROLL;   break;
+                                case RACE_BLOODELF:     raceTextId = BOT_TEXT_RACE_BELF;    break;
+                                case RACE_DRAENEI:      raceTextId = BOT_TEXT_RACE_DRAENEI; break;
+                                default:                raceTextId = BOT_TEXT_RACE_UNKNOWN; break;
+                            }
+                            info_ostr << bot->GetName() << " (" << (
+                                bot->GetGender() == GENDER_MALE ? bot_ai::LocalizedNpcText(player, BOT_TEXT_GENDER_MALE) + ' ' :
+                                bot->GetGender() == GENDER_FEMALE ? bot_ai::LocalizedNpcText(player, BOT_TEXT_GENDER_FEMALE) + ' ' :
+                                "") << bot_ai::LocalizedNpcText(player, raceTextId) << ')';
+
+                            player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TALK, info_ostr.str(),
+                                HIRE_ENTRY, GOSSIP_ACTION_INFO_DEF + bot->GetEntry(), message1.str(), cost, false);
+
+                            if (++availCount >= BOT_GOSSIP_MAX_ITEMS - 1) //back
+                                break;
                         }
-                        info_ostr << bot->GetName() << " (" << (
-                            bot->GetGender() == GENDER_MALE ? bot_ai::LocalizedNpcText(player, BOT_TEXT_GENDER_MALE) + ' ' :
-                            bot->GetGender() == GENDER_FEMALE ? bot_ai::LocalizedNpcText(player, BOT_TEXT_GENDER_FEMALE) + ' ' :
-                            "") << bot_ai::LocalizedNpcText(player, raceTextId) << ')';
-
-                        player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TALK, info_ostr.str(),
-                            HIRE_ENTRY, GOSSIP_ACTION_INFO_DEF + bot->GetEntry(), message1.str(), cost, false);
-
-                        if (++availCount >= BOT_GOSSIP_MAX_ITEMS - 1) //back
-                            break;
                     }
 
                     if (availCount == 0)

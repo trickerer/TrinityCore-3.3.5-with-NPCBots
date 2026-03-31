@@ -25,161 +25,161 @@ Npc Bot Config by Trickerer (onlysuffering@gmail.com)
 # define GetStringDefault GetOption<std::string>
 #endif
 
-uint8 _basefollowdist;
-uint8 _maxClassNpcBots;
-uint8 _maxAccountNpcBots;
-uint8 _maxSharedOwners;
-uint8 _xpReductionExtraAmount;
-uint8 _xpReductionExtraStartingNumber;
-uint8 _mountLevel60;
-uint8 _mountLevel100;
-uint8 _healTargetIconFlags;
-uint8 _tankingTargetIconFlags;
-uint8 _offTankingTargetIconFlags;
-uint8 _dpsTargetIconFlags;
-uint8 _rangedDpsTargetIconFlags;
-uint8 _noDpsTargetIconFlags;
-uint8 _npcBotOwnerExpireMode;
-int32 _botInfoPacketsLimit;
-uint32 _gearBankCapacity;
-uint32 _gearBankEquipmentSetsCount;
-uint32 _npcBotsCostHire;
-uint32 _npcBotsCostRent;
-uint32 _npcBotUpdateDelayBase;
-uint32 _npcBotEngageDelayDPS_default;
-uint32 _npcBotEngageDelayHeal_default;
-uint32 _npcBotOwnerExpireTime;
-uint32 _desiredWanderingBotsCount;
-uint32 _killrewardWandererMoneyBase;
-uint32 _killrewardWandererItemCount;
-uint32 _killrewardWandererItemQuality;
-uint32 _targetBGPlayersPerTeamCount_AV;
-uint32 _targetBGPlayersPerTeamCount_WS;
-uint32 _targetBGPlayersPerTeamCount_AB;
-uint32 _targetBGPlayersPerTeamCount_EY;
-uint32 _targetBGPlayersPerTeamCount_SA;
-uint32 _targetBGPlayersPerTeamCount_IC;
-uint32 _shared_ownership_options;
-bool _enableNpcBots;
-bool _logToDB;
-bool _xpReductionEnable;
-bool _xpReductionGroupOnly;
-bool _honorReductionEnable;
-bool _honorReductionGroupOnly;
-bool _moneyLootShareEnable;
-bool _moneyLootShareGroupOnly;
-bool _enableNpcBotsDungeons;
-bool _enableNpcBotsRaids;
-bool _enableNpcBotsBGs;
-bool _enableNpcBotsArenas;
-bool _enableDungeonFinder;
-bool _enableNpcBotsPremade;
-bool _limitNpcBotsDungeons;
-bool _limitNpcBotsRaids;
-bool _hideSpawns;
-bool _botPvP;
-bool _botMovementFoodInterrupt;
-bool _filterRaces;
-bool _displayEquipment;
-bool _showCloak;
-bool _showHelm;
-bool _sendEquipListItems;
-bool _enableBotGearBank;
-bool _transmog_enable;
-bool _transmog_mixArmorClasses;
-bool _transmog_mixWeaponClasses;
-bool _transmog_mixWeaponInvTypes;
-bool _transmog_useEquipmentSlots;
-bool _enableclass_warrior;
-bool _enableclass_paladin;
-bool _enableclass_hunter;
-bool _enableclass_rogue;
-bool _enableclass_priest;
-bool _enableclass_deathknight;
-bool _enableclass_shaman;
-bool _enableclass_mage;
-bool _enableclass_warlock;
-bool _enableclass_druid;
-bool _enableclass_blademaster;
-bool _enableclass_sphynx;
-bool _enableclass_archmage;
-bool _enableclass_dreadlord;
-bool _enableclass_spellbreaker;
-bool _enableclass_darkranger;
-bool _enableclass_necromancer;
-bool _enableclass_seawitch;
-bool _enableclass_cryptlord;
-bool _enableclass_wander_warrior;
-bool _enableclass_wander_paladin;
-bool _enableclass_wander_hunter;
-bool _enableclass_wander_rogue;
-bool _enableclass_wander_priest;
-bool _enableclass_wander_deathknight;
-bool _enableclass_wander_shaman;
-bool _enableclass_wander_mage;
-bool _enableclass_wander_warlock;
-bool _enableclass_wander_druid;
-bool _enableclass_wander_blademaster;
-bool _enableclass_wander_sphynx;
-bool _enableclass_wander_archmage;
-bool _enableclass_wander_dreadlord;
-bool _enableclass_wander_spellbreaker;
-bool _enableclass_wander_darkranger;
-bool _enableclass_wander_necromancer;
-bool _enableclass_wander_seawitch;
-bool _enableclass_wander_cryptlord;
-bool _enrageOnDismiss;
-bool _botStatLimits;
-bool _enableWanderingBotsBG;
-bool _enableConfigLevelCapBG;
-bool _enableConfigLevelCapBGFirst;
-bool _bothk_enable;
-bool _bothk_message_enable;
-bool _bothk_achievements_enable;
-bool _untarget_wnpc_questgiver;
-bool _untarget_wnpc_flightmaster;
-float _botStatLimits_dodge;
-float _botStatLimits_parry;
-float _botStatLimits_block;
-float _botStatLimits_crit;
-float _mult_dmg_physical;
-float _mult_dmg_spell;
-float _mult_healing;
-float _mult_hp;
-float _mult_dmg_wanderer;
-float _mult_healing_wanderer;
-float _mult_hp_wanderer;
-float _mult_speed_wanderer;
-float _mult_xpgain_wanderer;
-float _mult_dmg_warrior;
-float _mult_dmg_paladin;
-float _mult_dmg_hunter;
-float _mult_dmg_rogue;
-float _mult_dmg_priest;
-float _mult_dmg_deathknight;
-float _mult_dmg_shaman;
-float _mult_dmg_mage;
-float _mult_dmg_warlock;
-float _mult_dmg_druid;
-float _mult_dmg_blademaster;
-float _mult_dmg_obsidiandestroyer;
-float _mult_dmg_archmage;
-float _mult_dmg_dreadlord;
-float _mult_dmg_spellbreaker;
-float _mult_dmg_darkranger;
-float _mult_dmg_necromancer;
-float _mult_dmg_seawitch;
-float _mult_dmg_cryptlord;
-float _bothk_rate_honor;
-std::vector<float> _mult_dmg_levels;
-std::vector<float> _mult_heal_levels;
-std::vector<float> _mult_hp_levels;
-std::vector<float> _mult_mp_levels;
-LvlBrackets _max_npcbots;
-PctBrackets _botwanderer_pct_level_brackets;
-ItemLvlBrackets _botwanderer_itemlvl_level_brackets;
-std::vector<uint32> _disabled_instance_maps;
-std::vector<uint32> _enabled_wander_node_maps;
+static uint8 _basefollowdist;
+static uint8 _maxClassNpcBots;
+static uint8 _maxAccountNpcBots;
+static uint8 _maxSharedOwners;
+static uint8 _xpReductionExtraAmount;
+static uint8 _xpReductionExtraStartingNumber;
+static uint8 _mountLevel60;
+static uint8 _mountLevel100;
+static uint8 _healTargetIconFlags;
+static uint8 _tankingTargetIconFlags;
+static uint8 _offTankingTargetIconFlags;
+static uint8 _dpsTargetIconFlags;
+static uint8 _rangedDpsTargetIconFlags;
+static uint8 _noDpsTargetIconFlags;
+static uint8 _npcBotOwnerExpireMode;
+static int32 _botInfoPacketsLimit;
+static uint32 _gearBankCapacity;
+static uint32 _gearBankEquipmentSetsCount;
+static uint32 _npcBotsCostHire;
+static uint32 _npcBotsCostRent;
+static uint32 _npcBotUpdateDelayBase;
+static uint32 _npcBotEngageDelayDPS_default;
+static uint32 _npcBotEngageDelayHeal_default;
+static uint32 _npcBotOwnerExpireTime;
+static uint32 _desiredWanderingBotsCount;
+static uint32 _killrewardWandererMoneyBase;
+static uint32 _killrewardWandererItemCount;
+static uint32 _killrewardWandererItemQuality;
+static uint32 _targetBGPlayersPerTeamCount_AV;
+static uint32 _targetBGPlayersPerTeamCount_WS;
+static uint32 _targetBGPlayersPerTeamCount_AB;
+static uint32 _targetBGPlayersPerTeamCount_EY;
+static uint32 _targetBGPlayersPerTeamCount_SA;
+static uint32 _targetBGPlayersPerTeamCount_IC;
+static uint32 _shared_ownership_options;
+static bool _enableNpcBots;
+static bool _logToDB;
+static bool _xpReductionEnable;
+static bool _xpReductionGroupOnly;
+static bool _honorReductionEnable;
+static bool _honorReductionGroupOnly;
+static bool _moneyLootShareEnable;
+static bool _moneyLootShareGroupOnly;
+static bool _enableNpcBotsDungeons;
+static bool _enableNpcBotsRaids;
+static bool _enableNpcBotsBGs;
+static bool _enableNpcBotsArenas;
+static bool _enableDungeonFinder;
+static bool _enableNpcBotsPremade;
+static bool _limitNpcBotsDungeons;
+static bool _limitNpcBotsRaids;
+static bool _hideSpawns;
+/*static*/bool _botPvP;
+static bool _botMovementFoodInterrupt;
+static bool _filterRaces;
+static bool _displayEquipment;
+static bool _showCloak;
+static bool _showHelm;
+static bool _sendEquipListItems;
+static bool _enableBotGearBank;
+static bool _transmog_enable;
+static bool _transmog_mixArmorClasses;
+static bool _transmog_mixWeaponClasses;
+static bool _transmog_mixWeaponInvTypes;
+static bool _transmog_useEquipmentSlots;
+static bool _enableclass_warrior;
+static bool _enableclass_paladin;
+static bool _enableclass_hunter;
+static bool _enableclass_rogue;
+static bool _enableclass_priest;
+static bool _enableclass_deathknight;
+static bool _enableclass_shaman;
+static bool _enableclass_mage;
+static bool _enableclass_warlock;
+static bool _enableclass_druid;
+static bool _enableclass_blademaster;
+static bool _enableclass_sphynx;
+static bool _enableclass_archmage;
+static bool _enableclass_dreadlord;
+static bool _enableclass_spellbreaker;
+static bool _enableclass_darkranger;
+static bool _enableclass_necromancer;
+static bool _enableclass_seawitch;
+static bool _enableclass_cryptlord;
+static bool _enableclass_wander_warrior;
+static bool _enableclass_wander_paladin;
+static bool _enableclass_wander_hunter;
+static bool _enableclass_wander_rogue;
+static bool _enableclass_wander_priest;
+static bool _enableclass_wander_deathknight;
+static bool _enableclass_wander_shaman;
+static bool _enableclass_wander_mage;
+static bool _enableclass_wander_warlock;
+static bool _enableclass_wander_druid;
+static bool _enableclass_wander_blademaster;
+static bool _enableclass_wander_sphynx;
+static bool _enableclass_wander_archmage;
+static bool _enableclass_wander_dreadlord;
+static bool _enableclass_wander_spellbreaker;
+static bool _enableclass_wander_darkranger;
+static bool _enableclass_wander_necromancer;
+static bool _enableclass_wander_seawitch;
+static bool _enableclass_wander_cryptlord;
+static bool _enrageOnDismiss;
+static bool _botStatLimits;
+static bool _enableWanderingBotsBG;
+static bool _enableConfigLevelCapBG;
+static bool _enableConfigLevelCapBGFirst;
+static bool _bothk_enable;
+static bool _bothk_message_enable;
+static bool _bothk_achievements_enable;
+static bool _untarget_wnpc_questgiver;
+static bool _untarget_wnpc_flightmaster;
+static float _botStatLimits_dodge;
+static float _botStatLimits_parry;
+static float _botStatLimits_block;
+static float _botStatLimits_crit;
+static float _mult_dmg_physical;
+static float _mult_dmg_spell;
+static float _mult_healing;
+static float _mult_hp;
+static float _mult_dmg_wanderer;
+static float _mult_healing_wanderer;
+static float _mult_hp_wanderer;
+static float _mult_speed_wanderer;
+static float _mult_xpgain_wanderer;
+static float _mult_dmg_warrior;
+static float _mult_dmg_paladin;
+static float _mult_dmg_hunter;
+static float _mult_dmg_rogue;
+static float _mult_dmg_priest;
+static float _mult_dmg_deathknight;
+static float _mult_dmg_shaman;
+static float _mult_dmg_mage;
+static float _mult_dmg_warlock;
+static float _mult_dmg_druid;
+static float _mult_dmg_blademaster;
+static float _mult_dmg_obsidiandestroyer;
+static float _mult_dmg_archmage;
+static float _mult_dmg_dreadlord;
+static float _mult_dmg_spellbreaker;
+static float _mult_dmg_darkranger;
+static float _mult_dmg_necromancer;
+static float _mult_dmg_seawitch;
+static float _mult_dmg_cryptlord;
+static float _bothk_rate_honor;
+static std::vector<float> _mult_dmg_levels;
+static std::vector<float> _mult_heal_levels;
+static std::vector<float> _mult_hp_levels;
+static std::vector<float> _mult_mp_levels;
+static LvlBrackets _max_npcbots;
+static PctBrackets _botwanderer_pct_level_brackets;
+static ItemLvlBrackets _botwanderer_itemlvl_level_brackets;
+static std::vector<uint32> _disabled_instance_maps;
+static std::vector<uint32> _enabled_wander_node_maps;
 
 void AddSC_botconfig_scripts();
 void AddSC_death_knight_bot();
@@ -443,7 +443,7 @@ private:
         std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");
         std::vector<std::string_view> toks0 = Bcore::Tokenize(max_npcbots_by_levels, ',', false);
         ASSERT(toks0.size() == BRACKETS_COUNT, "NpcBot.MaxBots must have exactly %u values", uint32(BRACKETS_COUNT));
-        for (decltype(toks0)::size_type i = 0; i != toks0.size(); ++i)
+        for (std::size_t i{}; i != toks0.size(); ++i)
         {
             Optional<uint8> val = Bcore::StringTo<uint8>(toks0[i]);
             if (val == std::nullopt)
@@ -470,7 +470,7 @@ private:
         std::string mult_dps_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
         std::vector<std::string_view> toks1 = Bcore::Tokenize(mult_dps_by_levels, ',', false);
         ASSERT(toks1.size() >= BRACKETS_COUNT, "NpcBot.Mult.Damage.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-        for (decltype(toks1)::size_type i = 0; i != toks1.size(); ++i)
+        for (std::size_t i{}; i != toks1.size(); ++i)
         {
             Optional<float> val = Bcore::StringTo<float>(toks1[i]);
             if (val == std::nullopt)
@@ -484,7 +484,7 @@ private:
         std::string mult_healing_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Healing.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
         std::vector<std::string_view> toks5 = Bcore::Tokenize(mult_healing_by_levels, ',', false);
         ASSERT(toks5.size() >= BRACKETS_COUNT, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-        for (decltype(toks5)::size_type i = 0; i != toks5.size(); ++i)
+        for (std::size_t i{}; i != toks5.size(); ++i)
         {
             Optional<float> val = Bcore::StringTo<float>(toks5[i]);
             if (val == std::nullopt)
@@ -498,7 +498,7 @@ private:
         std::string mult_hp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.HP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
         std::vector<std::string_view> toks6 = Bcore::Tokenize(mult_hp_by_levels, ',', false);
         ASSERT(toks6.size() >= BRACKETS_COUNT, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-        for (decltype(toks6)::size_type i = 0; i != toks6.size(); ++i)
+        for (std::size_t i{}; i != toks6.size(); ++i)
         {
             Optional<float> val = Bcore::StringTo<float>(toks6[i]);
             if (val == std::nullopt)
@@ -512,7 +512,7 @@ private:
         std::string mult_mp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.MP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
         std::vector<std::string_view> toks7 = Bcore::Tokenize(mult_mp_by_levels, ',', false);
         ASSERT(toks7.size() >= BRACKETS_COUNT, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
-        for (decltype(toks7)::size_type i = 0; i != toks7.size(); ++i)
+        for (std::size_t i{}; i != toks7.size(); ++i)
         {
             Optional<float> val = Bcore::StringTo<float>(toks7[i]);
             if (val == std::nullopt)
@@ -527,7 +527,7 @@ private:
         std::vector<std::string_view> toks2 = Bcore::Tokenize(wanderers_by_levels, ',', false);
         ASSERT(toks2.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.Continents.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
         uint32 total_pct = 0;
-        for (decltype(toks2)::size_type i = 0; i != toks2.size(); ++i)
+        for (std::size_t i{}; i != toks2.size(); ++i)
         {
             Optional<uint32> val = Bcore::StringTo<uint32>(toks2[i]);
             if (val == std::nullopt)
@@ -541,7 +541,7 @@ private:
         _enabled_wander_node_maps.clear();
         std::string enabled_wander_node_maps = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Maps", "0,1,530,571");
         std::vector<std::string_view> toks3 = Bcore::Tokenize(enabled_wander_node_maps, ',', false);
-        for (decltype(toks3)::size_type i = 0; i != toks3.size(); ++i)
+        for (std::size_t i{}; i != toks3.size(); ++i)
         {
             Optional<uint32> val = Bcore::StringTo<uint32>(toks3[i]);
             if (val == std::nullopt)
@@ -567,7 +567,7 @@ private:
         _disabled_instance_maps.clear();
         std::string disabled_instance_maps = sConfigMgr->GetStringDefault("NpcBot.DisableInstances", "");
         std::vector<std::string_view> toks4 = Bcore::Tokenize(disabled_instance_maps, ',', false);
-        for (decltype(toks4)::size_type i = 0; i != toks4.size(); ++i)
+        for (std::size_t i{}; i != toks4.size(); ++i)
         {
             Optional<uint32> val = Bcore::StringTo<uint32>(toks4[i]);
             if (val == std::nullopt)
@@ -589,7 +589,7 @@ private:
         std::string itemlevel_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.MaxItemLevel.Levels", "0,0,0,0,0,0,0,0,0");
         std::vector<std::string_view> tok8 = Bcore::Tokenize(itemlevel_by_levels, ',', false);
         ASSERT(tok8.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
-        for (decltype(tok8)::size_type i = 0; i != tok8.size(); ++i)
+        for (std::size_t i{}; i != tok8.size(); ++i)
         {
             Optional<uint32> val = Bcore::StringTo<uint32>(tok8[i]);
             if (val == std::nullopt)
