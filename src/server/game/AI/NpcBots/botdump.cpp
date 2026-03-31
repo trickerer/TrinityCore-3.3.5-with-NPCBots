@@ -137,7 +137,7 @@ static void FixNULLBotFields(std::string& line)
 }
 
 template<typename T>
-static void StringToVal(std::string const& /*line*/, T& /*v*/, size_t /*begin_pos*/, size_t /*end_pos*/)
+void StringToVal(std::string const& /*line*/, T& /*v*/, size_t /*begin_pos*/, size_t /*end_pos*/)
 {
     BOT_LOG_ERROR("scripts", "StringToVal misuse");
 }
@@ -150,7 +150,7 @@ void StringToVal(std::string const& line, float& v, size_t begin_pos, size_t end
 }
 */
 template<>
-static void StringToVal(std::string const& line, uint32& v, size_t begin_pos, size_t end_pos)
+void StringToVal(std::string const& line, uint32& v, size_t begin_pos, size_t end_pos)
 {
     using v_type = std::remove_cvref_t<decltype(v)>;
 

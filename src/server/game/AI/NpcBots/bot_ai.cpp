@@ -4424,7 +4424,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
             //Try to prioritize flag carrier
             if (me->GetMap()->IsBattlegroundOrArena())
             {
-                std::ranges::copy_if(unitList, std::back_inserter(closeList), [=](Unit const* fc) {
+                std::ranges::copy_if(unitList, std::back_inserter(closeList), [=, this](Unit const* fc) {
                     return IsFlagCarrier(fc) && CanBotAttack(fc, byspell);
                 });
             }
@@ -9081,7 +9081,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 auto try_put_item = [player, slot, einfo, &itemList, &idsList, this](uint8 bag, uint8 bag_slot) {
                     if (Item const* pItem = player->GetItemByPos(bag, bag_slot))
                     {
-                        if (!std::ranges::any_of(einfo->ItemEntry, [=](uint32 eeid) { return eeid == pItem->GetEntry(); }) &&
+                        if (!std::ranges::any_of(einfo->ItemEntry, [=, this](uint32 eeid) { return eeid == pItem->GetEntry(); }) &&
                             _canEquip(pItem->GetTemplate(), slot, true, pItem) &&
                             (pItem->GetItemRandomPropertyId() == 0 || !idsList.contains(pItem->GetEntry())))
                         {

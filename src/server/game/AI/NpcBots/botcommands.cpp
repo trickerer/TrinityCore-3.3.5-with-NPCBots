@@ -709,7 +709,7 @@ public:
             return false;
         }
 
-        decltype(extra)::value_type extras = std::move(extra.value_or({}));
+        decltype(extra)::value_type extras = extra ? std::move(extra.value()) : decltype(extra)::value_type{};
         extras.resize(MAX_BOT_LOG_PARAMS, {});
         BotLogger::Log(*log_type, *entry, std::move(extras[0]), std::move(extras[1]), std::move(extras[2]), std::move(extras[3]), std::move(extras[4]));
         return true;

@@ -1049,7 +1049,7 @@ uint8 BotMgr::BotClassByClassName(std::string_view className)
 
     //std::transform(className.begin(), className.end(), className.begin(), std::tolower);
     decltype(BotClassNamesMap)::const_iterator ci = BotClassNamesMap.find(className);
-    return ci != BotClassNamesMap.cend() ? ci->second : BOT_CLASS_NONE;
+    return ci != BotClassNamesMap.cend() ? ci->second : static_cast<uint8>(BOT_CLASS_NONE);
 }
 
 uint8 BotMgr::GetBotPlayerClass(uint8 bot_class)
