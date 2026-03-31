@@ -390,25 +390,25 @@ static std::pair<uint8, uint8> GetZoneLevels(uint32 zoneId)
     }
 }
 
-static bool IsNoWPZone(uint32 zoneId)
-{
-    //Only maps 0 and 1 are covered
-    switch (zoneId)
-    {
-        case 1477: // Moonglade
-        case 1519: // Stormwind
-        case 1537: // Ironforge
-        case 1637: // Orgrimmar
-        case 1638: // Thunder Bluff
-        case 1657: // Darnassus
-        case 3487: // Silvermoon
-        case 3557: // Exodar
-        case 493: // Moonglade
-            return true;
-        default:
-            return false;
-    }
-}
+//static bool IsNoWPZone(uint32 zoneId)
+//{
+//    //Only maps 0 and 1 are covered
+//    switch (zoneId)
+//    {
+//        case 1477: // Moonglade
+//        case 1519: // Stormwind
+//        case 1537: // Ironforge
+//        case 1637: // Orgrimmar
+//        case 1638: // Thunder Bluff
+//        case 1657: // Darnassus
+//        case 3487: // Silvermoon
+//        case 3557: // Exodar
+//        case 493: // Moonglade
+//            return true;
+//        default:
+//            return false;
+//    }
+//}
 
 static uint32 GetZoneIdOverride(uint32 zoneId)
 {
