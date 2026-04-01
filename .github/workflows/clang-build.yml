@@ -76,5 +76,5 @@ jobs:
       run: |
         cmake --install ${{ steps.strings.outputs.build-output-dir }}
         cd ${{ github.workspace }}/check_install/bin
-        ./bnetserver --version
+        ./authserver --version
         ./worldserver --version

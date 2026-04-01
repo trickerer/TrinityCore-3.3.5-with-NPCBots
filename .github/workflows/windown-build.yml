@@ -98,5 +98,5 @@ jobs:
     - name: Check binaries
       run: |
         cd ${{ steps.strings.outputs.build-output-dir }}/bin/${{ env.CMAKE_BUILD_TYPE }}
-        ./bnetserver --version
+        ./authserver --version
         ./worldserver --version
