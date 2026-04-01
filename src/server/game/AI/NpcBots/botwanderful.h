@@ -1,6 +1,7 @@
 #ifndef BOTWANDERFUL_H_
 #define BOTWANDERFUL_H_
 
+#include "EnumFlag.h"
 #include "Position.h"
 
 #include <algorithm>

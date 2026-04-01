@@ -14,6 +14,10 @@ NpcBot System by Trickerer (onlysuffering@gmail.com)
 Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
 */
 
+#ifdef AC_COMPILER
+# define TARGET_ICONS_COUNT TARGETICONCOUNT
+#endif
+
 inline constexpr std::size_t MAX_BOT_LOG_PARAMS = 5;
 inline constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
 inline constexpr std::size_t MAX_BOT_ITEM_SET_NAME_LENGTH = 30;

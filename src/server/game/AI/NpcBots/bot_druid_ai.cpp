@@ -2255,7 +2255,7 @@ public:
                 if (Aura* stu = target->GetAura(spellId))
                 {
                     //1 extra second on creatures
-                    uint32 dur = stu->GetDuration() + target->IsPlayer() ? 1000 : 2000;
+                    uint32 dur = stu->GetDuration() + (target->IsPlayer() ? 1000 : 2000);
                     stu->SetDuration(dur);
                     stu->SetMaxDuration(dur);
                 }

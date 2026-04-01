@@ -9081,7 +9081,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 auto try_put_item = [player, slot, einfo, &itemList, &idsList, this](uint8 bag, uint8 bag_slot) {
                     if (Item const* pItem = player->GetItemByPos(bag, bag_slot))
                     {
-                        if (!std::ranges::any_of(einfo->ItemEntry, [=, this](uint32 eeid) { return eeid == pItem->GetEntry(); }) &&
+                        if (!std::ranges::any_of(einfo->ItemEntry, [=](uint32 eeid) { return eeid == pItem->GetEntry(); }) &&
                             _canEquip(pItem->GetTemplate(), slot, true, pItem) &&
                             (pItem->GetItemRandomPropertyId() == 0 || !idsList.contains(pItem->GetEntry())))
                         {
@@ -9171,7 +9171,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     const uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 6; //unequip, unequip (gear bank), reset, current, transmog, back
                     std::ostringstream name;
 
-                    auto try_put_gossip = [player, slot, einfo, &name, &counter, this](uint8 bag, uint8 bag_slot, uint32 guidlow) {
+                    auto try_put_gossip = [player, slot, &name, &counter, this](uint8 bag, uint8 bag_slot, uint32 guidlow) {
                         if (Item const* pItem = player->GetItemByPos(bag, bag_slot); pItem && pItem->GetGUID().GetCounter() == guidlow)
                         {
                             _AddItemLink(player, pItem, name);
@@ -9359,7 +9359,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 });
             };
 
-            auto try_put_item = [=, &itemList, &idsList, this](uint8 bag, uint8 bag_slot) {
+            auto try_put_item = [=, &itemList, &idsList](uint8 bag, uint8 bag_slot) {
                 if (Item const* pItem = player->GetItemByPos(bag, bag_slot))
                 {
                     if (!std::ranges::any_of(einfo->ItemEntry, [=](uint32 eeid) { return eeid == pItem->GetEntry(); }) &&

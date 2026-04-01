@@ -105,6 +105,13 @@ struct NpcBotAppearanceData
     uint8 hair;
     uint8 haircolor;
     uint8 features;
+
+    NpcBotAppearanceData(uint32 bgender, uint64 bskin, uint32 bface, uint32 bhair, uint8 bhaircolor, uint8 bfeatures)
+        : gender(bgender), skin(bskin), face(bface), hair(bhair), haircolor(bhaircolor), features(bfeatures) {}
+    NpcBotAppearanceData(NpcBotAppearanceData const&) = delete;
+    NpcBotAppearanceData(NpcBotAppearanceData&&) = delete;
+    NpcBotAppearanceData& operator=(NpcBotAppearanceData const&) = delete;
+    NpcBotAppearanceData& operator=(NpcBotAppearanceData&&) = delete;
 };
 
 struct NpcBotExtras
