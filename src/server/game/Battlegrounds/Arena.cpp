@@ -26,6 +26,10 @@
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
 
+//npcbot
+#include "Creature.h"
+//end npcbot
+
 void ArenaScore::AppendToPacket(WorldPackets::Battleground::PVPLogData_Player& playerData)
 {
     playerData.PlayerGUID = PlayerGuid;

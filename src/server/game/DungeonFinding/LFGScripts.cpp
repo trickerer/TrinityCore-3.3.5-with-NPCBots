@@ -31,6 +31,10 @@
 #include "SharedDefines.h"
 #include "WorldSession.h"
 
+//npcbot
+#include "Creature.h"
+//end npcbot
+
 namespace lfg
 {
 

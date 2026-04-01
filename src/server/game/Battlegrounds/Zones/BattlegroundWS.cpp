@@ -31,6 +31,7 @@
 //npcbot
 #include "botdatamgr.h"
 #include "botmgr.h"
+#include "Creature.h"
 //end npcbot
 
 // these variables aren't used outside of this file, so declare them only here

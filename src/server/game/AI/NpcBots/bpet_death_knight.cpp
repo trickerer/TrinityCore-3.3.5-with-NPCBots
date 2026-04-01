@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "bpet_ai.h"
+#include "Creature.h"
 #include "ScriptMgr.h"
 /*
 Deathknight NpcBot Pets (by Trickerer onlysuffering@gmail.com)
