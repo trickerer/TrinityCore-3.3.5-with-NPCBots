@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "WorldSession.h"
 /*
 NPCbot giver NPC by Trickerer (<https://github.com/Trickerer/> <onlysuffering@gmail.com>)
 Complete - 100%

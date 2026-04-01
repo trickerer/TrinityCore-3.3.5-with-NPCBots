@@ -3,6 +3,8 @@
 
 #include "botcommon.h"
 
+class Map;
+
 enum SharedOwnerOptions : uint32
 {
     SHARED_OWNER_ENABLE                 = 1,

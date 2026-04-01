@@ -1,11 +1,13 @@
 #include "bot_ai.h"
 #include "bpet_ai.h"
 #include "botmgr.h"
+#include "Creature.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
-#include "Player.h"
 /*
 Warlock NpcBot Pets (by Trickerer onlysuffering@gmail.com)
 Complete - 100%

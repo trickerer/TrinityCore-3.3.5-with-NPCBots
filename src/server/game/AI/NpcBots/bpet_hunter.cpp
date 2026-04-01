@@ -4,9 +4,9 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Map.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
-#include "Player.h"
 /*
 Hunter NpcBot Pets (by Trickerer onlysuffering@gmail.com)
 Complete - 100%
