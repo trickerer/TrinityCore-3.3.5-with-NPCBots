@@ -21,6 +21,7 @@
 #include "Map.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
