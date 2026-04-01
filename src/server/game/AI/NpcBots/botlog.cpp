@@ -3,7 +3,7 @@
 #include "botdatamgr.h"
 #include "botlog.h"
 #include "Creature.h"
-#include "DatabaseEnvFwd.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
 
 template<typename... Args>
