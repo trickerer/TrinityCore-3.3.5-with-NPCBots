@@ -227,7 +227,7 @@ void BotMgr::Update(uint32 diff)
             ai->SetReviveTimer(urand(1000, 5000));
         }
 
-        if (_owner->IsAlive() && (bot->IsAlive() || restrictBots) && !ai->IsTempBot() && !ai->IsDuringTeleport() &&
+        if (_owner->IsAlive() && (bot->IsAlive() || restrictBots) && !bot->IsSummon() && !ai->IsTempBot() && !ai->IsDuringTeleport() &&
             (restrictBots || bot->GetMap() != _owner->GetMap() ||
             (!bot->GetBotAI()->HasBotCommandState(BOT_COMMAND_STAY) && _owner->GetDistance(bot) > SIZE_OF_GRIDS)))
         {
@@ -534,7 +534,7 @@ void BotMgr::OnTeleportFar(uint32 mapId, float x, float y, float z, float ori)
 
     for (auto const& [_, bot] : _bots)
     {
-        if (bot->IsTempBot())
+        if (bot->IsTempBot() || bot->IsSummon())
             continue;
 
         //_owner->m_Controlled.erase(bot);
@@ -746,6 +746,20 @@ void BotMgr::CleanupsBeforeBotDelete(Creature* bot)
         bot->RemoveFromWorld();
 }
 
+void BotMgr::RemoveAllSummonedBots()
+{
+    if (!_bots.empty())
+    {
+        GuidVector summoned_bots;
+        summoned_bots.reserve(_bots.size());
+        for (auto const& [guid, bot] : _bots)
+            if (bot->IsSummon() && !bot->IsTempBot())
+                summoned_bots.push_back(guid);
+        for (ObjectGuid guid : summoned_bots)
+            RemoveBot(guid, BOT_REMOVE_UNSUMMON);
+    }
+}
+
 void BotMgr::RemoveAllBots(uint8 removetype)
 {
     while (!_bots.empty())
@@ -767,6 +781,15 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     }
     else if (!_delayedRemoveList.empty())
         std::erase_if(_delayedRemoveList, [=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
+
+    if (bot->IsSummon() && !bot->GetBotAI()->IsTempBot())
+    {
+        RemoveBotFromBGQueue(bot);
+        RemoveBotFromGroup(bot);
+        BotDataMgr::DespawnDungeonBot(bot->GetEntry());
+        _bots.erase(itr);
+        return;
+    }
 
     CleanupsBeforeBotDelete(guid, removetype);
 
@@ -820,12 +843,24 @@ BotAddResult BotMgr::RebindBot(Creature* bot)
     return res;
 }
 
+BotAddResult BotMgr::AddDungeonBot(Creature* bot)
+{
+    BotAddResult add_res = AddBot(bot);
+    if (add_res != BOT_ADD_SUCCESS)
+        return add_res;
+
+    uint32 lfg_roles = BotDataMgr::BotToLFGRoles(bot->GetBotAI()->GetBotRoles());
+    _owner->GetGroup()->SetLfgRoles(bot->GetGUID(), lfg_roles);
+
+    return BOT_ADD_SUCCESS;
+}
+
 BotAddResult BotMgr::AddBot(Creature* bot)
 {
     ASSERT(bot->IsNPCBot());
     ASSERT(bot->GetBotAI() != nullptr);
 
-    bool owned = bot->GetBotAI()->IsTempBot() || bot->GetBotAI()->HasOwner(_owner->GetGUID().GetCounter());
+    bool owned = bot->IsSummon() || bot->GetBotAI()->HasOwner(_owner->GetGUID().GetCounter());
     uint8 owned_count = BotDataMgr::GetOwnedBotsCount(_owner->GetGUID(), 0, true);
     uint8 class_count = BotDataMgr::GetOwnedBotsCount(_owner->GetGUID(), bot->GetClassMask(), true);
 
@@ -915,9 +950,12 @@ BotAddResult BotMgr::AddBot(Creature* bot)
 
     if (!bot->GetBotAI()->IsTempBot())
     {
-        uint32 newOwner = _owner->GetGUID().GetCounter();
-        if (!bot->GetBotAI()->HasSharedOwner(newOwner))
-            BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
+        if (!bot->IsSummon())
+        {
+            uint32 newOwner = _owner->GetGUID().GetCounter();
+            if (!bot->GetBotAI()->HasSharedOwner(newOwner))
+                BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
+        }
 
         bot->GetBotAI()->SetBotCommandState(BOT_COMMAND_FOLLOW, true);
         if (bot->GetBotAI()->HasRole(BOT_ROLE_PARTY))
@@ -999,7 +1037,7 @@ bool BotMgr::RemoveBotFromGroup(Creature* bot)
     gr->RemoveMember(bot->GetGUID());
 
     //if removed from group while in instance / bg then remove from world immediately
-    if (bot->IsInWorld() && RestrictBots(bot, true))
+    if (bot->IsInWorld() && !bot->IsSummon() && RestrictBots(bot, true))
         TeleportBot(bot, bot->GetMap(), bot);
 
     return true;

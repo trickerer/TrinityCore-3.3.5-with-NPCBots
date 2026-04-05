@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "bottext.h"
@@ -667,7 +668,7 @@ public:
                 {
                     if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
                         !member->IsInCombat() || IsTank(member) || me->GetDistance(member) > 30 ||
-                        (IsTankingClass(i == 0 ? member->GetClass() : member->ToCreature()->GetBotClass()) && !me->GetMap()->IsRaid()) ||
+                        (BotDataMgr::IsTankingClass(i == 0 ? member->GetClass() : member->ToCreature()->GetBotClass()) && !me->GetMap()->IsRaid()) ||
                         (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
                         member->HasAuraTypeWithFamilyFlags(SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE, SPELLFAMILY_PALADIN, 0x100))
                         continue;
@@ -1002,7 +1003,7 @@ public:
             }
             if (RETRIBUTION_AURA &&
                 (!(mask & SPECIFIC_AURA_RETRIBUTION) || idMap[RETRIBUTION_AURA_1] < RETRIBUTION_AURA) &&
-                (IsMeleeClass(master->GetClass()) || IsMelee()))
+                (BotDataMgr::IsMeleeClass(master->GetClass()) || IsMelee()))
             {
                 if (doCast(me, RETRIBUTION_AURA))
                     return;
@@ -1294,7 +1295,7 @@ public:
                 (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
                 (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
                 (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
-                ((!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
+                ((!BotDataMgr::IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
                 IsInBotParty(u))
             {
                 if (doCast(mytar, GetSpell(HAND_OF_RECKONING_1)))
@@ -1316,7 +1317,7 @@ public:
             //RIGHTEOUS DEFENSE //No GCD
             if (IsSpellReady(RIGHTEOUS_DEFENSE_1, diff, false) && !IAmFree() && u && u != me && IsTank() &&
                 me->GetDistance(u) < 40 && mytar->IsCreature() && !mytar->IsControlledByPlayer() &&
-                !IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80 &&
+                !BotDataMgr::IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80 &&
                 !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
                 (!IsTank(u) || (GetHealthPCT(u) < 30 && GetHealthPCT(me) > 67)) &&
                 IsInBotParty(u) && Rand() < 20 + 30 * u->getAttackers().size())

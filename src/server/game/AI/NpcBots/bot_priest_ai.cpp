@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "botspell.h"
@@ -934,7 +935,7 @@ public:
                 {
                     u = bot;
                     if (u->IsAlive() && u->IsInWorld() && u->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_HEAL) &&
-                        !IsHeroExClass(u->ToCreature()->GetBotClass()) &&
+                        !BotDataMgr::IsHeroExClass(u->ToCreature()->GetBotClass()) &&
                         GetManaPCT(u) < 70 && me->IsWithinDistInMap(u, 30) &&
                         !u->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, SPELLFAMILY_PRIEST, 0x80000000) &&
                         doCast(u, GetSpell(POWER_INFUSION_1)))

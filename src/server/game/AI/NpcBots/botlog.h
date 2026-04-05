@@ -22,7 +22,9 @@ enum BotLogType : uint16
     NPCBOT_LOG_SYSTEM_START             = 100,
     NPCBOT_LOG_CONFIG_RELOAD            = 101,
 
-    NPCBOT_LOG_END
+    NPCBOT_LOG_END,
+
+    NPCBOT_LOG_MASK_DUNGEON_BOT         = (1<<(NPCBOT_LOG_SPAWN-1))|(1<<(NPCBOT_LOG_TELEPORT_START-1))|(1<<(NPCBOT_LOG_TELEPORT_FINISH-1))
 };
 
 class BotLogger

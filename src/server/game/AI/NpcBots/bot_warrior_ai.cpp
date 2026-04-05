@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottext.h"
@@ -518,7 +519,7 @@ public:
                 (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
                 (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
                 (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
-                ((!IsTankingClass(u->GetClass()) && (GetHealthPCT(u) < 80 || _inStance(2))) || IsTank()) &&
+                ((!BotDataMgr::IsTankingClass(u->GetClass()) && (GetHealthPCT(u) < 80 || _inStance(2))) || IsTank()) &&
                 IsInBotParty(u) &&
                 (_inStance(2) || (stancetimer <= diff && stanceChange(diff, 2))))
             {
@@ -585,7 +586,7 @@ public:
                         return;
                 }
                 if (u && u != me && !IsSpellReady(TAUNT_1, diff, false) && !IsTank(u) && !CCed(mytar) && dist < 9 &&
-                    (!IsTankingClass(u->GetClass()) || IsTank()) && IsInBotParty(u))
+                    (!BotDataMgr::IsTankingClass(u->GetClass()) || IsTank()) && IsInBotParty(u))
                 {
                     if (doCast(me, GetSpell(CHALLENGING_SHOUT_1)))
                         return;
@@ -603,7 +604,7 @@ public:
             //MOCKING BLOW
             if (IsSpellReady(MOCKING_BLOW_1, diff) && can_do_normal && HasRole(BOT_ROLE_DPS) && Rand() < 70 && u && u != me &&
                 !IsTank(u) && dist < 5 && rage >= rcost(MOCKING_BLOW_1) &&
-                !CCed(mytar) && (!IsTankingClass(u->GetClass()) || IsTank()) && IsInBotParty(u) &&
+                !CCed(mytar) && (!BotDataMgr::IsTankingClass(u->GetClass()) || IsTank()) && IsInBotParty(u) &&
                 (_inStance(4) || (stancetimer <= diff && stanceChange(diff, 4))))
             {
                 if (doCast(mytar, GetSpell(MOCKING_BLOW_1)))
@@ -1039,7 +1040,7 @@ public:
                         if (!(!(i & 1) ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
                             !member->IsAlive() || me->GetDistance(member) > 30 ||
                             (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
-                            (i < 2 && !(i == 0 ? IsTankingClass(member->GetClass()) : IsTank(member))) ||
+                            (i < 2 && !(i == 0 ? BotDataMgr::IsTankingClass(member->GetClass()) : IsTank(member))) ||
                             (i == 3 && !member->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_DPS)) ||
                             member->HasAura(VIGILANCE) || member->HasAura(DAMAGE_REDUCTION))
                             continue;

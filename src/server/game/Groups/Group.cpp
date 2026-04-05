@@ -507,7 +507,7 @@ bool Group::AddMember(Creature* creature)
     }
 
     // insert into the table if we're not a battleground group
-    if (!isBGGroup() && !isBFGroup())
+    if (!isBGGroup() && !isBFGroup() && !creature->IsSummon())
     {
         //INSERT INTO characters_npcbot_group_member (guid, entry, memberFlags, subgroup, roles) VALUES(?, ?, ?, ?, ?), CONNECTION_ASYNC
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_NPCBOT_GROUP_MEMBER);
@@ -690,7 +690,7 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
         if (isLFGGroup() && method == GROUP_REMOVEMETHOD_KICK)
             return !m_memberSlots.empty();
 
-        if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u))
+        if (GetMembersCount() > ((isBGGroup() || isBFGroup()) ? 1u : 2u))
         {
             if (Creature const* cbot = BotDataMgr::FindBot(guid.GetEntry()))
             {

@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botmgr.h"
 #include "botspell.h"
 #include "bottext.h"
@@ -1828,7 +1829,7 @@ public:
             {
                 if ((master->GetGroup() && master->GetGroup()->isRaidGroup()) || master->GetNpcBotsCount() >= 10)
                     entry = BOT_PET_WOLF; //raid pet
-                else if (!IsMeleeClass(master->GetClass()))
+                else if (!BotDataMgr::IsMeleeClass(master->GetClass()))
                     entry = urand(BOT_PET_TENACITY_START, BOT_PET_TENACITY_END);
                 else if (sWorld->IsFFAPvPRealm() || sWorld->IsPvPRealm())
                     entry = urand(BOT_PET_CUNNING_START, BOT_PET_CUNNING_END);

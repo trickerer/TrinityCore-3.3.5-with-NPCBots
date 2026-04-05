@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "bottext.h"
@@ -777,7 +778,7 @@ public:
                 {
                     bool cast = false;
 
-                    if (!IsMelee() && HasRole(BOT_ROLE_DPS|BOT_ROLE_HEAL) && !IsMeleeClass(master->GetClass()))
+                    if (!IsMelee() && HasRole(BOT_ROLE_DPS|BOT_ROLE_HEAL) && !BotDataMgr::IsMeleeClass(master->GetClass()))
                         cast = true;
                     else if (!GetSpell(WINDFURY_TOTEM_1)) //disabled
                         cast = true;
@@ -801,7 +802,7 @@ public:
                 {
                     bool cast = false;
 
-                    if ((IsMelee() && HasRole(BOT_ROLE_DPS)) || (!IAmFree() && IsMeleeClass(master->GetClass())))
+                    if ((IsMelee() && HasRole(BOT_ROLE_DPS)) || (!IAmFree() && BotDataMgr::IsMeleeClass(master->GetClass())))
                         cast = true;
                     else if (!GetSpell(WRATH_OF_AIR_TOTEM_1)) //disabled or not available yet
                         cast = true;

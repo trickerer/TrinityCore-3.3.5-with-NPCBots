@@ -195,10 +195,12 @@ public:
 
     void CleanupsBeforeBotDelete(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
     static void CleanupsBeforeBotDelete(Creature* bot);
+    void RemoveAllSummonedBots();
     void RemoveAllBots(uint8 removetype = BOT_REMOVE_LOGOUT);
     void RemoveBot(ObjectGuid guid, uint8 removetype = BOT_REMOVE_LOGOUT);
     void UnbindBot(ObjectGuid guid);
     [[nodiscard]] BotAddResult RebindBot(Creature* bot);
+    [[nodiscard]] BotAddResult AddDungeonBot(Creature* bot);
     [[nodiscard]] BotAddResult AddBot(Creature* bot);
     bool AddBotToGroup(Creature* bot);
     void RemoveBotFromBGQueue(Creature const* bot);

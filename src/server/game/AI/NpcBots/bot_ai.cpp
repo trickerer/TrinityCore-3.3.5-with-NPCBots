@@ -159,7 +159,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
     _botData(const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(IsTempBot() ? creature->ToTempSummon()->GetSummonerGUID().GetEntry() : creature->GetEntry()))),
     _botExtras(BotDataMgr::SelectNpcBotExtras(creature->GetEntry()))
 {
-    _checkMasterTimer = urand(5000, 15000);
+    _checkMasterTimer = me->IsSummon() ? 0 : urand(5000, 15000);
     _updateTimerLong = urand(15000, 25000);
     _updateTimerEx1 = urand(12000, 15000);
     _updateTimerEx2 = urand(8000, 12000);
@@ -239,7 +239,7 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
 
 void bot_ai::InitializeAI()
 {
-    if (!me->GetSpawnId() && !IsTempBot())
+    if (!me->GetSpawnId() && !IsTempBot() && !me->IsSummon())
         SetWanderer();
 
     Reset();
@@ -321,7 +321,7 @@ void bot_ai::CheckOwnerExpiry()
     if (!BotCfg::GetOwnershipExpireTime())
         return; //disabled
 
-    if (IsTempBot() || !IAmFree())
+    if (IsTempBot() || me->IsSummon() || !IAmFree())
         return;
 
     if (_botData->owner == 0)
@@ -424,10 +424,10 @@ void bot_ai::CheckOwnerExpiry()
         NpcBotData::SharedOwnersContainer sharedOwners{};
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_SHARED_OWNERS, &sharedOwners);
         //...spec
-        uint8 spec = SelectSpecForClass(_botExtras->bclass);
+        uint8 spec = BotDataMgr::SelectSpecForClass(_botExtras->bclass);
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_SPEC, &spec);
         //...and roles
-        uint32 roleMask = DefaultRolesForClass(_botExtras->bclass, spec);
+        uint32 roleMask = BotDataMgr::DefaultRolesForClass(_botExtras->bclass, spec);
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_ROLES, &roleMask);
 
         if (Group* gr = GetGroup())
@@ -3065,7 +3065,7 @@ void bot_ai::SetStats(bool force)
         dodge = 0.0f;
 
     //BLOCK
-    if (IsBlockingClass(_botclass))
+    if (BotDataMgr::IsBlockingClass(_botclass))
     {
         value = 5.0f + float(IAmFree() ? mylevel / 4 : 0); // +20%/+0% at 80
 
@@ -3112,7 +3112,7 @@ void bot_ai::SetStats(bool force)
     //MANA
     _OnManaUpdate();
 
-    if (IsCastingClass(_botclass))
+    if (BotDataMgr::IsCastingClass(_botclass))
     {
         //SPELL PENETRATION
         value = IAmFree() ? mylevel : 0; // 80/0 at 80
@@ -7119,7 +7119,7 @@ void bot_ai::_OnManaUpdate() const
     intValue -= std::min<float>(me->GetCreateStat(STAT_INTELLECT), 20.f); //not a mistake
     intValue = std::max<float>(intValue, 0.f);
 
-    float intMult = _botclass < BOT_CLASS_EX_START ? 15.f : IsHeroExClass(_botclass) ? 5.f : 1.5f;
+    float intMult = _botclass < BOT_CLASS_EX_START ? 15.f : BotDataMgr::IsHeroExClass(_botclass) ? 5.f : 1.5f;
 
     m_basemana = intValue * intMult + 20.f; //20.f is not a mistake
     //m_basemana += IAmFree() ? mylevel * 50.f : 0; //+4000/+0 mana at 80
@@ -7177,7 +7177,7 @@ void bot_ai::_OnManaRegenUpdate() const
         modManaRegenInterrupt = 100;
         power_regen_mp5 = 0.0f;
 
-        if (IsHeroExClass(_botclass))
+        if (BotDataMgr::IsHeroExClass(_botclass))
         {
             float basemana;
             if (_botclass == BOT_CLASS_BM)
@@ -7698,7 +7698,7 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
         IsTempBot() || me->IsInCombat() || CCed(me) || IsCasting() || IsDuringTeleport() ||
         HasBotCommandState(BOT_COMMAND_ISSUED_ORDER | BOT_COMMAND_NOGOSSIP) ||
         (me->GetVehicle() && me->GetVehicle()->GetBase()->IsInCombat()) ||
-        (!player->IsGameMaster() && IsWanderer()))
+        (!player->IsGameMaster() && (IsWanderer() || me->IsSummon())))
     {
         player->PlayerTalkClass->SendCloseGossip();
         return true;
@@ -8796,7 +8796,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_SLOT_WRIST) + "...", GOSSIP_SENDER_EQUIPMENT_SHOW, GOSSIP_ACTION_INFO_DEF + uint32(BOT_SLOT_WRIST));
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_SLOT_HANDS) + "...", GOSSIP_SENDER_EQUIPMENT_SHOW, GOSSIP_ACTION_INFO_DEF + uint32(BOT_SLOT_HANDS));
 
-            if (IsHumanoidClass(_botclass))
+            if (BotDataMgr::IsHumanoidClass(_botclass))
             {
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_SLOT_BACK) + "...", GOSSIP_SENDER_EQUIPMENT_SHOW, GOSSIP_ACTION_INFO_DEF + uint32(BOT_SLOT_BACK));
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_SLOT_SHIRT) + "...", GOSSIP_SENDER_EQUIPMENT_SHOW, GOSSIP_ACTION_INFO_DEF + uint32(BOT_SLOT_BODY));
@@ -9991,7 +9991,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         {
             subMenu = true;
 
-            if (IsHumanoidClass(_botclass))
+            if (BotDataMgr::IsHumanoidClass(_botclass))
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_GATHERING) + "...", GOSSIP_SENDER_ROLES_GATHERING, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_LOOTING) + "...", GOSSIP_SENDER_ROLES_LOOTING, GOSSIP_ACTION_INFO_DEF + 2);
 
@@ -10000,7 +10000,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             {
                 if (!(role & BOT_ROLE_MASK_MAIN)) //hidden
                     continue;
-                if (role == BOT_ROLE_HEAL && !IsHealingClass(_botclass))
+                if (role == BOT_ROLE_HEAL && !BotDataMgr::IsHealingClass(_botclass))
                     continue;
 
                 AddGossipItemFor(player, GetRoleIcon(role), LocalizedNpcText(player, GetRoleString(role)), GOSSIP_SENDER_ROLES_MAIN_TOGGLE, GOSSIP_ACTION_INFO_DEF + role);
@@ -10224,7 +10224,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             {
                 _newspec = newSpec;
                 me->CastSpell(me, ACTIVATE_SPEC, false);
-                BotWhisper(LocalizedNpcText(player, BOT_TEXT_CHANGING_MY_SPEC_TO_) + LocalizedNpcText(player, TextForSpec(_newspec)));
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_CHANGING_MY_SPEC_TO_) + LocalizedNpcText(player, BotDataMgr::TextForSpec(_newspec)));
                 break;
             }
         }
@@ -10254,7 +10254,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             for (uint8 i = specIndex; i < specIndex + 3; ++i)
             {
                 GossipOptionIcon icon = (GetSpec() == i) ? BOT_ICON_ON : BOT_ICON_OFF;
-                AddGossipItemFor(player, icon, LocalizedNpcText(player, TextForSpec(i)), GOSSIP_SENDER_SPEC_SET, GOSSIP_ACTION_INFO_DEF + i);
+                AddGossipItemFor(player, icon, LocalizedNpcText(player, BotDataMgr::TextForSpec(i)), GOSSIP_SENDER_SPEC_SET, GOSSIP_ACTION_INFO_DEF + i);
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 2);
@@ -11142,7 +11142,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             ostr << "Bot: " << me->GetName()
                 << " (Id: " << me->GetEntry()
                 << ", guidlow: " << me->GetGUID().GetCounter()
-                << ", spec: " << uint32(_spec) << '(' << LocalizedNpcText(player, TextForSpec(_spec)) << ')'
+                << ", spec: " << uint32(_spec) << '(' << LocalizedNpcText(player, BotDataMgr::TextForSpec(_spec)) << ')'
                 << ", faction: " << me->GetFaction()
                 << "). owner: ";
             if (_botData->owner && sCharacterCache->GetCharacterNameByGuid(ObjectGuid::Create<HighGuid::Player>(_botData->owner), name))
@@ -14229,7 +14229,7 @@ float bot_ai::_getStatScore(uint8 stat) const
 
     float tankMod = IsTank() ? fone : fzero;
     float healMod = HasRole(BOT_ROLE_HEAL) ? fone : fzero;
-    float castMod = IsCastingClass(_botclass) ? fone : fzero;
+    float castMod = BotDataMgr::IsCastingClass(_botclass) ? fone : fzero;
     float spiritMod = (_botclass == BOT_CLASS_PRIEST || _botclass == BOT_CLASS_MAGE || _botclass == BOT_CLASS_WARLOCK || (_botclass == BOT_CLASS_DRUID && _spec != BOT_SPEC_DRUID_FERAL)) ? fone : fzero;
     float dpsMod = HasRole(BOT_ROLE_DPS) ? fone : fzero;
     float meleeMod = !HasRole(BOT_ROLE_RANGED) ? fone : fzero;
@@ -14244,7 +14244,7 @@ float bot_ai::_getStatScore(uint8 stat) const
         case BOT_STAT_MOD_AGILITY:
             return _botclass == BOT_CLASS_ROGUE ? 1.2f * dpsMod * meleeMod : (_botclass == BOT_CLASS_HUNTER ? 1.0f : 0.5f) * dpsMod;
         case BOT_STAT_MOD_STRENGTH:
-            return (IsMeleeClass(_botclass) ? 1.0f : 0.5f) * dpsMod * meleeMod;
+            return (BotDataMgr::IsMeleeClass(_botclass) ? 1.0f : 0.5f) * dpsMod * meleeMod;
         case BOT_STAT_MOD_INTELLECT:
             return 1.0f * castMod;
         case BOT_STAT_MOD_SPIRIT:
@@ -14289,7 +14289,7 @@ float bot_ai::_getStatScore(uint8 stat) const
         case BOT_STAT_MOD_EXPERTISE_RATING:
             return 2.0f * dpsMod * meleeMod;
         case BOT_STAT_MOD_ATTACK_POWER:
-            return ((IsMeleeClass(_botclass) || _botclass == BOT_CLASS_HUNTER) ? 0.43f : 0.1f) * dpsMod;
+            return ((BotDataMgr::IsMeleeClass(_botclass) || _botclass == BOT_CLASS_HUNTER) ? 0.43f : 0.1f) * dpsMod;
         case BOT_STAT_MOD_RANGED_ATTACK_POWER:
             switch (_botclass)
             {
@@ -14315,7 +14315,7 @@ float bot_ai::_getStatScore(uint8 stat) const
             return 1.2f * castMod * dpsMod;
         case BOT_STAT_MOD_DAMAGE_MIN:
         case BOT_STAT_MOD_DAMAGE_MAX:
-            return ((IsMeleeClass(_botclass) || _botclass == BOT_CLASS_HUNTER) ? 0.33f : 0.0f) * dpsMod;
+            return ((BotDataMgr::IsMeleeClass(_botclass) || _botclass == BOT_CLASS_HUNTER) ? 0.33f : 0.0f) * dpsMod;
         case BOT_STAT_MOD_RESIST_HOLY:
         case BOT_STAT_MOD_RESIST_FIRE:
         case BOT_STAT_MOD_RESIST_NATURE:
@@ -14799,29 +14799,6 @@ void bot_ai::ToggleRole(uint32 role, bool force)
     shouldUpdateStats = true;
 }
 
-uint32 bot_ai::DefaultRolesForClass(uint8 m_class, uint8 spec)
-{
-    uint32 roleMask = BOT_ROLE_DPS;
-
-    //if (bot_ai::IsHealingClass(m_class))
-    //    roleMask |= BOT_ROLE_HEAL;
-
-    if (!bot_ai::IsMeleeClass(m_class))
-    {
-        switch (spec)
-        {
-            case BOT_SPEC_SHAMAN_ENHANCEMENT:
-            case BOT_SPEC_DRUID_FERAL:
-                break;
-            default:
-                roleMask |= BOT_ROLE_RANGED;
-                break;
-        }
-    }
-
-    return roleMask;
-}
-
 bool bot_ai::IsTank(Unit const* unit) const
 {
     if (!unit || unit == me)
@@ -15068,29 +15045,22 @@ void bot_ai::InitRace()
 void bot_ai::InitRoles()
 {
     if (IsTempBot())
-    {
         _roleMask = BOT_ROLE_DPS;
-        return;
-    }
+    else if (me->IsSummon())
+        _roleMask = _botData->roles | (BotDataMgr::DefaultRolesForClass(_botclass, GetSpec()) & ~BOT_ROLE_DPS);
     else if (IAmFree())
-    {
-        //default roles
-        _roleMask = DefaultRolesForClass(_botclass, GetSpec());
-        return;
-    }
-
-    _roleMask = _botData->roles;
+        _roleMask = BotDataMgr::DefaultRolesForClass(_botclass, GetSpec());
+    else
+        _roleMask = _botData->roles;
 }
 
 void bot_ai::InitSpec()
 {
     uint8 spec;
     if (IAmFree())
-        spec = SelectSpecForClass(_botclass);
+        spec = BotDataMgr::SelectSpecForClass(_botclass);
     else
-    {
         spec = _botData->spec;
-    }
 
     //BOT_LOG_ERROR("entities.unit", "bot_ai::InitSpec(): bot {} class {} spec: {}", me->GetEntry(), uint32(_botclass), uint32(spec));
 
@@ -15139,237 +15109,12 @@ uint8 bot_ai::GetSpec() const
     return me->GetLevel() < 10 ? uint8(BOT_SPEC_DEFAULT) : _spec;
 }
 
-uint8 bot_ai::SelectSpecForClass(uint8 m_class)
-{
-    std::vector<uint8> specs;
-    specs.reserve(3);
-    switch (m_class)
-    {
-        case BOT_CLASS_WARRIOR: //any
-            specs.push_back(BOT_SPEC_WARRIOR_ARMS);
-            specs.push_back(BOT_SPEC_WARRIOR_FURY);
-            specs.push_back(BOT_SPEC_WARRIOR_PROTECTION);
-            break;
-        case BOT_CLASS_PALADIN: //retri
-            specs.push_back(BOT_SPEC_PALADIN_RETRIBUTION);
-            break;
-        case BOT_CLASS_HUNTER: //any
-            specs.push_back(BOT_SPEC_HUNTER_BEASTMASTERY);
-            specs.push_back(BOT_SPEC_HUNTER_MARKSMANSHIP);
-            specs.push_back(BOT_SPEC_HUNTER_SURVIVAL);
-            break;
-        case BOT_CLASS_ROGUE: //any
-            specs.push_back(BOT_SPEC_ROGUE_ASSASINATION);
-            specs.push_back(BOT_SPEC_ROGUE_COMBAT);
-            specs.push_back(BOT_SPEC_ROGUE_SUBTLETY);
-            break;
-        case BOT_CLASS_PRIEST: //discipline, shadow
-            specs.push_back(BOT_SPEC_PRIEST_DISCIPLINE);
-            specs.push_back(BOT_SPEC_PRIEST_SHADOW);
-            break;
-        case BOT_CLASS_DEATH_KNIGHT: //any
-            specs.push_back(BOT_SPEC_DK_BLOOD);
-            specs.push_back(BOT_SPEC_DK_FROST);
-            specs.push_back(BOT_SPEC_DK_UNHOLY);
-            break;
-        case BOT_CLASS_SHAMAN: //elem, enh
-            specs.push_back(BOT_SPEC_SHAMAN_ELEMENTAL);
-            specs.push_back(BOT_SPEC_SHAMAN_ENHANCEMENT);
-            break;
-        case BOT_CLASS_MAGE: //fire, frost
-            specs.push_back(BOT_SPEC_MAGE_FIRE);
-            specs.push_back(BOT_SPEC_MAGE_FROST);
-            break;
-        case BOT_CLASS_WARLOCK: //affli, destr
-            specs.push_back(BOT_SPEC_WARLOCK_AFFLICTION);
-            specs.push_back(BOT_SPEC_WARLOCK_DESTRUCTION);
-            break;
-        case BOT_CLASS_DRUID: //balance, feral
-            specs.push_back(BOT_SPEC_DRUID_BALANCE);
-            specs.push_back(BOT_SPEC_DRUID_FERAL);
-            break;
-        default:
-            specs.push_back(BOT_SPEC_DEFAULT);
-            break;
-    }
-
-    return specs.size() == 1 ? specs.front() : Bcore::Containers::SelectRandomContainerElement(specs);
-}
-
-uint32 bot_ai::TextForSpec(uint8 spec)
-{
-    switch (spec)
-    {
-        case BOT_SPEC_WARRIOR_ARMS:         return BOT_TEXT_SPEC_ARMS;
-        case BOT_SPEC_WARRIOR_FURY:         return BOT_TEXT_SPEC_FURY;
-        case BOT_SPEC_WARRIOR_PROTECTION:   return BOT_TEXT_SPEC_PROTECTION;
-        case BOT_SPEC_PALADIN_HOLY:         return BOT_TEXT_SPEC_HOLY;
-        case BOT_SPEC_PALADIN_PROTECTION:   return BOT_TEXT_SPEC_PROTECTION;
-        case BOT_SPEC_PALADIN_RETRIBUTION:  return BOT_TEXT_SPEC_RETRIBUTION;
-        case BOT_SPEC_HUNTER_BEASTMASTERY:  return BOT_TEXT_SPEC_BEASTMASTERY;
-        case BOT_SPEC_HUNTER_MARKSMANSHIP:  return BOT_TEXT_SPEC_MARKSMANSHIP;
-        case BOT_SPEC_HUNTER_SURVIVAL:      return BOT_TEXT_SPEC_SURVIVAL;
-        case BOT_SPEC_ROGUE_ASSASINATION:   return BOT_TEXT_SPEC_ASSASINATION;
-        case BOT_SPEC_ROGUE_COMBAT:         return BOT_TEXT_SPEC_COMBAT;
-        case BOT_SPEC_ROGUE_SUBTLETY:       return BOT_TEXT_SPEC_SUBTLETY;
-        case BOT_SPEC_PRIEST_DISCIPLINE:    return BOT_TEXT_SPEC_DISCIPLINE;
-        case BOT_SPEC_PRIEST_HOLY:          return BOT_TEXT_SPEC_HOLY;
-        case BOT_SPEC_PRIEST_SHADOW:        return BOT_TEXT_SPEC_SHADOW;
-        case BOT_SPEC_DK_BLOOD:             return BOT_TEXT_SPEC_BLOOD;
-        case BOT_SPEC_DK_FROST:             return BOT_TEXT_SPEC_FROST;
-        case BOT_SPEC_DK_UNHOLY:            return BOT_TEXT_SPEC_UNHOLY;
-        case BOT_SPEC_SHAMAN_ELEMENTAL:     return BOT_TEXT_SPEC_ELEMENTAL;
-        case BOT_SPEC_SHAMAN_ENHANCEMENT:   return BOT_TEXT_SPEC_ENHANCEMENT;
-        case BOT_SPEC_SHAMAN_RESTORATION:   return BOT_TEXT_SPEC_RESTORATION;
-        case BOT_SPEC_MAGE_ARCANE:          return BOT_TEXT_SPEC_ARCANE;
-        case BOT_SPEC_MAGE_FIRE:            return BOT_TEXT_SPEC_FIRE;
-        case BOT_SPEC_MAGE_FROST:           return BOT_TEXT_SPEC_FROST;
-        case BOT_SPEC_WARLOCK_AFFLICTION:   return BOT_TEXT_SPEC_AFFLICTION;
-        case BOT_SPEC_WARLOCK_DEMONOLOGY:   return BOT_TEXT_SPEC_DEMONOLOGY;
-        case BOT_SPEC_WARLOCK_DESTRUCTION:  return BOT_TEXT_SPEC_DESTRUCTION;
-        case BOT_SPEC_DRUID_BALANCE:        return BOT_TEXT_SPEC_BALANCE;
-        case BOT_SPEC_DRUID_FERAL:          return BOT_TEXT_SPEC_FERAL;
-        case BOT_SPEC_DRUID_RESTORATION:    return BOT_TEXT_SPEC_RESTORATION;
-        case BOT_SPEC_DEFAULT: default:     return BOT_TEXT_SPEC_UNKNOWN;
-    }
-}
-
-bool bot_ai::IsValidSpecForClass(uint8 m_class, uint8 spec)
-{
-    switch (m_class)
-    {
-        case BOT_CLASS_WARRIOR:
-            switch (spec)
-            {
-                case BOT_SPEC_WARRIOR_ARMS:
-                case BOT_SPEC_WARRIOR_FURY:
-                case BOT_SPEC_WARRIOR_PROTECTION:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_PALADIN:
-            switch (spec)
-            {
-                case BOT_SPEC_PALADIN_HOLY:
-                case BOT_SPEC_PALADIN_PROTECTION:
-                case BOT_SPEC_PALADIN_RETRIBUTION:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_HUNTER:
-            switch (spec)
-            {
-                case BOT_SPEC_HUNTER_BEASTMASTERY:
-                case BOT_SPEC_HUNTER_MARKSMANSHIP:
-                case BOT_SPEC_HUNTER_SURVIVAL:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_ROGUE:
-            switch (spec)
-            {
-                case BOT_SPEC_ROGUE_ASSASINATION:
-                case BOT_SPEC_ROGUE_COMBAT:
-                case BOT_SPEC_ROGUE_SUBTLETY:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_PRIEST:
-            switch (spec)
-            {
-                case BOT_SPEC_PRIEST_DISCIPLINE:
-                case BOT_SPEC_PRIEST_HOLY:
-                case BOT_SPEC_PRIEST_SHADOW:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_DEATH_KNIGHT:
-            switch (spec)
-            {
-                case BOT_SPEC_DK_BLOOD:
-                case BOT_SPEC_DK_FROST:
-                case BOT_SPEC_DK_UNHOLY:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_SHAMAN:
-            switch (spec)
-            {
-                case BOT_SPEC_SHAMAN_ELEMENTAL:
-                case BOT_SPEC_SHAMAN_ENHANCEMENT:
-                case BOT_SPEC_SHAMAN_RESTORATION:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_MAGE:
-            switch (spec)
-            {
-                case BOT_SPEC_MAGE_ARCANE:
-                case BOT_SPEC_MAGE_FIRE:
-                case BOT_SPEC_MAGE_FROST:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_WARLOCK:
-            switch (spec)
-            {
-                case BOT_SPEC_WARLOCK_AFFLICTION:
-                case BOT_SPEC_WARLOCK_DEMONOLOGY:
-                case BOT_SPEC_WARLOCK_DESTRUCTION:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_DRUID:
-            switch (spec)
-            {
-                case BOT_SPEC_DRUID_BALANCE:
-                case BOT_SPEC_DRUID_FERAL:
-                case BOT_SPEC_DRUID_RESTORATION:
-                    return true;
-                default:
-                    break;
-            }
-            break;
-        case BOT_CLASS_BM:
-        case BOT_CLASS_SPHYNX:
-        case BOT_CLASS_ARCHMAGE:
-        case BOT_CLASS_DREADLORD:
-        case BOT_CLASS_SPELLBREAKER:
-        case BOT_CLASS_DARK_RANGER:
-        case BOT_CLASS_NECROMANCER:
-        case BOT_CLASS_SEA_WITCH:
-        case BOT_CLASS_CRYPT_LORD:
-            return spec == BOT_SPEC_DEFAULT;
-        default:
-            break;
-    }
-    return false;
-}
-
 void bot_ai::InitEquips()
 {
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
     ASSERT(einfo, "Trying to spawn bot with no equip info!");
 
-    if (IsWanderer())
+    if (IsWanderer() || me->IsSummon())
     {
         auto fit_check = [this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForWanderingBot(slot, proto); };
 
@@ -15379,7 +15124,7 @@ void bot_ai::InitEquips()
         gss << "bot_ai::InitEquips(): Wanderer bot " << me->GetName() << " id " << me->GetEntry() << ' ' << "level " << uint32(lvl) << " generated gear:";
         for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
         {
-            if (i == BOT_SLOT_OFFHAND && (!_canUseOffHand() || (lvl < 10 && IsCastingClass(_botclass))))
+            if (i == BOT_SLOT_OFFHAND && (!_canUseOffHand() || (lvl < 10 && BotDataMgr::IsCastingClass(_botclass))))
                 continue;
             if ((i == BOT_SLOT_FINGER1 || i == BOT_SLOT_FINGER2 || i == BOT_SLOT_NECK || i == BOT_SLOT_SHOULDERS) && lvl < 20)
                 continue;
@@ -16113,12 +15858,8 @@ void bot_ai::JustDied(Unit* u)
         me->AddObjectToRemoveList();
         return;
     }
-    else if (!IAmFree())
-    {
-        if (Group* gr = master->GetGroup())
-            if (gr->IsMember(me->GetGUID()))
-                gr->SendUpdate();
-    }
+    else if (Group* gr = GetGroup())
+        gr->SendUpdate();
 
     if (IsWanderer() && me->GetMap()->IsBattlegroundOrArena())
     {
@@ -17726,7 +17467,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _saveDisabledSpells = false;
         _saveDisabledSpellsTimer = 5000;
 
-        if (!IsTempBot())
+        if (!IsTempBot() && !me->IsSummon())
             BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_DISABLED_SPELLS, &_botData->disabled_spells);
     }
     //  2) miscavalues
@@ -17735,7 +17476,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _saveMiscValues = false;
         _saveMiscValuesTimer = 5000;
 
-        if (!IsTempBot())
+        if (!IsTempBot() && !me->IsSummon())
             BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_MISCVALUES, &_botData->miscvalues);
     }
 
@@ -21078,35 +20819,6 @@ bool bot_ai::IsPetMelee(uint32 entry)
     }
 }
 
-bool bot_ai::IsMeleeClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, MELEE_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsTankingClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, TANKING_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsBlockingClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, BLOCKING_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsCastingClass(uint8 m_class)
-{
-    //Class can benefit from spellpower
-    return IsBotClassMask(m_class, CASTING_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsHealingClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, HEALING_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsHumanoidClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, HUMANOID_BOT_CLASSES_MASK);
-}
-bool bot_ai::IsHeroExClass(uint8 m_class)
-{
-    return IsBotClassMask(m_class, HERO_BOT_CLASSES_MASK);
-}
 bool bot_ai::IsMelee() const
 {
     return !IsRanged() && HasRole(BOT_ROLE_DPS|BOT_ROLE_TANK);

@@ -1394,7 +1394,7 @@ bool Creature::isTappedBy(Player const* player) const
 void Creature::SaveToDB()
 {
     //npcbot: disallow saving generated bots
-    if (IsNPCBot() && GetBotAI() && GetBotAI()->IsWanderer())
+    if (IsNPCBot() && GetBotAI() && (GetBotAI()->IsWanderer() || IsSummon()))
         return;
     //end npcbot
 
@@ -1414,7 +1414,7 @@ void Creature::SaveToDB()
 void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 {
     //npcbot: disallow saving generated bots
-    if (IsNPCBot() && GetBotAI() && GetBotAI()->IsWanderer())
+    if (IsNPCBot() && GetBotAI() && (GetBotAI()->IsWanderer() || IsSummon()))
         return;
     //end npcbot
 

@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "bottext.h"
@@ -355,7 +356,7 @@ public:
 
             Unit* target = nullptr;
 
-            if (master->GetVictim() && master->IsInCombat() && IsMeleeClass(master->GetClass()) &&
+            if (master->GetVictim() && master->IsInCombat() && BotDataMgr::IsMeleeClass(master->GetClass()) &&
                 GetHealthPCT(master) > 60 && me->GetDistance(master) < 30 &&
                 master->getAttackers().empty() && !CCed(master, true) &&
                 !master->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_DEATHKNIGHT, 0x20000000, 0x0, 0x0))
@@ -376,7 +377,7 @@ public:
                             me->GetMap() != player->FindMap())
                             continue;
 
-                        if (IsMeleeClass(player->GetClass()) && player->GetVictim() && GetHealthPCT(player) > 60 &&
+                        if (BotDataMgr::IsMeleeClass(player->GetClass()) && player->GetVictim() && GetHealthPCT(player) > 60 &&
                             me->GetDistance(player) < 30 && player->getAttackers().empty() && !CCed(player, true) &&
                             !player->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_DEATHKNIGHT, 0x20000000, 0x0, 0x0))
                         {
@@ -389,7 +390,7 @@ public:
 
                         for (auto const& [_, bot] : *player->GetBotMgr()->GetBotMap())
                         {
-                            if (IsMeleeClass(bot->GetBotClass()) && bot->GetVictim() &&
+                            if (BotDataMgr::IsMeleeClass(bot->GetBotClass()) && bot->GetVictim() &&
                                 bot->GetBotAI()->HasRole(BOT_ROLE_DPS) && !bot->GetBotAI()->HasRole(BOT_ROLE_RANGED) &&
                                 GetHealthPCT(bot) > 60 && me->GetDistance(bot) < 30 && !CCed(bot, true) &&
                                 !bot->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_DEATHKNIGHT, 0x20000000, 0x0, 0x0))
@@ -719,7 +720,7 @@ public:
                 (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
                 (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
                 (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
-                ((!IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
+                ((!BotDataMgr::IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) &&
                 IsInBotParty(u))
             {
                 if (doCast(mytar, GetSpell(DARK_COMMAND_1)))

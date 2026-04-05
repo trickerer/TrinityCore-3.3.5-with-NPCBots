@@ -1,4 +1,5 @@
 #include "bot_ai.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "botspell.h"
@@ -1764,7 +1765,7 @@ public:
                     entry = BOT_PET_IMP;
                 else if (me->GetLevel() >= 10 && IsTank())
                     entry = BOT_PET_VOIDWALKER;
-                else if (me->GetLevel() >= 20 && !IsMeleeClass(master->GetClass()))
+                else if (me->GetLevel() >= 20 && !BotDataMgr::IsMeleeClass(master->GetClass()))
                     entry = BOT_PET_SUCCUBUS;
                 else if (me->GetLevel() >= 10)
                     entry = BOT_PET_VOIDWALKER;

@@ -177,7 +177,6 @@ public:
     GossipOptionIcon GetRoleIcon(uint32 role) const;
     static uint32 GetRoleString(uint32 role);
     void ToggleRole(uint32 role, bool force);
-    static uint32 DefaultRolesForClass(uint8 m_class, uint8 spec);
     bool IsTank(Unit const* unit = nullptr) const;
     bool IsOffTank(Unit const* unit = nullptr) const;
 
@@ -334,18 +333,6 @@ public:
     void ReInitFaction() { InitFaction(); }
     void SetSpec(uint8 spec, bool activate = true);
     uint8 GetSpec() const;
-    static uint8 SelectSpecForClass(uint8 m_class);
-    static uint32 TextForSpec(uint8 spec);
-    static bool IsValidSpecForClass(uint8 m_class, uint8 spec);
-
-    static bool IsBotClassMask(uint8 m_class, uint32 class_mask) { return !!((1ull << m_class) & class_mask); }
-    static bool IsMeleeClass(uint8 m_class);
-    static bool IsTankingClass(uint8 m_class);
-    static bool IsBlockingClass(uint8 m_class);
-    static bool IsCastingClass(uint8 m_class);
-    static bool IsHealingClass(uint8 m_class);
-    static bool IsHumanoidClass(uint8 m_class);
-    static bool IsHeroExClass(uint8 m_class);
 
     AoeSpotsVec const& GetAoeSpots() const;
     static void CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots);

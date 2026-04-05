@@ -49,6 +49,9 @@ void BotLogger::Log(uint16 log_type, Creature const* bot, NPCBots::LoggableArgum
     if (!BotCfg::IsNpcBotLogEnabled())
         return;
 
+    if (bot->IsSummon() && !((1ull<<(log_type-1)) & NPCBOT_LOG_MASK_DUNGEON_BOT))
+        return;
+
     BotLogImpl(log_type, bot, int32(bot->GetBotAI() ? bot->GetBotAI()->GetBotOwnerGuid() : -1), std::forward<decltype(params)>(params)...);
 }
 

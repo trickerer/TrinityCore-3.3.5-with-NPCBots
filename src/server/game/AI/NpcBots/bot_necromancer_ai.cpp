@@ -1,5 +1,6 @@
 #include "bot_ai.h"
 #include "bot_GridNotifiers.h"
+#include "botdatamgr.h"
 #include "botlogtraits.h"
 #include "botmgr.h"
 #include "botspell.h"
@@ -228,13 +229,13 @@ public:
                 return;
 
             static const auto frenzy_pred_player = [](Player const* pl, Unit const* nec) -> bool {
-                return (pl->GetVictim() && pl->IsInCombat() && IsMeleeClass(pl->GetClass()) && nec->GetDistance(pl) < 30 &&
+                return (pl->GetVictim() && pl->IsInCombat() && BotDataMgr::IsMeleeClass(pl->GetClass()) && nec->GetDistance(pl) < 30 &&
                     pl->GetDistance(pl->GetVictim()) < 15 && pl->getAttackers().empty() && !CCed(pl, true) &&
                     !pl->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) && pl->GetHealth() >= nec->GetMaxHealth());
             };
 
             static const auto frenzy_pred_bot = [](Creature const* bot, Unit const* nec) -> bool {
-                return (IsMeleeClass(bot->GetBotClass()) && bot->GetVictim() && !bot->GetBotAI()->IsTank(bot) &&
+                return (BotDataMgr::IsMeleeClass(bot->GetBotClass()) && bot->GetVictim() && !bot->GetBotAI()->IsTank(bot) &&
                     bot->GetBotAI()->HasRole(BOT_ROLE_DPS) && !bot->GetBotAI()->HasRole(BOT_ROLE_RANGED) &&
                     nec->GetDistance(bot) < 30 && bot->GetDistance(bot->GetVictim()) < 15 &&
                     bot->getAttackers().empty() && !CCed(bot, true) &&

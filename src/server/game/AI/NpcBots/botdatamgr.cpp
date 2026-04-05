@@ -7,6 +7,7 @@
 #include "botlog.h"
 #include "botmgr.h"
 #include "botspell.h"
+#include "bottext.h"
 #include "botwanderful.h"
 #include "bpet_ai.h"
 #include "CharacterCache.h"
@@ -17,6 +18,7 @@
 #include "GameTime.h"
 #include "GroupMgr.h"
 #include "Item.h"
+#include "LFGMgr.h"
 #include "Log.h"
 #include "Map.h"
 #include "MapManager.h"
@@ -25,6 +27,7 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "TemporarySummon.h"
 #include "StringConvert.h"
 #include "World.h"
 #include "WorldDatabase.h"
@@ -57,10 +60,10 @@ static NpcBotRegistry _existingBots;
 static std::map<uint32, uint8> _wpMinSpawnLevelPerMapId;
 static std::map<uint32, uint8> _wpMaxSpawnLevelPerMapId;
 static std::map<uint8, std::set<uint32>> _spareBotIdsPerClassMap;
-static CreatureTemplateContainer _botsWanderCreatureTemplates;
-static std::unordered_map<uint32, EquipmentInfo const*> _botsWanderCreatureEquipmentTemplates;
+static CreatureTemplateContainer _botsExtraCreatureTemplates;
+static std::unordered_map<uint32, EquipmentInfo const*> _botsExtraCreatureEquipmentTemplates;
+static std::set<uint32> _botsExtraCreaturesToDespawn;
 static std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
-static std::set<uint32> _botsWanderCreaturesToDespawn;
 
 static ItemPerBotClassMap _botsWanderCreaturesSortedGear;
 
@@ -188,7 +191,7 @@ public:
 
 static void SpawnWandererBot(uint32 bot_id, WanderNode const* spawnLoc, NpcBotRegistry* registry)
 {
-    CreatureTemplate const& bot_template = _botsWanderCreatureTemplates.at(bot_id);
+    CreatureTemplate const& bot_template = _botsExtraCreatureTemplates.at(bot_id);
     NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
     NpcBotExtras const* bot_extras = BotDataMgr::SelectNpcBotExtras(bot_id);
     Position spawnPos = spawnLoc->GetPosition();
@@ -222,7 +225,45 @@ void BotDataMgr::DespawnWandererBot(uint32 entry)
     {
         if (bot->GetBotAI())
             bot->GetBotAI()->canUpdate = false;
-        _botsWanderCreaturesToDespawn.insert(entry);
+        _botsExtraCreaturesToDespawn.insert(entry);
+    }
+    else
+        BOT_LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot {} '{}'!", entry, bot ? bot->GetName() : "unknown");
+}
+
+static void SpawnDungeonBot(uint32 bot_id, Player const* owner)
+{
+    CreatureTemplate const& bot_template = _botsExtraCreatureTemplates.at(bot_id);
+    NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
+    NpcBotExtras const* bot_extras = BotDataMgr::SelectNpcBotExtras(bot_id);
+
+    ASSERT(bot_data);
+    ASSERT(bot_extras);
+
+    Map* map = owner->GetMap();
+
+    BOT_LOG_DEBUG("npcbots", "Spawning dungeon bot for player {}: {} ({}) class {} race {} fac {}, location: mapId {} {}",
+        owner->GetName(), bot_template.Name, bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
+        owner->GetMapId(), owner->GetPosition().ToString());
+
+    TempSummon* bot = map->SummonCreature(bot_id, *owner);
+    if (!bot)
+    {
+        BOT_LOG_FATAL("npcbots", "Cannot spawn bot {} ({}) for player {}!", bot_id, bot_template.Name, owner->GetGUID().ToString());
+        ABORT();
+    }
+
+    ASSERT(owner->GetBotMgr()->AddDungeonBot(bot) == BOT_ADD_SUCCESS);
+}
+
+void BotDataMgr::DespawnDungeonBot(uint32 entry)
+{
+    Creature const* bot = FindBot(entry);
+    if (bot && bot->IsSummon())
+    {
+        if (bot->GetBotAI())
+            bot->GetBotAI()->canUpdate = false;
+        _botsExtraCreaturesToDespawn.insert(entry);
     }
     else
         BOT_LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot {} '{}'!", entry, bot ? bot->GetName() : "unknown");
@@ -289,6 +330,44 @@ private:
                 _spareBotIdsPerClassMap.erase(c);
     }
 
+    void GenerateDungeonBotToSpawn(std::tuple<uint32, uint8, uint8, uint32>&& entry_class_spec_roles, Player const* owner)
+    {
+        CreatureTemplateContainer const& all_templates = sObjectMgr->GetCreatureTemplates();
+
+        while (all_templates.contains(++next_bot_id));
+
+        const auto& [orig_entry, bot_class, bot_spec, bot_roles] = entry_class_spec_roles;
+        CreatureTemplate const* orig_template = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(orig_entry));
+        NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(orig_entry));
+        CreatureTemplate& bot_template = _botsExtraCreatureTemplates[next_bot_id];
+
+        //copy all fields
+        bot_template = *orig_template;
+        bot_template.Entry = next_bot_id;
+        bot_template.Title = "";
+        bot_template.KillCredit[0] = orig_entry;
+
+        bot_template.minlevel = owner->GetLevel();
+        bot_template.maxlevel = owner->GetLevel();
+
+        bot_template.InitializeQueryData();
+
+        ObjectGuid::LowType owner_lowguid = owner->GetGUID().GetCounter();
+        _botsData.emplace(std::piecewise_construct, std::forward_as_tuple(next_bot_id), std::forward_as_tuple(owner_lowguid, 0ull, bot_roles, FACTION_FRIENDLY, bot_spec));
+        _botsExtras.emplace(next_bot_id, NpcBotExtras{.race = orig_extras->race, .bclass = bot_class});
+        if (NpcBotAppearanceData const* orig_apdata = BotDataMgr::SelectNpcBotAppearance(orig_entry))
+            _botsAppearanceData.emplace(std::piecewise_construct, std::forward_as_tuple(next_bot_id), std::forward_as_tuple(orig_apdata->gender, orig_apdata->skin, orig_apdata->face, orig_apdata->hair, orig_apdata->haircolor, orig_apdata->features));
+
+        int8 beqId = 1;
+        _botsExtraCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_entry, beqId);
+
+        SpawnDungeonBot(next_bot_id, owner);
+
+        _spareBotIdsPerClassMap.at(bot_class).erase(orig_entry);
+        if (_spareBotIdsPerClassMap.at(bot_class).empty())
+            _spareBotIdsPerClassMap.erase(bot_class);
+    }
+
     bool GenerateWanderingBotToSpawn(std::pair<uint8, uint32> const& spareBotPair, uint8 desired_bracket,
         NodeVec const& spawns_a, NodeVec const& spawns_h, NodeVec const& spawns_n,
         bool immediate, PvPDifficultyEntry const* bracketEntry, NpcBotRegistry* registry)
@@ -297,8 +376,7 @@ private:
 
         while (all_templates.contains(++next_bot_id));
 
-        const uint8 bot_class = spareBotPair.first;
-        const uint32 orig_entry = spareBotPair.second;
+        const auto [bot_class, orig_entry] = spareBotPair;
         CreatureTemplate const* orig_template = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(orig_entry));
         NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(orig_entry));
         uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(bot_class, orig_extras->race);
@@ -329,7 +407,7 @@ private:
         ASSERT(!level_nodes.empty());
         WanderNode const* spawnLoc = Bcore::Containers::SelectRandomContainerElement(level_nodes);
 
-        CreatureTemplate& bot_template = _botsWanderCreatureTemplates[next_bot_id];
+        CreatureTemplate& bot_template = _botsExtraCreatureTemplates[next_bot_id];
         //copy all fields
         bot_template = *orig_template;
         bot_template.Entry = next_bot_id;
@@ -368,14 +446,14 @@ private:
 
         bot_template.InitializeQueryData();
 
-        uint8 bot_spec = bot_ai::SelectSpecForClass(bot_class);
-        _botsData.emplace(std::piecewise_construct, std::forward_as_tuple(next_bot_id), std::forward_as_tuple(bot_ai::DefaultRolesForClass(bot_class, bot_spec), bot_faction, bot_spec));
+        uint8 bot_spec = BotDataMgr::SelectSpecForClass(bot_class);
+        _botsData.emplace(std::piecewise_construct, std::forward_as_tuple(next_bot_id), std::forward_as_tuple(BotDataMgr::DefaultRolesForClass(bot_class, bot_spec), bot_faction, bot_spec));
         _botsExtras.emplace(next_bot_id, NpcBotExtras{.race = orig_extras->race, .bclass = bot_class});
         if (NpcBotAppearanceData const* orig_apdata = BotDataMgr::SelectNpcBotAppearance(orig_entry))
             _botsAppearanceData.emplace(std::piecewise_construct, std::forward_as_tuple(next_bot_id), std::forward_as_tuple(orig_apdata->gender, orig_apdata->skin, orig_apdata->face, orig_apdata->hair, orig_apdata->haircolor, orig_apdata->features));
 
         int8 beqId = 1;
-        _botsWanderCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_entry, beqId);
+        _botsExtraCreatureEquipmentTemplates[next_bot_id] = sObjectMgr->GetEquipmentInfo(orig_entry, beqId);
 
         //We do not create CreatureData for generated bots
 
@@ -399,6 +477,8 @@ private:
     }
 
 public:
+    uint32 GetNextBotId() const { return next_bot_id; }
+
     uint32 GetEnabledBotsCount() const { return enabledBotsCount; }
 
     uint32 GetSpareBotsCount(TeamId teamId = TEAM_NEUTRAL) const
@@ -605,6 +685,100 @@ public:
         return true;
     }
 
+    bool GenerateDungeonBotsToSpawn(Player const* owner, uint32 bots_count, std::array<uint8, 3>&& desired_roles)
+    {
+        // PLAYER_ROLE_TANK = 0, PLAYER_ROLE_HEALER = 1, PLAYER_ROLE_DAMAGE = 2
+        using enum lfg::LfgRoles;
+        using tuple_type = std::tuple<uint32, uint8, uint32>;
+        using roles_arr = std::decay_t<decltype(desired_roles)>;
+
+        if (_spareBotIdsPerClassMap.empty())
+            return false;
+
+        auto roles_array_to_bot_role_mask = [](roles_arr const& roles) {
+            return static_cast<uint32>(
+                (!!roles[0] ? static_cast<uint32>(BOT_ROLE_TANK) : 0) |
+                (!!roles[1] ? static_cast<uint32>(BOT_ROLE_HEAL) : 0) |
+                (!!roles[2] ? static_cast<uint32>(BOT_ROLE_DPS) : 0));
+        };
+
+        std::vector<tuple_type> spareBots;
+        spareBots.reserve(bots_count);
+
+        for (auto const& [bot_class, spare_bots] : _spareBotIdsPerClassMap)
+        {
+            const uint32 bot_roles = BotDataMgr::GetViableRolesForClass(bot_class) & roles_array_to_bot_role_mask(desired_roles);
+            if (!bot_roles)
+                continue;
+
+            for (const uint32 spareBotId : spare_bots)
+            {
+                if (BotCfg::FilterRaces())
+                {
+                    NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(spareBotId));
+                    const uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(orig_extras->bclass, orig_extras->race);
+                    const uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
+
+                    if (botTeam != owner->GetTeam())
+                        continue;
+                }
+
+                if (BotDataMgr::GetMinLevelForBotClass(bot_class) > owner->GetLevel())
+                    continue;
+
+                spareBots.emplace_back(spareBotId, bot_class, bot_roles);
+            }
+        }
+
+        Bcore::Containers::RandomShuffle(spareBots);
+
+        roles_arr remaining_roles = desired_roles; // copy
+
+        for (auto const& ecr : spareBots)
+        {
+            const uint32 remaining_bot_roles_mask = roles_array_to_bot_role_mask(remaining_roles);
+            if (!remaining_bot_roles_mask)
+                break;
+
+            if (uint32 broles_mask = std::get<2>(ecr) & remaining_bot_roles_mask)
+            {
+                const uint32 first_role = BotDataMgr::GetFirstRoleInMask(broles_mask);
+                broles_mask = first_role | BOT_ROLE_PARTY | BOT_ROLE_DPS;
+                //if (broles_mask & BOT_ROLE_TANK)
+                //    broles_mask |= BOT_ROLE_DPS;
+                if (first_role == BOT_ROLE_TANK)
+                    broles_mask &= ~BOT_ROLE_RANGED;
+                if ((!BotDataMgr::IsMeleeClass(std::get<1>(ecr)) || first_role == BOT_ROLE_HEAL) && first_role != BOT_ROLE_TANK)
+                    broles_mask |= BOT_ROLE_RANGED;
+
+                const uint8 bot_spec = BotDataMgr::SelectBotSpecForRoles(std::get<1>(ecr), first_role);
+
+                GenerateDungeonBotToSpawn({ std::get<0>(ecr), std::get<1>(ecr), bot_spec, broles_mask }, owner);
+                for (const uint32 brmask : { BOT_ROLE_DPS, BOT_ROLE_HEAL, BOT_ROLE_TANK })
+                {
+                    if (first_role & brmask)
+                    {
+                        const uint8 brindex = (brmask == BOT_ROLE_TANK) ? 0 : (brmask == BOT_ROLE_HEAL) ? 1 : 2;
+                        ASSERT(remaining_roles[brindex] > 0);
+                        remaining_roles[brindex]--;
+                        break;
+                    }
+                }
+            }
+        }
+
+        CharacterDatabase.PExecute("UPDATE worldstates SET value = {} WHERE entry = {}", next_bot_id, uint32(BOT_GIVER_ENTRY));
+
+        if (std::ranges::any_of(remaining_roles, [](uint8 val) { return !!val; }))
+        {
+            BOT_LOG_WARN("npcbot", "Failed to summon enough bots for player {} ({})! Remaining: {}, {}, {}", owner->GetName(), owner->GetGUID().GetCounter(),
+                uint32(remaining_roles[0]), uint32(remaining_roles[1]), uint32(remaining_roles[2]));
+            return false;
+        }
+
+        return true;
+    }
+
     static WanderingBotsGenerator* instance()
     {
         static WanderingBotsGenerator _instance;
@@ -622,57 +796,63 @@ void BotDataMgr::Update(uint32 diff)
     //lock is not needed here
     for (Creature const* bot : _existingBots)
     {
-        if (bot->IsFreeBot() && !bot->IsWandererBot() && !bot->IsInWorld() && bot->FindMap() && !!SelectNpcBotData(bot->GetEntry()))
+        if (!bot->IsInWorld() && bot->FindMap() && !bot->IsWandererBot() && !!SelectNpcBotData(bot->GetEntry()) && bot->IsFreeBot())
         {
             bot->GetBotAI()->CommonTimers(diff);
             bot->GetBotAI()->UpdateAI(diff);
         }
     }
 
-    if (!_botsWanderCreaturesToDespawn.empty())
+    if (!_botsExtraCreaturesToDespawn.empty())
     {
-        BOT_LOG_DEBUG("npcbots", "Bots to despawn: {}", uint32(_botsWanderCreaturesToDespawn.size()));
+        BOT_LOG_DEBUG("npcbots", "Bots to despawn: {}", uint32(_botsExtraCreaturesToDespawn.size()));
 
-        while (!_botsWanderCreaturesToDespawn.empty())
+        while (!_botsExtraCreaturesToDespawn.empty())
         {
-            uint32 bot_despawn_id = *_botsWanderCreaturesToDespawn.begin();
+            auto bot_despawn_iter = _botsExtraCreaturesToDespawn.begin();
 
+            const uint32 bot_despawn_id = *bot_despawn_iter;
             Creature* bot = const_cast<Creature*>(ASSERT_NOTNULL(FindBot(bot_despawn_id)));
 
             if (!bot->IsInWorld())
                 break;
 
-            _botsWanderCreaturesToDespawn.erase(bot_despawn_id);
+            _botsExtraCreaturesToDespawn.erase(bot_despawn_iter);
 
-            uint32 origEntry = _botsWanderCreatureTemplates.at(bot_despawn_id).KillCredit[0];
-            std::string_view botName = bot->GetName();
+            const uint32 origEntry = _botsExtraCreatureTemplates.at(bot_despawn_id).KillCredit[0];
+            const std::string_view botName = bot->GetName();
 
             _spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
 
             BotMgr::CleanupsBeforeBotDelete(bot);
             bot->GetBotAI()->canUpdate = false;
-            bot->GetMap()->AddObjectToRemoveList(bot);
+            if (bot->IsSummon())
+                bot->ToTempSummon()->UnSummon();
+            else
+                bot->GetMap()->AddObjectToRemoveList(bot);
 
             auto bditr = _botsData.find(bot_despawn_id);
             auto beitr = _botsExtras.find(bot_despawn_id);
             auto baditr = _botsAppearanceData.find(bot_despawn_id);
-            auto bwcetitr = _botsWanderCreatureEquipmentTemplates.find(bot_despawn_id);
-            auto bwctitr = _botsWanderCreatureTemplates.find(bot_despawn_id);
+            auto bwcetitr = _botsExtraCreatureEquipmentTemplates.find(bot_despawn_id);
+            auto bwctitr = _botsExtraCreatureTemplates.find(bot_despawn_id);
 
             ASSERT(bditr != _botsData.end());
             ASSERT(beitr != _botsExtras.end());
             //ASSERT(baditr != _botsAppearanceData.end()); may not exist
-            ASSERT(bwcetitr != _botsWanderCreatureEquipmentTemplates.end());
-            ASSERT(bwctitr != _botsWanderCreatureTemplates.end());
+            ASSERT(bwcetitr != _botsExtraCreatureEquipmentTemplates.end());
+            ASSERT(bwctitr != _botsExtraCreatureTemplates.end());
+
+            const bool is_owned = bditr->second.owner != 0;
 
             _botsData.erase(bditr);
             _botsExtras.erase(beitr);
             if (baditr != _botsAppearanceData.end())
                 _botsAppearanceData.erase(baditr);
-            _botsWanderCreatureEquipmentTemplates.erase(bwcetitr);
-            _botsWanderCreatureTemplates.erase(bwctitr);
+            _botsExtraCreatureEquipmentTemplates.erase(bwcetitr);
+            _botsExtraCreatureTemplates.erase(bwctitr);
 
-            BOT_LOG_DEBUG("npcbots", "Despawned wanderer bot {} '{}' (orig {})", bot_despawn_id, botName, origEntry);
+            BOT_LOG_DEBUG("npcbots", "Despawned {} bot {} '{}' (orig {})", is_owned ? "dungeon" : "wanderer", bot_despawn_id, botName, origEntry);
         }
     }
 
@@ -1483,7 +1663,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
     }
 
     bool spawn_node_minclasslvl_exists_all = true;
-    for (auto [map_id, exists] : spawn_node_exists_a)
+    for (auto [map_id, exists] : spawn_node_exists_a) //copying 8 bytes
     {
         if (!exists)
         {
@@ -1492,7 +1672,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             spawn_node_minclasslvl_exists_all = false;
         }
     }
-    for (auto [map_id, exists] : spawn_node_exists_h)
+    for (auto [map_id, exists] : spawn_node_exists_h) //copying 8 bytes
     {
         if (!exists)
         {
@@ -1501,7 +1681,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             spawn_node_minclasslvl_exists_all = false;
         }
     }
-    for (auto [map_id, exists] : spawn_node_exists_n)
+    for (auto [map_id, exists] : spawn_node_exists_n) //copying 8 bytes
     {
         if (!exists)
         {
@@ -1697,6 +1877,55 @@ void BotDataMgr::GenerateWanderingBots()
     }
 
     BOT_LOG_INFO("server.loading", ">> Set up spawning of {} wandering bots in {} ms", spawned_count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void BotDataMgr::GenerateDungeonBots(Player const* leader, Group const* group, Map const* map)
+{
+    using enum lfg::LfgRoles;
+    using roles_arr = std::array<uint8, 3>;
+
+    if (!BotCfg::IsNpcBotDungeonFinderBotGenerationEnabled())
+        return;
+
+    if (!group->isLFGGroup())
+        return;
+
+    const uint32 members_count = group->GetMembersCount();
+    if (members_count >= MAX_GROUP_SIZE)
+        return;
+
+    const uint32 bots_to_generate_count = static_cast<uint32>(MAX_GROUP_SIZE) - members_count;
+
+    BOT_LOG_INFO("npcbots", "DungeonBots: player: {} ({}), map '{}', group size: {}, bots to generate: {}",
+        leader->GetName(), leader->GetGUID().GetCounter(), map->GetId(), members_count, bots_to_generate_count);
+
+    roles_arr existing_roles{};
+    auto collect_existing_roles = [&existing_roles](ObjectGuid guid) {
+        const uint8 roles = sLFGMgr->GetRoles(guid);
+        if ((roles & PLAYER_ROLE_TANK) && existing_roles[0] < 1)
+            existing_roles[0]++;
+        else if ((roles & PLAYER_ROLE_HEALER) && existing_roles[1] < 1)
+            existing_roles[1]++;
+        else if (existing_roles[2] < 3)
+            existing_roles[2]++;
+    };
+    for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (Player const* gplayer = itr->GetSource())
+            collect_existing_roles(gplayer->GetGUID());
+    for (GroupBotReference const* itr = group->GetFirstBotMember(); itr != nullptr; itr = itr->next())
+        if (Creature const* gbot = itr->GetSource())
+            collect_existing_roles(gbot->GetGUID());
+
+    BOT_LOG_INFO("npcbots", "DungeonBots: existing roles: [{}, {}, {}]", uint32(existing_roles[0]), uint32(existing_roles[1]), uint32(existing_roles[2]));
+
+    roles_arr desired_roles{ 1, 1, 3 };
+    for (auto i : NPCBots::index_array<std::size_t, std::size(existing_roles)>)
+        desired_roles[i] -= existing_roles[i];
+
+    BOT_LOG_INFO("npcbots", "DungeonBots: desired roles: [{}, {}, {}]", uint32(desired_roles[0]), uint32(desired_roles[1]), uint32(desired_roles[2]));
+
+    if (!sBotGen->GenerateDungeonBotsToSpawn(leader, bots_to_generate_count, std::move(desired_roles)))
+        BOT_LOG_WARN("npcbots", "DungeonBots: Failed to spawn {} bots", bots_to_generate_count);
 }
 
 bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unused]] Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo)
@@ -2610,14 +2839,14 @@ bool BotDataMgr::GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 
 
 CreatureTemplate const* BotDataMgr::GetBotExtraCreatureTemplate(uint32 entry)
 {
-    CreatureTemplateContainer::const_iterator cit = _botsWanderCreatureTemplates.find(entry);
-    return cit == _botsWanderCreatureTemplates.cend() ? nullptr : &cit->second;
+    CreatureTemplateContainer::const_iterator cit = _botsExtraCreatureTemplates.find(entry);
+    return cit == _botsExtraCreatureTemplates.cend() ? nullptr : &cit->second;
 }
 
 EquipmentInfo const* BotDataMgr::GetBotEquipmentInfo(uint32 entry)
 {
-    decltype(_botsWanderCreatureEquipmentTemplates)::const_iterator cit = _botsWanderCreatureEquipmentTemplates.find(entry);
-    if (cit == _botsWanderCreatureEquipmentTemplates.cend())
+    decltype(_botsExtraCreatureEquipmentTemplates)::const_iterator cit = _botsExtraCreatureEquipmentTemplates.find(entry);
+    if (cit == _botsExtraCreatureEquipmentTemplates.cend())
     {
         int8 eqId = 1;
         return sObjectMgr->GetEquipmentInfo(entry, eqId);
@@ -2998,14 +3227,13 @@ void BotDataMgr::ResetNpcBotTransmogData(uint32 entry, bool update_db)
 
 void BotDataMgr::RegisterBot(Creature const* bot)
 {
+    std::unique_lock lock(*GetLock());
+
     if (_existingBots.contains(bot))
     {
-        BOT_LOG_ERROR("entities.unit", "BotDataMgr::RegisterBot: bot {} ({}) already registered!",
-            bot->GetEntry(), bot->GetName());
+        BOT_LOG_ERROR("entities.unit", "BotDataMgr::RegisterBot: bot {} ({}) already registered!", bot->GetEntry(), bot->GetName());
         return;
     }
-
-    std::unique_lock lock(*GetLock());
 
     _existingBots.insert(bot);
     //BOT_LOG_ERROR("entities.unit", "BotDataMgr::RegisterBot: registered bot {} ({})", bot->GetEntry(), bot->GetName());
@@ -3262,6 +3490,435 @@ uint32 BotDataMgr::GetTeamForFaction(uint32 factionTemplateId)
         default:
             return TEAM_OTHER;
     }
+}
+
+uint32 BotDataMgr::GetFirstRoleInMask(uint32 roles_mask)
+{
+    for (uint32 i = 1u; i < BOT_MAX_ROLE; i <<= 1u)
+        if (roles_mask & i)
+            return i;
+    return roles_mask;
+}
+
+uint32 BotDataMgr::LFGToBotRoles(uint8 roles_mask)
+{
+    using enum lfg::LfgRoles;
+    uint32 new_roles = 0;
+    if (roles_mask & PLAYER_ROLE_TANK)
+        new_roles |= BOT_ROLE_TANK;
+    if (roles_mask & PLAYER_ROLE_HEALER)
+        new_roles |= BOT_ROLE_HEAL;
+    if (roles_mask & PLAYER_ROLE_DAMAGE)
+        new_roles |= BOT_ROLE_DPS;
+    return new_roles;
+}
+uint8 BotDataMgr::BotToLFGRoles(uint32 roles_mask, bool first_in_mask)
+{
+    using enum lfg::LfgRoles;
+    uint8 new_roles = 0;
+    if (roles_mask & BOT_ROLE_TANK)
+        new_roles |= PLAYER_ROLE_TANK;
+    if (roles_mask & BOT_ROLE_HEAL)
+        if (!first_in_mask || !new_roles)
+            new_roles |= PLAYER_ROLE_HEALER;
+    if (roles_mask & BOT_ROLE_DPS)
+        if (!first_in_mask || !new_roles)
+            new_roles |= PLAYER_ROLE_DAMAGE;
+    return new_roles;
+}
+uint32 BotDataMgr::DefaultRolesForClass(uint8 m_class, uint8 spec)
+{
+    uint32 roleMask = BOT_ROLE_DPS;
+
+    //if (bot_ai::IsHealingClass(m_class))
+    //    roleMask |= BOT_ROLE_HEAL;
+
+    if (!BotDataMgr::IsMeleeClass(m_class))
+    {
+        switch (spec)
+        {
+            case BOT_SPEC_SHAMAN_ENHANCEMENT:
+            case BOT_SPEC_DRUID_FERAL:
+                break;
+            default:
+                roleMask |= BOT_ROLE_RANGED;
+                break;
+        }
+    }
+
+    return roleMask;
+}
+
+uint32 BotDataMgr::GetViableRolesForClass(uint8 bot_class)
+{
+    uint32 roles;
+    switch (bot_class)
+    {
+        case BOT_CLASS_WARRIOR:     roles = BOT_ROLE_DPS | BOT_ROLE_TANK;                 break;
+        case BOT_CLASS_PALADIN:     roles = BOT_ROLE_DPS | BOT_ROLE_TANK | BOT_ROLE_HEAL; break;
+        case BOT_CLASS_HUNTER:      roles = BOT_ROLE_DPS;                                 break;
+        case BOT_CLASS_ROGUE:       roles = BOT_ROLE_DPS;                                 break;
+        case BOT_CLASS_PRIEST:      roles = BOT_ROLE_DPS | BOT_ROLE_HEAL;                 break;
+        case BOT_CLASS_DEATH_KNIGHT:roles = BOT_ROLE_DPS | BOT_ROLE_TANK;                 break;
+        case BOT_CLASS_SHAMAN:      roles = BOT_ROLE_DPS | BOT_ROLE_HEAL;                 break;
+        case BOT_CLASS_MAGE:        roles = BOT_ROLE_DPS;                                 break;
+        case BOT_CLASS_WARLOCK:     roles = BOT_ROLE_DPS;                                 break;
+        case BOT_CLASS_DRUID:       roles = BOT_ROLE_DPS | BOT_ROLE_TANK | BOT_ROLE_HEAL; break;
+        case BOT_CLASS_CRYPT_LORD:  roles = BOT_ROLE_DPS | BOT_ROLE_TANK;                 break;
+        case BOT_CLASS_BM:
+        case BOT_CLASS_SPHYNX:
+        case BOT_CLASS_ARCHMAGE:
+        case BOT_CLASS_DREADLORD:
+        case BOT_CLASS_SPELLBREAKER:
+        case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
+        case BOT_CLASS_SEA_WITCH:   roles = BOT_ROLE_DPS;                                 break;
+        default:                    roles = BOT_ROLE_DPS;                                 break;
+    }
+    return roles;
+}
+
+uint8 BotDataMgr::SelectBotSpecForRoles(uint8 bot_class, uint32 bot_roles)
+{
+    std::vector<uint8> specs;
+    specs.reserve(3);
+    switch (bot_class)
+    {
+        case BOT_CLASS_WARRIOR:
+            if (bot_roles & BOT_ROLE_TANK)
+                specs.push_back(BOT_SPEC_WARRIOR_PROTECTION);
+            else
+            {
+                specs.push_back(BOT_SPEC_WARRIOR_ARMS);
+                specs.push_back(BOT_SPEC_WARRIOR_FURY);
+            }
+            break;
+        case BOT_CLASS_PALADIN:
+            if (bot_roles & BOT_ROLE_HEAL)
+                specs.push_back(BOT_SPEC_PALADIN_HOLY);
+            else if (bot_roles & BOT_ROLE_TANK)
+                specs.push_back(BOT_SPEC_PALADIN_PROTECTION);
+            else
+                specs.push_back(BOT_SPEC_PALADIN_RETRIBUTION);
+            break;
+        case BOT_CLASS_HUNTER:
+            specs.push_back(BOT_SPEC_HUNTER_BEASTMASTERY);
+            specs.push_back(BOT_SPEC_HUNTER_MARKSMANSHIP);
+            specs.push_back(BOT_SPEC_HUNTER_SURVIVAL);
+            break;
+        case BOT_CLASS_ROGUE:
+            specs.push_back(BOT_SPEC_ROGUE_ASSASINATION);
+            specs.push_back(BOT_SPEC_ROGUE_COMBAT);
+            specs.push_back(BOT_SPEC_ROGUE_SUBTLETY);
+            break;
+        case BOT_CLASS_PRIEST:
+            if (bot_roles & BOT_ROLE_HEAL)
+            {
+                specs.push_back(BOT_SPEC_PRIEST_DISCIPLINE);
+                specs.push_back(BOT_SPEC_PRIEST_HOLY);
+            }
+            else
+                specs.push_back(BOT_SPEC_PRIEST_SHADOW);
+            break;
+        case BOT_CLASS_DEATH_KNIGHT:
+            specs.push_back(BOT_SPEC_DK_BLOOD);
+            specs.push_back(BOT_SPEC_DK_UNHOLY);
+            if (bot_roles & BOT_ROLE_TANK)
+                specs.push_back(BOT_SPEC_DK_FROST);
+            break;
+        case BOT_CLASS_SHAMAN:
+            if (bot_roles & BOT_ROLE_HEAL)
+                specs.push_back(BOT_SPEC_SHAMAN_RESTORATION);
+            else if (bot_roles & BOT_ROLE_TANK)
+                specs.push_back(BOT_SPEC_SHAMAN_ENHANCEMENT);
+            else
+            {
+                specs.push_back(BOT_SPEC_SHAMAN_ELEMENTAL);
+                specs.push_back(BOT_SPEC_SHAMAN_ENHANCEMENT);
+            }
+            break;
+        case BOT_CLASS_MAGE:
+            specs.push_back(BOT_SPEC_MAGE_ARCANE);
+            specs.push_back(BOT_SPEC_MAGE_FIRE);
+            specs.push_back(BOT_SPEC_MAGE_FROST);
+            break;
+        case BOT_CLASS_WARLOCK:
+            specs.push_back(BOT_SPEC_WARLOCK_AFFLICTION);
+            specs.push_back(BOT_SPEC_WARLOCK_DEMONOLOGY);
+            specs.push_back(BOT_SPEC_WARLOCK_DESTRUCTION);
+            break;
+        case BOT_CLASS_DRUID:
+            if (bot_roles & BOT_ROLE_HEAL)
+                specs.push_back(BOT_SPEC_DRUID_RESTORATION);
+            else if (bot_roles & BOT_ROLE_TANK)
+                specs.push_back(BOT_SPEC_DRUID_FERAL);
+            else
+            {
+                specs.push_back(BOT_SPEC_DRUID_BALANCE);
+                specs.push_back(BOT_SPEC_DRUID_FERAL);
+            }
+            break;
+        default:
+            break;
+    }
+
+    uint8 spec = specs.empty() ? BotDataMgr::SelectSpecForClass(bot_class) : specs.size() == std::size_t(1) ? specs.front() : Bcore::Containers::SelectRandomContainerElement(specs);
+    return spec;
+}
+
+uint8 BotDataMgr::SelectSpecForClass(uint8 m_class)
+{
+    std::vector<uint8> specs;
+    specs.reserve(3);
+    switch (m_class)
+    {
+        case BOT_CLASS_WARRIOR: //any
+            specs.push_back(BOT_SPEC_WARRIOR_ARMS);
+            specs.push_back(BOT_SPEC_WARRIOR_FURY);
+            specs.push_back(BOT_SPEC_WARRIOR_PROTECTION);
+            break;
+        case BOT_CLASS_PALADIN: //retri
+            specs.push_back(BOT_SPEC_PALADIN_RETRIBUTION);
+            break;
+        case BOT_CLASS_HUNTER: //any
+            specs.push_back(BOT_SPEC_HUNTER_BEASTMASTERY);
+            specs.push_back(BOT_SPEC_HUNTER_MARKSMANSHIP);
+            specs.push_back(BOT_SPEC_HUNTER_SURVIVAL);
+            break;
+        case BOT_CLASS_ROGUE: //any
+            specs.push_back(BOT_SPEC_ROGUE_ASSASINATION);
+            specs.push_back(BOT_SPEC_ROGUE_COMBAT);
+            specs.push_back(BOT_SPEC_ROGUE_SUBTLETY);
+            break;
+        case BOT_CLASS_PRIEST: //discipline, shadow
+            specs.push_back(BOT_SPEC_PRIEST_DISCIPLINE);
+            specs.push_back(BOT_SPEC_PRIEST_SHADOW);
+            break;
+        case BOT_CLASS_DEATH_KNIGHT: //any
+            specs.push_back(BOT_SPEC_DK_BLOOD);
+            specs.push_back(BOT_SPEC_DK_FROST);
+            specs.push_back(BOT_SPEC_DK_UNHOLY);
+            break;
+        case BOT_CLASS_SHAMAN: //elem, enh
+            specs.push_back(BOT_SPEC_SHAMAN_ELEMENTAL);
+            specs.push_back(BOT_SPEC_SHAMAN_ENHANCEMENT);
+            break;
+        case BOT_CLASS_MAGE: //fire, frost
+            specs.push_back(BOT_SPEC_MAGE_FIRE);
+            specs.push_back(BOT_SPEC_MAGE_FROST);
+            break;
+        case BOT_CLASS_WARLOCK: //affli, destr
+            specs.push_back(BOT_SPEC_WARLOCK_AFFLICTION);
+            specs.push_back(BOT_SPEC_WARLOCK_DESTRUCTION);
+            break;
+        case BOT_CLASS_DRUID: //balance, feral
+            specs.push_back(BOT_SPEC_DRUID_BALANCE);
+            specs.push_back(BOT_SPEC_DRUID_FERAL);
+            break;
+        default:
+            specs.push_back(BOT_SPEC_DEFAULT);
+            break;
+    }
+
+    return specs.size() == 1 ? specs.front() : Bcore::Containers::SelectRandomContainerElement(specs);
+}
+
+uint32 BotDataMgr::TextForSpec(uint8 spec)
+{
+    switch (spec)
+    {
+        case BOT_SPEC_WARRIOR_ARMS:         return BOT_TEXT_SPEC_ARMS;
+        case BOT_SPEC_WARRIOR_FURY:         return BOT_TEXT_SPEC_FURY;
+        case BOT_SPEC_WARRIOR_PROTECTION:   return BOT_TEXT_SPEC_PROTECTION;
+        case BOT_SPEC_PALADIN_HOLY:         return BOT_TEXT_SPEC_HOLY;
+        case BOT_SPEC_PALADIN_PROTECTION:   return BOT_TEXT_SPEC_PROTECTION;
+        case BOT_SPEC_PALADIN_RETRIBUTION:  return BOT_TEXT_SPEC_RETRIBUTION;
+        case BOT_SPEC_HUNTER_BEASTMASTERY:  return BOT_TEXT_SPEC_BEASTMASTERY;
+        case BOT_SPEC_HUNTER_MARKSMANSHIP:  return BOT_TEXT_SPEC_MARKSMANSHIP;
+        case BOT_SPEC_HUNTER_SURVIVAL:      return BOT_TEXT_SPEC_SURVIVAL;
+        case BOT_SPEC_ROGUE_ASSASINATION:   return BOT_TEXT_SPEC_ASSASINATION;
+        case BOT_SPEC_ROGUE_COMBAT:         return BOT_TEXT_SPEC_COMBAT;
+        case BOT_SPEC_ROGUE_SUBTLETY:       return BOT_TEXT_SPEC_SUBTLETY;
+        case BOT_SPEC_PRIEST_DISCIPLINE:    return BOT_TEXT_SPEC_DISCIPLINE;
+        case BOT_SPEC_PRIEST_HOLY:          return BOT_TEXT_SPEC_HOLY;
+        case BOT_SPEC_PRIEST_SHADOW:        return BOT_TEXT_SPEC_SHADOW;
+        case BOT_SPEC_DK_BLOOD:             return BOT_TEXT_SPEC_BLOOD;
+        case BOT_SPEC_DK_FROST:             return BOT_TEXT_SPEC_FROST;
+        case BOT_SPEC_DK_UNHOLY:            return BOT_TEXT_SPEC_UNHOLY;
+        case BOT_SPEC_SHAMAN_ELEMENTAL:     return BOT_TEXT_SPEC_ELEMENTAL;
+        case BOT_SPEC_SHAMAN_ENHANCEMENT:   return BOT_TEXT_SPEC_ENHANCEMENT;
+        case BOT_SPEC_SHAMAN_RESTORATION:   return BOT_TEXT_SPEC_RESTORATION;
+        case BOT_SPEC_MAGE_ARCANE:          return BOT_TEXT_SPEC_ARCANE;
+        case BOT_SPEC_MAGE_FIRE:            return BOT_TEXT_SPEC_FIRE;
+        case BOT_SPEC_MAGE_FROST:           return BOT_TEXT_SPEC_FROST;
+        case BOT_SPEC_WARLOCK_AFFLICTION:   return BOT_TEXT_SPEC_AFFLICTION;
+        case BOT_SPEC_WARLOCK_DEMONOLOGY:   return BOT_TEXT_SPEC_DEMONOLOGY;
+        case BOT_SPEC_WARLOCK_DESTRUCTION:  return BOT_TEXT_SPEC_DESTRUCTION;
+        case BOT_SPEC_DRUID_BALANCE:        return BOT_TEXT_SPEC_BALANCE;
+        case BOT_SPEC_DRUID_FERAL:          return BOT_TEXT_SPEC_FERAL;
+        case BOT_SPEC_DRUID_RESTORATION:    return BOT_TEXT_SPEC_RESTORATION;
+        case BOT_SPEC_DEFAULT: default:     return BOT_TEXT_SPEC_UNKNOWN;
+    }
+}
+
+bool BotDataMgr::IsValidSpecForClass(uint8 m_class, uint8 spec)
+{
+    switch (m_class)
+    {
+        case BOT_CLASS_WARRIOR:
+            switch (spec)
+            {
+                case BOT_SPEC_WARRIOR_ARMS:
+                case BOT_SPEC_WARRIOR_FURY:
+                case BOT_SPEC_WARRIOR_PROTECTION:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_PALADIN:
+            switch (spec)
+            {
+                case BOT_SPEC_PALADIN_HOLY:
+                case BOT_SPEC_PALADIN_PROTECTION:
+                case BOT_SPEC_PALADIN_RETRIBUTION:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_HUNTER:
+            switch (spec)
+            {
+                case BOT_SPEC_HUNTER_BEASTMASTERY:
+                case BOT_SPEC_HUNTER_MARKSMANSHIP:
+                case BOT_SPEC_HUNTER_SURVIVAL:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_ROGUE:
+            switch (spec)
+            {
+                case BOT_SPEC_ROGUE_ASSASINATION:
+                case BOT_SPEC_ROGUE_COMBAT:
+                case BOT_SPEC_ROGUE_SUBTLETY:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_PRIEST:
+            switch (spec)
+            {
+                case BOT_SPEC_PRIEST_DISCIPLINE:
+                case BOT_SPEC_PRIEST_HOLY:
+                case BOT_SPEC_PRIEST_SHADOW:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_DEATH_KNIGHT:
+            switch (spec)
+            {
+                case BOT_SPEC_DK_BLOOD:
+                case BOT_SPEC_DK_FROST:
+                case BOT_SPEC_DK_UNHOLY:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_SHAMAN:
+            switch (spec)
+            {
+                case BOT_SPEC_SHAMAN_ELEMENTAL:
+                case BOT_SPEC_SHAMAN_ENHANCEMENT:
+                case BOT_SPEC_SHAMAN_RESTORATION:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_MAGE:
+            switch (spec)
+            {
+                case BOT_SPEC_MAGE_ARCANE:
+                case BOT_SPEC_MAGE_FIRE:
+                case BOT_SPEC_MAGE_FROST:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_WARLOCK:
+            switch (spec)
+            {
+                case BOT_SPEC_WARLOCK_AFFLICTION:
+                case BOT_SPEC_WARLOCK_DEMONOLOGY:
+                case BOT_SPEC_WARLOCK_DESTRUCTION:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_DRUID:
+            switch (spec)
+            {
+                case BOT_SPEC_DRUID_BALANCE:
+                case BOT_SPEC_DRUID_FERAL:
+                case BOT_SPEC_DRUID_RESTORATION:
+                    return true;
+                default:
+                    break;
+            }
+            break;
+        case BOT_CLASS_BM:
+        case BOT_CLASS_SPHYNX:
+        case BOT_CLASS_ARCHMAGE:
+        case BOT_CLASS_DREADLORD:
+        case BOT_CLASS_SPELLBREAKER:
+        case BOT_CLASS_DARK_RANGER:
+        case BOT_CLASS_NECROMANCER:
+        case BOT_CLASS_SEA_WITCH:
+        case BOT_CLASS_CRYPT_LORD:
+            return spec == BOT_SPEC_DEFAULT;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool BotDataMgr::IsMeleeClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, MELEE_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsTankingClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, TANKING_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsBlockingClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, BLOCKING_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsCastingClass(uint8 m_class)
+{
+    //Class can benefit from spellpower
+    return IsBotClassMask(m_class, CASTING_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsHealingClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, HEALING_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsHumanoidClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, HUMANOID_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsHeroExClass(uint8 m_class)
+{
+    return IsBotClassMask(m_class, HERO_BOT_CLASSES_MASK);
 }
 
 bool BotDataMgr::CanDepositBotBankItemsCount(ObjectGuid playerGuid, uint32 items_count)
