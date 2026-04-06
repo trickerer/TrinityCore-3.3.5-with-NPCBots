@@ -4723,7 +4723,7 @@ NpcBot.EnrageOnDismiss = 1
 #        Description: Allow autogenerating bots for non-full LFG groups entering non-raid dungeons
 #        Default:     0 - (NpcBot.DungeonBots.Enable)
 
-NpcBot.DungeonBots.Enable   = 0
+NpcBot.DungeonBots.Enable = 0
 
 #
 #    NpcBot.WanderingBots.Continents.Count
