@@ -1884,7 +1884,7 @@ void BotDataMgr::GenerateDungeonBots(Player const* leader, Group const* group, M
     using enum lfg::LfgRoles;
     using roles_arr = std::array<uint8, 3>;
 
-    if (!BotCfg::IsNpcBotDungeonFinderBotGenerationEnabled())
+    if (!BotCfg::IsNpcBotModEnabled() || !BotCfg::IsNpcBotDungeonFinderBotGenerationEnabled())
         return;
 
     if (!group->isLFGGroup())

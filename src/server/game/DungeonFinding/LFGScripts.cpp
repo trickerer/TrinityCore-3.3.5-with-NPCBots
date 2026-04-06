@@ -114,7 +114,7 @@ void LFGPlayerScript::OnMapChanged(Player* player)
 
         //npcbot
         if (group->GetLeaderGUID() == player->GetGUID() && group->GetMembersCount() < MAX_GROUP_SIZE &&
-            BotCfg::IsNpcBotDungeonFinderBotGenerationEnabled())
+            BotCfg::IsNpcBotModEnabled() && BotCfg::IsNpcBotDungeonFinderBotGenerationEnabled())
             BotDataMgr::GenerateDungeonBots(player, group, map);
         //end npcbot
 
