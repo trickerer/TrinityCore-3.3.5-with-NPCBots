@@ -265,6 +265,14 @@ FIRE_RESISTANCE_TOTEM_1, FROST_RESISTANCE_TOTEM_1, NATURE_RESISTANCE_TOTEM_1, FL
 CLEANSING_TOTEM_1, MANA_SPRING_TOTEM_1, TOTEM_OF_WRATH_1, MANA_TIDE_TOTEM_1, TREMOR_TOTEM_1/*, TOTEMIC_RECALL_1,
 ROCKBITER_WEAPON_1, FLAMETONGUE_WEAPON_1, FROSTBRAND_WEAPON_1, WINDFURY_WEAPON_1, EARTHLIVING_WEAPON_1*/ };
 
+struct BotTotemParam
+{
+    BotTotemParam() = default;
+    uint32 _type{};
+    Position _pos;
+    float _effradius{};
+};
+
 class shaman_bot : public CreatureScript
 {
 public:
@@ -2746,15 +2754,6 @@ public:
         }
 
     private:
-        //Totem system
-        struct BotTotemParam
-        {
-            BotTotemParam() = default;
-            uint32 _type{};
-            Position _pos{};
-            float _effradius{};
-        };
-
         using BotTotem = std::pair<ObjectGuid /*guid*/, BotTotemParam /*param*/>;
         std::array<BotTotem, MAX_TOTEMS> _totems{};
         std::array<uint32, MAX_TOTEMS> _totemTimers{};
