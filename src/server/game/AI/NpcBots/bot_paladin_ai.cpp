@@ -864,7 +864,7 @@ public:
             if (!CheckAttackTarget())
                 return;
 
-            Repentance(diff);
+            CheckRepentance(diff);
             Counter(diff);
             TurnEvil(diff);
 
@@ -1144,14 +1144,12 @@ public:
             return false;
         }
 
-        void Repentance(uint32 diff, Unit* target = nullptr)
+        void CheckRepentance(uint32 diff)
         {
-            if (target)
-            {
-                if (IsSpellReady(REPENTANCE_1, diff) && doCast(target, GetSpell(REPENTANCE_1)))
-                    return;
-            }
-            else if (IsSpellReady(REPENTANCE_1, diff))
+            if (Rand() > 25)
+                return;
+
+            if (IsSpellReady(REPENTANCE_1, diff))
             {
                 Unit* u = FindStunTarget();
                 if (u && u->GetVictim() != me && doCast(u, GetSpell(REPENTANCE_1)))
@@ -1161,32 +1159,14 @@ public:
 
         void Counter(uint32 diff)
         {
-            if (IsCasting())
-                return;
-            if (Rand() > 60)
+            if (Rand() > 30)
                 return;
 
-            Unit* target = IsSpellReady(REPENTANCE_1, diff) ? FindCastingTarget(20, 0, REPENTANCE_1) : nullptr;
-            if (target)
-                Repentance(diff, target); //first check repentance
-            if (!target && IsSpellReady(TURN_EVIL_1, diff))
-            {
-                target = FindCastingTarget(20, 0, TURN_EVIL_1);
-                if (target && doCast(target, GetSpell(TURN_EVIL_1)))
-                    return;
-            }
-            if (!target && IsSpellReady(HOLY_WRATH_1, diff, false) && HasRole(BOT_ROLE_DPS))
-            {
-                target = FindCastingTarget(8, 0, TURN_EVIL_1); //here we check target as with turn evil cuz of same requirements
-                if (target && doCast(me, GetSpell(HOLY_WRATH_1)))
-                    return;
-            }
-            if (!target && IsSpellReady(HAMMER_OF_JUSTICE_1, diff, false))
-            {
-                target = FindCastingTarget(10, 0, HAMMER_OF_JUSTICE_1);
-                if (target && doCast(target, GetSpell(HAMMER_OF_JUSTICE_1)))
-                {}
-            }
+            for (const auto base_spell : { REPENTANCE_1, TURN_EVIL_1, HOLY_WRATH_1, HAMMER_OF_JUSTICE_1 })
+                if (IsSpellReady(base_spell, diff, false) && !HasQueuedSpellAction(base_spell))
+                    if (Unit const* target = FindCastingTarget(base_spell == HOLY_WRATH_1 ? 8.0f : CalcSpellMaxRange(base_spell), 0, base_spell))
+                        if (EnqueueCounterSpellAction(target->GetGUID(), base_spell, true))
+                            return;
         }
 
         void TurnEvil(uint32 diff)

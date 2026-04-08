@@ -124,12 +124,10 @@ public:
             if (Rand() > 55)
                 return;
 
-            if (IsSpellReady(SILENCE_1, diff))
-            {
-                Unit* target = FindCastingTarget(CalcSpellMaxRange(SILENCE_1), 0, SILENCE_1);
-                if (target && doCast(target, GetSpell(SILENCE_1)))
-                    return;
-            }
+            if (IsSpellReady(SILENCE_1, diff, false) && !HasQueuedSpellAction(SILENCE_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(SILENCE_1), 0, SILENCE_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), SILENCE_1, true))
+                        return;
         }
 
         void UpdateAI(uint32 diff) override

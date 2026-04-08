@@ -889,15 +889,13 @@ public:
 
         void Counter(uint32 diff)
         {
-            if (!IsSpellReady(WIND_SHEAR_1, diff, false) || (HasRole(BOT_ROLE_HEAL) && IsCasting()) || Rand() > 40)
+            if (Rand() > 40)
                 return;
 
-            if (Unit* target = FindCastingTarget(CalcSpellMaxRange(WIND_SHEAR_1), 0, WIND_SHEAR_1))
-            {
-                me->InterruptNonMeleeSpells(false);
-                if (doCast(target, GetSpell(WIND_SHEAR_1)))
-                    return;
-            }
+            if (IsSpellReady(WIND_SHEAR_1, diff, false) && !HasQueuedSpellAction(WIND_SHEAR_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(WIND_SHEAR_1), 0, WIND_SHEAR_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), WIND_SHEAR_1, !HasRole(BOT_ROLE_HEAL)))
+                        return;
         }
 
         void CheckShield(uint32 diff)

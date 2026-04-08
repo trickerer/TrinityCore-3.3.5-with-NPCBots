@@ -1264,6 +1264,10 @@ class TC_GAME_API Unit : public WorldObject
         void SetCreator(Unit* creator);
         Unit* GetCreator() const { return m_creator; }
         Unit* m_creator = nullptr;
+
+        void SetLastSpellGoTime(TimePoint time_point) { last_spell_go_time_point = time_point; }
+        TimePoint GetLastSpellGoTime() const { return last_spell_go_time_point; }
+        TimePoint last_spell_go_time_point{};
         //end npcbot
 
         bool IsControlledByPlayer() const { return m_ControlledByPlayer; }

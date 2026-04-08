@@ -1534,7 +1534,7 @@ bool bot_pet_ai::CheckAttackTarget()
 
         return false;
     }
-    if (petOwner->GetBotAI()->IsLastOrder(BOT_ORDER_PULL, 0, opponent->GetGUID()))
+    if (petOwner->GetBotAI()->IsActionNext(BotActionTypes::BOT_ACTION_PULL, 0, opponent->GetGUID()))
         return false;
 
     if (reset)

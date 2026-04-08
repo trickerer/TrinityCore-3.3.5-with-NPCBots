@@ -2893,7 +2893,7 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
             if (itr->second.owner == *(uint32*)(data))
                 break;
             itr->second.owner = *(uint32*)(data);
-            itr->second.hire_time = itr->second.owner ? uint64(std::time(0)) : 1ULL;
+            itr->second.hire_time = itr->second.owner ? uint64(GameTime::GetGameTime()) : 1ULL;
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_OWNER);
             //"UPDATE characters_npcbot SET owner = ?, hire_time = FROM_UNIXTIME(?) WHERE entry = ?", CONNECTION_ASYNC
             bstmt->setUInt32(0, itr->second.owner);

@@ -377,20 +377,14 @@ public:
             if (IsCasting() || Rand() > 35)
                 return;
 
-            Unit* target = nullptr;
-
-            if (IsSpellReady(SCATTER_SHOT_1, diff) && HasRole(BOT_ROLE_DPS))
-            {
-                target = FindCastingTarget(CalcSpellMaxRange(SCATTER_SHOT_1), 0, SCATTER_SHOT_1);
-                if (target && doCast(target, GetSpell(SCATTER_SHOT_1)))
-                    return;
-            }
-            if (!target && IsSpellReady(WYVERN_STING_1, diff) && HasRole(BOT_ROLE_DPS))
-            {
-                target = FindCastingTarget(CalcSpellMaxRange(WYVERN_STING_1), 5, WYVERN_STING_1);
-                if (target && doCast(target, GetSpell(WYVERN_STING_1)))
-                    return;
-            }
+            if (IsSpellReady(SCATTER_SHOT_1, diff, false) && HasRole(BOT_ROLE_DPS) && !HasQueuedSpellAction(SCATTER_SHOT_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(SCATTER_SHOT_1), 0, SCATTER_SHOT_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), SCATTER_SHOT_1, true))
+                        return;
+            if (IsSpellReady(WYVERN_STING_1, diff, false) && HasRole(BOT_ROLE_DPS) && !HasQueuedSpellAction(WYVERN_STING_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(WYVERN_STING_1), 5, WYVERN_STING_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), WYVERN_STING_1, true))
+                        return;
             //if (!target && IsSpellReady(FREEZING_ARROW_1, diff))
             //{
             //    target = FindCastingTarget(40, 0, false, FREEZING_ARROW_1);
@@ -403,12 +397,10 @@ public:
             //    if (target && doCast(target, GetSpell(SCARE_BEAST_1)))
             //        return;
             //}
-            if (!target && IsSpellReady(SILENCING_SHOT_1, diff, false) && HasRole(BOT_ROLE_DPS))
-            {
-                target = FindCastingTarget(CalcSpellMaxRange(SILENCING_SHOT_1), 5, SILENCING_SHOT_1);
-                if (target && doCast(target, GetSpell(SILENCING_SHOT_1)))
-                    return;
-            }
+            if (IsSpellReady(SILENCING_SHOT_1, diff, false) && HasRole(BOT_ROLE_DPS) && !HasQueuedSpellAction(SILENCING_SHOT_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(SILENCING_SHOT_1), 5, SILENCING_SHOT_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), SILENCING_SHOT_1, true))
+                        return;
         }
 
         void CheckScatter(uint32 diff)

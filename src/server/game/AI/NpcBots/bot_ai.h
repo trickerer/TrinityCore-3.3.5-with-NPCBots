@@ -4,13 +4,13 @@
 #include "botcommon.h"
 
 #include "CreatureAI.h"
+#include "Duration.h"
 #include "EventProcessor.h"
 #include "GroupReference.h"
 #include "ItemDefines.h"
 #include "Position.h"
 
-#include <queue>
-#include <tuple>
+#include <set>
 
 /*
 NpcBot System by Trickerer (onlysuffering@gmail.com)
@@ -536,8 +536,10 @@ protected:
     void ApplyItemEnchantment(Item* item, EnchantmentSlot eslot, uint8 slot);
     void RemoveItemClassEnchantment(uint8 slot);
 
-    bool HasAuraTypeWithValueAtLeast(AuraType auratype, int32 minvalue, Unit const* unit = nullptr) const;
+    bool IsCastingOnMyParty(Unit const* unit, int32 cast_time = 0) const;
 
+    //Vehicles
+    bool HasAuraTypeWithValueAtLeast(AuraType auratype, int32 minvalue, Unit const* unit = nullptr) const;
     void DoSkytalonVehicleStrats(uint32 diff);
     void DoRubyDrakeVehicleStrats(uint32 diff);
     void DoEmeraldDrakeVehicleStrats(uint32 diff);
@@ -646,7 +648,7 @@ private:
 
     void _castBotItemUseSpell(Item const* item, SpellCastTargets const& targets/*, uint8 cast_count = 0, uint32 glyphIndex = 0*/);
 
-    std::tuple<Unit*, Unit*> _getTargets(bool byspell, bool ranged, bool &reset) const;
+    std::pair<Unit*, Unit*> _getTargets(bool byspell, bool ranged, bool &reset) const;
     Unit* _getVehicleTarget(BotVehicleStrats strat) const;
     void _listAuras(Player const* player, Unit const* unit) const;
     bool _checkImmunities(Unit const* target, SpellInfo const* spellInfo) const;
@@ -703,7 +705,7 @@ private:
 
     //timers
     uint32 _reviveTimer{}, _powersTimer{}, _chaseTimer{}, _engageTimer{}, _potionTimer{};
-    uint32 lastdiff{}, checkAurasTimer{}, roleTimer{}, ordersTimer{}, regenTimer{}, _updateTimerLong{}, _updateTimerMedium{}, _updateTimerEx1{}, _updateTimerEx2{};
+    uint32 lastdiff{}, checkAurasTimer{}, roleTimer{}, actionsTimer{}, regenTimer{}, _updateTimerLong{}, _updateTimerMedium{}, _updateTimerEx1{}, _updateTimerEx2{};
     uint32 _checkOwershipTimer{}, _checkMasterTimer{};
     uint32 _moveBehindTimer{};
     uint32 _rentTimer{};
@@ -798,50 +800,61 @@ private:
 
 public:
     //much simplier than SmartAI I guess...
-    struct BotOrder
+    struct BotAction
     {
         friend class bot_ai;
+
+        explicit BotAction(BotActionTypes action_type, Milliseconds delay = 0s, Milliseconds timeout = 1s);
+        BotAction(BotAction&&) noexcept = default;
+        BotAction& operator=(BotAction&&) = default;
+
+        BotAction(BotAction const&) = delete;
+        BotAction& operator=(BotAction const&) = delete;
+
+        inline constexpr TimePoint GetTimeout() const noexcept { return _exec_point + Milliseconds{ _exec_window }; }
+
+        inline constexpr bool operator==(BotAction const& other) const noexcept { return _exec_point == other._exec_point; }
+        inline constexpr std::strong_ordering operator<=>(BotAction const& other) const noexcept { return _exec_point <=> other._exec_point; }
+
+        BotActionTypes _type;
+        uint32 _exec_window;
+        TimePoint _exec_point;
 
         union
         {
             struct
             {
-                ObjectGuid targetGuid;
-                uint32 baseSpell;
-            } spellCastParams;
+                ObjectGuid target_guid;
+                uint32 base_spell;
+                bool interrupt_self;
+            } spell_cast_params;
 
             struct
             {
-                ObjectGuid targetGuid;
-            } pullParams;
+                ObjectGuid target_guid;
+            } pull_params;
 
         } params;
-
-        explicit BotOrder(BotOrderTypes order_type, uint32 timeout_sec = 10) : params{}, _type(order_type), _timeout(time(0) + timeout_sec) {}
-        BotOrder(BotOrder&&) noexcept = default;
-
-        BotOrder(BotOrder const&) = delete;
-        BotOrder& operator=(BotOrder const&) = delete;
-        BotOrder& operator=(BotOrder&&) = delete;
-
-    private:
-        BotOrderTypes _type;
-        time_t _timeout;
     };
 
-    bool HasOrders() const { return !_orders.empty(); }
-    bool IsLastOrder(BotOrderTypes order_type, uint32 param1 = 0, ObjectGuid guidparam1 = ObjectGuid::Empty) const;
-    std::size_t GetOrdersCount() const { return _orders.size(); }
-    bool AddOrder(BotOrder&& order);
-    void CancelOrder(BotOrder const& order);
-    void CompleteOrder(BotOrder const& order);
-    void CancelAllOrders();
+    bool HasQueuedActions() const { return !_action_queue.empty(); }
+    bool HasQueuedSpellAction(uint32 base_spell) const { return HasQueuedAction(BotActionTypes::BOT_ACTION_SPELLCAST, ObjectGuid::Empty, base_spell); }
+    bool HasQueuedAction(BotActionTypes action_type, ObjectGuid guid_param, uint32 uparam, Optional<bool> bparam = std::nullopt) const;
+    bool IsActionNext(BotActionTypes action_type, uint32 param1 = 0, ObjectGuid guidparam1 = ObjectGuid::Empty) const;
+    BotAction const& GetFirstActionInQueue() const { ASSERT(HasQueuedActions()); return *_action_queue.cbegin(); }
+    std::size_t GetActionsQueueSize() const { return _action_queue.size(); }
+    bool EnqueueAction(BotAction&& action, bool is_order);
+    void CancelAction(BotAction const& action);
+    void CompleteAction(BotAction const& action);
+    void CancelAllActions();
+    //Utils
+    bool EnqueueCounterSpellAction(ObjectGuid target_guid, uint32 base_spell, bool interrupt_self_cast);
 
 private:
-    void _ProcessOrders();
+    void _processQueuedActions();
 
-    using OrdersQueue = std::queue<BotOrder>;
-    OrdersQueue _orders;
+    using ActionsQueue = std::set<BotAction>;
+    ActionsQueue _action_queue;
 };
 
 #endif

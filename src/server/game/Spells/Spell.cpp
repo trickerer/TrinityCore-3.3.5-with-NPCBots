@@ -3649,14 +3649,19 @@ void Spell::_cast(bool skipCheck)
     }
 
     //npcbot - hook for spellcast finish
-    if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsNPCBotOrPet())
+    if (m_caster->IsCreature() && m_caster->ToCreature()->IsNPCBotOrPet())
         BotMgr::OnBotSpellGo(m_caster->ToCreature(), this);
     //npcbot - hook for master's spellcast finish
-    else if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->HaveBot())
+    else if (m_caster->IsPlayer() && m_caster->ToPlayer()->HaveBot())
         BotMgr::OnBotOwnerSpellGo(m_caster->ToPlayer(), this);
     //npcbot - hook for master's vehicle spellcast finish
-    else if (m_caster->ToUnit() && m_caster->ToUnit()->IsVehicle())
+    else if (m_caster->IsUnit() && m_caster->ToUnit()->IsVehicle())
         BotMgr::OnVehicleSpellGo(m_caster->ToUnit(), this);
+    //end npcbot
+
+    //npcbot
+    if (m_caster->IsUnit())
+        m_caster->ToUnit()->SetLastSpellGoTime(GameTime::Now());
     //end npcbot
 
     CallScriptAfterCastHandlers();

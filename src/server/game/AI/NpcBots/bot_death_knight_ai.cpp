@@ -510,20 +510,16 @@ public:
             if (Rand() > 35)
                 return;
 
-            if (IsSpellReady(STRANGULATE_1, diff) && me->IsInCombat() && HaveRunes(STRANGULATE_1))
-            {
-                Unit* u = FindCastingTarget(CalcSpellMaxRange(STRANGULATE_1), 0, STRANGULATE_1);
-                if (u && doCast(u, GetSpell(STRANGULATE_1)))
-                    return;
-            }
+            if (IsSpellReady(STRANGULATE_1, diff, false) && me->IsInCombat() && HaveRunes(STRANGULATE_1) && !HasQueuedSpellAction(STRANGULATE_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(STRANGULATE_1), 0, STRANGULATE_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), STRANGULATE_1, true))
+                        return;
 
-            Unit* target = me->GetVictim();
-            if (IsSpellReady(MIND_FREEZE_1, diff, false) && target && me->GetDistance(target) < 5 &&
-                runicpower >= rcost(MIND_FREEZE_1) && target->IsNonMeleeSpellCast(false,false,true))
-            {
-                if (doCast(me->GetVictim(), GetSpell(MIND_FREEZE_1)))
-                    getpower();
-            }
+            Unit const* target = me->GetVictim();
+            if (IsSpellReady(MIND_FREEZE_1, diff, false) && target && !HasQueuedSpellAction(STRANGULATE_1) &&
+                me->GetDistance(target) < 5 && runicpower >= rcost(MIND_FREEZE_1) && target->IsNonMeleeSpellCast(false,false,true))
+                if (EnqueueCounterSpellAction(target->GetGUID(), MIND_FREEZE_1, true))
+                    return;
         }
 
         void UpdateAI(uint32 diff) override

@@ -635,16 +635,28 @@ enum BotAwaitStates
 inline constexpr std::size_t MAX_SEND_POINTS = 5u;
 
 //Only non-persistent types are allowed
-enum BotOrderTypes
+enum class BotActionTypes
 {
-    BOT_ORDER_NONE          = 0,
-    BOT_ORDER_SPELLCAST     = 1,
-    BOT_ORDER_PULL          = 2,
+    BOT_ACTION_SPELLCAST,
+    BOT_ACTION_PULL,
 
-    BOT_ORDER_END
+    BOT_ACTIONS_COUNT
 };
-inline constexpr bool DEBUG_BOT_ORDERS = false;
+
+inline constexpr bool DEBUG_BOT_ACTIONS = false;
 inline constexpr std::size_t MAX_BOT_ORDERS_QUEUE_SIZE = 3u;
+inline constexpr std::size_t MAX_BOT_ACTIONS_QUEUE_SIZE = 5u;
+
+inline constexpr std::pair<uint32, uint32> BOT_ACTION_COUNTERSPELL_DELAY_RANGE{ 150, 900 };
+static_assert(BOT_ACTION_COUNTERSPELL_DELAY_RANGE.first < BOT_ACTION_COUNTERSPELL_DELAY_RANGE.second);
+inline constexpr uint32 BOT_ACTION_MAX_AFTERCAST_INTERRUPT_TIME_MS = 300;
+inline constexpr uint32 BOT_ACTION_COUNTERCAST_TIME_WINDOW_EXTENSION_MS = 800;
+
+inline constexpr std::array BOT_ACTION_RETRY_DELAYS{
+    static_cast<uint32>(100),
+    static_cast<uint32>(200)
+};
+static_assert(std::size(BOT_ACTION_RETRY_DELAYS) == static_cast<std::size_t>(BotActionTypes::BOT_ACTIONS_COUNT));
 
 enum BotVehicleStrats
 {

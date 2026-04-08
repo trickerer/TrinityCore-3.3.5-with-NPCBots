@@ -478,48 +478,14 @@ public:
 
         void Counter(uint32 diff)
         {
-            if (GC_Timer > diff || IsCasting() || Rand() > 25)
+            if (Rand() > 25)
                 return;
 
-            bool busyCasting = me->IsNonMeleeSpellCast(true,true,true);
-
-            //Fear
-            if (!busyCasting && IsSpellReady(FEAR_1, diff))
-            {
-                Unit* u = FindCastingTarget(CalcSpellMaxRange(FEAR_1), 0, FEAR_1);
-                if (u && doCast(u, GetSpell(FEAR_1)))
-                    return;
-            }
-            //Howl of Terror (only instant cast)
-            if ((GetSpec() == BOT_SPEC_WARLOCK_AFFLICTION) &&
-                !busyCasting && me->GetLevel() >= 45 && IsSpellReady(HOWL_OF_TERROR_1, diff))
-            {
-                Unit* u = FindCastingTarget(8, 0, FEAR_1); //same immunity
-                if (u && doCast(u, GetSpell(HOWL_OF_TERROR_1)))
-                    return;
-            }
-            //Shadowfury
-            if (HasRole(BOT_ROLE_DPS) && IsSpellReady(SHADOWFURY_1, diff))
-            {
-                if (Unit* u = FindCastingTarget(CalcSpellMaxRange(SHADOWFURY_1), 0, SHADOWFURY_1))
-                {
-                    if (busyCasting)
-                        me->InterruptNonMeleeSpells(true);
-                    if (doCast(u, GetSpell(SHADOWFURY_1)))
-                        return;
-                }
-            }
-             //Death Coil
-            if (HasRole(BOT_ROLE_DPS) && IsSpellReady(DEATH_COIL_1, diff))
-            {
-                if (Unit* u = FindCastingTarget(CalcSpellMaxRange(DEATH_COIL_1), 0, DEATH_COIL_1))
-                {
-                    if (busyCasting)
-                        me->InterruptNonMeleeSpells(true);
-                    if (doCast(u, GetSpell(DEATH_COIL_1)))
-                        return;
-                }
-            }
+            for (const auto base_spell : { FEAR_1, HOWL_OF_TERROR_1, SHADOWFURY_1, DEATH_COIL_1 })
+                if (IsSpellReady(base_spell, diff, false) && !HasQueuedSpellAction(base_spell))
+                    if (Unit const* target = FindCastingTarget(base_spell == HOWL_OF_TERROR_1 ? 8.0f : CalcSpellMaxRange(base_spell), 0, base_spell))
+                        if (EnqueueCounterSpellAction(target->GetGUID(), base_spell, true))
+                            return;
         }
 
         void DoDefend(uint32 diff)

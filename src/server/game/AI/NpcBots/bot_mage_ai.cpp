@@ -217,45 +217,26 @@ public:
 
         void Counter(uint32 diff)
         {
-            //skip if evocation, blizzard
-            if (IsChanneling() || Rand() > 30)
+            if (Rand() > 30)
                 return;
 
-            if (IsSpellReady(COUNTERSPELL_1, diff, false))
-            {
-                if (Unit* target = FindCastingTarget(CalcSpellMaxRange(COUNTERSPELL_1), 0, COUNTERSPELL_1))
-                {
-                    me->InterruptNonMeleeSpells(false);
-                    if (doCast(target, GetSpell(COUNTERSPELL_1)))
+            if (IsSpellReady(COUNTERSPELL_1, diff, false) && !HasQueuedSpellAction(COUNTERSPELL_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(COUNTERSPELL_1), 0, COUNTERSPELL_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), COUNTERSPELL_1, true))
                         return;
-                }
-            }
-            if (IsSpellReady(DEEP_FREEZE_1, diff) && me->HasAuraType(SPELL_AURA_ABILITY_IGNORE_AURASTATE))
-            {
-                if (Unit* target = FindCastingTarget(CalcSpellMaxRange(DEEP_FREEZE_1), 0, DEEP_FREEZE_1))
-                {
-                    me->InterruptNonMeleeSpells(false);
-                    if (doCast(target, GetSpell(DEEP_FREEZE_1)))
+            if (IsSpellReady(DEEP_FREEZE_1, diff, false) && me->HasAuraType(SPELL_AURA_ABILITY_IGNORE_AURASTATE) && !HasQueuedSpellAction(DEEP_FREEZE_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(DEEP_FREEZE_1), 0, DEEP_FREEZE_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), DEEP_FREEZE_1, true))
                         return;
-                }
-            }
-            if (IsSpellReady(FIRE_BLAST_1, diff) && me->HasAura(IMPACT_BUFF))
-            {
-                if (Unit* target = FindCastingTarget(CalcSpellMaxRange(FIRE_BLAST_1), 0, FIRE_BLAST_1))
-                {
-                    me->InterruptNonMeleeSpells(false);
-                    if (doCast(target, GetSpell(FIRE_BLAST_1)))
+            if (IsSpellReady(FIRE_BLAST_1, diff, false) && me->HasAura(IMPACT_BUFF) && !HasQueuedSpellAction(FIRE_BLAST_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(FIRE_BLAST_1), 0, FIRE_BLAST_1))
+                    if (EnqueueCounterSpellAction(target->GetGUID(), FIRE_BLAST_1, true))
                         return;
-                }
-            }
-            if (!IsCasting() && IsSpellReady(POLYMORPH_1, diff))
-            {
-                if (Unit* target = FindCastingTarget(CalcSpellMaxRange(POLYMORPH_1), 0, POLYMORPH_1, 75))
-                {
-                    if (doCast(target, GetSpell(POLYMORPH_1)))
-                        return;
-                }
-            }
+            if (!IsCasting() && IsSpellReady(POLYMORPH_1, diff, false) && !HasQueuedSpellAction(POLYMORPH_1))
+                if (Unit const* target = FindCastingTarget(CalcSpellMaxRange(POLYMORPH_1), 0, POLYMORPH_1, 75))
+                    if (IsCastingOnMyParty(target, 1500))
+                        if (EnqueueCounterSpellAction(target->GetGUID(), POLYMORPH_1, true))
+                            return;
         }
 
         void CheckSpellSteal(uint32 diff)
