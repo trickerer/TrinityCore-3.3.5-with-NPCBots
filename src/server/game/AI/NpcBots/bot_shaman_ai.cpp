@@ -444,7 +444,7 @@ public:
                     }
                     to->ToTotem()->UnSummon();
                     //reset summon check timer;
-                    _totemTimer[i] = 0;
+                    _totemTimers[i] = 0;
                 }
             }
             //global cooldown is not performed below, intead there is a special condition for Calls
@@ -462,7 +462,7 @@ public:
 
             //EARTH
             //EARTHsituative1 : tremor
-            if (_totemTimer[T_EARTH] <= diff && me->IsInCombat() && !IAmFree() &&
+            if (_totemTimers[T_EARTH] <= diff && me->IsInCombat() && !IAmFree() &&
                 IsSpellReady(TREMOR_TOTEM_1, diff, false) && _totems[T_EARTH].second._type != BOT_TOTEM_TREMOR)
             {
                 //Tremor no cd
@@ -509,7 +509,7 @@ public:
                     SetSpellCooldown(TREMOR_TOTEM_1, 3000); //fail
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimer[T_EARTH] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimers[T_EARTH] <= diff && me->IsInCombat())
             {
                 //EARTHsituative2 : earthbind
                 if (GetSpell(EARTHBIND_TOTEM_1)/* && _totems[T_EARTH].second.type != BOT_TOTEM_EARTHBIND*/)
@@ -548,7 +548,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimer[T_EARTH] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_EARTH) && _totemTimers[T_EARTH] <= diff && me->IsInCombat())
             {
                 //EARTHmain : strength of earth
                 uint32 SoE = GetSpell(STRENGTH_OF_EARTH_TOTEM_1); //tripple check
@@ -575,7 +575,7 @@ public:
 
             //FIRE
             //FIREsituative1 : magma
-            if (_totemTimer[T_FIRE] <= diff && me->IsInCombat() && !IAmFree() && HasRole(BOT_ROLE_DPS) &&
+            if (_totemTimers[T_FIRE] <= diff && me->IsInCombat() && !IAmFree() && HasRole(BOT_ROLE_DPS) &&
                 GetSpell(MAGMA_TOTEM_1)/* && _totems[T_FIRE].second.type != BOT_TOTEM_MAGMA*/)
             {
                 //magma no cd 8 yd, 2 sec delay before first tick
@@ -609,7 +609,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimer[T_FIRE] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimers[T_FIRE] <= diff)
             {
                 //FIREMain : wrath or flametongue no cd
                 //aura is exclusive so check mask
@@ -641,7 +641,7 @@ public:
                 //}
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimer[T_FIRE] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_FIRE) && me->IsInCombat() && _totemTimers[T_FIRE] <= diff)
             {
                 //FIRElastresort : frostres (3 shamans of same level req)
                 uint32 frostRes = GetSpell(FROST_RESISTANCE_TOTEM_1);
@@ -656,7 +656,7 @@ public:
 
             //WATER
             //WATERsituative1 : manatide
-            if (_totemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
+            if (_totemTimers[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
                 IsSpellReady(MANA_TIDE_TOTEM_1, diff, false))
             {
                 //5 min cd, party members only, instant effect +4 ticks in 12 secs
@@ -695,7 +695,7 @@ public:
             //WATERsituative2 : cleansing
             //REMOVED CHECKS ARE TOO HEAVY
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimer[T_WATER] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimers[T_WATER] <= diff)
             {
                 //WATERmain : manaspring
                 uint32 MSpring = GetSpell(MANA_SPRING_TOTEM_1); //tripple check
@@ -730,11 +730,11 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimer[T_WATER] <= diff)
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_WATER) && _totemTimers[T_WATER] <= diff)
             {
                 //WATERlastresort : fireres (2-3 shamans of same level req)
                 uint32 fireRes = GetSpell(FIRE_RESISTANCE_TOTEM_1);
-                if (fireRes && _totemTimer[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
+                if (fireRes && _totemTimers[T_WATER] <= diff && me->IsInCombat() && !IAmFree() &&
                     (!(mask & BOT_TOTEM_MASK_RESISTANCE_FIRE) || idMap[FIRE_RESISTANCE_TOTEM_1] < fireRes))
                 {
                     if (doCast(me, fireRes, CotE ? TRIGGERED_CAST_DIRECTLY : TRIGGERED_NONE))
@@ -745,7 +745,7 @@ public:
 
             //AIR
             //AIRsituative1 : grounding
-            if (_totemTimer[T_AIR] <= diff && me->IsInCombat() &&/* !IAmFree() &&*/
+            if (_totemTimers[T_AIR] <= diff && me->IsInCombat() &&/* !IAmFree() &&*/
                 IsSpellReady(GROUNDING_TOTEM_1, diff, false))
             {
                 //grounding 15 sec cd, party members only (and bot and master of course)
@@ -771,7 +771,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimers[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRmain1 : wrathofair - if windfury is disabled or me and master both casters
                 if (!(mask & BOT_TOTEM_MASK_WRATH_OF_AIR) && GetSpell(WRATH_OF_AIR_TOTEM_1))
@@ -795,7 +795,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimers[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRmain2 : windfury
                 if (!(mask & BOT_TOTEM_MASK_WINDFURY) && GetSpell(WINDFURY_TOTEM_1))
@@ -819,7 +819,7 @@ public:
                 }
             }
 
-            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimer[T_AIR] <= diff && me->IsInCombat())
+            if (!(mask & BOT_TOTEM_MASK_MY_TOTEM_AIR) && _totemTimers[T_AIR] <= diff && me->IsInCombat())
             {
                 //AIRlastresort : natureres (3-4 shamans of same level req)
                 uint32 natureRes = GetSpell(NATURE_RESISTANCE_TOTEM_1);
@@ -1862,49 +1862,48 @@ public:
 
             //autouse totems
             if (baseId == EARTHBIND_TOTEM_1 || baseId == STRENGTH_OF_EARTH_TOTEM_1)
-                _totemTimer[T_EARTH] = 5000;
+                _totemTimers[T_EARTH] = 5000;
             if (baseId == TREMOR_TOTEM_1)
-                _totemTimer[T_EARTH] = 12000;
+                _totemTimers[T_EARTH] = 12000;
             if (baseId == MAGMA_TOTEM_1)
-                _totemTimer[T_FIRE] = 12000;
+                _totemTimers[T_FIRE] = 12000;
             if (baseId == TOTEM_OF_WRATH_1 || baseId == FLAMETONGUE_TOTEM_1)
-                _totemTimer[T_FIRE] = 5000;
+                _totemTimers[T_FIRE] = 5000;
             if (baseId == FROST_RESISTANCE_TOTEM_1)
-                _totemTimer[T_FIRE] = 120000;
+                _totemTimers[T_FIRE] = 120000;
             if (baseId == MANA_TIDE_TOTEM_1)
-                _totemTimer[T_WATER] = 12000;
+                _totemTimers[T_WATER] = 12000;
             if (baseId == MANA_SPRING_TOTEM_1)
-                _totemTimer[T_WATER] = 5000;
+                _totemTimers[T_WATER] = 5000;
             if (baseId == FIRE_RESISTANCE_TOTEM_1)
-                _totemTimer[T_WATER] = 120000;
+                _totemTimers[T_WATER] = 120000;
             if (baseId == GROUNDING_TOTEM_1)
-                _totemTimer[T_AIR] = me->GetLevel() >= 15 ? 13000 : 15000;
+                _totemTimers[T_AIR] = me->GetLevel() >= 15 ? 13000 : 15000;
             if (baseId == WRATH_OF_AIR_TOTEM_1 || baseId == WINDFURY_TOTEM_1)
-                _totemTimer[T_AIR] = 5000;
+                _totemTimers[T_AIR] = 5000;
             if (baseId == NATURE_RESISTANCE_TOTEM_1)
-                _totemTimer[T_AIR] = 120000;
+                _totemTimers[T_AIR] = 120000;
             //other (manual use)
             if (baseId == STONECLAW_TOTEM_1)
-                _totemTimer[T_EARTH] = 15000;
+                _totemTimers[T_EARTH] = 15000;
             if (baseId == STONESKIN_TOTEM_1)
-                _totemTimer[T_EARTH] = 300000;
+                _totemTimers[T_EARTH] = 300000;
             if (baseId == EARTH_ELEMENTAL_TOTEM_1)
-                _totemTimer[T_EARTH] = 120000;
+                _totemTimers[T_EARTH] = 120000;
             if (baseId == SEARING_TOTEM_1)
-                _totemTimer[T_FIRE] = 60000;
+                _totemTimers[T_FIRE] = 60000;
             if (baseId == FIRE_ELEMENTAL_TOTEM_1)
-                _totemTimer[T_FIRE] = 120000;
+                _totemTimers[T_FIRE] = 120000;
             if (baseId == CLEANSING_TOTEM_1)
-                _totemTimer[T_WATER] = 300000;
+                _totemTimers[T_WATER] = 300000;
             if (baseId == HEALING_STREAM_TOTEM_1)
-                _totemTimer[T_WATER] = 300000;
+                _totemTimers[T_WATER] = 300000;
 
             //Totemic Recall totems resummon helper
             if (baseId == TOTEMIC_RECALL_1)
             {
                 TotemsCheckTimer = GC_Timer;
-                for (auto i : NPCBots::index_array<uint8, MAX_TOTEMS>)
-                    _totemTimer[i] = 0;
+                _totemTimers = {};
             }
 
             if (maelUseUp)
@@ -2193,11 +2192,11 @@ public:
         {
             UnsummonWolves();
 
-            for (auto i : NPCBots::index_array<uint8, MAX_WOLVES>)
+            for (const auto& [guid, _] : _totems)
             {
-                if (_totems[i].first != ObjectGuid::Empty)
+                if (!guid.IsEmpty())
                 {
-                    Unit* to = ObjectAccessor::GetUnit(*me, _totems[i].first);
+                    Unit* to = ObjectAccessor::GetUnit(*me, guid);
                     if (!to)
                     {
                         //BOT_LOG_ERROR("entities.player", "{} has no totem in slot {} during remove!", me->GetName(), i);
@@ -2245,7 +2244,7 @@ public:
             //here we reset totem category cd (not totem spell cd) if totem is destroyed
             //BOT_LOG_ERROR("entities.player", "OnBotDespawn(): {} despawned ({} : {})", summon->GetName(), summon->IsAlive() ? "alive" : summon->isDying() ? "justdied" : "unk", (uint32)summon->getDeathState());
             if (!summon->IsAlive()) // alive here means totem is being replaced or unsummoned through other means
-                _totemTimer[slot] = 0;
+                _totemTimers[slot] = 0;
 
             _totems[slot].first = ObjectGuid::Empty;
             _totems[slot].second._type = BOT_TOTEM_NONE;
@@ -2442,7 +2441,7 @@ public:
             UnsummonAll(false);
 
             _wolves = {};
-            _totemTimer = {};
+            _totemTimers = {};
 
             removeShapeshiftForm();
 
@@ -2468,7 +2467,7 @@ public:
 
         void ReduceCD(uint32 diff) override
         {
-            for (auto& ttimer : _totemTimer)
+            for (auto& ttimer : _totemTimers)
                 if (ttimer > diff)
                     ttimer -= diff;
 
@@ -2752,17 +2751,17 @@ public:
         //Totem system
         struct BotTotemParam
         {
-            BotTotemParam() : _effradius(0.f) {}
-            uint32 _type;
-            Position _pos;
-            float _effradius;
+            BotTotemParam() = default;
+            uint32 _type{};
+            Position _pos{};
+            float _effradius{};
         };
 
         using BotTotem = std::pair<ObjectGuid /*guid*/, BotTotemParam /*param*/>;
-        std::array<BotTotem, MAX_TOTEMS> _totems;
-        std::array<uint32, MAX_TOTEMS> _totemTimer;
+        std::array<BotTotem, MAX_TOTEMS> _totems{};
+        std::array<uint32, MAX_TOTEMS> _totemTimers{};
         //Wolves
-        std::array<ObjectGuid, MAX_WOLVES> _wolves;
+        std::array<ObjectGuid, MAX_WOLVES> _wolves{};
         //Spells
         uint32 CURE_TOXINS;
         //Timers
