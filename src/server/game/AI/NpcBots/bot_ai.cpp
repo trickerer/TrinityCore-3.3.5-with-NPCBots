@@ -19960,11 +19960,11 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 if (myTeamId != teamId)
                     continue;
 
-                uint8 unowned_points_mask = 0;
+                uint32 unowned_points_mask = 0;
                 for (uint8 index : NPCBots::index_array<uint8, EY_POINTS_MAX>)
                     if (ey->GetPointOwner(index) != myTeamId)
-                        unowned_points_mask |= static_cast<uint8>(1u << index);
-                if (unowned_points_mask)
+                        unowned_points_mask |= 1u << index;
+                if (!unowned_points_mask)
                 {
                     WanderNode const* lockWP = WanderNode::FindInMapWPs(me->GetMapId(), [=](WanderNode const* mwp) {
                         return mwp->HasAllFlags(myTeamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_SPAWN_INTERCEPT_ALLIANCE : BotWPFlags::BOTWP_FLAG_SPAWN_INTERCEPT_HORDE);
@@ -19987,11 +19987,11 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     if (!((1u << index) & unowned_points_mask))
                         continue;
                     uint8 attackers_count = std::ranges::count_if(team_members, [=, this](Unit const* m) {
-                        return (m != me && (m->GetExactDist2d(BG_EY_TriggerPositions[index]) < float(BG_EY_POINT_RADIUS) * 0.5f ||
-                            (m->IsNPCBot() && m->GetExactDist2d(BG_EY_TriggerPositions[index]) < me->GetExactDist2d(BG_EY_TriggerPositions[index]))));
+                        return (m != me && (m->GetExactDist2dSq(BG_EY_TriggerPositions[index]) < std::pow(float(BG_EY_POINT_RADIUS) * 0.5f, 2.f) ||
+                            (m->IsNPCBot() && m->GetExactDist2dSq(BG_EY_TriggerPositions[index]) < me->GetExactDist2dSq(BG_EY_TriggerPositions[index]))));
                     });
-                    if (attackers_count < uint8(team_members.size() / 5u + 1u))
-                        attackable_points_mask |= static_cast<uint8>(1u << index);
+                    if (attackers_count < team_members.size() / 5u + 1u)
+                        attackable_points_mask |= 1u << index;
                 }
                 NodeList attackableWPs;
                 WanderNode::DoForAllMapWPs(bg->GetMapId(), [&attackableWPs](WanderNode const* dwp) {
