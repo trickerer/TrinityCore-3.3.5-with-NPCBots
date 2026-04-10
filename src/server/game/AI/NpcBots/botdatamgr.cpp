@@ -253,6 +253,8 @@ static void SpawnDungeonBot(uint32 bot_id, Player const* owner)
         ABORT();
     }
 
+    bot->setActive(true);
+
     ASSERT(owner->GetBotMgr()->AddDungeonBot(bot) == BOT_ADD_SUCCESS);
 }
 
@@ -779,6 +781,34 @@ public:
         return true;
     }
 
+    static void CleanExtraBotData(Creature const* bot)
+    {
+        const uint8 bot_class = bot->GetBotClass();
+        const uint32 bot_despawn_id = bot->GetEntry();
+        const uint32 original_id = _botsExtraCreatureTemplates.at(bot_despawn_id).KillCredit[0];
+
+        auto bditr = _botsData.find(bot_despawn_id);
+        auto beitr = _botsExtras.find(bot_despawn_id);
+        auto baditr = _botsAppearanceData.find(bot_despawn_id);
+        auto bwcetitr = _botsExtraCreatureEquipmentTemplates.find(bot_despawn_id);
+        auto bwctitr = _botsExtraCreatureTemplates.find(bot_despawn_id);
+
+        ASSERT(bditr != _botsData.end());
+        ASSERT(beitr != _botsExtras.end());
+        //ASSERT(baditr != _botsAppearanceData.end()); may not exist
+        ASSERT(bwcetitr != _botsExtraCreatureEquipmentTemplates.end());
+        ASSERT(bwctitr != _botsExtraCreatureTemplates.end());
+
+        _botsData.erase(bditr);
+        _botsExtras.erase(beitr);
+        if (baditr != _botsAppearanceData.end())
+            _botsAppearanceData.erase(baditr);
+        _botsExtraCreatureEquipmentTemplates.erase(bwcetitr);
+        _botsExtraCreatureTemplates.erase(bwctitr);
+
+        _spareBotIdsPerClassMap[bot_class].insert(original_id);
+    }
+
     static WanderingBotsGenerator* instance()
     {
         static WanderingBotsGenerator _instance;
@@ -819,10 +849,8 @@ void BotDataMgr::Update(uint32 diff)
 
             _botsExtraCreaturesToDespawn.erase(bot_despawn_iter);
 
-            const uint32 origEntry = _botsExtraCreatureTemplates.at(bot_despawn_id).KillCredit[0];
-            const std::string_view botName = bot->GetName();
-
-            _spareBotIdsPerClassMap[bot->GetBotClass()].insert(origEntry);
+            const uint32 bot_orig_id = _botsExtraCreatureTemplates.at(bot_despawn_id).KillCredit[0];
+            const std::string_view bot_name = bot->GetName();
 
             BotMgr::CleanupsBeforeBotDelete(bot);
             bot->GetBotAI()->canUpdate = false;
@@ -831,28 +859,13 @@ void BotDataMgr::Update(uint32 diff)
             else
                 bot->GetMap()->AddObjectToRemoveList(bot);
 
-            auto bditr = _botsData.find(bot_despawn_id);
-            auto beitr = _botsExtras.find(bot_despawn_id);
-            auto baditr = _botsAppearanceData.find(bot_despawn_id);
-            auto bwcetitr = _botsExtraCreatureEquipmentTemplates.find(bot_despawn_id);
-            auto bwctitr = _botsExtraCreatureTemplates.find(bot_despawn_id);
-
-            ASSERT(bditr != _botsData.end());
-            ASSERT(beitr != _botsExtras.end());
-            //ASSERT(baditr != _botsAppearanceData.end()); may not exist
-            ASSERT(bwcetitr != _botsExtraCreatureEquipmentTemplates.end());
-            ASSERT(bwctitr != _botsExtraCreatureTemplates.end());
-
+            const auto bditr = _botsData.find(bot_despawn_id);
+            ASSERT(bditr != _botsData.cend());
             const bool is_owned = bditr->second.owner != 0;
 
-            _botsData.erase(bditr);
-            _botsExtras.erase(beitr);
-            if (baditr != _botsAppearanceData.end())
-                _botsAppearanceData.erase(baditr);
-            _botsExtraCreatureEquipmentTemplates.erase(bwcetitr);
-            _botsExtraCreatureTemplates.erase(bwctitr);
+            sBotGen->CleanExtraBotData(bot);
 
-            BOT_LOG_DEBUG("npcbots", "Despawned {} bot {} '{}' (orig {})", is_owned ? "dungeon" : "wanderer", bot_despawn_id, botName, origEntry);
+            BOT_LOG_DEBUG("npcbots", "Despawned {} bot {} '{}' (orig {})", is_owned ? "dungeon" : "wanderer", bot_despawn_id, bot_name, bot_orig_id);
         }
     }
 
@@ -3249,6 +3262,13 @@ void BotDataMgr::UnregisterBot(Creature const* bot)
     }
 
     _existingBots.erase(bot);
+
+    if (auto ditr = _botsExtraCreaturesToDespawn.find(bot->GetEntry()); ditr != _botsExtraCreaturesToDespawn.cend())
+    {
+        sBotGen->CleanExtraBotData(bot);
+        _botsExtraCreaturesToDespawn.erase(ditr);
+    }
+
     //BOT_LOG_ERROR("entities.unit", "BotDataMgr::UnregisterBot: unregistered bot {} ({})", bot->GetEntry(), bot->GetName());
 }
 Creature const* BotDataMgr::FindBot(uint32 entry)

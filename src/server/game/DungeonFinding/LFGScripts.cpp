@@ -136,7 +136,9 @@ void LFGPlayerScript::OnMapChanged(Player* player)
         }
 
         //npcbot
-        player->GetBotMgr()->RemoveAllSummonedBots();
+        if (group && group->isLFGGroup())
+            if (sLFGMgr->GetState(group->GetGUID()) >= LFG_STATE_FINISHED_DUNGEON)
+                player->GetBotMgr()->RemoveAllSummonedBots();
         //end npcbot
 
         player->RemoveAurasDueToSpell(LFG_SPELL_LUCK_OF_THE_DRAW);

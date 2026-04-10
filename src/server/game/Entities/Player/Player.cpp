@@ -2380,53 +2380,55 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method 
         return;
 
     //npcbot - player is being removed from group - remove bots from that group
-    if (Player* player = ObjectAccessor::FindPlayer(guid))
+    if (guid.IsPlayer())
     {
-        if (player->HaveBot())
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
         {
-            bool lfg_group = group->isLFGGroup();
-            //remove npcbots and set up new group if needed
-            player->GetBotMgr()->RemoveAllBotsFromGroup();
-            if (lfg_group)
-                player->GetBotMgr()->RemoveAllSummonedBots();
-            group = player->GetGroup();
-            if (!group)
-                return; //group has been disbanded
-        }
-    }
-    //npcbot - deleting player from db: remove bots
-    else if (guid.IsPlayer())
-    {
-        std::vector<ObjectGuid> botguids;
-        botguids.reserve(BotCfg::GetMaxNpcBots(DEFAULT_MAX_LEVEL) / 2 + 1);
-        BotDataMgr::GetNPCBotGuidsByOwner(botguids, guid, true);
-        for (std::vector<ObjectGuid>::const_iterator ci = botguids.begin(); ci != botguids.end(); ++ci)
-        {
-            if (group->IsMember(*ci))
+            if (player->HaveBot())
             {
-                if (!group->RemoveMember(*ci, method, kicker, reason))
-                    return;
+                //remove npcbots and set up new group if needed
+                player->GetBotMgr()->RemoveAllBotsFromGroup();
+                if (group->isLFGGroup())
+                    player->GetBotMgr()->RemoveAllSummonedBots();
+                group = player->GetGroup();
+                if (!group)
+                    return; //group has been disbanded
             }
+        }
+        //npcbot - deleting player from db: remove bots
+        else
+        {
+            std::vector<ObjectGuid> botguids;
+            botguids.reserve(static_cast<std::size_t>(BotCfg::GetMaxNpcBots(DEFAULT_MAX_LEVEL) / 2u) + 1u);
+            BotDataMgr::GetNPCBotGuidsByOwner(botguids, guid, true);
+            for (ObjectGuid botguid : botguids)
+                if (group->IsMember(botguid))
+                    if (!group->RemoveMember(botguid, method, kicker, reason))
+                        return;
         }
     }
     //npcbot - bot is being removed from group - find master and remove bot through botmap
     else if (guid.IsCreature())
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            if (Player* member = itr->GetSource())
+            if (Player const* member = itr->GetSource())
             {
                 if (!member->HaveBot())
                     continue;
 
                 if (Creature* bot = member->GetBotMgr()->GetBot(guid))
                 {
+                    if (group->isLFGGroup() && bot->IsSummon())
+                        return;
+
                     member->GetBotMgr()->RemoveBotFromGroup(bot);
                     return;
                 }
             }
         }
     }
+    //end npcbot
 
     group->RemoveMember(guid, method, kicker, reason);
 }
