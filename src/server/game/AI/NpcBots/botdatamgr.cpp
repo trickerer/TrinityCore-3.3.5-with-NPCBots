@@ -268,7 +268,7 @@ void BotDataMgr::DespawnDungeonBot(uint32 entry)
         _botsExtraCreaturesToDespawn.insert(entry);
     }
     else
-        BOT_LOG_ERROR("npcbots", "DespawnWandererBot(): trying to despawn non-existing wanderer bot {} '{}'!", entry, bot ? bot->GetName() : "unknown");
+        BOT_LOG_ERROR("npcbots", "DespawnDungeonBot(): trying to despawn non-existing dungeon bot {} '{}'!", entry, bot ? bot->GetName() : "unknown");
 }
 
 struct WanderingBotsGenerator
