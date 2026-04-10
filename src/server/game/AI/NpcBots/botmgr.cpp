@@ -792,6 +792,9 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
         RemoveBotFromBGQueue(bot);
         RemoveBotFromGroup(bot);
         bot->SetCreator(nullptr);
+        if (Unit* bpet = bot->GetBotsPet())
+            bpet->SetCreator(nullptr);
+        bot->GetBotAI()->ResetBotAI(BOTAI_RESET_LOGOUT | BOTAI_RESET_DISMISS);
         BotDataMgr::DespawnDungeonBot(bot->GetEntry());
         _bots.erase(itr);
         return;
