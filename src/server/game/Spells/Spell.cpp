@@ -3402,6 +3402,11 @@ void Spell::cancel(SpellCastResult result /*= SPELL_FAILED_INTERRUPTED*/, Option
     if (m_selfContainer && *m_selfContainer == this)
         *m_selfContainer = nullptr;
 
+    //npcbot: bot original caster can be removed from world during SPELL_STATE_DELAYED (Haunt Heal 48210)
+    if (m_originalCaster && m_caster != m_originalCaster && m_originalCasterGUID.GetEntry() > BOT_ENTRY_CREATE_BEGIN)
+        m_originalCaster = ObjectAccessor::GetCreature(*m_caster, m_originalCasterGUID);
+    //end npcbot
+
     // originalcaster handles gameobjects/dynobjects for gob caster
     if (m_originalCaster)
     {
