@@ -481,7 +481,7 @@ public:
             //sizes of theese are typically 1, sometimes maybe 2
             for (AuraEffect const* aeff : mytar->GetAuraEffectsByType(SPELL_AURA_MOD_STUN))
             {
-                if (!(aeff->GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_TAKE_DAMAGE) && 
+                if (!(aeff->GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_TAKE_DAMAGE) &&
                     aeff->GetBase()->GetDuration() > 2000)
                 {
                     hasnormalstun = true;

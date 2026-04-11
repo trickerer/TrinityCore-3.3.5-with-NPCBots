@@ -6259,7 +6259,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* param1 /*= nullptr*/, uint
 
                     if (!target->GetCharmerGUID().IsEmpty())
                         return SPELL_FAILED_CANT_BE_CHARMED;
- 
+
                     //npcbot: do not allow to charm owned npcbots
                     if (target->GetCreator() && target->GetCreator()->IsPlayer())
                         return SPELL_FAILED_TARGET_IS_PLAYER_CONTROLLED;

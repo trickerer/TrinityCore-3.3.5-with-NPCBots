@@ -2572,7 +2572,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                 c == BOT_CLASS_MAGE || c == BOT_CLASS_WARLOCK || c == BOT_CLASS_DARK_RANGER || c == BOT_CLASS_SEA_WITCH))
                 continue;
             ItemLeveledArr const& il_arr = ips_arr[s];
-            
+
             for (auto lstep : NPCBots::index_array<uint32, LEVEL_STEPS>)
             {
                 if ((s == BOT_SLOT_SHOULDERS || s == BOT_SLOT_FINGER1 || s == BOT_SLOT_NECK) && lstep < 4)
