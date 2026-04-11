@@ -242,8 +242,8 @@ static void SpawnDungeonBot(uint32 bot_id, Player const* owner)
 
     Map* map = owner->GetMap();
 
-    BOT_LOG_DEBUG("npcbots", "Spawning dungeon bot for player {}: {} ({}) class {} race {} fac {}, location: mapId {} {}",
-        owner->GetName(), bot_template.Name, bot_id, uint32(bot_extras->bclass), uint32(bot_extras->race), bot_data->faction,
+    BOT_LOG_DEBUG("npcbots", "Spawning dungeon bot for player {}: {} ({}) class {} spec {} race {} fac {}, location: mapId {} {}",
+        owner->GetName(), bot_template.Name, bot_id, uint32(bot_extras->bclass), uint32(bot_data->spec), uint32(bot_extras->race), bot_data->faction,
         owner->GetMapId(), owner->GetPosition().ToString());
 
     TempSummon* bot = map->SummonCreature(bot_id, *owner);
@@ -754,6 +754,9 @@ public:
                     broles_mask |= BOT_ROLE_RANGED;
 
                 const uint8 bot_spec = BotDataMgr::SelectBotSpecForRoles(std::get<1>(ecr), first_role);
+
+                if ((broles_mask & BOT_ROLE_RANGED) && BotDataMgr::IsMeleeSpec(bot_spec))
+                    broles_mask &= ~BOT_ROLE_RANGED;
 
                 GenerateDungeonBotToSpawn({ std::get<0>(ecr), std::get<1>(ecr), bot_spec, broles_mask }, owner);
                 for (const uint32 brmask : { BOT_ROLE_DPS, BOT_ROLE_HEAL, BOT_ROLE_TANK })
@@ -3939,6 +3942,10 @@ bool BotDataMgr::IsHumanoidClass(uint8 m_class)
 bool BotDataMgr::IsHeroExClass(uint8 m_class)
 {
     return IsBotClassMask(m_class, HERO_BOT_CLASSES_MASK);
+}
+bool BotDataMgr::IsMeleeSpec(uint8 spec)
+{
+    return IsBotSpecMask(spec, BOT_SPEC_MASK_MELEE);
 }
 
 bool BotDataMgr::CanDepositBotBankItemsCount(ObjectGuid playerGuid, uint32 items_count)

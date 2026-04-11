@@ -265,6 +265,8 @@ public:
     static bool IsHealingClass(uint8 m_class);
     static bool IsHumanoidClass(uint8 m_class);
     static bool IsHeroExClass(uint8 m_class);
+    static bool IsBotSpecMask(uint8 spec, uint32 spec_mask) { return !!((1ull << spec) & spec_mask); }
+    static bool IsMeleeSpec(uint8 spec);
 
     static bool CanDepositBotBankItemsCount(ObjectGuid playerGuid, uint32 items_count);
     static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);

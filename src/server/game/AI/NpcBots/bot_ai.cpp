@@ -12919,12 +12919,12 @@ bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) co
                     if (me->GetLevel() < 70)
                         break;
                     return !item_has_stat(proto, ITEM_MOD_INTELLECT);
-                case BOT_SLOT_OFFHAND:
-                    if (!(proto->InventoryType == INVTYPE_SHIELD))
-                        return false;
-                    if (me->GetLevel() < 70)
-                        break;
-                    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
+                //case BOT_SLOT_OFFHAND:
+                //    if (!(proto->InventoryType == INVTYPE_SHIELD))
+                //        return false;
+                //    if (me->GetLevel() < 70)
+                //        break;
+                //    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
                 default:
                     break;
             }
@@ -13046,10 +13046,15 @@ bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) co
             }
             break;
         case BOT_SPEC_DRUID_BALANCE:
+        case BOT_SPEC_DRUID_RESTORATION:
             switch (slot)
             {
                 case BOT_SLOT_TRINKET1: case BOT_SLOT_TRINKET2:
                     break;
+                case BOT_SLOT_MAINHAND:
+                    if (me->GetLevel() < 70)
+                        break;
+                    return proto->InventoryType == INVTYPE_2HWEAPON && item_has_stat(proto, ITEM_MOD_INTELLECT);
                 default:
                     if (me->GetLevel() < 70)
                         break;
@@ -15038,7 +15043,7 @@ void bot_ai::InitRoles()
 void bot_ai::InitSpec()
 {
     uint8 spec;
-    if (IAmFree())
+    if (IAmFree() && !me->IsSummon())
         spec = BotDataMgr::SelectSpecForClass(_botclass);
     else
         spec = _botData->spec;
@@ -15047,9 +15052,7 @@ void bot_ai::InitSpec()
 
     if (spec < BOT_SPEC_BEGIN || spec > BOT_SPEC_END)
     {
-        BOT_LOG_ERROR("entities.unit", "bot_ai::InitSpec(): spec ({}) is out of range for bot {}! Falling to default (1)...",
-            uint32(spec), me->GetEntry());
-
+        BOT_LOG_ERROR("entities.unit", "bot_ai::InitSpec(): spec ({}) is out of range for bot {} ({})! Falling to default ({})...", uint32(spec), me->GetName(), me->GetEntry(), BOT_SPEC_DEFAULT);
         spec = BOT_SPEC_DEFAULT;
     }
 
@@ -15097,6 +15100,8 @@ void bot_ai::InitEquips()
 
     if (IsWanderer() || me->IsSummon())
     {
+        BOT_LOG_TRACE("npcbots", "Bot {} id {} class {} spec {} level {} generates gear...", me->GetName(), me->GetEntry(), uint32(_botclass), uint32(GetSpec()), uint32(me->GetLevel()));
+
         auto fit_check = [this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForWanderingBot(slot, proto); };
 
         GenerateRand();
