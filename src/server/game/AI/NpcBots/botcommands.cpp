@@ -3893,7 +3893,7 @@ public:
             std::ostringstream bss;
             for (Creature const* bot : found_bots)
             {
-                auto const& [bot_color_str, bot_class_str] = BotColors.at(bot->GetBotClass());
+                auto const& [bot_class_str, bot_color_str] = BotColors.at(bot->GetBotClass());
 
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
                 std::string zone_name = zone ? zone->AreaName[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
