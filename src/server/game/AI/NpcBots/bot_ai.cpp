@@ -12840,38 +12840,51 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
     return false;
 }
 
-bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) const
+bool bot_ai::_isItemFitForGeneratedBot([[maybe_unused]] uint8 category, uint8 slot, ItemTemplate const* proto) const
 {
     if (!_canEquip(proto, slot, true))
         return false;
 
-    auto item_stat_check = [](_ItemStat const& stat, uint32 wanted_stat) { return stat.ItemStatType == wanted_stat && stat.ItemStatValue > 0; };
-    auto item_has_stat = [&item_stat_check](ItemTemplate const* itemProto, uint32 wanted_stat) {
-        return std::ranges::any_of(itemProto->ItemStat, [=, &item_stat_check](_ItemStat const& stat) { return item_stat_check(stat, wanted_stat); });
+    auto item_stat_check = [](_ItemStat const& stat, ItemModType wanted_stat) { return stat.ItemStatType == static_cast<uint32>(wanted_stat) && stat.ItemStatValue > 0; };
+    auto item_has_stat = [&item_stat_check](ItemTemplate const* itemProto, ItemModType wanted_stat) {
+        return std::ranges::any_of(itemProto->ItemStat, [wanted_stat, &item_stat_check](_ItemStat const& stat) { return item_stat_check(stat, wanted_stat); });
     };
 
-    if (me->GetLevel() >= DEFAULT_MAX_LEVEL && me->GetMap()->IsBattlegroundOrArena() && Rand() < 50)
+    if (me->GetLevel() >= DEFAULT_MAX_LEVEL)
     {
-        if (Rand() < 20 && proto->ItemLevel < 245)
-            return false;
-        if (Rand() < 10 && proto->ItemLevel < 264)
-            return false;
-
-        switch (slot)
+        if (me->GetMap()->IsBattlegroundOrArena())
         {
-            case BOT_SLOT_HEAD:
-            case BOT_SLOT_SHOULDERS:
-            case BOT_SLOT_CHEST:
-            case BOT_SLOT_WAIST:
-            case BOT_SLOT_LEGS:
-            case BOT_SLOT_FEET:
-            case BOT_SLOT_WRIST:
-            case BOT_SLOT_HANDS:
-                if (!item_has_stat(proto, ITEM_MOD_RESILIENCE_RATING))
+            if (Rand() < 50)
+            {
+                if (Rand() < 20 && proto->ItemLevel < 245)
                     return false;
-                break;
-            default:
-                break;
+                if (Rand() < 10 && proto->ItemLevel < 264)
+                    return false;
+
+                switch (slot)
+                {
+                    case BOT_SLOT_HEAD:
+                    case BOT_SLOT_SHOULDERS:
+                    case BOT_SLOT_CHEST:
+                    case BOT_SLOT_WAIST:
+                    case BOT_SLOT_LEGS:
+                    case BOT_SLOT_FEET:
+                    case BOT_SLOT_WRIST:
+                    case BOT_SLOT_HANDS:
+                        if (!item_has_stat(proto, ITEM_MOD_RESILIENCE_RATING))
+                            return false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        if (!((1u << slot) & BOT_SLOT_MASK_NON_STAT_MAXLEVEL) && BotDataMgr::IsTankingClass(_botclass))
+        {
+            const bool is_tank_item = std::ranges::any_of(std::array{ ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_VALUE }, [proto, &item_has_stat](ItemModType mod) { return item_has_stat(proto, mod); });
+            if (IsTank() != is_tank_item)
+               return false;
         }
     }
 
@@ -12919,12 +12932,12 @@ bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) co
                     if (me->GetLevel() < 70)
                         break;
                     return !item_has_stat(proto, ITEM_MOD_INTELLECT);
-                //case BOT_SLOT_OFFHAND:
-                //    if (!(proto->InventoryType == INVTYPE_SHIELD))
-                //        return false;
-                //    if (me->GetLevel() < 70)
-                //        break;
-                //    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
+                case BOT_SLOT_OFFHAND:
+                    if (!(proto->InventoryType == INVTYPE_SHIELD))
+                        return false;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
                 default:
                     break;
             }
@@ -12956,9 +12969,13 @@ bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) co
             switch (slot)
             {
                 case BOT_SLOT_MAINHAND:
-                    return proto->InventoryType == INVTYPE_2HWEAPON;
+                    if (!(proto->InventoryType == INVTYPE_2HWEAPON))
+                        return false;
+                [[fallthrough]];
                 default:
-                    break;
+                    if (me->GetLevel() < 70)
+                        break;
+                    return !item_has_stat(proto, ITEM_MOD_INTELLECT);
             }
             break;
         case BOT_SPEC_HUNTER_BEASTMASTERY:
@@ -13004,15 +13021,6 @@ bool bot_ai::_isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) co
                     return proto->SubClass == ITEM_SUBCLASS_WEAPON_MACE;
                 case BOT_SLOT_RANGED:
                     return me->GetLevel() < 64 || proto->SubClass == ITEM_SUBCLASS_WEAPON_THROWN;
-                default:
-                    break;
-            }
-            break;
-        case BOT_SPEC_DK_FROST:
-            switch (slot)
-            {
-                case BOT_SLOT_MAINHAND:
-                    return me->GetLevel() < 61 || proto->InventoryType == INVTYPE_2HWEAPON;
                 default:
                     break;
             }
@@ -15098,11 +15106,13 @@ void bot_ai::InitEquips()
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
     ASSERT(einfo, "Trying to spawn bot with no equip info!");
 
-    if (IsWanderer() || me->IsSummon())
+    const bool is_wanderer = IsWanderer();
+    if (is_wanderer || me->IsSummon())
     {
         BOT_LOG_TRACE("npcbots", "Bot {} id {} class {} spec {} level {} generates gear...", me->GetName(), me->GetEntry(), uint32(_botclass), uint32(GetSpec()), uint32(me->GetLevel()));
 
-        auto fit_check = [this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForWanderingBot(slot, proto); };
+        const uint8 gen_category = (std::array{ BOT_GENERATED_DUNGEON, BOT_GENERATED_WANDERING })[is_wanderer];
+        auto fit_check = [gen_category, this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForGeneratedBot(gen_category, slot, proto); };
 
         GenerateRand();
         uint8 lvl = me->GetLevel();
@@ -15117,7 +15127,7 @@ void bot_ai::InitEquips()
             if ((i == BOT_SLOT_TRINKET1 || i == BOT_SLOT_TRINKET2 || i == BOT_SLOT_HEAD) && lvl < 30)
                 continue;
 
-            Item* item = BotDataMgr::GenerateWanderingBotItem(i, _botclass, lvl, fit_check);
+            Item* item = BotDataMgr::GenerateWanderingBotItem(gen_category, i, _botclass, lvl, fit_check);
             if (!item)
             {
                 if (i <= BOT_SLOT_RANGED && einfo->ItemEntry[i] != 0)

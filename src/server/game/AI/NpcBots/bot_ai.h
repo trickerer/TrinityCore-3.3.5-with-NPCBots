@@ -641,7 +641,7 @@ private:
     bool _canCombineWeapons(ItemTemplate const* mh, ItemTemplate const* oh) const;
     bool _canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem = nullptr, bool ignore_combine = false) const;
     void _removeEquipment(uint8 slot);
-    bool _isItemFitForWanderingBot(uint8 slot, ItemTemplate const* proto) const;
+    bool _isItemFitForGeneratedBot(uint8 category, uint8 slot, ItemTemplate const* proto) const;
     [[nodiscard]] BotEquipResult _unequip(uint8 slot, ObjectGuid receiver, bool store_to_bank, bool on_equip_from_bank = false);
     [[nodiscard]] BotEquipResult _equip(uint8 slot, Item* newItem, ObjectGuid receiver, bool store_to_bank, bool from_bank = false);
     [[nodiscard]] BotEquipResult _resetEquipment(uint8 slot, ObjectGuid receiver, bool store_to_bank);

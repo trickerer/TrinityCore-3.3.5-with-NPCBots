@@ -72,7 +72,7 @@ void BotMgr::Initialize()
     BotDataMgr::LoadNpcBots();
     BotDataMgr::LoadWanderMap();
     BotDataMgr::GenerateWanderingBots();
-    BotDataMgr::CreateWanderingBotsSortedGear();
+    BotDataMgr::CreateGeneratedBotsSortedGear();
     BotDataMgr::LoadNpcBotGroupData();
     BotDataMgr::LoadNpcBotGearStorage();
     BotDataMgr::LoadNpcBotGearSets();

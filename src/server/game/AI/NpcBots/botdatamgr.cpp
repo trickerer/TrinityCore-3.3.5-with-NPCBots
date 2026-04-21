@@ -65,7 +65,7 @@ static std::unordered_map<uint32, EquipmentInfo const*> _botsExtraCreatureEquipm
 static std::set<uint32> _botsExtraCreaturesToDespawn;
 static std::list<std::pair<uint32, WanderNode const*>> _botsWanderCreaturesToSpawn;
 
-static ItemPerBotClassMap _botsWanderCreaturesSortedGear;
+static ItemPerBotClassPerBotCategoryMap _botsExtraCreatureSortedGear;
 
 using BotGearStorageMap = std::unordered_map<ObjectGuid /*playerGuid*/, BotBankItemContainer>;
 static BotGearStorageMap _botStoredGearMap;
@@ -2116,18 +2116,18 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     return true;
 }
 
-ItemPerBotClassMap const& BotDataMgr::GetWanderingBotsSortedGearMap()
+ItemPerBotClassPerBotCategoryMap const& BotDataMgr::GetWanderingBotsSortedGearMap()
 {
-    return _botsWanderCreaturesSortedGear;
+    return _botsExtraCreatureSortedGear;
 }
 
-void BotDataMgr::CreateWanderingBotsSortedGear()
+void BotDataMgr::CreateGeneratedBotsSortedGear()
 {
     BOT_LOG_INFO("server.loading", "Sorting wandering bot's gear...");
 
     uint32 oldMSTime = getMSTime();
 
-    std::set<uint32> disabled_item_ids;
+    std::unordered_set<uint32> disabled_item_ids;
     QueryResult dires = WorldDatabase.Query("SELECT id FROM creature_template_npcbot_disabled_items");
     if (dires)
     {
@@ -2155,19 +2155,25 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
         {INVTYPE_HANDS, BOT_SLOT_HANDS}
     };
 
-    auto push_gear_to_classes = [](ItemTemplate const& itt, uint8 slot, uint8 lstep, std::initializer_list<BotClasses> const& cs) {
-        for (BotClasses c : cs)
+    const uint32 InvTypeMaskAccessory = (1u << INVTYPE_FINGER) | (1u << INVTYPE_TRINKET) | (1u << INVTYPE_CLOAK) | (1u << INVTYPE_NECK) | (1u << INVTYPE_SHIELD);
+
+    auto push_gear_to_classes = [](ItemTemplate const& itt, uint32 category_mask, uint8 slot, uint8 lstep, std::initializer_list<BotClasses> const& cs) {
+        for (auto category : NPCBots::index_array<uint8, NpcBotGeneratedCategory::BOT_GENERATION_CATEGORIES_COUNT>)
         {
-            if (c == BOT_CLASS_SPHYNX &&
-                (itt.InventoryType == INVTYPE_FINGER || itt.InventoryType == INVTYPE_TRINKET || itt.InventoryType == INVTYPE_CLOAK || itt.InventoryType == INVTYPE_NECK || itt.InventoryType == INVTYPE_SHIELD))
+            if (!(category_mask & (1u << category)))
                 continue;
-            if (!itt.AllowableClass || itt.AllowableClass >= ((1u << MAX_CLASSES) - 1) || !!(itt.AllowableClass & (1u << (c - 1))))
-                _botsWanderCreaturesSortedGear[c][slot][lstep].push_back(itt.ItemId);
+            for (BotClasses c : cs)
+            {
+                if (c == BOT_CLASS_SPHYNX && ((1u << itt.InventoryType) & InvTypeMaskAccessory))
+                    continue;
+                if (!itt.AllowableClass || itt.AllowableClass >= ((1u << MAX_CLASSES) - 1) || !!(itt.AllowableClass & (1u << (c - 1))))
+                    _botsExtraCreatureSortedGear[category][c][slot][lstep].push_back(itt.ItemId);
+            }
         }
     };
 
     const std::initializer_list<BotClasses> IntUsers = { BOT_CLASS_PALADIN, BOT_CLASS_PRIEST, BOT_CLASS_SHAMAN, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID, BOT_CLASS_SPHYNX, BOT_CLASS_ARCHMAGE, BOT_CLASS_DREADLORD, BOT_CLASS_NECROMANCER, BOT_CLASS_SEA_WITCH, BOT_CLASS_CRYPT_LORD };
-    const std::initializer_list<BotClasses> StrUsers = { BOT_CLASS_WARRIOR, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_SPELLBREAKER, BOT_CLASS_CRYPT_LORD };
+    const std::initializer_list<BotClasses> StrUsers = { BOT_CLASS_WARRIOR, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_SPELLBREAKER, BOT_CLASS_CRYPT_LORD, BOT_CLASS_PALADIN };
     const std::initializer_list<BotClasses> AgiUsers = { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN, BOT_CLASS_ROGUE, BOT_CLASS_DRUID, BOT_CLASS_BM, BOT_CLASS_DARK_RANGER };
 
     ItemTemplateContainer const& all_item_templates = sObjectMgr->GetItemTemplateStore();
@@ -2190,9 +2196,9 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                     skip = true;
             [[fallthrough]];
             case ITEM_QUALITY_RARE:
-                if (proto.RequiredLevel > 75 && proto.RequiredLevel < 80)
-                    skip = true;
-            [[fallthrough]];
+            //    if (proto.RequiredLevel > 75 && proto.RequiredLevel < 80)
+            //        skip = true;
+            //[[fallthrough]];
             case ITEM_QUALITY_EPIC:
                 if (!(proto.RequiredLevel >= 2 && proto.RequiredLevel <= DEFAULT_MAX_LEVEL))
                     skip = true;
@@ -2214,58 +2220,70 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
             continue;
         }
 
+        uint32 gencat_mask = 0;
         if (proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return (stat.ItemStatType == ITEM_MOD_DEFENSE_SKILL_RATING || stat.ItemStatType == ITEM_MOD_DODGE_RATING ||
                 stat.ItemStatType == ITEM_MOD_PARRY_RATING || stat.ItemStatType == ITEM_MOD_BLOCK_VALUE) &&
-                stat.ItemStatValue > 0;
+                stat.ItemStatValue > 0; 
         }))
-            continue;
+        {
+            gencat_mask = 1u << NpcBotGeneratedCategory::BOT_GENERATED_DUNGEON;
+        }
+        else if (proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
+            return stat.ItemStatType == ITEM_MOD_RESILIENCE_RATING && stat.ItemStatValue > 0;
+        }))
+        {
+            gencat_mask = 1u << NpcBotGeneratedCategory::BOT_GENERATED_WANDERING;
+        }
+        else
+            gencat_mask = NPCBOT_GENERATED_CATEGORY_MASK_ALL;
 
-        uint8 reqLstep = (((proto.RequiredLevel == 1) ? 0 : proto.RequiredLevel) + ITEM_SORTING_LEVEL_STEP - 1) / ITEM_SORTING_LEVEL_STEP;
-        bool is_caster_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
+        const uint8 reqLstep = (((proto.RequiredLevel == 1) ? 0 : proto.RequiredLevel) + ITEM_SORTING_LEVEL_STEP - 1) / ITEM_SORTING_LEVEL_STEP;
+        const bool is_caster_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return (stat.ItemStatType == ITEM_MOD_INTELLECT || stat.ItemStatType == ITEM_MOD_SPELL_POWER ||
                 stat.ItemStatType == ITEM_MOD_SPELL_PENETRATION || stat.ItemStatType == ITEM_MOD_MANA_REGENERATION) &&
                 stat.ItemStatValue > 0;
-        });
-        bool is_strength_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
-            return stat.ItemStatType == ITEM_MOD_STRENGTH && stat.ItemStatValue > 0;
-        });
-        bool is_agility_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
-            return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
         });
 
         switch (proto.Class)
         {
             case ITEM_CLASS_ARMOR:
+            {
+                const bool is_strength_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
+                    return stat.ItemStatType == ITEM_MOD_STRENGTH && stat.ItemStatValue > 0;
+                });
+                const bool is_agility_item = proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
+                    return stat.ItemStatType == ITEM_MOD_AGILITY && stat.ItemStatValue > 0;
+                });
                 switch (proto.InventoryType)
                 {
                     case INVTYPE_NECK:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
                             break;
                         if (is_caster_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_NECK, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_NECK, reqLstep, IntUsers);
                         if (is_strength_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_NECK, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_NECK, reqLstep, StrUsers);
                         if (is_agility_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_NECK, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_NECK, reqLstep, AgiUsers);
                         break;
                     case INVTYPE_FINGER:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
                             break;
                         if (is_caster_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER1, reqLstep, IntUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER2, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER1, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER2, reqLstep, IntUsers);
                         }
                         if (is_strength_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER1, reqLstep, StrUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER2, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER1, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER2, reqLstep, StrUsers);
                         }
                         if (is_agility_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER1, reqLstep, AgiUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_FINGER2, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER1, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_FINGER2, reqLstep, AgiUsers);
                         }
                         break;
                     case INVTYPE_TRINKET:
@@ -2273,37 +2291,38 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                             break;
                         if (!is_strength_item && !is_agility_item)
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, IntUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET2, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET1, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET2, reqLstep, IntUsers);
                         }
                         if (!is_caster_item)
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, StrUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET2, reqLstep, StrUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET1, reqLstep, AgiUsers);
-                            push_gear_to_classes(proto, BOT_SLOT_TRINKET2, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET1, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET2, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET1, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_TRINKET2, reqLstep, AgiUsers);
                         }
                         break;
                     case INVTYPE_CLOAK:
                         if (is_caster_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, IntUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_BACK, reqLstep, IntUsers);
                         if (is_strength_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, StrUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_BACK, reqLstep, StrUsers);
                         if (is_agility_item || (reqLstep < LEVEL_STEPS - 1 && proto.StatsCount == 0))
-                            push_gear_to_classes(proto, BOT_SLOT_BACK, reqLstep, AgiUsers);
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_BACK, reqLstep, AgiUsers);
                         break;
                     case INVTYPE_HOLDABLE:
                         if (proto.Quality < ITEM_QUALITY_UNCOMMON)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID });
                         break;
                     case INVTYPE_SHIELD:
                         if (proto.Armor == 0)
                             break;
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SPELLBREAKER });
                         if (!is_caster_item)
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
                         if (is_caster_item || proto.RequiredLevel < 60 || (proto.RequiredLevel < 69 && (proto.RandomProperty || proto.RandomSuffix)))
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN, BOT_CLASS_SPELLBREAKER });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN });
                         break;
                     case INVTYPE_HEAD:
                     case INVTYPE_SHOULDERS:
@@ -2325,33 +2344,34 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                             case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_CLOTH:
                                 if (slot == BOT_SLOT_CHEST && proto.InventoryType != INVTYPE_ROBE)
                                     break;
-                                push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_ARCHMAGE, BOT_CLASS_NECROMANCER, BOT_CLASS_SEA_WITCH });
+                                push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_ARCHMAGE, BOT_CLASS_NECROMANCER, BOT_CLASS_SEA_WITCH });
                                 break;
                             case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_LEATHER:
                                 if (!is_caster_item)
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
-                                push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_DRUID });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
+                                push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_DRUID });
                                 if (proto.RequiredLevel < 40)
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN });
                                 break;
                             case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_MAIL:
                                 if (proto.RequiredLevel < 40)
                                 {
                                     if (!is_caster_item)
-                                        push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_WARRIOR });
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_PALADIN });
+                                        push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_WARRIOR });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_PALADIN });
                                 }
                                 else
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN });
                                 if (!is_caster_item)
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_BM, BOT_CLASS_SPELLBREAKER });
-                                push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_SPHYNX, BOT_CLASS_CRYPT_LORD });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_BM, BOT_CLASS_SPELLBREAKER });
+                                push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_SPHYNX, BOT_CLASS_CRYPT_LORD });
                                 break;
                             case ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_PLATE:
+                                push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SPELLBREAKER });
                                 if (!is_caster_item)
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM, BOT_CLASS_SPELLBREAKER });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
                                 if (is_caster_item || proto.RequiredLevel < 60 || (proto.RequiredLevel < 78 && (proto.RandomProperty || proto.RandomSuffix)))
-                                    push_gear_to_classes(proto, slot, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SPHYNX, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                                    push_gear_to_classes(proto, gencat_mask, slot, reqLstep, { BOT_CLASS_SPHYNX, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                                 break;
                             default:
                                 break;
@@ -2362,6 +2382,7 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         break;
                 }
                 break;
+            }
             case ITEM_CLASS_WEAPON:
                 if (proto.Damage[0].DamageMin < 1.0f || proto.Damage[0].DamageMax < 2.0f || proto.Delay < 1000)
                     break;
@@ -2372,91 +2393,91 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_WAND:
                         if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SPHYNX });
-                        push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SPHYNX });
-                        push_gear_to_classes(proto, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SPHYNX });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SPHYNX });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_GUN:
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_CROSSBOW:
                         if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE, BOT_CLASS_HUNTER });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE, BOT_CLASS_HUNTER });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_BOW:
                         if (proto.InventoryType != INVTYPE_RANGED && proto.InventoryType != INVTYPE_RANGEDRIGHT)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE, BOT_CLASS_HUNTER, BOT_CLASS_DARK_RANGER, BOT_CLASS_SEA_WITCH });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE, BOT_CLASS_HUNTER, BOT_CLASS_DARK_RANGER, BOT_CLASS_SEA_WITCH });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_THROWN:
                         if (proto.InventoryType != INVTYPE_THROWN)
                             break;
-                        push_gear_to_classes(proto, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_RANGED, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_ROGUE });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_STAFF:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
                             break;
                         if (is_caster_item || proto.RequiredLevel < 50)
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID, BOT_CLASS_SHAMAN, BOT_CLASS_ARCHMAGE, BOT_CLASS_NECROMANCER, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID, BOT_CLASS_SHAMAN, BOT_CLASS_ARCHMAGE, BOT_CLASS_NECROMANCER, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
                             break;
                         if (!is_caster_item)
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
                             if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
                         }
-                        push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_SHAMAN, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
                             break;
                         if (!is_caster_item)
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
                             if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
                         }
-                        push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_POLEARM:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
                             break;
                         if (!is_caster_item)
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
-                        push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DRUID, BOT_CLASS_HUNTER, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT, BOT_CLASS_BM });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_HUNTER, BOT_CLASS_DRUID, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE2:
                         if (proto.InventoryType != INVTYPE_2HWEAPON)
                             break;
                         if (!is_caster_item)
                         {
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_HUNTER, BOT_CLASS_DEATH_KNIGHT });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR, BOT_CLASS_PALADIN, BOT_CLASS_DEATH_KNIGHT });
                             if (proto.RequiredLevel >= 60 - ITEM_SORTING_LEVEL_STEP)
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
                         }
-                        push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DRUID, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
+                        push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DRUID, BOT_CLASS_DREADLORD, BOT_CLASS_CRYPT_LORD });
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE:
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONMAINHAND)
                         {
                             if (!is_caster_item)
                             {
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN });
                         }
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
                         {
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN });
                         }
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE:
@@ -2464,22 +2485,26 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         {
                             if (!is_caster_item)
                             {
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
+                                if (proto.RequiredLevel >= 55)
+                                   push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DEATH_KNIGHT });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN, BOT_CLASS_SHAMAN });
                             if (is_caster_item || proto.RequiredLevel < 55 || (proto.RequiredLevel < 78 && (proto.RandomProperty || proto.RandomSuffix)))
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DRUID, BOT_CLASS_PRIEST });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DRUID, BOT_CLASS_PRIEST });
                         }
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
                         {
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE });
+                                if (proto.RequiredLevel >= 55)
+                                   push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_DEATH_KNIGHT });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN });
                         }
                         break;
                     case ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD:
@@ -2487,20 +2512,24 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         {
                             if (!is_caster_item)
                             {
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER, BOT_CLASS_DARK_RANGER });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER, BOT_CLASS_DARK_RANGER });
+                                if (proto.RequiredLevel >= 55)
+                                   push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_DEATH_KNIGHT });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PALADIN });
                             if (is_caster_item || proto.RequiredLevel < 55 || (proto.RequiredLevel < 78 && (proto.RandomProperty || proto.RandomSuffix)))
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_MAGE, BOT_CLASS_WARLOCK });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_MAGE, BOT_CLASS_WARLOCK });
                         }
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
                         {
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
+                                if (proto.RequiredLevel >= 55)
+                                   push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_DEATH_KNIGHT });
                             }
                         }
                         break;
@@ -2509,8 +2538,8 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                         {
                             if (!is_caster_item)
                             {
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER });
                             }
                         }
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
@@ -2518,8 +2547,8 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_ROGUE });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_ROGUE });
                             }
                         }
                         break;
@@ -2529,22 +2558,22 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER, BOT_CLASS_DARK_RANGER });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_SPELLBREAKER, BOT_CLASS_DARK_RANGER });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SHAMAN });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_SHAMAN });
                             if (is_caster_item || proto.RequiredLevel < 55 || (proto.RequiredLevel < 78 && (proto.RandomProperty || proto.RandomSuffix)))
-                                push_gear_to_classes(proto, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID, BOT_CLASS_SEA_WITCH });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_MAINHAND, reqLstep, { BOT_CLASS_PRIEST, BOT_CLASS_MAGE, BOT_CLASS_WARLOCK, BOT_CLASS_DRUID, BOT_CLASS_SEA_WITCH });
                         }
                         if (proto.InventoryType == INVTYPE_WEAPON || proto.InventoryType == INVTYPE_WEAPONOFFHAND)
                         {
                             if (!is_caster_item)
                             {
                                 if (proto.RequiredLevel < 60 - ITEM_SORTING_LEVEL_STEP)
-                                    push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
-                                push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
+                                    push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_WARRIOR });
+                                push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_ROGUE, BOT_CLASS_DARK_RANGER });
                             }
-                            push_gear_to_classes(proto, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_SEA_WITCH });
+                            push_gear_to_classes(proto, gencat_mask, BOT_SLOT_OFFHAND, reqLstep, { BOT_CLASS_SHAMAN, BOT_CLASS_SEA_WITCH });
                         }
                         break;
                     default:
@@ -2556,40 +2585,44 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
         }
     }
 
-    for (uint32 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
+    for (auto category : NPCBots::index_array<uint32, NpcBotGeneratedCategory::BOT_GENERATION_CATEGORIES_COUNT>)
     {
-        if (!((1u << c) & ALL_BOT_CLASSES_MASK))
-            continue;
-
-        ItemPerSlot const& ips_arr = _botsWanderCreaturesSortedGear.at(c);
-        for (uint32 s = BOT_SLOT_MAINHAND; s < BOT_INVENTORY_SIZE; ++s)
+        auto const& class_map = _botsExtraCreatureSortedGear.at(category);
+        for (auto c : NPCBots::index_array<uint32, BOT_CLASS_END>)
         {
-            if (s == BOT_SLOT_FINGER2 || s == BOT_SLOT_TRINKET1 || s == BOT_SLOT_TRINKET2 || s == BOT_SLOT_BODY)
+            if (!((1u << c) & ALL_BOT_CLASSES_MASK))
                 continue;
-            if ((s == BOT_SLOT_FINGER1 || s == BOT_SLOT_NECK || s == BOT_SLOT_BACK) && c == BOT_CLASS_SPHYNX)
-                continue;
-            if (s == BOT_SLOT_RANGED && !(c == BOT_CLASS_HUNTER || c == BOT_CLASS_ROGUE || c == BOT_CLASS_WARRIOR || c == BOT_CLASS_PRIEST ||
-                c == BOT_CLASS_MAGE || c == BOT_CLASS_WARLOCK || c == BOT_CLASS_DARK_RANGER || c == BOT_CLASS_SEA_WITCH))
-                continue;
-            ItemLeveledArr const& il_arr = ips_arr[s];
 
-            for (auto lstep : NPCBots::index_array<uint32, LEVEL_STEPS>)
+            ItemPerSlot const& ips_arr = class_map.at(c);
+            for (uint32 s = BOT_SLOT_MAINHAND; s < BOT_INVENTORY_SIZE; ++s)
             {
-                if ((s == BOT_SLOT_SHOULDERS || s == BOT_SLOT_FINGER1 || s == BOT_SLOT_NECK) && lstep < 4)
+                if (s == BOT_SLOT_FINGER2 || s == BOT_SLOT_TRINKET1 || s == BOT_SLOT_TRINKET2 || s == BOT_SLOT_BODY)
                     continue;
-                if ((s == BOT_SLOT_HEAD || s == BOT_SLOT_TRINKET1) && lstep < 6)
+                if ((s == BOT_SLOT_FINGER1 || s == BOT_SLOT_NECK || s == BOT_SLOT_BACK) && c == BOT_CLASS_SPHYNX)
                     continue;
-                if (s == BOT_SLOT_OFFHAND &&
-                    (lstep < 3 || c == BOT_CLASS_PALADIN || c == BOT_CLASS_HUNTER || c == BOT_CLASS_DEATH_KNIGHT || c == BOT_CLASS_BM || c == BOT_CLASS_ARCHMAGE ||
-                        c == BOT_CLASS_SPHYNX || c == BOT_CLASS_DREADLORD || c == BOT_CLASS_NECROMANCER || c == BOT_CLASS_CRYPT_LORD))
+                if (s == BOT_SLOT_RANGED && !(c == BOT_CLASS_HUNTER || c == BOT_CLASS_ROGUE || c == BOT_CLASS_WARRIOR || c == BOT_CLASS_PRIEST ||
+                    c == BOT_CLASS_MAGE || c == BOT_CLASS_WARLOCK || c == BOT_CLASS_DARK_RANGER || c == BOT_CLASS_SEA_WITCH))
                     continue;
-                if ((c == BOT_CLASS_DREADLORD || c == BOT_CLASS_DEATH_KNIGHT) && lstep < 8)
-                    continue;
-                if (il_arr[lstep].empty())
+                ItemLeveledArr const& il_arr = ips_arr[s];
+
+                for (auto lstep : NPCBots::index_array<uint32, LEVEL_STEPS>)
                 {
-                    uint32 minlvl = std::max<uint32>(lstep * ITEM_SORTING_LEVEL_STEP, 1);
-                    uint32 maxlvl = (lstep + 1) * ITEM_SORTING_LEVEL_STEP - 1;
-                    BOT_LOG_DEBUG("npcbots", "No items for class {} slot {} at levels {}-{}!", c, s, minlvl, maxlvl);
+                    if ((s == BOT_SLOT_SHOULDERS || s == BOT_SLOT_FINGER1 || s == BOT_SLOT_NECK) && lstep < 4)
+                        continue;
+                    if ((s == BOT_SLOT_HEAD || s == BOT_SLOT_TRINKET1) && lstep < 6)
+                        continue;
+                    if (s == BOT_SLOT_OFFHAND &&
+                        (lstep < 3 || c == BOT_CLASS_PALADIN || c == BOT_CLASS_HUNTER || c == BOT_CLASS_DEATH_KNIGHT || c == BOT_CLASS_BM || c == BOT_CLASS_ARCHMAGE ||
+                            c == BOT_CLASS_SPHYNX || c == BOT_CLASS_DREADLORD || c == BOT_CLASS_NECROMANCER || c == BOT_CLASS_CRYPT_LORD))
+                        continue;
+                    if ((c == BOT_CLASS_DREADLORD || c == BOT_CLASS_DEATH_KNIGHT) && lstep < 8)
+                        continue;
+                    if (il_arr[lstep].empty())
+                    {
+                        uint32 minlvl = std::max<uint32>(lstep * ITEM_SORTING_LEVEL_STEP, 1);
+                        uint32 maxlvl = (lstep + 1) * ITEM_SORTING_LEVEL_STEP - 1;
+                        BOT_LOG_DEBUG("npcbots", "No items for category {} class {} slot {} at levels {}-{}!", category, c, s, minlvl, maxlvl);
+                    }
                 }
             }
         }
@@ -2598,17 +2631,17 @@ void BotDataMgr::CreateWanderingBotsSortedGear()
     BOT_LOG_INFO("server.loading", ">> Sorted wandering bots gear in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
-Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check)
+Item* BotDataMgr::GenerateWanderingBotItem(uint8 category, uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check)
 {
     ASSERT(slot < BOT_INVENTORY_SIZE);
     ASSERT(botclass < BOT_CLASS_END);
     ASSERT(level <= DEFAULT_MAX_LEVEL + 4);
 
     uint8 lvl = level;
-    while (_botsWanderCreaturesSortedGear[botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP].empty() && lvl > ITEM_SORTING_LEVEL_STEP)
+    while (_botsExtraCreatureSortedGear[category][botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP].empty() && lvl > ITEM_SORTING_LEVEL_STEP)
         lvl -= ITEM_SORTING_LEVEL_STEP;
 
-    auto& itemIdVec = _botsWanderCreaturesSortedGear[botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP];
+    auto& itemIdVec = _botsExtraCreatureSortedGear[category][botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP];
     if (!itemIdVec.empty())
     {
         ItemIdVector validVec;

@@ -58,6 +58,16 @@ public:
     NpcBotMgrData& operator=(NpcBotMgrData&&) = delete;
 };
 
+enum NpcBotGeneratedCategory : uint8
+{
+    BOT_GENERATED_DUNGEON               = 0,
+    BOT_GENERATED_WANDERING             = 1,
+
+    BOT_GENERATION_CATEGORIES_COUNT
+};
+
+inline constexpr uint32 NPCBOT_GENERATED_CATEGORY_MASK_ALL = (1u << BOT_GENERATED_DUNGEON) | (1u << BOT_GENERATED_WANDERING);
+
 enum NpcBotDataUpdateType
 {
     NPCBOT_UPDATE_OWNER                 = 1,
@@ -181,11 +191,12 @@ using BotBankItemContainer = std::multiset<Item*, BotBankItemCompare>;
 
 inline constexpr uint8 ITEM_SORTING_LEVEL_STEP = 5;
 inline constexpr uint8 LEVEL_STEPS = DEFAULT_MAX_LEVEL / ITEM_SORTING_LEVEL_STEP + 1;
-using ItemIdVector = std::vector<uint32>;
 using BotItemSetsArray = std::array<NpcBotItemSet, MAX_BOT_EQUIPMENT_SETS>;
+using ItemIdVector = std::vector<uint32>;
 using ItemLeveledArr = std::array<ItemIdVector, LEVEL_STEPS>;
 using ItemPerSlot = std::array<ItemLeveledArr, BOT_INVENTORY_SIZE>;
 using ItemPerBotClassMap = std::array<ItemPerSlot, BOT_CLASS_END>;
+using ItemPerBotClassPerBotCategoryMap = std::array<ItemPerBotClassMap, BOT_GENERATION_CATEGORIES_COUNT>;
 
 class BotDataMgr
 {
@@ -233,9 +244,9 @@ public:
     static void GenerateWanderingBots();
     static void GenerateDungeonBots(Player const* leader, Group const* group, Map const* map);
     static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
-    static void CreateWanderingBotsSortedGear();
-    static ItemPerBotClassMap const& GetWanderingBotsSortedGearMap();
-    static Item* GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check);
+    static void CreateGeneratedBotsSortedGear();
+    static ItemPerBotClassPerBotCategoryMap const& GetWanderingBotsSortedGearMap();
+    static Item* GenerateWanderingBotItem(uint8 category, uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check);
     static bool GenerateWanderingBotItemEnchants(Item* item, uint8 slot, uint8 spec);
     static CreatureTemplate const* GetBotExtraCreatureTemplate(uint32 entry);
     static EquipmentInfo const* GetBotEquipmentInfo(uint32 entry);
