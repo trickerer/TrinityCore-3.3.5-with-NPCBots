@@ -4726,6 +4726,18 @@ NpcBot.EnrageOnDismiss = 1
 NpcBot.DungeonBots.Enable = 0
 
 #
+#    NpcBot.DungeonBots.MaxItemLevel.Ratio
+#        Description: Maximum item ilevel to generate for dungeon bots per level bracket compared
+#                     to dungeon max item level.
+#        Note:        If item generation attempt fails becuse of item ilevel restriction
+#                     the item will be generated again with this restriction ignored
+#        Example:     0,0,0,0,0,0,0,0,90 makes dungeon bots for Halls of Reflection only generate
+#                     items of ilevel 198N/209H or less instead of default max 219/232
+#        Default:     0,0,0,0,0,0,0,0,0
+
+NpcBot.DungeonBots.MaxItemLevel.Ratio = 0,0,0,0,0,0,0,0,0
+
+#
 #    NpcBot.WanderingBots.Continents.Count
 #        Description: Desired number of free wandering bots to generate. Wandering bots roam
 #                     around the map looking for trouble. Names and visuals are cloned from

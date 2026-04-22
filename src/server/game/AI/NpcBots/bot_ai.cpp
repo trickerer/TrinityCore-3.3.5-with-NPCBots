@@ -15111,11 +15111,22 @@ void bot_ai::InitEquips()
     {
         BOT_LOG_TRACE("npcbots", "Bot {} id {} class {} spec {} level {} generates gear...", me->GetName(), me->GetEntry(), uint32(_botclass), uint32(GetSpec()), uint32(me->GetLevel()));
 
-        const uint8 gen_category = (std::array{ BOT_GENERATED_DUNGEON, BOT_GENERATED_WANDERING })[is_wanderer];
+        const uint8 lvl = me->GetLevel();
+        const uint8 gen_category = is_wanderer ? BOT_GENERATED_WANDERING : BOT_GENERATED_DUNGEON;
         auto fit_check = [gen_category, this](uint8 slot, ItemTemplate const* proto) { return _isItemFitForGeneratedBot(gen_category, slot, proto); };
 
+        uint32 max_item_level = 0;
+        if (gen_category == BOT_GENERATED_DUNGEON)
+        {
+            Map const* mymap = me->GetMap();
+            ASSERT(mymap->IsNonRaidDungeon());
+            const Difficulty map_difficulty = mymap->ToInstanceMap()->GetDifficulty();
+            max_item_level = BotCfg::GetBotDungeonMaxItemLevel(lvl, mymap->GetId(), map_difficulty);
+        }
+        else
+            max_item_level = BotCfg::GetBotWandererMaxItemLevel(lvl);
+
         GenerateRand();
-        uint8 lvl = me->GetLevel();
         std::ostringstream gss;
         gss << "bot_ai::InitEquips(): Wanderer bot " << me->GetName() << " id " << me->GetEntry() << ' ' << "level " << uint32(lvl) << " generated gear:";
         for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
@@ -15127,7 +15138,7 @@ void bot_ai::InitEquips()
             if ((i == BOT_SLOT_TRINKET1 || i == BOT_SLOT_TRINKET2 || i == BOT_SLOT_HEAD) && lvl < 30)
                 continue;
 
-            Item* item = BotDataMgr::GenerateWanderingBotItem(gen_category, i, _botclass, lvl, fit_check);
+            Item* item = BotDataMgr::GenerateWanderingBotItem(gen_category, i, _botclass, lvl, max_item_level, fit_check);
             if (!item)
             {
                 if (i <= BOT_SLOT_RANGED && einfo->ItemEntry[i] != 0)

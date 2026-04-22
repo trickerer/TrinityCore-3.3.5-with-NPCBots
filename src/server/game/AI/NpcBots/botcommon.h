@@ -23,6 +23,9 @@ inline constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
 inline constexpr std::size_t MAX_BOT_ITEM_SET_NAME_LENGTH = 30;
 inline constexpr uint8 BOT_GOSSIP_MAX_ITEMS = 32; // Client limitation 3.3.5 code confirmed
 
+inline constexpr uint16 MAX_ITEM_LEVEL_WOTLK_NORMAL = 271;
+inline constexpr uint16 MAX_ITEM_LEVEL_WOTLK_HEROIC = 284;
+
 inline constexpr std::size_t BRACKETS_COUNT = DEFAULT_MAX_LEVEL / 10 + 1; //0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80-83
 
 struct Position;

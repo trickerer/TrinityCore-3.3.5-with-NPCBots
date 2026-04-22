@@ -2631,44 +2631,45 @@ void BotDataMgr::CreateGeneratedBotsSortedGear()
     BOT_LOG_INFO("server.loading", ">> Sorted wandering bots gear in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }
 
-Item* BotDataMgr::GenerateWanderingBotItem(uint8 category, uint8 slot, uint8 botclass, uint8 level, std::function<bool(uint8, ItemTemplate const*)> const& check)
+Item* BotDataMgr::GenerateWanderingBotItem(uint8 category, uint8 slot, uint8 botclass, uint8 level, uint32 maxitemlevel, std::function<bool(uint8, ItemTemplate const*)> const& check)
 {
     ASSERT(slot < BOT_INVENTORY_SIZE);
     ASSERT(botclass < BOT_CLASS_END);
     ASSERT(level <= DEFAULT_MAX_LEVEL + 4);
 
-    uint8 lvl = level;
-    while (_botsExtraCreatureSortedGear[category][botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP].empty() && lvl > ITEM_SORTING_LEVEL_STEP)
-        lvl -= ITEM_SORTING_LEVEL_STEP;
-
-    auto& itemIdVec = _botsExtraCreatureSortedGear[category][botclass][slot][lvl / ITEM_SORTING_LEVEL_STEP];
-    if (!itemIdVec.empty())
+    auto const& slot_items = _botsExtraCreatureSortedGear[category][botclass][slot];
+    ItemIdVector valid_ids;
+    valid_ids.reserve(slot_items.back().size());
+    const std::array ilevels_to_check{ maxitemlevel, decltype(maxitemlevel){} };
+    for (auto i : NPCBots::index_array<size_t, std::size(ilevels_to_check)>)
     {
-        ItemIdVector validVec;
-        validVec.reserve(itemIdVec.size());
-        uint32 maxItemLevel = BotCfg::GetBotWandererMaxItemLevel(level);
-        for (uint32 maxLvl : { maxItemLevel, decltype(maxItemLevel){} })
-        {
-            if (!validVec.empty())
-                break;
+        const uint32 max_item_lvl = ilevels_to_check[i];
 
-            for (uint32 iid : itemIdVec)
+        if (i > 0 && (!valid_ids.empty() || ilevels_to_check[0] == max_item_lvl))
+            break;
+
+        for (uint8 lvl = level; lvl > ITEM_SORTING_LEVEL_STEP; lvl -= ITEM_SORTING_LEVEL_STEP)
+        {
+            ItemIdVector const& item_id_vec = slot_items[lvl / ITEM_SORTING_LEVEL_STEP];
+            if (item_id_vec.empty())
+                continue;
+
+            for (uint32 iid : item_id_vec)
             {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(iid);
-                if ((!maxLvl || proto->ItemLevel <= maxLvl) && check(slot, proto))
-                    validVec.push_back(iid);
+                if ((!max_item_lvl || proto->ItemLevel <= max_item_lvl) && check(slot, proto))
+                    valid_ids.push_back(iid);
             }
-        }
 
-        if (!validVec.empty())
-        {
-            uint32 itemId = Bcore::Containers::SelectRandomContainerElement(validVec);
-            if (Item* newItem = Item::CreateItem(itemId, 1, nullptr))
+            if (valid_ids.empty())
+                continue;
+
+            const uint32 item_id = Bcore::Containers::SelectRandomContainerElement(valid_ids);
+            if (Item* new_item = Item::CreateItem(item_id, 1, nullptr))
             {
-                if (uint32 randomPropertyId = GenerateItemRandomPropertyId(itemId))
-                    newItem->SetItemRandomProperties(randomPropertyId);
-
-                return newItem;
+                if (const uint32 randomPropertyId = GenerateItemRandomPropertyId(item_id))
+                    new_item->SetItemRandomProperties(randomPropertyId);
+                return new_item;
             }
         }
     }

@@ -179,8 +179,29 @@ static std::vector<float> _mult_mp_levels;
 static LvlBrackets _max_npcbots;
 static PctBrackets _botwanderer_pct_level_brackets;
 static ItemLvlBrackets _botwanderer_itemlvl_level_brackets;
+static PctBrackets _botdungeon_itemlvl_brackets;
 static std::vector<uint32> _disabled_instance_maps;
 static std::vector<uint32> _enabled_wander_node_maps;
+
+struct BotMapItemLevelRange { uint16 map_id{}, normal{}, heroic{}; };
+static constinit const std::array MAP_MAX_ITEM_LEVELS {
+    BotMapItemLevelRange{ .map_id = 574, .normal = 155, .heroic = 200 }, // UK
+    BotMapItemLevelRange{ .map_id = 575, .normal = 187, .heroic = 200 }, // UP
+    BotMapItemLevelRange{ .map_id = 576, .normal = 159, .heroic = 200 }, // NE
+    BotMapItemLevelRange{ .map_id = 578, .normal = 187, .heroic = 200 }, // OC
+    BotMapItemLevelRange{ .map_id = 595, .normal = 187, .heroic = 200 }, // CoS
+    BotMapItemLevelRange{ .map_id = 599, .normal = 183, .heroic = 200 }, // HoS
+    BotMapItemLevelRange{ .map_id = 600, .normal = 171, .heroic = 200 }, // DT
+    BotMapItemLevelRange{ .map_id = 601, .normal = 163, .heroic = 200 }, // AN
+    BotMapItemLevelRange{ .map_id = 602, .normal = 187, .heroic = 200 }, // HoL
+    BotMapItemLevelRange{ .map_id = 604, .normal = 179, .heroic = 200 }, // GD
+    BotMapItemLevelRange{ .map_id = 608, .normal = 175, .heroic = 200 }, // VH
+    BotMapItemLevelRange{ .map_id = 619, .normal = 167, .heroic = 200 }, // AK
+    BotMapItemLevelRange{ .map_id = 632, .normal = 219, .heroic = 232 }, // FoS
+    BotMapItemLevelRange{ .map_id = 650, .normal = 200, .heroic = 219 }, // TC5
+    BotMapItemLevelRange{ .map_id = 658, .normal = 219, .heroic = 232 }, // PoS
+    BotMapItemLevelRange{ .map_id = 668, .normal = 219, .heroic = 232 }, // HoR
+};
 
 void AddSC_botconfig_scripts();
 void AddSC_death_knight_bot();
@@ -598,6 +619,19 @@ private:
                 BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.MaxItemLevel.Levels contains invalid uint32 value '{}', set to default", tok8[i]);
             uint32 uval = val.value_or(uint32(0));
             _botwanderer_itemlvl_level_brackets[i] = uval;
+        }
+
+        _botdungeon_itemlvl_brackets = {};
+        std::string itemlevel_ratio_by_levels = sConfigMgr->GetStringDefault("NpcBot.DungeonBots.MaxItemLevel.Ratio", "0,0,0,0,0,0,0,0,0");
+        std::vector<std::string_view> tok9 = Bcore::Tokenize(itemlevel_ratio_by_levels, ',', false);
+        ASSERT(tok9.size() == BRACKETS_COUNT, "NpcBot.DungeonBots.MaxItemLevel.Ratio must have exactly %u values", uint32(BRACKETS_COUNT));
+        for (std::size_t i{}; i != tok9.size(); ++i)
+        {
+            Optional<uint32> val = Bcore::StringTo<uint32>(tok9[i]);
+            if (val == std::nullopt)
+                BOT_LOG_ERROR("server.loading", "NpcBot.DungeonBots.MaxItemLevel.Ratio contains invalid float value '{}', set to default", tok9[i]);
+            uint32 uval = val.value_or(uint32(0));
+            _botdungeon_itemlvl_brackets[i] = uval;
         }
 
         //limits
@@ -1185,7 +1219,7 @@ PctBrackets BotCfg::GetBotWandererLevelBrackets()
 }
 uint32 BotCfg::GetBotWandererMaxItemLevel(uint8 level)
 {
-    return _botwanderer_itemlvl_level_brackets[std::min<size_t>(BRACKETS_COUNT - 1, level / 10)];
+    return _botwanderer_itemlvl_level_brackets[std::min<std::size_t>(BRACKETS_COUNT - 1, level / 10)];
 }
 uint32 BotCfg::GetBotWandererKillRewardMoney()
 {
@@ -1199,6 +1233,15 @@ uint32 BotCfg::GetBotWandererKillRewardItemMaxQuality()
 {
     return _killrewardWandererItemQuality;
 }
+
+uint32 BotCfg::GetBotDungeonMaxItemLevel(uint8 level, uint16 map_id, Difficulty map_difficulty)
+{
+    const bool heroic = map_difficulty == Difficulty::DUNGEON_DIFFICULTY_HEROIC;
+    auto ci = std::ranges::find_if(MAP_MAX_ITEM_LEVELS, [map_id](BotMapItemLevelRange r) { return r.map_id == map_id; });
+    const uint16 ilvl = ci != MAP_MAX_ITEM_LEVELS.cend() ? heroic ? ci->heroic : ci->normal : heroic ? MAX_ITEM_LEVEL_WOTLK_HEROIC : MAX_ITEM_LEVEL_WOTLK_NORMAL;
+    return static_cast<uint32>(std::ceil(CalculatePct(static_cast<float>(ilvl), _botdungeon_itemlvl_brackets[std::min<std::size_t>(BRACKETS_COUNT - 1, level / 10)])));
+}
+
 float BotCfg::GetBotDamageModByClass(uint8 botclass)
 {
     switch (botclass)
