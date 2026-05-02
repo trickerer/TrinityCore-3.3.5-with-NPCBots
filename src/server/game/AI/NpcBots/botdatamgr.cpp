@@ -2224,7 +2224,7 @@ void BotDataMgr::CreateGeneratedBotsSortedGear()
         if (proto.StatsCount > 0 && std::ranges::any_of(proto.ItemStat, [](_ItemStat const& stat) {
             return (stat.ItemStatType == ITEM_MOD_DEFENSE_SKILL_RATING || stat.ItemStatType == ITEM_MOD_DODGE_RATING ||
                 stat.ItemStatType == ITEM_MOD_PARRY_RATING || stat.ItemStatType == ITEM_MOD_BLOCK_VALUE) &&
-                stat.ItemStatValue > 0; 
+                stat.ItemStatValue > 0;
         }))
         {
             gencat_mask = 1u << NpcBotGeneratedCategory::BOT_GENERATED_DUNGEON;
