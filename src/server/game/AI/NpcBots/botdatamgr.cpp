@@ -2186,7 +2186,7 @@ void BotDataMgr::CreateGeneratedBotsSortedGear()
         switch (proto.Quality)
         {
             case ITEM_QUALITY_NORMAL:
-                if (std::ranges::any_of(proto.Spells, [](_Spell const& spell) { return !!spell.SpellId; }))
+                if (std::ranges::any_of(proto.Effects, [](ItemEffect const& spell) { return !!spell.SpellID; }))
                     skip = true;
                 if (proto.RequiredLevel > 14)
                     skip = true;
