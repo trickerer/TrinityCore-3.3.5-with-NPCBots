@@ -1279,7 +1279,7 @@ public:
                 if (lvl >= 20)
                     pctbonus *= 1.1f;
                 //Poleaxe Specialization: 5% additional critical damage for all attacks
-                if ((GetSpec() == BOT_SPEC_WARRIOR_PROTECTION) && lvl >= 30)
+                if ((GetSpec() == BOT_SPEC_WARRIOR_ARMS) && lvl >= 30)
                     if (Item const* weap = GetEquips(uint8(attackType)))
                         if (ItemTemplate const* proto = weap->GetTemplate())
                             if (proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || proto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
