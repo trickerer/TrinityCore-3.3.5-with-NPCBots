@@ -188,7 +188,7 @@ enum DruidSpecial
     PRIMAL_FURY_EFFECT_ENERGIZE         = 16959,//5 rage
 
     FORCE_OF_NATURE_1                   = 33831, //not casted
-    PRE_PULL_HEAL_TIMER                 = 1500
+    PRE_PULL_HEAL_TIMER                 = 1100
 };
 
 static const std::vector<uint32> Druid_spells_damage
@@ -1358,73 +1358,50 @@ public:
 
         void DoPrePullTankHealing(uint32 diff)
         {
-            if (prePullHealTimer > diff || GC_Timer > diff)
-                return;
-            if (me->IsInCombat() || master->IsInCombat() || me->IsMounted() || me->GetVehicle() ||
-                !HasRole(BOT_ROLE_HEAL) || HasRole(BOT_ROLE_TANK))
-                return;
-            if (IAmFree() || IsCasting())
-                return;
-            if (master->GetBotMgr()->IsPartyInCombat(false))
+            if (prePullHealTimer > diff || GC_Timer > diff || Rand() > 75)
                 return;
 
             prePullHealTimer = PRE_PULL_HEAL_TIMER;
 
-            if (me->GetPowerType() != POWER_MANA || GetManaPCT(me) < 55)
+            if (me->IsMounted() || me->GetVehicle() || !HasRole(BOT_ROLE_HEAL) || HasRole(BOT_ROLE_TANK) || IAmFree() || !master->GetGroup() || GetManaPCT(me) < 55 || IsCasting())
                 return;
-
-            if (_form != BOT_STANCE_NONE && _form != DRUID_TREE_FORM)
-                if (!removeShapeshiftForm())
-                    return;
 
             for (Unit* member : BotMgr::GetAllGroupMembers(master))
             {
-                if (!member || member == me || !member->IsAlive() || me->GetMap() != member->FindMap())
-                    continue;
-                if (member->isPossessed() || member->IsCharmed())
-                    continue;
-                if (member->IsInCombat() || !member->getAttackers().empty())
-                    continue;
-                if (!IsTank(member))
-                    continue;
-                if (me->GetDistance(member) > 40.f)
+                if (member == me || !member->IsAlive() || me->GetMap() != member->FindMap() || !IsTank(member) || me->GetDistance(member) > 40.f)
                     continue;
 
-                Unit* nearby = member->SelectNearbyTarget(nullptr, 45.f);
-                if (!nearby || !nearby->IsAlive() || !nearby->IsInWorld() || nearby->FindMap() != me->GetMap() ||
-                    !nearby->IsCreature() || !me->IsValidAttackTarget(nearby))
+                Unit const* target = !member->getAttackers().empty() ? *member->getAttackers().begin() : member->GetVictim();
+                if (!target || !target->IsCreature() || member->GetExactDistSq(target) > 50 * 50)
                     continue;
 
-                if (uint32 REJUVENATION = GetSpell(REJUVENATION_1))
+                //check if combat is starting
+                const bool engaged = (!member->IsInCombat() || !target->IsInCombat()) && target == member->GetVictim(); //BotActionTypes::BOT_ACTION_PULL / master attacks
+                const bool engaged_by = target->ToCreature()->CanHaveThreatList() && target->GetThreatManager().GetThreat(member) < member->GetMaxHealth() / 4;
+
+                if (!engaged && !engaged_by)
+                    continue;
+
+                if (IsSpellReady(REJUVENATION_1, diff) && !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x10, 0x0, 0x0, me->GetGUID()))
                 {
-                    if (IsSpellReady(REJUVENATION_1, diff) &&
-                        !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x10, 0x0, 0x0, me->GetGUID()))
-                    {
-                        if (doCast(member, REJUVENATION))
-                            return;
-                    }
+                    if (doCast(member, GetSpell(REJUVENATION_1)))
+                        return;
                 }
 
-                if (uint32 REGROWTH = GetSpell(REGROWTH_1))
-                {
-                    if (IsSpellReady(REGROWTH_1, diff) &&
-                        !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x40, 0x0, 0x0, me->GetGUID()))
-                    {
-                        if (doCast(member, REGROWTH))
-                            return;
-                    }
-                }
+                // Healing spells with cast time will be interrupted when cast on target with full hp
+                //if (IsSpellReady(REGROWTH_1, diff) && !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x40, 0x0, 0x0, me->GetGUID()))
+                //{
+                //    if (doCast(member, GetSpell(REGROWTH_1)))
+                //        return;
+                //}
 
-                if (uint32 LIFEBLOOM = GetSpell(LIFEBLOOM_1))
+                if (IsSpellReady(LIFEBLOOM_1, diff))
                 {
-                    if (IsSpellReady(LIFEBLOOM_1, diff))
+                    AuraEffect const* bloom = member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x0, 0x10, 0x0, me->GetGUID());
+                    if (!bloom || bloom->GetBase()->GetStackAmount() < 3 || bloom->GetBase()->GetDuration() < 3500)
                     {
-                        AuraEffect const* bloom = member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x0, 0x10, 0x0, me->GetGUID());
-                        if (!bloom || bloom->GetBase()->GetStackAmount() < 3 || bloom->GetBase()->GetDuration() < 3500)
-                        {
-                            if (doCast(member, LIFEBLOOM))
-                                return;
-                        }
+                        if (doCast(member, GetSpell(LIFEBLOOM_1)))
+                            return;
                     }
                 }
             }
