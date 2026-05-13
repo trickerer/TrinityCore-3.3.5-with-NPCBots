@@ -2166,7 +2166,7 @@ public:
             return true;
         }
 
-        bot_ai::BotAction order(BotActionTypes::BOT_ACTION_PULL);
+        bot_ai::BotAction order(BotActionTypes::BOT_ACTION_PULL, 0s, 5s);
         order.params.pull_params.target_guid = target_guid;
 
         if (bot->GetBotAI()->EnqueueAction(std::move(order), true))
