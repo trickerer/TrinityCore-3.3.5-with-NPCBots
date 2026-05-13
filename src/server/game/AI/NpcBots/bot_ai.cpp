@@ -16509,7 +16509,7 @@ void bot_ai::_processQueuedActions()
 
     BotAction const& action = GetFirstActionInQueue();
 
-    if (action._exec_point <= now)
+    if (action._exec_point > now)
         return;
 
     Unit* target = nullptr;
@@ -16550,7 +16550,7 @@ void bot_ai::_processQueuedActions()
                 return;
             }
 
-            const bool is_casting = IsCasting(target);
+            const bool is_casting = IsCasting();
             const bool is_target_casting = IsCasting(target);
             const uint32 spell_id = _spells.at(action.params.spell_cast_params.base_spell).spellId;
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
