@@ -65,7 +65,7 @@ enum DeathKnightBaseSpells
     DEATHCHILL_1                        = 49796,
     HYSTERIA_1                          = 49016,
     HUNGERING_COLD_1                    = 49203,
-    ANTI_MAGIC_ZONE_1                   = 48707,
+    ANTI_MAGIC_ZONE_1                   = 51052,
     VAMPIRIC_BLOOD_1                    = 55233,
     UNBREAKABLE_ARMOR_1                 = 51271,
     BONE_SHIELD_1                       = 49222,
