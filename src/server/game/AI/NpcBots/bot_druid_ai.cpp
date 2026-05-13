@@ -187,7 +187,8 @@ enum DruidSpecial
     INFECTED_WOUNDS_EFFECT              = 58181,//rank 3
     PRIMAL_FURY_EFFECT_ENERGIZE         = 16959,//5 rage
 
-    FORCE_OF_NATURE_1                   = 33831 //not casted
+    FORCE_OF_NATURE_1                   = 33831, //not casted
+    PRE_PULL_HEAL_TIMER                 = 1500
 };
 
 static const std::vector<uint32> Druid_spells_damage
@@ -564,6 +565,8 @@ public:
                 CureGroup(GetSpell(CURE_POISON_1), diff);
                 CureGroup(GetSpell(REMOVE_CURSE_1), diff);
             }
+
+            DoPrePullTankHealing(diff);
 
             if (ProcessImmediateNonAttackTarget())
                 return;
@@ -1349,6 +1352,80 @@ public:
                 {
                     if (doCast(me, GetSpell(TRAVEL_FORM_1)))
                         return;
+                }
+            }
+        }
+
+        void DoPrePullTankHealing(uint32 diff)
+        {
+            if (prePullHealTimer > diff || GC_Timer > diff)
+                return;
+            if (me->IsInCombat() || master->IsInCombat() || me->IsMounted() || me->GetVehicle() ||
+                !HasRole(BOT_ROLE_HEAL) || HasRole(BOT_ROLE_TANK))
+                return;
+            if (IAmFree() || IsCasting())
+                return;
+            if (master->GetBotMgr()->IsPartyInCombat(false))
+                return;
+
+            prePullHealTimer = PRE_PULL_HEAL_TIMER;
+
+            if (me->GetPowerType() != POWER_MANA || GetManaPCT(me) < 55)
+                return;
+
+            if (_form != BOT_STANCE_NONE && _form != DRUID_TREE_FORM)
+                if (!removeShapeshiftForm())
+                    return;
+
+            for (Unit* member : BotMgr::GetAllGroupMembers(master))
+            {
+                if (!member || member == me || !member->IsAlive() || me->GetMap() != member->FindMap())
+                    continue;
+                if (member->isPossessed() || member->IsCharmed())
+                    continue;
+                if (member->IsInCombat() || !member->getAttackers().empty())
+                    continue;
+                if (!IsTank(member))
+                    continue;
+                if (me->GetDistance(member) > 40.f)
+                    continue;
+
+                Unit* nearby = member->SelectNearbyTarget(nullptr, 45.f);
+                if (!nearby || !nearby->IsAlive() || !nearby->IsInWorld() || nearby->FindMap() != me->GetMap() ||
+                    !nearby->IsCreature() || !me->IsValidAttackTarget(nearby))
+                    continue;
+
+                if (uint32 REJUVENATION = GetSpell(REJUVENATION_1))
+                {
+                    if (IsSpellReady(REJUVENATION_1, diff) &&
+                        !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x10, 0x0, 0x0, me->GetGUID()))
+                    {
+                        if (doCast(member, REJUVENATION))
+                            return;
+                    }
+                }
+
+                if (uint32 REGROWTH = GetSpell(REGROWTH_1))
+                {
+                    if (IsSpellReady(REGROWTH_1, diff) &&
+                        !member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x40, 0x0, 0x0, me->GetGUID()))
+                    {
+                        if (doCast(member, REGROWTH))
+                            return;
+                    }
+                }
+
+                if (uint32 LIFEBLOOM = GetSpell(LIFEBLOOM_1))
+                {
+                    if (IsSpellReady(LIFEBLOOM_1, diff))
+                    {
+                        AuraEffect const* bloom = member->GetAuraEffect(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, 0x0, 0x10, 0x0, me->GetGUID());
+                        if (!bloom || bloom->GetBase()->GetStackAmount() < 3 || bloom->GetBase()->GetDuration() < 3500)
+                        {
+                            if (doCast(member, LIFEBLOOM))
+                                return;
+                        }
+                    }
                 }
             }
         }
@@ -2611,6 +2688,7 @@ public:
 
             hibery = false;
             hiberyCheckTimer = 0;
+            prePullHealTimer = 0;
 
             me->SetMaxPower(POWER_ENERGY, 100); //for regeneration
             rageLossMult = sWorld->getRate(RATE_POWER_RAGE_LOSS);
@@ -2625,6 +2703,7 @@ public:
             if (ragetimer > diff)                   ragetimer -= diff;
 
             if (hiberyCheckTimer > diff)            hiberyCheckTimer -= diff;
+            if (prePullHealTimer > diff)            prePullHealTimer -= diff;
         }
 
         void InitPowers() override
@@ -2957,6 +3036,7 @@ public:
 /*Misc*/uint32 ragetimer;
         bool hibery;
         uint32 hiberyCheckTimer;
+        uint32 prePullHealTimer;
 /*Misc*/int32 rage, energy;
 
         using HealMap = std::unordered_map<uint32 /*baseId*/, int32 /*amount*/>;
