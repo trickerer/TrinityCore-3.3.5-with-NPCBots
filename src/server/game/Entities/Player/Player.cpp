@@ -34,6 +34,7 @@
 #include "CharacterDatabaseCleaner.h"
 #include "CharacterPackets.h"
 #include "Chat.h"
+#include "ChatPackets.h"
 #include "CinematicMgr.h"
 #include "CombatLogPackets.h"
 #include "CombatPackets.h"
@@ -43,6 +44,7 @@
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "EquipmentSetPackets.h"
 #include "Formulas.h"
 #include "GameClient.h"
 #include "GameEventMgr.h"
@@ -59,6 +61,7 @@
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Item.h"
+#include "ItemPackets.h"
 #include "KillRewarder.h"
 #include "Language.h"
 #include "LFGMgr.h"
@@ -70,6 +73,7 @@
 #include "MapManager.h"
 #include "MiscPackets.h"
 #include "MotionMaster.h"
+#include "MovementPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -80,6 +84,7 @@
 #include "PoolMgr.h"
 #include "QueryHolder.h"
 #include "QuestDef.h"
+#include "QuestPackets.h"
 #include "QuestPools.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
@@ -1737,12 +1742,16 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packets
-                WorldPacket data(SMSG_TRANSFER_PENDING, 4 + 4 + 4);
-                data << uint32(mapid);
+                WorldPackets::Movement::TransferPending transferPending;
+                transferPending.MapID = mapid;
                 if (Transport* transport = GetTransport())
-                    data << transport->GetEntry() << GetMapId();
+                {
+                    WorldPackets::Movement::ShipTransferPending& shipTransferPending = transferPending.Ship.emplace();
+                    shipTransferPending.ID = transport->GetEntry();
+                    shipTransferPending.OriginMapID = GetMapId();
+                }
 
-                SendDirectMessage(&data);
+                SendDirectMessage(transferPending.Write());
             }
 
             // remove from old map now
@@ -1760,14 +1769,11 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
-                WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
-                data << uint32(mapid);
-                if (GetTransport())
-                    data << m_movementInfo.transport.pos.PositionXYZOStream();
-                else
-                    data << m_teleport_dest.PositionXYZOStream();
+                WorldPackets::Movement::NewWorld packet;
+                packet.MapID = mapid;
+                packet.Pos = GetTransport() ? m_movementInfo.transport.pos : m_teleport_dest.GetPosition();
 
-                SendDirectMessage(&data);
+                SendDirectMessage(packet.Write());
                 SendSavedInstances();
             }
 
@@ -2842,11 +2848,7 @@ void Player::SendInitialSpells()
 
 void Player::SendUnlearnSpells()
 {
-    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
-
-    uint32 spellCount = 0;
-    size_t countPos = data.wpos();
-    data << uint32(spellCount);                             // spell count placeholder
+    WorldPackets::Spells::SendUnlearnSpells sendUnlearnSpells;
 
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
@@ -2877,14 +2879,10 @@ void Player::SendUnlearnSpells()
         if (!nextRank || !HasSpell(nextRank))
             continue;
 
-        data << uint32(itr->first);
-
-        ++spellCount;
+        sendUnlearnSpells.Spells.push_back(itr->first);
     }
 
-    data.put<uint32>(countPos, spellCount);                  // write real count value
-
-    SendDirectMessage(&data);
+    SendDirectMessage(sendUnlearnSpells.Write());
 }
 
 void Player::SendTameFailure(uint8 result)
@@ -6099,27 +6097,15 @@ int16 Player::GetSkillTempBonusValue(uint32 skill) const
 
 void Player::SendActionButtons(uint32 state) const
 {
-    WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
-    data << uint8(state);
-    /*
-        state can be 0, 1, 2
-        0 - Sends initial action buttons, client does not validate if we have the spell or not
-        1 - Used used after spec swaps, client validates if a spell is known.
-        2 - Clears the action bars client sided. This is sent during spec swap before unlearning and before sending the new buttons
-    */
-    if (state != 2)
-    {
-        for (uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
-        {
-            ActionButtonList::const_iterator itr = m_actionButtons.find(button);
-            if (itr != m_actionButtons.end() && itr->second.uState != ACTIONBUTTON_DELETED)
-                data << uint32(itr->second.packedData);
-            else
-                data << uint32(0);
-        }
-    }
+    WorldPackets::Spells::UpdateActionButtons packet;
 
-    SendDirectMessage(&data);
+    for (auto const& [i, button] : m_actionButtons)
+        if (button.uState != ACTIONBUTTON_DELETED && i < packet.ActionButtons.size())
+            packet.ActionButtons[i] = button.packedData;
+
+    packet.Reason = state;
+
+    SendDirectMessage(packet.Write());
 }
 
 bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type) const
@@ -16817,15 +16803,10 @@ void Player::SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint
 
 void Player::SendQuestGiverStatusMultiple()
 {
-    uint32 count = 0;
-
-    WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 4);
-    data << uint32(count);                                  // placeholder
+    WorldPackets::Quest::QuestGiverStatusMultiple response;
 
     for (auto itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
-        uint32 questStatus = DIALOG_STATUS_NONE;
-
         if (itr->IsAnyTypeCreature())
         {
             // need also pet quests case support
@@ -16835,11 +16816,7 @@ void Player::SendQuestGiverStatusMultiple()
             if (!questgiver->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
                 continue;
 
-            questStatus = GetQuestDialogStatus(questgiver);
-
-            data << questgiver->GetGUID();
-            data << uint8(questStatus);
-            ++count;
+            response.QuestGiver.emplace_back(questgiver->GetGUID(), GetQuestDialogStatus(questgiver));
         }
         else if (itr->IsGameObject())
         {
@@ -16847,16 +16824,11 @@ void Player::SendQuestGiverStatusMultiple()
             if (!questgiver || questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
                 continue;
 
-            questStatus = GetQuestDialogStatus(questgiver);
-
-            data << questgiver->GetGUID();
-            data << uint8(questStatus);
-            ++count;
+            response.QuestGiver.emplace_back(questgiver->GetGUID(), GetQuestDialogStatus(questgiver));
         }
     }
 
-    data.put<uint32>(0, count);                             // write real count
-    SendDirectMessage(&data);
+    SendDirectMessage(response.Write());
 }
 
 bool Player::HasPvPForcingQuest() const
@@ -17031,6 +17003,12 @@ void Player::SendBindPointUpdate()
     packet.BindPosition = Position(m_homebindX, m_homebindY, m_homebindZ);
     packet.BindMapID = m_homebindMapId;
     packet.BindAreaID = m_homebindAreaId;
+    SendDirectMessage(packet.Write());
+}
+
+void Player::SendPlayerBound(ObjectGuid const& binderGuid, uint32 areaId) const
+{
+    WorldPackets::Misc::PlayerBound packet(binderGuid, areaId);
     SendDirectMessage(packet.Write());
 }
 
@@ -20642,9 +20620,9 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true, false, true);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_SAY, language, this, this, _text);
+    SendMessageToSetInRange(packet.Write(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true, false, true);
 }
 
 void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -20657,9 +20635,9 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true, false, true);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_YELL, language, this, this, _text);
+    SendMessageToSetInRange(packet.Write(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true, false, true);
 }
 
 void Player::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -20672,9 +20650,9 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT), true);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+    SendMessageToSetInRange(packet.Write(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT), true);
 }
 
 void Player::WhisperAddon(std::string const& text, Player* receiver)
@@ -20682,9 +20660,9 @@ void Player::WhisperAddon(std::string const& text, Player* receiver)
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, uint32(LANG_ADDON), _text, receiver);
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, this, this, _text);
-    receiver->SendDirectMessage(&data);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_WHISPER, LANG_ADDON, this, this, _text);
+    receiver->SendDirectMessage(packet.Write());
 }
 
 void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
@@ -20704,16 +20682,16 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, Language(language), this, this, _text);
-    target->SendDirectMessage(&data);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_WHISPER, Language(language), this, this, _text);
+    target->SendDirectMessage(packet.Write());
 
     // rest stuff shouldn't happen in case of addon message
     if (isAddonMessage)
         return;
 
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), target, target, _text);
-    SendDirectMessage(&data);
+    packet.Initialize(CHAT_MSG_WHISPER_INFORM, Language(language), target, target, _text);
+    SendDirectMessage(packet.Write());
 
     if (!isAcceptWhispers() && !IsGameMaster() && !target->IsGameMaster())
     {
@@ -20741,9 +20719,9 @@ void Player::Whisper(uint32 textId, Player* target, bool /*isBossWhisper = false
     }
 
     LocaleConstant locale = target->GetSession()->GetSessionDbLocaleIndex();
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, GetGender()), 0, "", locale);
-    target->SendDirectMessage(&data);
+    WorldPackets::Chat::Chat packet;
+    packet.Initialize(CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, GetGender()), 0, "", locale);
+    target->SendDirectMessage(packet.Write());
 }
 
 Item* Player::GetMItem(ObjectGuid::LowType id)
@@ -21122,9 +21100,10 @@ void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 // send Proficiency
 void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask) const
 {
-    WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
-    data << uint8(itemClass) << uint32(itemSubclassMask);
-    SendDirectMessage(&data);
+    WorldPackets::Item::SetProficiency packet;
+    packet.ProficiencyMask = itemSubclassMask;
+    packet.ProficiencyClass = itemClass;
+    SendDirectMessage(packet.Write());
 }
 
 void Player::RemovePetitionsAndSigns(ObjectGuid guid, CharterTypes type)
@@ -22625,6 +22604,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     /// SMSG_INITIAL_SPELLS
     SendInitialSpells();
+
     /// SMSG_SEND_UNLEARN_SPELLS
     SendUnlearnSpells();
 
@@ -22770,21 +22750,11 @@ void Player::SendUpdateToOutOfRangeGroupMembers()
 
 void Player::SendTransferAborted(uint32 mapid, TransferAbortReason reason, uint8 arg) const
 {
-    WorldPacket data(SMSG_TRANSFER_ABORTED, 4+2);
-    data << uint32(mapid);
-    data << uint8(reason);                                 // transfer abort reason
-    switch (reason)
-    {
-        case TRANSFER_ABORT_INSUF_EXPAN_LVL:
-        case TRANSFER_ABORT_DIFFICULTY:
-        case TRANSFER_ABORT_UNIQUE_MESSAGE:
-            // these are the ONLY cases that have an extra argument in the packet!!!
-            data << uint8(arg);
-            break;
-        default:
-            break;
-    }
-    SendDirectMessage(&data);
+    WorldPackets::Movement::TransferAborted transferAborted;
+    transferAborted.MapID = mapid;
+    transferAborted.Arg = arg;
+    transferAborted.TransfertAbort = reason;
+    SendDirectMessage(transferAborted.Write());
 }
 
 void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool welcome) const
@@ -25573,72 +25543,55 @@ void Player::SendTalentsInfoData(bool pet)
     SendDirectMessage(updateTalentData.Write());
 }
 
+ObjectGuid const EquipmentSetInfo::IgnoredSlot = []
+{
+    ObjectGuid guid;
+    guid.SetRawValue(1);
+    return guid;
+}();
+
 void Player::SendEquipmentSetList()
 {
-    uint32 count = 0;
-    WorldPacket data(SMSG_EQUIPMENT_SET_LIST, 1000); // guess size
-    size_t count_pos = data.wpos();
-    data << uint32(count);                                  // count placeholder
-
-    static ObjectGuid const IgnoredSlot = []
-    {
-        ObjectGuid guid;
-        guid.SetRawValue(1);
-        return guid;
-    }();
+    WorldPackets::EquipmentSet::LoadEquipmentSet data;
 
     for (EquipmentSetContainer::value_type const& eqSet : _equipmentSets)
     {
         if (eqSet.second.State == EQUIPMENT_SET_DELETED)
             continue;
 
-        data.appendPackGUID(eqSet.first);
-        data << uint32(eqSet.second.Data.SetID);
-        data << eqSet.second.Data.SetName;
-        data << eqSet.second.Data.SetIcon;
-
-        for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-        {
-            // ignored slots stored in IgnoreMask, client wants "1" as raw GUID, so no HighGuid::Item
-            if (eqSet.second.Data.IgnoreMask & (1 << i))
-                data << IgnoredSlot.WriteAsPacked();
-            else
-                data << eqSet.second.Data.Pieces[i].WriteAsPacked();
-        }
-
-        ++count;                                            // client have limit but it checked at loading and set
+        data.SetData.push_back(&eqSet.second.Data);
     }
-    data.put<uint32>(count_pos, count);
-    SendDirectMessage(&data);
+
+    SendDirectMessage(data.Write());
 }
 
-void Player::SetEquipmentSet(EquipmentSetInfo::EquipmentSetData const& eqSet)
+void Player::SetEquipmentSet(EquipmentSetInfo::EquipmentSetData const& newEqSet)
 {
-    if (eqSet.Guid != 0)
+    if (newEqSet.Guid != 0)
     {
         // something wrong...
-        auto itr = _equipmentSets.find(eqSet.Guid);
-        if (itr == _equipmentSets.end() || itr->second.Data.Guid != eqSet.Guid)
+        auto itr = _equipmentSets.find(newEqSet.Guid);
+        if (itr == _equipmentSets.end() || itr->second.Data.Guid != newEqSet.Guid)
         {
             TC_LOG_ERROR("entities.player", "Player::SetEquipmentSet: Player '{}' ({}) tried to save nonexistent equipment set {} (index: {})",
-                GetName(), GetGUID().ToString(), eqSet.Guid, eqSet.SetID);
+                GetName(), GetGUID().ToString(), newEqSet.Guid, newEqSet.SetID);
             return;
         }
     }
 
-    uint64 setGuid = (eqSet.Guid != 0) ? eqSet.Guid : sObjectMgr->GenerateEquipmentSetGuid();
+    uint64 setGuid = (newEqSet.Guid != 0) ? newEqSet.Guid : sObjectMgr->GenerateEquipmentSetGuid();
 
     EquipmentSetInfo& eqSlot = _equipmentSets[setGuid];
-    eqSlot.Data = eqSet;
+    eqSlot.Data = newEqSet;
 
-    if (eqSet.Guid == 0)
+    if (eqSlot.Data.Guid == 0)
     {
         eqSlot.Data.Guid = setGuid;
 
-        WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4 + 1);
-        data << uint32(eqSlot.Data.SetID);
-        data.appendPackGUID(eqSlot.Data.Guid);
-        SendDirectMessage(&data);
+        WorldPackets::EquipmentSet::EquipmentSetID data;
+        data.GUID = eqSlot.Data.Guid;
+        data.SetID = eqSlot.Data.SetID;
+        SendDirectMessage(data.Write());
     }
 
     eqSlot.State = (eqSlot.State == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED);
@@ -25715,11 +25668,11 @@ void Player::_SaveBGData(CharacterDatabaseTransaction trans)
     trans->Append(stmt);
 }
 
-void Player::DeleteEquipmentSet(uint64 setGuid)
+void Player::DeleteEquipmentSet(uint64 id)
 {
     for (EquipmentSetContainer::iterator itr = _equipmentSets.begin(); itr != _equipmentSets.end();)
     {
-        if (itr->second.Data.Guid == setGuid)
+        if (itr->second.Data.Guid == id)
         {
             if (itr->second.State == EQUIPMENT_SET_NEW)
                 itr = _equipmentSets.erase(itr);
@@ -26459,6 +26412,12 @@ void Player::SetInGuild(ObjectGuid::LowType guildId)
 }
 
 Guild* Player::GetGuild()
+{
+    ObjectGuid::LowType guildId = GetGuildId();
+    return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;
+}
+
+Guild const* Player::GetGuild() const
 {
     ObjectGuid::LowType guildId = GetGuildId();
     return guildId ? sGuildMgr->GetGuildById(guildId) : nullptr;

@@ -23,6 +23,7 @@
 #include "InstanceSaveMgr.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "MiscPackets.h"
 #include "MotionMaster.h"
 #include "MovementGenerator.h"
 #include "MovementPackets.h"
@@ -42,7 +43,7 @@
 #include <boost/accumulators/statistics.hpp>
 #include <boost/circular_buffer.hpp>
 
-bool WorldSession::ValidateMovementInfo(MovementInfo* mi) const
+bool WorldSession::ValidateMovementInfo(Unit const* mover, MovementInfo* mi) const
 {
     //! Anti-cheat checks. Please keep them in seperate if () blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
@@ -65,14 +66,11 @@ bool WorldSession::ValidateMovementInfo(MovementInfo* mi) const
     } while (0)
     #endif
 
-    if (!IsRightUnitBeingMoved(mi->guid))
+    if (!mover)
         return false;
 
     if (!mi->pos.IsPositionValid())
         return false;
-
-    // never nullptr, guaranteed by IsRightUnitBeingMoved
-    Unit* mover = GetGameClient()->GetActivelyMovedUnit();
 
     if (!GetPlayer()->GetVehicleBase() || !(GetPlayer()->GetVehicle()->GetVehicleInfo()->Flags & VEHICLE_FLAG_FIXED_POSITION))
         REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_ROOT), MOVEMENTFLAG_ROOT);
@@ -141,7 +139,50 @@ bool WorldSession::ValidateMovementInfo(MovementInfo* mi) const
     return true;
 }
 
-void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvPacket*/)
+Unit* WorldSession::ValidateAndGetUnitBeingMoved(ObjectGuid guid, bool forStatusAck) const
+{
+    GameClient* client = GetGameClient();
+
+    // the client is attempting to tamper movement data
+    // edit: this wouldn't happen in retail but it does in TC, even with a legitimate client.
+    Unit* activelyMovedUnit = client->GetActivelyMovedUnit();
+    if (!forStatusAck && (!activelyMovedUnit || activelyMovedUnit->GetGUID() != guid))
+    {
+        TC_LOG_DEBUG("entities.unit", "Attempt at tampering movement data by Player {}", _player->GetName());
+        return nullptr;
+    }
+
+    // This can happen if a legitimate client has lost control of a unit but hasn't received SMSG_CONTROL_UPDATE before
+    // sending this packet yet. The server should silently ignore all MOVE messages coming from the client as soon
+    // as control over that unit is revoked (through a 'SMSG_CONTROL_UPDATE allowMove=false' message).
+    if (!client->IsAllowedToMove(guid))
+    {
+        TC_LOG_DEBUG("entities.unit", "Bad or outdated movement data by Player {}", _player->GetName());
+        return nullptr;
+    }
+
+    if (activelyMovedUnit && activelyMovedUnit->GetGUID() == guid)
+        return activelyMovedUnit;
+
+    if (_player->GetGUID() == guid)
+        return _player;
+
+    return ObjectAccessor::GetUnit(*_player, guid);
+}
+
+uint32 WorldSession::AdjustClientMovementTime(uint32 time) const
+{
+    int64 movementTime = int64(time) + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > SI64LIT(0xFFFFFFFF))
+    {
+        TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
+        return GameTime::GetGameTimeMS();
+    }
+    else
+        return uint32(movementTime);
+}
+
+void WorldSession::HandleMoveWorldportAckOpcode(WorldPackets::Movement::WorldPortResponse& /*packet*/)
 {
     TC_LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAck();
@@ -317,7 +358,8 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
 
     recvPacket >> guid.ReadAsPacked();
 
-    if (!IsRightUnitBeingMoved(guid))
+    Unit* mover = ValidateAndGetUnitBeingMoved(guid, false);
+    if (!mover)
     {
         recvPacket.rfinish();                     // prevent warnings spam
         return;
@@ -326,8 +368,6 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
     uint32 sequenceIndex, time;
     recvPacket >> sequenceIndex >> time;
 
-    GameClient* client = GetGameClient();
-    Unit* mover = client->GetActivelyMovedUnit();
     Player* plMover = mover->ToPlayer();
 
     if (!plMover || !plMover->IsBeingTeleportedNear())
@@ -372,11 +412,10 @@ void WorldSession::HandleMovementOpcodes(WorldPackets::Movement::ClientPlayerMov
 
 void WorldSession::HandleMovementOpcode(OpcodeClient opcode, MovementInfo& movementInfo)
 {
-    if (!ValidateMovementInfo(&movementInfo))
+    Unit* mover = ValidateAndGetUnitBeingMoved(movementInfo.guid, false);
+    if (!ValidateMovementInfo(mover, &movementInfo))
         return;
 
-    GameClient* client = GetGameClient();
-    Unit* mover = client->GetActivelyMovedUnit();
     Player* plrMover = mover->ToPlayer();
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
@@ -985,14 +1024,13 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     recvData >> guid.ReadAsPacked();
     recvData >> timeSkipped;
 
-    if (!IsRightUnitBeingMoved(guid))
+    Unit* mover = ValidateAndGetUnitBeingMoved(guid, false);
+    if (!mover)
     {
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
 
-    GameClient* client = GetGameClient();
-    Unit* mover = client->GetActivelyMovedUnit();
     mover->m_movementInfo.time += timeSkipped;
 
     WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
@@ -1001,24 +1039,19 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-void WorldSession::HandleTimeSyncResponse(WorldPacket& recvData)
+void WorldSession::HandleTimeSyncResponse(WorldPackets::Misc::TimeSyncResponse& packet)
 {
-    TC_LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
-
-    uint32 counter, clientTimestamp;
-    recvData >> counter >> clientTimestamp;
-
-    if (_pendingTimeSyncRequests.count(counter) == 0)
+    if (_pendingTimeSyncRequests.count(packet.SequenceIndex) == 0)
         return;
 
-    uint32 serverTimeAtSent = _pendingTimeSyncRequests.at(counter);
-    _pendingTimeSyncRequests.erase(counter);
+    uint32 serverTimeAtSent = _pendingTimeSyncRequests.at(packet.SequenceIndex);
+    _pendingTimeSyncRequests.erase(packet.SequenceIndex);
 
     // time it took for the request to travel to the client, for the client to process it and reply and for response to travel back to the server.
     // we are going to make 2 assumptions:
     // 1) we assume that the request processing time equals 0.
     // 2) we assume that the packet took as much time to travel from server to client than it took to travel from client to server.
-    uint32 roundTripDuration = getMSTimeDiff(serverTimeAtSent, recvData.GetReceivedTime());
+    uint32 roundTripDuration = getMSTimeDiff(serverTimeAtSent, packet.GetReceivedTime());
     uint32 lagDelay = roundTripDuration / 2;
 
     /*
@@ -1031,7 +1064,7 @@ void WorldSession::HandleTimeSyncResponse(WorldPacket& recvData)
     using the following relation:
     serverTime = clockDelta + clientTime
     */
-    int64 clockDelta = (int64)serverTimeAtSent + (int64)lagDelay - (int64)clientTimestamp;
+    int64 clockDelta = (int64)serverTimeAtSent + (int64)lagDelay - (int64)packet.ClientTime;
     _timeSyncClockDeltaQueue->push_back(std::pair<int64, uint32>(clockDelta, roundTripDuration));
     ComputeNewClockDelta();
 }

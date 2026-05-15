@@ -15,23 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_TRADE_PACKETS_H
-#define TRINITYCORE_TRADE_PACKETS_H
+#ifndef TRINITYCORE_ITEM_PACKETS_H
+#define TRINITYCORE_ITEM_PACKETS_H
 
 #include "Packet.h"
 
 namespace WorldPackets
 {
-    namespace Trade
+    namespace Item
     {
-        class CancelTrade final : public ClientPacket
+        class SetProficiency final : public ServerPacket
         {
         public:
-            explicit CancelTrade(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_TRADE, std::move(packet)) { }
+            explicit SetProficiency() : ServerPacket(SMSG_SET_PROFICIENCY, 1 + 4) { }
 
-            void Read() override { }
+            WorldPacket const* Write() override;
+
+            uint32 ProficiencyMask = 0;
+            uint8 ProficiencyClass = 0;
         };
     }
 }
 
-#endif // TRINITYCORE_TRADE_PACKETS_H
+#endif // TRINITYCORE_ITEM_PACKETS_H

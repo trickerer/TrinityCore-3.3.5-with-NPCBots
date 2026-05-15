@@ -39,6 +39,7 @@
 #include "Log.h"
 #include "Map.h"
 #include "Metric.h"
+#include "MiscPackets.h"
 #include "MovementPackets.h"
 #include "MoveSpline.h"
 #include "ObjectAccessor.h"
@@ -136,7 +137,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     m_sessionDbLocaleIndex(locale),
     _timezoneOffset(timezoneOffset),
     m_latency(0),
-    m_TutorialsChanged(TUTORIALS_FLAG_NONE),
+    _tutorials(),
+    _tutorialsChanged(TUTORIALS_FLAG_NONE),
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     _RBACData(nullptr),
@@ -151,8 +153,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _calendarEventCreationCooldown(0),
     _gameClient(new GameClient(this))
 {
-    memset(m_Tutorials, 0, sizeof(m_Tutorials));
-
     if (m_Socket)
     {
         m_Address = m_Socket->GetRemoteIpAddress().to_string();
@@ -778,7 +778,7 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
 {
     for (uint32 i = 0; i < NUM_ACCOUNT_DATA_TYPES; ++i)
         if (mask & (1 << i))
-            m_accountData[i] = AccountData();
+            _accountData[i] = AccountData();
 
     if (!result)
         return;
@@ -801,13 +801,13 @@ void WorldSession::LoadAccountData(PreparedQueryResult result, uint32 mask)
             continue;
         }
 
-        m_accountData[type].Time = time_t(fields[1].GetUInt32());
-        m_accountData[type].Data = fields[2].GetString();
+        _accountData[type].Time = time_t(fields[1].GetUInt32());
+        _accountData[type].Data = fields[2].GetString();
     }
     while (result->NextRow());
 }
 
-void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string const& data)
+void WorldSession::SetAccountData(AccountDataType type, time_t time, std::string const& data)
 {
     uint32 id = 0;
     CharacterDatabaseStatements index;
@@ -829,12 +829,12 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(index);
     stmt->setUInt32(0, id);
     stmt->setUInt8 (1, type);
-    stmt->setUInt32(2, uint32(tm));
+    stmt->setUInt32(2, uint32(time));
     stmt->setString(3, data);
     CharacterDatabase.Execute(stmt);
 
-    m_accountData[type].Time = tm;
-    m_accountData[type].Data = data;
+    _accountData[type].Time = time;
+    _accountData[type].Data = data;
 }
 
 void WorldSession::SendAccountDataTimes(uint32 mask)
@@ -851,43 +851,42 @@ void WorldSession::SendAccountDataTimes(uint32 mask)
 
 void WorldSession::LoadTutorialsData(PreparedQueryResult result)
 {
-    memset(m_Tutorials, 0, sizeof(uint32) * MAX_ACCOUNT_TUTORIAL_VALUES);
+    _tutorials = { };
 
     if (result)
     {
         for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-            m_Tutorials[i] = (*result)[i].GetUInt32();
-        m_TutorialsChanged |= TUTORIALS_FLAG_LOADED_FROM_DB;
+            _tutorials[i] = (*result)[i].GetUInt32();
+        _tutorialsChanged |= TUTORIALS_FLAG_LOADED_FROM_DB;
     }
 
-    m_TutorialsChanged &= ~TUTORIALS_FLAG_CHANGED;
+    _tutorialsChanged &= ~TUTORIALS_FLAG_CHANGED;
 }
 
 void WorldSession::SendTutorialsData()
 {
-    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * MAX_ACCOUNT_TUTORIAL_VALUES);
-    for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-        data << m_Tutorials[i];
-    SendPacket(&data);
+    WorldPackets::Misc::TutorialFlags packet;
+    packet.TutorialData = _tutorials;
+    SendPacket(packet.Write());
 }
 
 void WorldSession::SaveTutorialsData(CharacterDatabaseTransaction trans)
 {
-    if (!(m_TutorialsChanged & TUTORIALS_FLAG_CHANGED))
+    if (!(_tutorialsChanged & TUTORIALS_FLAG_CHANGED))
         return;
 
-    bool const hasTutorialsInDB = (m_TutorialsChanged & TUTORIALS_FLAG_LOADED_FROM_DB) != 0;
+    bool const hasTutorialsInDB = (_tutorialsChanged & TUTORIALS_FLAG_LOADED_FROM_DB) != 0;
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(hasTutorialsInDB ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-        stmt->setUInt32(i, m_Tutorials[i]);
+        stmt->setUInt32(i, _tutorials[i]);
     stmt->setUInt32(MAX_ACCOUNT_TUTORIAL_VALUES, GetAccountId());
     trans->Append(stmt);
 
     // now has, set flag so next save uses update query
     if (!hasTutorialsInDB)
-        m_TutorialsChanged |= TUTORIALS_FLAG_LOADED_FROM_DB;
+        _tutorialsChanged |= TUTORIALS_FLAG_LOADED_FROM_DB;
 
-    m_TutorialsChanged &= ~TUTORIALS_FLAG_CHANGED;
+    _tutorialsChanged &= ~TUTORIALS_FLAG_CHANGED;
 }
 
 void WorldSession::LoadInstanceTimeRestrictions(PreparedQueryResult result)
@@ -959,7 +958,8 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
         return;
     }
 
-    ValidateMovementInfo(mi);
+    Unit* mover = ValidateAndGetUnitBeingMoved(mi->guid, true /*all remaining uses are ack handlers*/);
+    ValidateMovementInfo(mover, mi);
 }
 
 void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
@@ -1540,49 +1540,13 @@ void WorldSession::ResetTimeSync()
 
 void WorldSession::SendTimeSync()
 {
-    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
-    data << uint32(_timeSyncNextCounter);
-    SendPacket(&data);
+    WorldPackets::Misc::TimeSyncRequest timeSyncRequest;
+    timeSyncRequest.SequenceIndex = _timeSyncNextCounter;
+    SendPacket(timeSyncRequest.Write());
 
     _pendingTimeSyncRequests[_timeSyncNextCounter] = getMSTime();
 
     // Schedule next sync in 10 sec (except for the 2 first packets, which are spaced by only 5s)
     _timeSyncTimer = _timeSyncNextCounter == 0 ? 5000 : 10000;
     _timeSyncNextCounter++;
-}
-
-uint32 WorldSession::AdjustClientMovementTime(uint32 time) const
-{
-    int64 movementTime = int64(time) + _timeSyncClockDelta;
-    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
-    {
-        TC_LOG_WARN("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
-        return GameTime::GetGameTimeMS();
-    }
-    else
-        return uint32(movementTime);
-}
-
-bool WorldSession::IsRightUnitBeingMoved(ObjectGuid guid) const
-{
-    GameClient* client = GetGameClient();
-
-    // the client is attempting to tamper movement data
-    // edit: this wouldn't happen in retail but it does in TC, even with a legitimate client.
-    if (!client->GetActivelyMovedUnit() || client->GetActivelyMovedUnit()->GetGUID() != guid)
-    {
-        TC_LOG_DEBUG("entities.unit", "Attempt at tampering movement data by Player {}", _player->GetName());
-        return false;
-    }
-
-    // This can happen if a legitimate client has lost control of a unit but hasn't received SMSG_CONTROL_UPDATE before
-    // sending this packet yet. The server should silently ignore all MOVE messages coming from the client as soon
-    // as control over that unit is revoked (through a 'SMSG_CONTROL_UPDATE allowMove=false' message).
-    if (!client->IsAllowedToMove(guid))
-    {
-        TC_LOG_DEBUG("entities.unit", "Bad or outdated movement data by Player {}", _player->GetName());
-        return false;
-    }
-
-    return true;
 }

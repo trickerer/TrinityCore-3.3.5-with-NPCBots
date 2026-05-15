@@ -722,7 +722,7 @@ enum SpellAttr7 : uint32
 #define MAX_TALENT_GROUP         1
 #define MIN_TALENT_GROUPS        1
 #define MAX_TALENT_GROUPS        2
-#define MAX_GLYPH_SLOT_INDEX    6
+#define MAX_GLYPH_SLOT_INDEX     6
 
 // Custom values
 enum SpellClickUserTypes
@@ -3280,10 +3280,22 @@ enum ChatMsg : uint8
     CHAT_MSG_ACHIEVEMENT            = 0x30,
     CHAT_MSG_GUILD_ACHIEVEMENT      = 0x31,
     CHAT_MSG_ARENA_POINTS           = 0x32,
-    CHAT_MSG_PARTY_LEADER           = 0x33
+    CHAT_MSG_PARTY_LEADER           = 0x33,
+
+    MAX_CHAT_MSG_TYPE
 };
 
-#define MAX_CHAT_MSG_TYPE 0x34
+#define GM_SILENCE_AURA 1852
+
+enum PlayerChatTag
+{
+    CHAT_TAG_NONE       = 0x00,
+    CHAT_TAG_AFK        = 0x01,
+    CHAT_TAG_DND        = 0x02,
+    CHAT_TAG_GM         = 0x04,
+    CHAT_TAG_COM        = 0x08, // Commentator
+    CHAT_TAG_DEV        = 0x10
+};
 
 enum ChatLinkColors : uint32
 {
@@ -3884,6 +3896,8 @@ enum LineOfSightChecks
 
     LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
 };
+
+#define MAX_ACCOUNT_TUTORIAL_VALUES 8
 
 enum ServerProcessTypes
 {

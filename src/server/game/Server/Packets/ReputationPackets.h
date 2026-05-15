@@ -15,23 +15,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_TRADE_PACKETS_H
-#define TRINITYCORE_TRADE_PACKETS_H
+#ifndef TRINITYCORE_REPUTATION_PACKETS_H
+#define TRINITYCORE_REPUTATION_PACKETS_H
 
 #include "Packet.h"
 
 namespace WorldPackets
 {
-    namespace Trade
+    namespace Reputation
     {
-        class CancelTrade final : public ClientPacket
+        struct FactionData
         {
-        public:
-            explicit CancelTrade(WorldPacket&& packet) : ClientPacket(CMSG_CANCEL_TRADE, std::move(packet)) { }
+            uint8 Flags = 0;
+            int32 Standing = 0;
+        };
 
-            void Read() override { }
+        class InitializeFactions final : public ServerPacket
+        {
+            static constexpr uint32 FactionCount = 128;
+
+        public:
+            explicit InitializeFactions() : ServerPacket(SMSG_INITIALIZE_FACTIONS, 4 + (1 + 4) * FactionCount) { }
+
+            WorldPacket const* Write() override;
+
+            std::array<FactionData, FactionCount> Factions = { };
         };
     }
 }
 
-#endif // TRINITYCORE_TRADE_PACKETS_H
+#endif // TRINITYCORE_REPUTATION_PACKETS_H
