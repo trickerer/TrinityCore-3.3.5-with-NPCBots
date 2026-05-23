@@ -650,9 +650,13 @@ public:
 
             DamageInfo dinfo(*calcdinfo, 0);
 
-            me->SendSpellNonMeleeDamageLog(target, CRITICAL_STRIKE_1,
-                dinfo.GetDamage() + dinfo.GetAbsorb() + dinfo.GetResist() + dinfo.GetBlock(),
-                SPELL_SCHOOL_MASK_NORMAL, dinfo.GetAbsorb(), dinfo.GetResist(), false, dinfo.GetBlock(), true, false);
+            SpellNonMeleeDamage log(me, target, CRITICAL_STRIKE_1, SPELL_SCHOOL_MASK_NORMAL);
+            log.damage = dinfo.GetDamage() + dinfo.GetAbsorb() + dinfo.GetResist() + dinfo.GetBlock();
+            log.absorb = dinfo.GetAbsorb();
+            log.resist = dinfo.GetResist();
+            log.blocked = dinfo.GetBlock();
+            log.HitInfo |= SPELL_HIT_TYPE_CRIT;
+            me->SendSpellNonMeleeDamageLog(&log);
             CleanDamage cl(0, 0, BASE_ATTACK, MELEE_HIT_CRIT);
             Unit::DealDamage(me, target, dinfo.GetDamage(), &cl);
             Unit::ProcSkillsAndAuras((Unit*)me, calcdinfo->Target, calcdinfo->ProcAttacker, calcdinfo->ProcVictim, 0, 0, calcdinfo->HitInfo, nullptr, &dinfo, nullptr);

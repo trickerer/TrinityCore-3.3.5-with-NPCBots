@@ -3171,7 +3171,7 @@ void bot_ai::SetStats(bool force)
             //from wands
             for (auto i : NPCBots::index_array<uint8, BOT_FIRST_NON_MELEE_SLOT>)
                 if (ItemTemplate const* proto = _equips[i] ? _equips[i]->GetTemplate() : nullptr)
-                    value += proto->getDPS() * 1.35f;
+                    value += proto->GetDPS() * 1.35f;
         }
         if (_botclass == BOT_CLASS_ARCHMAGE)
         {
@@ -16149,8 +16149,8 @@ void bot_ai::OnBotOwnerSpellGo(Spell const* spell, bool ok)
             }
             if (spell->m_targets.GetSpeed() != 0)
                 targets.SetSpeed(spell->m_targets.GetSpeed());
-            if (spell->m_targets.GetElevation() != 0)
-                targets.SetElevation(spell->m_targets.GetElevation());
+            if (spell->m_targets.GetPitch() != 0)
+                targets.SetPitch(spell->m_targets.GetPitch());
             if (!spell->m_targets.GetUnitTargetGUID().IsEmpty())
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*veh->GetBase(), spell->m_targets.GetUnitTargetGUID()))

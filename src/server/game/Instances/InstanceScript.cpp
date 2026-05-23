@@ -699,7 +699,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
         ObjectGuid summonGUID = player->m_SummonSlot[itr2];
         if (!summonGUID.IsEmpty())
             if (Creature* summon = instance->GetCreature(summonGUID))
-                summon->CastSpell(player, spell, true);
+                summon->CastSpell(summon, spell, true);
     }
 
     if (!includeControlled)
@@ -709,7 +709,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
     {
         if (Unit* controlled = *itr2)
             if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
-                controlled->CastSpell(player, spell, true);
+                controlled->CastSpell(controlled, spell, true);
     }
 }
 
