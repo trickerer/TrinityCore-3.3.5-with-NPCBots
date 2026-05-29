@@ -1032,24 +1032,23 @@ public:
             Unit* target = nullptr;
             if (Group const* gr = GetGroup())
             {
-                std::set<Unit*> targets;
-                for (uint8 i = 0; i < 4 && !targets.empty(); ++i)
+                std::vector<Unit*> targets;
+                targets.reserve(gr->GetMembersCount());
+                for (uint8 i = 0; i < 3 && targets.empty(); ++i)
                 {
                     for (Unit* member : BotMgr::GetAllGroupMembers(gr))
                     {
-                        if (!(!(i & 1) ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
-                            !member->IsAlive() || me->GetDistance(member) > 30 ||
-                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
-                            (i < 2 && !(i == 0 ? BotDataMgr::IsTankingClass(member->GetClass()) : IsTank(member))) ||
-                            (i == 3 && !member->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_DPS)) ||
-                            member->HasAura(VIGILANCE) || member->HasAura(DAMAGE_REDUCTION))
+                        if ((i == 0) != member->IsPlayer() || me->GetMap() != member->FindMap() || !member->IsAlive() ||
+                            (i == 1) != (member->IsNPCBot() && member->ToCreature()->GetBotAI()->HasRole(BOT_ROLE_DPS)) ||
+                            (member->IsNPCBot() && member->ToCreature()->IsTempBot()) || IsTank(member) ||
+                            me->GetDistance(member) > 30 || member->HasAura(VIGILANCE))
                             continue;
-                        targets.insert(member);
+                        targets.push_back(member);
                     }
                 }
 
                 if (!targets.empty())
-                    target = targets.size() == 1 ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1 ? targets.front() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (!target && !IAmFree() && master->IsAlive() && me->IsWithinDistInMap(master, 30) && !master->HasAura(VIGILANCE))
