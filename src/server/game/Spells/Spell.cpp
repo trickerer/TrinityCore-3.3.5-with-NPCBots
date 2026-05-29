@@ -2293,10 +2293,10 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
         // Calculate reflected spell result on caster
         SpellCastResult castResult = m_spellInfo->CheckTarget(target, unitCaster, implicit);
-        if (castResult == SPELL_CAST_OK || castResult == SPELL_FAILED_TARGET_AURASTATE)
-            targetInfo.ReflectResult = unitCaster->SpellHitResult(unitCaster, m_spellInfo, false); // can't reflect twice
-        else
-            targetInfo.ReflectResult = SPELL_MISS_IMMUNE;
+        targetInfo.ReflectResult = castResult == SPELL_CAST_OK || castResult == SPELL_FAILED_TARGET_AURASTATE
+            ? unitCaster->SpellHitResult(unitCaster, m_spellInfo,
+                false /*can't reflect twice*/)
+            : SPELL_MISS_IMMUNE;
 
         // Proc spell reflect aura when missile hits the original target
         target->m_Events.AddEvent(new ProcReflectDelayed(target, m_originalCasterGUID), target->m_Events.CalculateTime(Milliseconds(targetInfo.TimeDelay)));
@@ -4894,7 +4894,7 @@ void Spell::TakeCastItem()
     for (uint32 i = 0; i < proto->Effects.size(); ++i)
     {
         ItemEffect const& itemEffect = proto->Effects[i];
-        if (itemEffect.SpellID > 0)
+        if (itemEffect.TriggerType == ITEM_SPELLTRIGGER_ON_USE && itemEffect.SpellID > 0)
         {
             // item has limited charges
             if (itemEffect.Charges)
