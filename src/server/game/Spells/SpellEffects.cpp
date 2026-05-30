@@ -4447,6 +4447,11 @@ void Spell::EffectSkinning()
 
     uint32 skill = creature->GetCreatureTemplate()->GetRequiredLootSkill();
 
+    //npcbot: skinning nobody's kill
+    if (!creature->hasLootRecipient())
+        creature->SetLootRecipient(player);
+    //end npcbot
+
     creature->RemoveUnitFlag(UNIT_FLAG_SKINNABLE);
     creature->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
     player->SendLoot(creature->GetGUID(), LOOT_SKINNING);

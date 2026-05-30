@@ -11762,6 +11762,15 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
             // must be after setDeathState which resets dynamic flags
             if (!creature->loot.isLooted())
                 creature->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+            //npcbot
+            else if (attacker && attacker->IsCreature() && attacker->ToCreature()->IsWandererBot() && !creature->IsNPCBotOrPet())
+            {
+                if (BotCfg::EnableWandererFreeLootSkinning() && creature->loot.loot_type != LOOT_SKINNING && !creature->IsPet() && creature->GetCreatureTemplate()->SkinLootId)
+                    if (LootTemplates_Skinning.HaveLootFor(creature->GetCreatureTemplate()->SkinLootId))
+                        creature->SetUnitFlag(UNIT_FLAG_SKINNABLE);
+                creature->AllLootRemovedFromCorpse();
+            }
+            //end npcbot
             else
                 creature->AllLootRemovedFromCorpse();
         }

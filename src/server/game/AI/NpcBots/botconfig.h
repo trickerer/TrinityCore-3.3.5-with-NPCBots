@@ -106,6 +106,7 @@ public:
     static uint32 GetBotWandererKillRewardMoney();
     static uint32 GetBotWandererKillRewardItemMaxCount();
     static uint32 GetBotWandererKillRewardItemMaxQuality();
+    static bool EnableWandererFreeLootSkinning();
     static uint32 GetBotDungeonMaxItemLevel(uint8 level, uint16 map_id, Difficulty map_difficulty);
     static float GetBotDamageModByClass(uint8 botclass);
     static float GetBotDamageModByLevel(uint8 botlevel);

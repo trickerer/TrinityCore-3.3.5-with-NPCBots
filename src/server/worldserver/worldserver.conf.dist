@@ -4796,6 +4796,14 @@ NpcBot.WanderingBots.KillReward.ItemCount   = 0
 NpcBot.WanderingBots.KillReward.ItemQuality = 0
 
 #
+#    NpcBot.WanderingBots.FreeLoot.Skinning
+#        Description: Let wandering bot kills benefit surrounding players.
+#                     Skinning - preserve skinnable flag
+#        Default:     0 - (NpcBot.WanderingBots.FreeLoot.Skinning)
+
+NpcBot.WanderingBots.FreeLoot.Skinning = 0
+
+#
 #    NpcBot.WanderingBots.MaxItemLevel.Levels
 #        Description: Maximum item ilevel to generate for wandering bots per level bracket:
 #                     0-9, 10-19, 20,29, ... , 70-79, 80+.

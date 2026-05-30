@@ -139,6 +139,7 @@ static bool _bothk_message_enable;
 static bool _bothk_achievements_enable;
 static bool _untarget_wnpc_questgiver;
 static bool _untarget_wnpc_flightmaster;
+static bool _wanderingFreeLootSkinning;
 static float _botStatLimits_dodge;
 static float _botStatLimits_parry;
 static float _botStatLimits_block;
@@ -444,6 +445,7 @@ private:
         _killrewardWandererMoneyBase    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.Money", 0);
         _killrewardWandererItemCount    = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemCount", 0);
         _killrewardWandererItemQuality  = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.KillReward.ItemQuality", int(ITEM_QUALITY_RARE));
+        _wanderingFreeLootSkinning      = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.FreeLoot.Skinning", false);
         _mult_xpgain_wanderer           = sConfigMgr->GetFloatDefault("NpcBot.WanderingBots.Continents.XPGain", 1.0f);
         _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
         _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
@@ -1232,6 +1234,11 @@ uint32 BotCfg::GetBotWandererKillRewardItemMaxCount()
 uint32 BotCfg::GetBotWandererKillRewardItemMaxQuality()
 {
     return _killrewardWandererItemQuality;
+}
+
+bool BotCfg::EnableWandererFreeLootSkinning()
+{
+    return _wanderingFreeLootSkinning;
 }
 
 uint32 BotCfg::GetBotDungeonMaxItemLevel(uint8 level, uint16 map_id, Difficulty map_difficulty)
