@@ -1010,12 +1010,13 @@ public:
                 return;
 
             vigiCheckTimer = urand(1500, 3000);
-            uint32 VIGILANCE = GetSpell(VIGILANCE_1);
+            const uint32 VIGILANCE = GetSpell(VIGILANCE_1);
+            const bool is_owned_nontank = !IAmFree() && !IsTank();
 
             if (Unit* u = !vigilanceTargetGuid.IsEmpty() ? ObjectAccessor::GetUnit(*me, vigilanceTargetGuid) : nullptr)
             {
-                bool myVig = u->HasAura(VIGILANCE, me->GetGUID());
-                if (!IsTank() || !myVig)
+                const bool myVig = u->HasAura(VIGILANCE, me->GetGUID());
+                if (is_owned_nontank || !myVig)
                 {
                     if (myVig)
                         u->RemoveAura(VIGILANCE, me->GetGUID(), 0, AURA_REMOVE_BY_EXPIRE);
@@ -1026,7 +1027,7 @@ public:
             else if (!vigilanceTargetGuid.IsEmpty())
                 vigilanceTargetGuid = ObjectGuid::Empty;
 
-            if (!IAmFree() && !IsTank())
+            if (is_owned_nontank)
                 return;
 
             Unit* target = nullptr;
