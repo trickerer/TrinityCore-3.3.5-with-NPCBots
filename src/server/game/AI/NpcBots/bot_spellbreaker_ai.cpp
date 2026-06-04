@@ -268,7 +268,7 @@ public:
                 else
                 {
                     me->EnergizeBySpell(me, ENERGY_SYPHON_ENERGIZE, int32(damage / 4), POWER_MANA);
-                    me->SendPlaySpellVisualKit(1, 524); //mana gain visual
+                    me->SendPlaySpellVisualKit(524, 1); //mana gain visual
                 }
             }
 

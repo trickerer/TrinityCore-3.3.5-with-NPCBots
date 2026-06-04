@@ -1944,7 +1944,7 @@ public:
             return true;
         }
 
-        target->SendPlaySpellVisualKit(1, kit.value_or(0));
+        target->SendPlaySpellVisualKit(kit.value_or(0), 1);
         return true;
     }
 
