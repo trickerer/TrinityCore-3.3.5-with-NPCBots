@@ -5161,7 +5161,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && (GetSpellInfo()->SpellFamilyFlags[1] & 0x4) &&
         target->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
     {
-        if (damage * 5 > target->GetHealth())
+        if (damage * 5u > target->GetHealth())
         {
             damage *= 5;
             crit = true;

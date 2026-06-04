@@ -266,7 +266,7 @@ public:
             //Black Arrow on targets < 20% hp (only direct damage)
             if (baseId == BLACK_ARROW_1 && damageinfo.target && damageinfo.target->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
             {
-                if (damage * 5 > damageinfo.target->GetHealth())
+                if (static_cast<uint32>(damage * 5) > damageinfo.target->GetHealth())
                     damage *= 5;
                 else
                     damage *= 3;
