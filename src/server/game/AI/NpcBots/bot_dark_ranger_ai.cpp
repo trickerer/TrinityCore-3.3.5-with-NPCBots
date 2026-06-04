@@ -265,7 +265,12 @@ public:
             float pctbonus = 1.0f;
             //Black Arrow on targets < 20% hp (only direct damage)
             if (baseId == BLACK_ARROW_1 && damageinfo.target && damageinfo.target->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT))
-                pctbonus *= 5.f;
+            {
+                if (damage * 5 > damageinfo.target->GetHealth())
+                    damage *= 5;
+                else
+                    damage *= 3;
+            }
 
             damage = int32(damage * pctbonus + flat_mod);
         }
