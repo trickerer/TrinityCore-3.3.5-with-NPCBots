@@ -8079,46 +8079,20 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     }
                     else if (option == 3) //refreshment table
                     {
-                        uint32 tableSpellId = GetSpell(43987); //Ritual of Refreshment
+                        uint32 tableSpellId = GetSpell(RITUAL_OF_REFRESHMENT_1); //Ritual of Refreshment
                         if (!tableSpellId)
                         {
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_DISABLED), player);
                             break;
                         }
-                        if (!IsSpellReady(43987, GetLastDiff(), false))
+                        if (!IsSpellReady(RITUAL_OF_REFRESHMENT_1, GetLastDiff(), false))
                         {
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_NOT_READY_YET), player);
                             break;
                         }
-                        uint32 tableGOForSpell = (tableSpellId == 43987 ? GO_REFRESHMENT_TABLE_1 : GO_REFRESHMENT_TABLE_2);
-                        GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(tableGOForSpell);
-                        if (!goInfo)
-                        {
-                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_INVALID_OBJECT_TYPE), player);
-                            break;
-                        }
-                        float x,y,z;
-                        me->GetClosePoint(x, y, z, me->GetCombatReach(), 0.f, 0.f);
-                        QuaternionData rot = QuaternionData::fromEulerAnglesZYX(me->GetOrientation(), 0.f, 0.f);
+                        uint32 tableGOForSpell = (tableSpellId == RITUAL_OF_REFRESHMENT_1 ? GO_REFRESHMENT_TABLE_1 : GO_REFRESHMENT_TABLE_2);
 
-                        GameObject* table = new GameObject;
-                        if (!table->Create(me->GetMap()->GenerateLowGuid<HighGuid::GameObject>(), tableGOForSpell, me->GetMap(),
-                            me->GetPhaseMask(), Position(x,y,z,me->GetOrientation()), rot, 255, GO_STATE_READY))
-                        {
-                            delete table;
-                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
-                            break;
-                        }
-
-                        SetSpellCooldown(43987, 300000);
-
-                        table->SetRespawnTime(180);
-                        //table->SetOwnerGUID(master->GetGUID());
-                        master->AddGameObject(table);
-                        table->SetSpellId(tableSpellId);
-                        me->GetMap()->AddToMap(table);
-
-                        BotWhisper(LocalizedNpcText(player, BOT_TEXT_DONE), player);
+                        SummonGameobject(tableGOForSpell, RITUAL_OF_REFRESHMENT_1, 180, 300000, BOT_TEXT_DONE, master, true);
                         break;
                     }
                     else if (option == 4) // portal
@@ -8480,46 +8454,19 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     }
                     else if (action == 3) //soulwell
                     {
-                        uint32 wellSpellId = GetSpell(29893); //Ritual of Souls
+                        uint32 wellSpellId = GetSpell(RITUAL_OF_SOULS_1); //Ritual of Souls
                         if (!wellSpellId)
                         {
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_DISABLED), player);
                             break;
                         }
-                        if (!IsSpellReady(29893, GetLastDiff(), false))
+                        if (!IsSpellReady(RITUAL_OF_SOULS_1, GetLastDiff(), false))
                         {
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_NOT_READY_YET), player);
                             break;
                         }
-                        uint32 wellGOForSpell = (wellSpellId == 29893 ? GO_SOULWELL_1 : GO_SOULWELL_2);
-                        GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(wellGOForSpell);
-                        if (!goInfo)
-                        {
-                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_INVALID_OBJECT_TYPE), player);
-                            break;
-                        }
-                        float x,y,z;
-                        me->GetClosePoint(x, y, z, me->GetCombatReach(), 0.f, 0.f);
-                        QuaternionData rot = QuaternionData::fromEulerAnglesZYX(me->GetOrientation(), 0.f, 0.f);
-
-                        GameObject* soulwell = new GameObject;
-                        if (!soulwell->Create(me->GetMap()->GenerateLowGuid<HighGuid::GameObject>(), wellGOForSpell, me->GetMap(),
-                            me->GetPhaseMask(), Position(x,y,z,me->GetOrientation()), rot, 255, GO_STATE_READY))
-                        {
-                            delete soulwell;
-                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
-                            break;
-                        }
-
-                        SetSpellCooldown(29893, 300000);
-
-                        soulwell->SetRespawnTime(180);
-                        //soulwell->SetOwnerGUID(master->GetGUID());
-                        master->AddGameObject(soulwell);
-                        soulwell->SetSpellId(wellSpellId);
-                        me->GetMap()->AddToMap(soulwell);
-
-                        BotWhisper(LocalizedNpcText(player, BOT_TEXT_DONE), player);
+                        uint32 wellGOForSpell = (wellSpellId == RITUAL_OF_SOULS_1 ? GO_SOULWELL_1 : GO_SOULWELL_2);
+                        SummonGameobject(wellGOForSpell, RITUAL_OF_SOULS_1, 180, 300000, BOT_TEXT_DONE, master, true);
                         break;
                     }
                     break;
@@ -15982,6 +15929,43 @@ void bot_ai::KilledUnit(Unit* u)
     }
 }
 
+bool bot_ai::SummonGameobject(uint32 entry, uint32 spell_id, int32 life_time, uint32 cooldown, uint32 text_id, Player* forPlayer, bool report_fail)
+{
+    GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
+    if (!goInfo)
+    {
+        if (forPlayer && report_fail)
+            BotWhisper(LocalizedNpcText(forPlayer, BOT_TEXT_INVALID_OBJECT_TYPE), forPlayer);
+        return false;
+    }
+
+    float x,y,z;
+    me->GetClosePoint(x, y, z, me->GetCombatReach(), 0.f, 0.f);
+    QuaternionData rot = QuaternionData::fromEulerAnglesZYX(me->GetOrientation(), 0.f, 0.f);
+
+    GameObject* go = new GameObject;
+    if (!go->Create(me->GetMap()->GenerateLowGuid<HighGuid::GameObject>(), entry, me->GetMap(), me->GetPhaseMask(), Position(x,y,z,me->GetOrientation()), rot, 255, GO_STATE_READY))
+    {
+        delete go;
+        if (forPlayer && report_fail)
+            BotWhisper(LocalizedNpcText(forPlayer, BOT_TEXT_FAILED), forPlayer);
+        return false;
+    }
+
+    SetSpellCooldown(spell_id, cooldown);
+
+    go->SetRespawnTime(life_time);
+    //go->SetOwnerGUID(forPlayer->GetGUID());
+    forPlayer->AddGameObject(go);
+    go->SetSpellId(spell_id);
+    me->GetMap()->AddToMap(go);
+
+    if (forPlayer && text_id)
+        BotWhisper(LocalizedNpcText(forPlayer, text_id), forPlayer);
+
+    return true;
+}
+
 void bot_ai::UnsummonCreature(Creature* creature, bool /*save*/)
 {
     if (creature)
@@ -18019,6 +18003,56 @@ bool bot_ai::GlobalUpdate(uint32 diff)
 
             if (_wmoAreaUpdateTimer <= diff)
                 _UpdateWMOArea();
+        }
+
+        //Battleground start summons
+        if (me->IsInWorld() && IsWanderer() && (GetBotClassMask1() & BOT_CLASS_MASK_MAGE_OR_WARLOCK) && GetGroup() && GetBG() && GetBG()->GetStartDelayTime() && IAmFree())
+        {
+            Player* player = nullptr;
+            for (GroupReference* itr = GetGroup()->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                if (Player* psrc = itr->GetSource())
+                {
+                    player = psrc;
+                    break;
+                }
+            }
+
+            if (player)
+            {
+                uint32 base_spell_id = 0;
+                uint32 gameobject_id = 0;
+
+                if (GetBotClass() == BOT_CLASS_MAGE)
+                {
+                    base_spell_id = RITUAL_OF_REFRESHMENT_1;
+                    gameobject_id = (GetSpell(base_spell_id) == RITUAL_OF_REFRESHMENT_1) ? GO_REFRESHMENT_TABLE_1 : GO_REFRESHMENT_TABLE_2;
+                }
+                else // if (GetBotClass() == BOT_CLASS_WARLOCK)
+                {
+                    base_spell_id = RITUAL_OF_SOULS_1;
+                    gameobject_id = (GetSpell(base_spell_id) == RITUAL_OF_SOULS_1 ? GO_SOULWELL_1 : GO_SOULWELL_2);
+                }
+
+                if (base_spell_id && gameobject_id && IsSpellReady(base_spell_id, diff))
+                {
+                    GameObject* go = nullptr;
+                    Bcore::GameObjectInRangeCheck gcheck(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 50.f, gameobject_id);
+                    Bcore::GameObjectSearcher gsearcher(me, go, gcheck);
+                    Cell::VisitGridObjects(me, gsearcher, 50.f);
+
+                    if (!go)
+                    {
+                        Unit* caster = nullptr;
+                        CastingUnitCheck check(me, 0.f, 50.f); // do not check spell id
+                        Trinity::UnitSearcher searcher(me, caster, check);
+                        Cell::VisitAllObjects(me, searcher, 50.f);
+
+                        if (!caster)
+                            SummonGameobject(gameobject_id, base_spell_id, 180, 300000, BOT_TEXT_HERE_YOU_GO, player);
+                    }
+                }
+            }
         }
 
         //Meeting Stone
@@ -20090,12 +20124,6 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
         default:
             break;
     }
-
-    //if (links.size() > 1)
-    //{
-    //    BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AB! Falling back to random ({} links)!. Cur node: {} {}",
-    //        me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
-    //}
 
     return nullptr;
 }

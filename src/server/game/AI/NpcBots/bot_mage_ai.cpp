@@ -73,7 +73,6 @@ enum MageBaseSpells
     LIVING_BOMB_DAMAGE_1                = 44461,
     CONJURE_MANA_GEM_1                  = 759,
     MANA_GEM_1                          = 5405,
-    RITUAL_OF_REFRESHMENT_1             = 43987,
 
     SUMMON_WATER_ELEMENTAL_1            = 31687
 };

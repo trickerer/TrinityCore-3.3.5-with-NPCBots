@@ -75,6 +75,8 @@ public:
     void OnDeath(Unit* attacker = nullptr);
     //bool CanRespawn() override { return IAmFree(); }
 
+    bool SummonGameobject(uint32 entry, uint32 spell_id, int32 life_time, uint32 cooldown = 0, uint32 text_id = 0, Player* forPlayer = nullptr, bool report_fail = false);
+
     virtual void OnBotSummon(Creature* /*summon*/) {}
     virtual void OnBotDespawn(Creature* /*summon*/) {}
 
@@ -128,6 +130,8 @@ public:
     bool SetBotOwner(Player* newowner);
     void CheckOwnerExpiry();
     uint8 GetBotClass() const { return _botclass; }
+    uint32 GetBotClassMask0() const { return 1ul << (_botclass - 1u); }
+    uint32 GetBotClassMask1() const { return 1ul << _botclass; }
     uint32 GetLastDiff() const { return lastdiff; }
     virtual void UpdateDeadAI(uint32 diff);
     void ReturnHome() { _atHome = false; }

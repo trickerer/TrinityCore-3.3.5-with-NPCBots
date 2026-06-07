@@ -70,8 +70,7 @@ enum WarlockBaseSpells
 
     CHAOTIC_MIND                        = 61188, //8 sec duration, no cd
 
-    RITUAL_OF_SUMMONING_1               = 698,
-    RITUAL_OF_SOULS_1                   = 29893
+    RITUAL_OF_SUMMONING_1               = 698
 };
 enum WarlockPassives
 {

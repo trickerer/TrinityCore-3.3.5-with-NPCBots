@@ -27,6 +27,11 @@ enum BotSpells : uint32
     ARENA_FLAG_TEAM_A_GREEN             = 32725,
     ARENA_FLAG_TEAM_H_GOLD              = 35774,
     ARENA_FLAG_TEAM_H_GREEN             = 35775,
+///Rank 1 spells used outside of class ai
+//MAGE
+    RITUAL_OF_REFRESHMENT_1             = 43987,
+//WARLOCK
+    RITUAL_OF_SOULS_1                   = 29893,
 ///Portals
     PORTAL_STORMWIND                    = 10059,
     PORTAL_IRONFORGE                    = 11416,
