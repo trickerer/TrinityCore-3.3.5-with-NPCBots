@@ -19584,7 +19584,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     }
                 });
 
-                uint8 max_attackers = std::max<uint8>(my_team_size * 7 / 10, my_team_size / 2 + 2);
+                uint8 max_attackers = std::max<uint8>(my_team_size * 8 / 10, my_team_size / 2 + 2);
                 uint8 max_defenders = my_team_size - max_attackers;
 
                 //attack?
