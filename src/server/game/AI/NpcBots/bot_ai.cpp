@@ -18045,7 +18045,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                     {
                         Unit* caster = nullptr;
                         CastingUnitCheck check(me, 0.f, 50.f); // do not check spell id
-                        Trinity::UnitSearcher searcher(me, caster, check);
+                        Bcore::UnitSearcher searcher(me, caster, check);
                         Cell::VisitAllObjects(me, searcher, 50.f);
 
                         if (!caster)
