@@ -189,6 +189,7 @@ enum BotSpells : uint32
     SPELL_IMPALE_VISUAL                 = 59446,
     SPELL_CARRION_BEETLES               = 53520,
     SPELL_LOCUST_SWARM                  = 28785,
+    SPELL_TAUNT_CRYPT_LORD              = 54794,
     SPELL_SOUL_BITE                     = 11016, //special - pet
     SPELL_ENERGIZE_VISUAL               = 59198,
     SPELL_BURROW                        = 68394, //special - pet (NYI) //SPELL_EFFECT_FORCE_DESELECT

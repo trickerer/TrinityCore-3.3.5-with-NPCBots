@@ -1984,7 +1984,17 @@ void GenerateBotCustomSpells()
     }
     //49) END LOCUST SWARM
 
-    //50) SOUL BITE
+    //50) TAUNT (CRYPT LORD)
+    spellId = SPELL_TAUNT_CRYPT_LORD; //54794
+    botSpellInfoOverrides.insert({ spellId, *sSpellMgr->GetSpellInfo(spellId) });
+    sinfo = &botSpellInfoOverrides.at(spellId);
+    sinfo->SpellLevel = 10;
+    sinfo->BaseLevel = 10;
+    sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
+    sinfo->AttributesEx &= ~SPELL_ATTR1_UNAUTOCASTABLE_BY_PET;
+    //50) END TAUNT (CRYPT LORD)
+
+    //51) SOUL BITE
     spellId = SPELL_SOUL_BITE; //11016
     botSpellInfoOverrides.insert({ spellId, *sSpellMgr->GetSpellInfo(spellId) });
     sinfo = &botSpellInfoOverrides.at(spellId);
@@ -2060,9 +2070,9 @@ void GenerateBotCustomSpells()
     sinfo->_effects[2].ChainAmplitude = 0.0f;
     sinfo->_effects[2].Amplitude = 0.0f;
     sinfo->_effects[2].BonusCoefficient = 0.0f;
-    //50) END SOUL BITE
+    //51) END SOUL BITE
 
-    //51) ENERGIZE VISUAL
+    //52) ENERGIZE VISUAL
     spellId = SPELL_ENERGIZE_VISUAL; //59198
     botSpellInfoOverrides.insert({ spellId, *sSpellMgr->GetSpellInfo(spellId) });
     sinfo = &botSpellInfoOverrides.at(spellId);
@@ -2074,7 +2084,7 @@ void GenerateBotCustomSpells()
     sinfo->_effects[0].Effect = SPELL_EFFECT_DUMMY;
     sinfo->_effects[0].BasePoints = 0;
     sinfo->_effects[0].DieSides = 0;
-    //51) END ENERGIZE VISUAL
+    //52) END ENERGIZE VISUAL
 
     //XX) FIXES
     spellId = 48155; // Mind Flay (Rank 8)

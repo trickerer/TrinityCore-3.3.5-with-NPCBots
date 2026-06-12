@@ -436,6 +436,8 @@ protected:
     virtual bool removeShapeshiftForm() { return true; }
 
     bool CanRemoveReflectSpells(Unit const* target, uint32 spellId) const;
+    bool CanTauntTarget(Unit const* target, float dist) const;
+    bool CanTauntDistantTarget(Unit const* target) const;
 
     bool IsMelee() const;
     bool IsRanged() const;

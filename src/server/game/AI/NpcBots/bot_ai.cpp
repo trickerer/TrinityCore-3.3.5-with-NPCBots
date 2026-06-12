@@ -1848,6 +1848,32 @@ bool bot_ai::CanRemoveReflectSpells(Unit const* target, uint32 spellId) const
 
     return false;
 }
+
+bool bot_ai::CanTauntTarget(Unit const* target, float dist) const
+{
+    Unit const* u = target->GetVictim();
+
+    if (u && u != me && Rand() < 50 && dist < 30 &&
+        target->CanHaveThreatList() && !CCed(target) && !target->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
+        (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
+        (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(target)) ||
+        (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(target))))))
+        return true;
+
+    return false;
+}
+bool bot_ai::CanTauntDistantTarget(Unit const* target) const
+{
+    Unit const* u = target->GetVictim();
+
+    if (!IAmFree() && u == me && Rand() < 35 && IsTank() &&
+        (IsOffTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK_OFF) == 0) &&
+        !(me->GetLevel() >= 40 && target->IsCreature() &&
+        (target->ToCreature()->IsDungeonBoss() || target->ToCreature()->isWorldBoss())))
+        return true;
+
+    return false;
+}
 //LIST AURAS
 // Debug: Returns bot's info to called player
 void bot_ai::_listAuras(Player const* player, Unit const* unit) const

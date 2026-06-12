@@ -51,7 +51,8 @@ enum CryptLordBaseSpells
 //54022
     IMPALE_1                = SPELL_IMPALE,
     CARRION_BEETLES_1       = SPELL_CARRION_BEETLES,
-    LOCUST_SWARM_1          = SPELL_LOCUST_SWARM
+    LOCUST_SWARM_1          = SPELL_LOCUST_SWARM,
+    TAUNT_1                 = SPELL_TAUNT_CRYPT_LORD
 };
 enum CryptLordPassives
 {
@@ -86,7 +87,7 @@ enum CryptLordSpecial
 
 static const std::vector<uint32> CryptLord_spells_damage{ IMPALE_1, LOCUST_SWARM_1 };
 static const std::vector<uint32> CryptLord_spells_cc{ IMPALE_1, LOCUST_SWARM_1 };
-static const std::vector<uint32> CryptLord_spells_support{ CARRION_BEETLES_1 };
+static const std::vector<uint32> CryptLord_spells_support{ CARRION_BEETLES_1, TAUNT_1 };
 
 class crypt_lord_bot : public CreatureScript
 {
@@ -284,11 +285,30 @@ public:
 
             StartAttack(mytar, IsMelee());
 
+            float dist = me->GetDistance(mytar);
+            Unit const* u = mytar->GetVictim();
+
+            //TAUNT //No GCD
+            if (IsSpellReady(TAUNT_1, diff, false) && CanTauntTarget(mytar, dist) &&
+                ((!BotDataMgr::IsTankingClass(u->GetClass()) && GetHealthPCT(u) < 80) || IsTank()) && IsInBotParty(u))
+            {
+                if (doCast(mytar, GetSpell(TAUNT_1)))
+                    return;
+            }
+            //TAUNT 2 (distant)
+            if (IsSpellReady(TAUNT_1, diff, false) && CanTauntDistantTarget(mytar))
+            {
+                if (Unit* tUnit = FindDistantTauntTarget())
+                    if (doCast(tUnit, GetSpell(TAUNT_1)))
+                        return;
+            }
+
             MoveBehind(mytar);
 
             if (!HasRole(BOT_ROLE_DPS))
                 return;
 
+            //IMPALE
             if (IsSpellReady(IMPALE_1, diff) && _impaleCheckTimer <= diff && me->GetPower(POWER_MANA) >= IMPALE_COST &&
                 me->isAttackReady() && Rand() < 75)
             {
@@ -317,16 +337,16 @@ public:
                 GetNearbyTargetsList(impale_targets, IMPALE_DAMAGE_DIST_MAX, 0);
 
                 std::array<decltype(impale_targets), std::size(my_angles)> direction_targets{};
-                for (Unit* u : impale_targets)
+                for (Unit* iUnit : impale_targets)
                 {
-                    float angle = me->GetRelativeAngle(u);
+                    float angle = me->GetRelativeAngle(iUnit);
                     for (auto i : NPCBots::index_array<size_t, std::size(my_angles)>)
                     {
                         float rborder = Position::NormalizeOrientation(my_angles[i] - float(M_PI) * 0.25f);
                         float lborder = Position::NormalizeOrientation(my_angles[i] + float(M_PI) * 0.25f);
-                        if ((angle > rborder && angle < lborder) || u->IsWithinMeleeRange(me))
+                        if ((angle > rborder && angle < lborder) || iUnit->IsWithinMeleeRange(me))
                         {
-                            direction_targets[i].push_back(u);
+                            direction_targets[i].push_back(iUnit);
                             break;
                         }
                     }
@@ -693,6 +713,7 @@ public:
             InitSpellMap(IMPALE_1);
             InitSpellMap(CARRION_BEETLES_1);
             InitSpellMap(LOCUST_SWARM_1);
+            InitSpellMap(TAUNT_1);
         }
 
         void ApplyClassPassives() const override

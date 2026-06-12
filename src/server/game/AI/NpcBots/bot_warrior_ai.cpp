@@ -514,11 +514,7 @@ public:
             Unit const* u = mytar->GetVictim();
 
             //TAUNT //No GCD
-            if (IsSpellReady(TAUNT_1, diff, false) && u && u != me && Rand() < 50 && dist < 30 &&
-                mytar->CanHaveThreatList() && !CCed(mytar) && !mytar->HasAuraType(SPELL_AURA_MOD_TAUNT) &&
-                (!IsTank(u) || (IsTank() && GetHealthPCT(me) > 67 &&
-                (GetHealthPCT(u) < 30 || (IsOffTank() && !IsOffTank(u) && IsPointedOffTankingTarget(mytar)) ||
-                (!IsOffTank() && IsOffTank(u) && IsPointedTankingTarget(mytar))))) &&
+            if (IsSpellReady(TAUNT_1, diff, false) && CanTauntTarget(mytar, dist) &&
                 ((!BotDataMgr::IsTankingClass(u->GetClass()) && (GetHealthPCT(u) < 80 || _inStance(2))) || IsTank()) &&
                 IsInBotParty(u) &&
                 (_inStance(2) || (stancetimer <= diff && stanceChange(diff, 2))))
@@ -527,10 +523,7 @@ public:
                     return;
             }
             //TAUNT 2 (distant)
-            if (IsSpellReady(TAUNT_1, diff, false) && !IAmFree() && u == me && Rand() < 35 && IsTank() &&
-                (IsOffTank() || master->GetBotMgr()->GetNpcBotsCountByRole(BOT_ROLE_TANK_OFF) == 0) &&
-                !(me->GetLevel() >= 40 && mytar->IsCreature() &&
-                (mytar->ToCreature()->IsDungeonBoss() || mytar->ToCreature()->isWorldBoss())) &&
+            if (IsSpellReady(TAUNT_1, diff, false) && CanTauntDistantTarget(mytar) &&
                 (_inStance(2) || stancetimer <= diff))
             {
                 Unit* tUnit = FindDistantTauntTarget();
