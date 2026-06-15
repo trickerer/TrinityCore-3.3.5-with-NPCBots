@@ -15863,7 +15863,7 @@ void bot_ai::JustDied(Unit* u)
     }
 
     _reviveTimer = (IsWanderer() && !(u && u->IsControlledByPlayer())) ? REVIVE_TIMER_MEDIUM :
-        IAmFree() ? REVIVE_TIMER_DEFAULT : master->InBattleground() ? REVIVE_TIMER_SHORT / 2 : REVIVE_TIMER_SHORT;
+        IAmFree() ? REVIVE_TIMER_DEFAULT : master->InBattleground() ? REVIVE_TIMER_BG : REVIVE_TIMER_SHORT;
     _atHome = false;
     _evadeMode = false;
     spawned = false;
