@@ -307,7 +307,7 @@ public:
 
         bool BuffTarget(Unit* target, uint32 /*diff*/) override
         {
-            if (me->IsInCombat() && !master->GetMap()->IsRaid()) return false;
+            if ((me->IsInCombat() || !CanDoNonCombatActions()) && !master->GetMap()->IsRaid()) return false;
 
             if (GetSpell(ARCANEINTELLECT_1) && target->GetMaxPower(POWER_MANA) > 1 &&
                 !target->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_STAT, SPELLFAMILY_MAGE, 0x400)

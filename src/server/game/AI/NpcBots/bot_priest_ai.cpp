@@ -710,7 +710,7 @@ public:
                     return true;
             }
 
-            if (me->IsInCombat() && !master->GetMap()->IsRaid())
+            if ((me->IsInCombat() || !CanDoNonCombatActions()) && !master->GetMap()->IsRaid())
                 return false;
 
             if (uint32 PW_FORTITUDE = GetSpell(PW_FORTITUDE_1))

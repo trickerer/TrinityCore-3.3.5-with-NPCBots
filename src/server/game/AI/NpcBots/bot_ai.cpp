@@ -1240,7 +1240,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         std::erase_if(targets2, [this](Unit const* unit) {
             return !unit->IsPlayer() && !(IsWanderer() && unit->IsNPCBot() && unit->ToCreature()->GetBotAI()->IsWanderer());
         });
-        if (!targets2.empty() && BuffTarget(targets2.size() == 1 ? targets2.front() : Bcore::Containers::SelectRandomContainerElement(targets2), diff))
+        if (!targets2.empty() && CanDoNonCombatActions() && BuffTarget(targets2.size() == 1 ? targets2.front() : Bcore::Containers::SelectRandomContainerElement(targets2), diff))
             return;
         for (Unit* heal_target : targets2)
             if (GetHealthPCT(heal_target) < 95 && urand(1, 100) <= (30 + 30*uint32(!!GetBG())) && HealTarget(heal_target, diff))
@@ -1461,12 +1461,16 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
 // no need to check global cooldown
 void bot_ai::ResurrectGroup(uint32 spell_id)
 {
-    if (!spell_id || Rand() > 10)
+    if (!spell_id || Rand() > 10 || me->GetMap()->IsBattleground())
         return;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
     ASSERT(spellInfo);
     spellInfo = spellInfo->TryGetSpellInfoOverride(me);
+
+    if (!spellInfo->CanBeUsedInCombat() && (me->IsInCombat() || !CanDoNonCombatActions()))
+        return;
+
     if (int32(me->GetPower(spellInfo->PowerType)) < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
         return;
 
@@ -15810,6 +15814,10 @@ void bot_ai::JustEnteredCombat(Unit* u)
         }
     }
 }
+void bot_ai::JustExitedCombat()
+{
+    _nonCombatActionsTimer = NON_COMBAT_ACTIONS_TIMER_DEFAULT;
+}
 //killer may be NULL
 void bot_ai::JustDied(Unit* u)
 {
@@ -18503,6 +18511,7 @@ void bot_ai::CommonTimers(uint32 diff)
         }
     }
 
+    if (_nonCombatActionsTimer > diff)_nonCombatActionsTimer -= diff;
     if (_contestedPvPTimer > diff)  _contestedPvPTimer -= diff;
 
     if (_groupUpdateTimer > diff)   _groupUpdateTimer -= diff;

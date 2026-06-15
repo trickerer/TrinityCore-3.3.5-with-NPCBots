@@ -554,7 +554,7 @@ public:
         bool BuffTarget(Unit* target, uint32 /*diff*/) override
         {
             if (!target->IsPlayer()) return false;
-            if (me->IsInCombat() && !master->GetMap()->IsRaid()) return false;
+            if ((me->IsInCombat() || !CanDoNonCombatActions()) && !master->GetMap()->IsRaid()) return false;
 
             if (GetSpell(UNENDING_BREATH_1) && target->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) &&
                 !target->HasAuraType(SPELL_AURA_WATER_BREATHING))

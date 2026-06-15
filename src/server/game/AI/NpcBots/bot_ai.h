@@ -65,6 +65,7 @@ public:
     void KilledUnit(Unit* u) override;
     void AttackStart(Unit* u) override;
     void JustEnteredCombat(Unit* u) override;
+    void JustExitedCombat() override;
     void MoveInLineOfSight(Unit* u) override;
     void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override;
     //void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo*/) override { }
@@ -74,6 +75,7 @@ public:
     void OnSpellStart(SpellInfo const* spellInfo) override { OnBotSpellStart(spellInfo); }
     void OnDeath(Unit* attacker = nullptr);
     //bool CanRespawn() override { return IAmFree(); }
+    bool CanDoNonCombatActions() const { return _nonCombatActionsTimer <= lastdiff; }
 
     bool SummonGameobject(uint32 entry, uint32 spell_id, int32 life_time, uint32 cooldown = 0, uint32 text_id = 0, Player* forPlayer = nullptr, bool report_fail = false);
 
@@ -721,6 +723,7 @@ private:
     uint32 evadeDelayTimer{};
     uint32 indoorsTimer{};
     uint32 outdoorsTimer{};
+    uint32 _nonCombatActionsTimer{};
     uint32 _contestedPvPTimer{};
     uint32 _groupUpdateTimer{BOT_GROUP_UPDATE_TIMER};
     //save timers
