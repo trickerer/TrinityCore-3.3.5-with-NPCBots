@@ -2205,7 +2205,7 @@ public:
             return bot->GetBotAI()->GetBaseSpell(spellname, handler->GetSessionDbcLocale());
         };
 
-        auto canBotUseSpell = [handler](Creature const* tbot, uint32 bspell) {
+        auto canBotUseSpell = [](Creature const* tbot, uint32 bspell) {
             //we ignore GCD for now
             return bspell && tbot->GetBotAI()->IsSpellReady(bspell, tbot->GetBotAI()->GetLastDiff(), false);
         };
