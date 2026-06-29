@@ -16649,7 +16649,12 @@ void bot_ai::_processQueuedActions()
                 me->InterruptNonMeleeSpells(false);
 
             if (doCast(target, spell_id))
+            {
+                // bot could die via spell cast: action is garbage then!
+                if (!HasQueuedActions())
+                    break;
                 CompleteAction(action);
+            }
             else
             {
                 const bool cancel_now = action.GetTimeout() > now + 1s;
@@ -17774,12 +17779,18 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _OnManaUpdate();
     }
 
+    if (actionsTimer <= diff)
+    {
+        _processQueuedActions();
+
+        //performing queued action could kill the bot
+        if (!me->IsAlive())
+            return false;
+    }
+
     // group update
     if (_groupUpdateTimer <= diff)
         SendUpdateToOutOfRangeBotGroupMembers();
-
-    if (actionsTimer <= diff)
-        _processQueuedActions();
 
     //if (me->HasInvisibilityAura() || me->HasStealthAura())
     //    return false;
