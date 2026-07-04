@@ -15491,7 +15491,7 @@ void bot_ai::_AddItemLink(Player const* forPlayer, Item const* item, std::ostrin
 //Unused
 void bot_ai::_AddQuestLink(Player const* forPlayer, Quest const* quest, std::ostringstream &str) const
 {
-    std::string questTitle = quest->GetTitle();
+    std::string questTitle = quest->GetLogTitle();
     _LocalizeQuest(forPlayer, questTitle, quest->GetQuestId());
     str << "|cFFEFFD00|Hquest:" << quest->GetQuestId() << ':' << quest->GetQuestLevel() << "|h[" << questTitle << "]|h|r";
 }
@@ -15613,9 +15613,9 @@ void bot_ai::_LocalizeQuest(Player const* forPlayer, std::string &questTitle, ui
     if (!questInfo)
         return;
 
-    if (questInfo->Title.size() > loc && !questInfo->Title[loc].empty())
+    if (questInfo->LogTitle.size() > loc && !questInfo->LogTitle[loc].empty())
     {
-        const std::string title = questInfo->Title[loc];
+        const std::string title = questInfo->LogTitle[loc];
         if (Utf8FitTo(title, wnamepart))
             questTitle = title;
     }
