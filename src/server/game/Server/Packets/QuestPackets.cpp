@@ -197,6 +197,48 @@ WorldPacket const* WorldPackets::Quest::QuestGiverQuestDetails::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Quest::QuestGiverRequestItems::Write()
+{
+    _worldPacket << QuestGiverGUID;
+    _worldPacket << int32(QuestID);
+    _worldPacket << QuestTitle;
+    _worldPacket << CompletionText;
+    _worldPacket << int32(CompEmoteDelay);
+    _worldPacket << int32(CompEmoteType);
+    _worldPacket << int32(AutoLaunched ? 1 : 0);
+    _worldPacket << uint32(QuestFlags);
+    _worldPacket << int32(SuggestPartyMembers);
+    _worldPacket << int32(MoneyToGet);
+    _worldPacket << uint32(Collect.size());
+
+    for (QuestObjectiveCollect const& obj : Collect)
+    {
+        _worldPacket << int32(obj.ObjectID);
+        _worldPacket << int32(obj.Amount);
+        _worldPacket << uint32(obj.DisplayID);
+    }
+
+    _worldPacket << uint32(Explored);
+    _worldPacket << uint32(HasItems);
+    _worldPacket << uint32(HasFaction);
+    _worldPacket << uint32(HasMoney);
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Quest::QuestGiverRequestReward::Read()
+{
+    _worldPacket >> QuestGiverGUID;
+    _worldPacket >> QuestID;
+}
+
+void WorldPackets::Quest::QuestGiverQueryQuest::Read()
+{
+    _worldPacket >> QuestGiverGUID;
+    _worldPacket >> QuestID;
+    _worldPacket >> RespondToGiver;
+}
+
 WorldPacket const* WorldPackets::Quest::QuestGiverOfferRewardMessage::Write()
 {
     _worldPacket << QuestGiverGUID;
@@ -253,6 +295,17 @@ WorldPacket const* WorldPackets::Quest::QuestGiverOfferRewardMessage::Write()
 
     for (uint32 valueOverride : Rewards.RewardFactionOverride)
         _worldPacket << int32(valueOverride);
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Quest::QueryQuestsCompletedResponse::Write()
+{
+    _worldPacket.reserve(sizeof(uint32) + QuestsCompleted->size() * sizeof(uint32));
+
+    _worldPacket << uint32(QuestsCompleted->size());
+    for (uint32 questId : *QuestsCompleted)
+        _worldPacket << uint32(questId);
 
     return &_worldPacket;
 }

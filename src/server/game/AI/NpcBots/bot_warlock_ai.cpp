@@ -901,7 +901,7 @@ public:
             //Haunt
             if (IsSpellReady(HAUNT_1, diff) && can_do_shadow && Rand() < 125 && dist < CalcSpellMaxRange(HAUNT_1) &&
                 mytar->GetHealth() > me->GetMaxHealth()/4 * (1 + mytar->getAttackers().size()) &&
-                !mytar->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_WARLOCK, 0x0, 0x40000, 0x0, me->GetGUID()))
+                !mytar->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_FROM_CASTER, SPELLFAMILY_WARLOCK, 0x0, 0x40000, 0x0, me->GetGUID()))
             {
                 if (doCast(mytar, GetSpell(HAUNT_1)))
                     return;

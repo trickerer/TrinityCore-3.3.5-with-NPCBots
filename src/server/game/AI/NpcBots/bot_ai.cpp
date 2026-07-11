@@ -15097,7 +15097,7 @@ void bot_ai::InitEquips()
         {
             Map const* mymap = me->GetMap();
             ASSERT(mymap->IsNonRaidDungeon());
-            const Difficulty map_difficulty = mymap->ToInstanceMap()->GetDifficulty();
+            const Difficulty map_difficulty = mymap->ToInstanceMap()->GetDifficultyID();
             max_item_level = BotCfg::GetBotDungeonMaxItemLevel(lvl, mymap->GetId(), map_difficulty);
         }
         else

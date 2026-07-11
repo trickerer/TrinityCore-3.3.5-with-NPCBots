@@ -148,7 +148,9 @@ void Quest::LoadQuestRequestItems(Field* fields)
     if (!sEmotesStore.LookupEntry(_emoteOnIncomplete))
         TC_LOG_ERROR("sql.sql", "Table `quest_request_items` has non-existing EmoteOnIncomplete ({}) set for quest {}.", _emoteOnIncomplete, fields[0].GetUInt32());
 
-    _requestItemsText = fields[3].GetString();
+    _emoteOnCompleteDelay = fields[3].GetUInt32();
+    _emoteOnIncompleteDelay = fields[4].GetUInt32();
+    _requestItemsText = fields[5].GetStringView();
 }
 
 void Quest::LoadQuestOfferReward(Field* fields)
@@ -312,19 +314,19 @@ bool Quest::IsAutoAccept() const
 
 bool Quest::IsAutoComplete() const
 {
-    return !sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_COMPLETE) && (_type == 0 || HasFlag(QUEST_FLAGS_AUTOCOMPLETE));
+    return !sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_COMPLETE) && (_type == QUEST_TYPE_TURNIN || HasFlag(QUEST_FLAGS_AUTOCOMPLETE));
 }
 
 bool Quest::IsRaidQuest(Difficulty difficulty) const
 {
     switch (_questInfoID)
     {
-        case QUEST_TYPE_RAID:
+        case QUEST_INFO_RAID:
             return true;
-        case QUEST_TYPE_RAID_10:
-            return !(difficulty & RAID_DIFFICULTY_MASK_25MAN);
-        case QUEST_TYPE_RAID_25:
-            return difficulty & RAID_DIFFICULTY_MASK_25MAN;
+        case QUEST_INFO_RAID_10:
+            return difficulty == RAID_DIFFICULTY_10MAN_NORMAL || difficulty == RAID_DIFFICULTY_10MAN_HEROIC;
+        case QUEST_INFO_RAID_25:
+            return difficulty == RAID_DIFFICULTY_25MAN_NORMAL || difficulty == RAID_DIFFICULTY_25MAN_HEROIC;
         default:
             break;
     }

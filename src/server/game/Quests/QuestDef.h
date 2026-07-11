@@ -268,7 +268,7 @@ class TC_GAME_API Quest
         uint32 GetRewHonor() const { return _rewardHonor; }
         uint32 GetRewKillHonor() const { return _rewardKillHonor; }
         uint32 GetRewMoneyMaxLevel() const; // use in XP calculation at client
-        uint32 GetRewDisplaySpell() const { return _rewardSpell; }
+        uint32 GetRewDisplaySpell() const { return _rewardDisplaySpell; }
         int32 GetRewSpell() const { return _rewardSpell; }
         uint32 GetRewMailTemplateId() const { return _rewardMailTemplateId; }
         uint32 GetRewMailDelaySecs() const { return _rewardMailDelay; }
@@ -280,6 +280,8 @@ class TC_GAME_API Quest
         uint32 GetPOIPriority() const { return _poiPriority; }
         uint32 GetIncompleteEmote() const { return _emoteOnIncomplete; }
         uint32 GetCompleteEmote() const { return _emoteOnComplete; }
+        uint32 GetIncompleteEmoteDelay() const { return _emoteOnIncompleteDelay; }
+        uint32 GetCompleteEmoteDelay() const { return _emoteOnCompleteDelay; }
         bool IsRepeatable() const { return _specialFlags & QUEST_SPECIAL_FLAGS_REPEATABLE; }
         bool IsAutoAccept() const;
         bool IsAutoComplete() const;
@@ -390,6 +392,8 @@ class TC_GAME_API Quest
         // quest_request_items table
         uint32 _emoteOnComplete = 0;
         uint32 _emoteOnIncomplete = 0;
+        uint32 _emoteOnCompleteDelay = 0;
+        uint32 _emoteOnIncompleteDelay = 0;
         std::string _requestItemsText;
 
         // quest_offer_reward table
@@ -427,4 +431,5 @@ struct QuestStatusData
     uint16 PlayerCount = 0;
     bool Explored = false;
 };
+
 #endif

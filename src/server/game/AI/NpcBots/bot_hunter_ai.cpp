@@ -922,7 +922,7 @@ public:
             if (IsSpellReady(CHIMERA_SHOT_1, diff) && can_do_nature && HasRole(BOT_ROLE_DPS))
             {
                 //Serpent
-                if (mytar->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()))
+                if (mytar->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()))
                 {
                     if (doCast(mytar, GetSpell(CHIMERA_SHOT_1)))
                         return;
@@ -964,7 +964,7 @@ public:
                 if (!STING && GetSpell(SERPENT_STING_1) && HasRole(BOT_ROLE_DPS) &&
                     mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()))
                 {
-                    sting = mytar->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID());
+                    sting = mytar->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID());
                     if (!sting)
                         STING = SERPENT_STING_1;
                 }
@@ -1169,7 +1169,7 @@ public:
                 pctbonus += 0.1f;
             //Glyph of Steady Shot: 10% bonus damage for Steady Shot if affected by Serpent Sting
             if (lvl >= 62 && baseId == STEADY_SHOT_1 && damageinfo.target &&
-                damageinfo.target->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0/*, me->GetGUID()*/))
+                damageinfo.target->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0/*, me->GetGUID()*/))
                 pctbonus += 0.1f;
             //The Beast Within part 1: 10% bonus damage for all abilities
             if ((GetSpec() == BOT_SPEC_HUNTER_BEASTMASTERY) && lvl >= 50)
@@ -1482,7 +1482,7 @@ public:
             {
                 Unit const* victim = me->GetVictim();
                 if (victim &&
-                    (victim->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()) ||
+                    (victim->GetAuraEffect(SPELL_AURA_MOD_SPELL_DAMAGE_FROM_CASTER, SPELLFAMILY_HUNTER, 0x4000, 0x0, 0x0, me->GetGUID()) ||
                     victim->GetAuraEffect(SPELL_AURA_PERIODIC_MANA_LEECH, SPELLFAMILY_HUNTER, 0x0, 0x80, 0x0, me->GetGUID()) ||
                     victim->GetAuraEffect(SPELL_AURA_MOD_HIT_CHANCE, SPELLFAMILY_HUNTER, 0x8000, 0x0, 0x0, me->GetGUID()) ||
                     victim->GetAuraEffect(SPELL_AURA_MOD_STUN, SPELLFAMILY_HUNTER, 0x0, 0x1000, 0x0, me->GetGUID()) ||

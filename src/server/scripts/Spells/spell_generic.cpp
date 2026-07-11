@@ -1624,7 +1624,7 @@ class spell_ethereal_pet_aura : public AuraScript
     {
         PreventDefaultAction();
 
-        std::list<Creature*> minionList;
+        std::list<TempSummon*> minionList;
         GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
         for (Creature* minion : minionList)
         {
@@ -2557,6 +2557,8 @@ class spell_gen_mounted_charge : public SpellScript
                 }
                 break;
             }
+            default:
+                break;
         }
     }
 
