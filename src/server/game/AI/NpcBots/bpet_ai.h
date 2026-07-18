@@ -165,6 +165,9 @@ private:
     Position movepos{}, attackpos{};
     uint32 _botCommandState{};
 
+    //stats
+    float attackpower_bonus{};
+
     //timers
     uint32 lastdiff{}, checkAurasTimer{}, regenTimer{}, _updateTimerMedium{}, _updateTimerEx1{};
     uint32 _moveBehindTimer{};

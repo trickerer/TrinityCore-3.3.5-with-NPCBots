@@ -849,7 +849,8 @@ void bot_pet_ai::SetPetStats(bool force)
         default:
             break;
     }
-    me->SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, atpower);
+    me->HandleAttackPowerModifier(AttackPowerModIndex::Melee,  AttackPowerModType::FlatPositive, atpower - attackpower_bonus, true);
+    attackpower_bonus = atpower;
     me->UpdateAttackPowerAndDamage();
     //armor
     myarmor = std::max<uint32>(myarmor, level*50);

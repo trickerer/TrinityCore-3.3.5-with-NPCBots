@@ -710,6 +710,7 @@ private:
     uint32 blockvalue{1};
     int32 haste{};
     int32 resistbonus[MAX_SPELL_SCHOOL - 1]{};
+    float attackpower_bonus{}, attackpowerranged_bonus{};
 
     //timers
     uint32 _reviveTimer{}, _powersTimer{}, _chaseTimer{}, _engageTimer{}, _potionTimer{};

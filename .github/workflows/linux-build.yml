@@ -1,4 +1,4 @@
-name: Clang
+name: Ubuntu x64
 
 on:
   push:
@@ -13,21 +13,26 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - cc: clang-15
-            cxx: clang++-15
+          - cc: gcc-13
+            cxx: g++-13
             pch: 1
             launcher: 
-          - cc: clang-15
-            cxx: clang++-15
+          - cc: clang-17
+            cxx: clang++-17
+            pch: 1
+            launcher: 
+          - cc: clang-17
+            cxx: clang++-17
             pch: 0
             launcher: ccache
     steps:
-    - uses: actions/checkout@v4
-    - name: Set strings cache
+    - uses: actions/checkout@v5
+    - name: Set reusable strings
       id: strings
       shell: bash
       run: |

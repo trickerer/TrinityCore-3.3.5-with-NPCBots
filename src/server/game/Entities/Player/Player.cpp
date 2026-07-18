@@ -322,6 +322,7 @@ Player::Player(WorldSession* session): Unit(true)
 
     m_ChampioningFaction = 0;
 
+    m_healthFraction = 0.0f;
     for (uint8 i = 0; i < MAX_POWERS; ++i)
         m_powerFraction[i] = 0;
 
@@ -1042,6 +1043,15 @@ void Player::Update(uint32 p_time)
                         m_swingErrorMsg = 2;
                     }
                 }
+                else if (!IsValidAttackTarget(victim))
+                {
+                    setAttackTimer(BASE_ATTACK, 100);
+                    if (m_swingErrorMsg != 3)               // send single time (client auto repeat)
+                    {
+                        SendAttackSwingCantAttack();
+                        m_swingErrorMsg = 3;
+                    }
+                }
                 else
                 {
                     m_swingErrorMsg = 0;                    // reset swing error state
@@ -1062,6 +1072,8 @@ void Player::Update(uint32 p_time)
                 if (!IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
                 else if (!HasInArc(2 * float(M_PI) / 3, victim))
+                    setAttackTimer(OFF_ATTACK, 100);
+                else if (!IsValidAttackTarget(victim))
                     setAttackTimer(OFF_ATTACK, 100);
                 else
                 {
@@ -2092,9 +2104,25 @@ void Player::RegenerateHealth()
     addValue += m_baseHealthRegen / 2.5f;
 
     if (addValue < 0.0f)
-        addValue = 0.0f;
+        return;
 
-    ModifyHealth(int32(addValue));
+    addValue += m_healthFraction;
+    int32 integerValue = int32(addValue);
+    if (!integerValue)
+        return;
+
+    if (curValue + integerValue < maxValue)
+    {
+        curValue += integerValue;
+        m_healthFraction = addValue - integerValue;
+    }
+    else
+    {
+        curValue = maxValue;
+        m_healthFraction = 0.0f;
+    }
+
+    SetHealth(curValue);
 }
 
 void Player::ResetAllPowers()
@@ -7401,11 +7429,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplyRatingMod(CR_EXPERTISE, int32(val), apply);
                 break;
             case ITEM_MOD_ATTACK_POWER:
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleAttackPowerModifier(AttackPowerModIndex::Melee,  (val >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(val), apply);
+                HandleAttackPowerModifier(AttackPowerModIndex::Ranged, (val >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(val), apply);
                 break;
             case ITEM_MOD_RANGED_ATTACK_POWER:
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleAttackPowerModifier(AttackPowerModIndex::Ranged, (val >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(val), apply);
                 break;
 //            case ITEM_MOD_FERAL_ATTACK_POWER:
 //                ApplyFeralAPBonus(int32(val), apply);
@@ -13159,10 +13187,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
         uint32 eslot = slot - BUYBACK_SLOT_START;
 
         SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), pItem->GetGUID());
-        if (ItemTemplate const* proto = pItem->GetTemplate())
-            SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, proto->GetSellPrice() * pItem->GetCount());
-        else
-            SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
+        SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, pItem->GetSellPrice(true) * pItem->GetCount());
 
         SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, (uint32)etime);
 
@@ -13617,7 +13642,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
         for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
         {
             uint32 enchant_display_type = pEnchant->Effect[s];
-            uint32 enchant_amount = pEnchant->EffectPointsMin[s];
+            int32 enchant_amount = pEnchant->EffectPointsMin[s];
             uint32 enchant_spell_id = pEnchant->EffectArg[s];
 
             switch (enchant_display_type)
@@ -13680,7 +13705,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             {
                                 if (item_rand->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = int32((item_rand->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -13700,7 +13725,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             {
                                 if (item_rand_suffix->Enchantment[k] == enchant_id)
                                 {
-                                    enchant_amount = uint32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
+                                    enchant_amount = int32((item_rand_suffix->AllocationPct[k] * item->GetItemSuffixFactor()) / 10000);
                                     break;
                                 }
                             }
@@ -13852,12 +13877,12 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             TC_LOG_DEBUG("entities.player.items", "+ {} EXPERTISE", enchant_amount);
                             break;
                         case ITEM_MOD_ATTACK_POWER:
-                            HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(enchant_amount), apply);
-                            HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
+                            HandleAttackPowerModifier(AttackPowerModIndex::Melee,  (enchant_amount >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(enchant_amount), apply);
+                            HandleAttackPowerModifier(AttackPowerModIndex::Ranged, (enchant_amount >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(enchant_amount), apply);
                             TC_LOG_DEBUG("entities.player.items", "+ {} ATTACK_POWER", enchant_amount);
                             break;
                         case ITEM_MOD_RANGED_ATTACK_POWER:
-                            HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
+                            HandleAttackPowerModifier(AttackPowerModIndex::Ranged, (enchant_amount >= 0) ? AttackPowerModType::FlatPositive : AttackPowerModType::FlatNegative, float(enchant_amount), apply);
                             TC_LOG_DEBUG("entities.player.items", "+ {} RANGED_ATTACK_POWER", enchant_amount);
                             break;
 //                        case ITEM_MOD_FERAL_ATTACK_POWER:

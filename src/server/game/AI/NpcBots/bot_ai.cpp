@@ -2391,7 +2391,8 @@ void bot_ai::SetStats(bool force)
     }
 
     atpower *= ap_mod;
-    me->SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, atpower);
+    me->HandleAttackPowerModifier(AttackPowerModIndex::Melee,  AttackPowerModType::FlatPositive, atpower - attackpower_bonus, true);
+    attackpower_bonus = atpower;
 
     me->UpdateAttackPowerAndDamage();
     if (_botclass == BOT_CLASS_WARRIOR || _botclass == BOT_CLASS_HUNTER || _botclass == BOT_CLASS_ROGUE ||
@@ -2399,7 +2400,8 @@ void bot_ai::SetStats(bool force)
         _botclass == BOT_CLASS_DARK_RANGER || _botclass == BOT_CLASS_SEA_WITCH)
     {
         atpower += _getTotalBotStat(BOT_STAT_MOD_RANGED_ATTACK_POWER) * ap_mod;
-        me->SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, atpower);
+        me->HandleAttackPowerModifier(AttackPowerModIndex::Ranged,  AttackPowerModType::FlatPositive, atpower - attackpowerranged_bonus, true);
+        attackpowerranged_bonus = atpower;
         me->UpdateAttackPowerAndDamage(true);
     }
 

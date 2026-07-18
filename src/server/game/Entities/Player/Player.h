@@ -2262,6 +2262,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         GuidList WhisperList;
         uint32 m_regenTimerCount;
         uint32 m_foodEmoteTimerCount;
+        float m_healthFraction;
         float m_powerFraction[MAX_POWERS];
         uint32 m_contestedPvPTimer;
 
