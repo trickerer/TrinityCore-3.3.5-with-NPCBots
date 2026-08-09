@@ -4141,6 +4141,10 @@ public:
         return true;
     }
 
+    // Local NPCBot extension: resolves a learned positive spell by localized name.
+    // It prepares the spell directly on the selected active bot and bypasses the
+    // 3.3.5 client restriction that rejects creature-backed NPCBots as friendly
+    // spell targets. See CUSTOM_CHANGES.md.
     static bool HandleNpcBotUseOnBotNamedSpellCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string> spell_name)
     {
         Player* player = handler->GetSession()->GetPlayer();

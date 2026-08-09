@@ -60,6 +60,8 @@ enum Yells
 enum Spells
 {
     // Server-side Trial of the Champion achievement marker for Eadric/Paletress.
+    // DBC uses separate boss-completion criteria: 68574 credits Paletress,
+    // while 68575 credits Eadric. Do not merge these IDs.
     SPELL_PALETRESS_CREDIT       = 68574,
     SPELL_EADRIC_CREDIT          = 68575,
     // Server-side Trial of the Champion achievement credit markers

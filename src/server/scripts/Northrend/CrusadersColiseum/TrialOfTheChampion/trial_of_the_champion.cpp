@@ -361,6 +361,8 @@ public:
 
         void SetArgentChampion()
         {
+            // Production selection must remain random:
+            // 0 = Eadric, 1 = Paletress. Force a value only for temporary tests.
            uint8 uiTempBoss = urand(0, 1);
 
            switch (uiTempBoss)
