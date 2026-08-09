@@ -63,3 +63,11 @@ Temporary Trial of the Champion spell tracing was removed from the core files. A
 ```text
 /home/katharsis/TrinityCore-untracked-backup-2026-08-09/toc5-spell-debug.patch
 ```
+
+### Database changes
+
+The matching world-database update is stored in:
+
+`sql/custom/world/2026_08_09_00_world_trial_of_the_champion.sql`
+
+It assigns the standalone lesser-champion script, removes the obsolete vehicle accessories, and restores the usable configuration for all six normal/heroic reward chests.
