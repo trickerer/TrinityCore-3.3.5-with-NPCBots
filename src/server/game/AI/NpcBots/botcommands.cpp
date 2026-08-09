@@ -647,6 +647,7 @@ public:
         static ChatCommandTable npcbotUseOnBotCommandTable =
         {
             { "spell",      HandleNpcBotUseOnBotSpellCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
+            { "namedspell", HandleNpcBotUseOnBotNamedSpellCommand,  rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "item",       HandleNpcBotUseOnBotItemCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
         };
 
@@ -4136,6 +4137,80 @@ public:
             auto scores = bot->GetBotAI()->GetBotGearScores();
             handler->PSendSysMessage("%s's GearScore total: %u, average: %u", bot->GetName(), uint32(scores.first), uint32(scores.second));
         }
+
+        return true;
+    }
+
+    // Local NPCBot extension: resolves a learned positive spell by localized name.
+    // It prepares the spell directly on the selected active bot and bypasses the
+    // 3.3.5 client restriction that rejects creature-backed NPCBots as friendly
+    // spell targets. See CUSTOM_CHANGES.md.
+    static bool HandleNpcBotUseOnBotNamedSpellCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string> spell_name)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!bot_name || !spell_name)
+        {
+            handler->SendSysMessage(".npcbot useonbot namedspell #bot_name #spell_underscored_name");
+            handler->SendSysMessage("Attempts to cast a learned positive spell on an active NPCBot by name, bypassing client restrictions");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        for (char& c : *bot_name)
+            if (c == '_')
+                c = ' ';
+
+        for (char& c : *spell_name)
+            if (c == '_')
+                c = ' ';
+
+        Creature* target = player->GetBotMgr()->GetBotByName(*bot_name);
+        if (!target || !target->IsNPCBot() || !target->IsInWorld())
+        {
+            handler->PSendSysMessage("NPCBot '%s' is not found or not active!", bot_name->c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 spellId = 0;
+        LocaleConstant locale = handler->GetSession()->GetSessionDbcLocale();
+
+        for (auto const& [spellid, pspell] : player->GetSpellMap())
+        {
+            if (pspell.state != PLAYERSPELL_REMOVED && pspell.active && !pspell.disabled)
+            {
+                SpellInfo const* info = sSpellMgr->GetSpellInfo(spellid);
+                if (info && info->SpellName[locale] == *spell_name)
+                {
+                    spellId = spellid;
+                    break;
+                }
+            }
+        }
+
+        SpellInfo const* spellInfo = spellId ? sSpellMgr->AssertSpellInfo(spellId) : nullptr;
+        if (!spellInfo)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Unit* mover = handler->GetSession()->GetGameClient()->GetActivelyMovedUnit();
+        if (spellInfo->IsPassive() || !spellInfo->IsPositive() || player->isPossessing() || player->IsInFlight() ||
+            !mover || (mover != player && mover->IsPlayer()))
+            return true;
+
+        SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(target->GetLevel());
+        if (actualSpellInfo)
+            spellInfo = actualSpellInfo;
+
+        SpellCastTargets targets;
+        targets.SetUnitTarget(target);
+        Spell* spell = new Spell(player, spellInfo, TRIGGERED_NONE);
+        spell->m_cast_count = 1;
+        spell->prepare(targets);
 
         return true;
     }
