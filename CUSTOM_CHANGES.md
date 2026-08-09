@@ -71,3 +71,9 @@ The matching world-database update is stored in:
 `sql/custom/world/2026_08_09_00_world_trial_of_the_champion.sql`
 
 It assigns the standalone lesser-champion script, removes the obsolete vehicle accessories, and restores the usable configuration for all six normal/heroic reward chests.
+
+## Dungeon Finder exit handling
+
+LFG players are teleported back to their saved entry point before their LFG group and dungeon data are cleared.
+
+This also handles the NPCBot-specific case where one real player with NPCBots leaves the group and the entire LFG group is disbanded instead of passing the player through the normal member-removal path.

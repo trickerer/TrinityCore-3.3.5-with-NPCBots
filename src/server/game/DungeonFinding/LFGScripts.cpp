@@ -209,11 +209,17 @@ void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod 
         return;
     }
 
+    Player* player = ObjectAccessor::FindPlayer(guid);
+    // TeleportPlayer needs the active LFG group and dungeon data to restore
+    // the saved entry point, so teleport before clearing the LFG state.
+    if (isLFG && player && player->GetMap()->IsDungeon())
+        sLFGMgr->TeleportPlayer(player, true);
+
     sLFGMgr->LeaveLfg(guid);
     sLFGMgr->SetGroup(guid, ObjectGuid::Empty);
     uint8 players = sLFGMgr->RemovePlayerFromGroup(gguid, guid);
 
-    if (Player* player = ObjectAccessor::FindPlayer(guid))
+    if (player)
     {
         if (method == GROUP_REMOVEMETHOD_LEAVE && state == LFG_STATE_DUNGEON &&
             players >= LFG_GROUP_KICK_VOTES_NEEDED)
@@ -224,8 +230,6 @@ void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod 
             // Update internal kick cooldown of kicked
 
         player->GetSession()->SendLfgUpdateParty(LfgUpdateData(LFG_UPDATETYPE_LEADER_UNK1));
-        if (isLFG && player->GetMap()->IsDungeon())            // Teleport player out the dungeon
-            sLFGMgr->TeleportPlayer(player, true);
     }
 
     if (isLFG && state != LFG_STATE_FINISHED_DUNGEON) // Need more players to finish the dungeon
@@ -240,6 +244,15 @@ void LFGGroupScript::OnDisband(Group* group)
 
     ObjectGuid gguid = group->GetGUID();
     TC_LOG_DEBUG("lfg", "LFGScripts::OnDisband [{}]", gguid.ToString());
+
+    // A solo player with NPCBots disbands the entire LFG group instead of
+    // passing through OnRemoveMember. Teleport real players before the
+    // group and its saved dungeon data are destroyed.
+    if (group->isLFGGroup())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            if (Player* player = itr->GetSource())
+                if (player->GetMap()->IsDungeon())
+                    sLFGMgr->TeleportPlayer(player, true);
 
     sLFGMgr->RemoveGroupData(gguid);
 }
