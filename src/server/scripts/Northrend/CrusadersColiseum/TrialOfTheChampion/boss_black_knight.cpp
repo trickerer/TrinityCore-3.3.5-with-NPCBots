@@ -28,6 +28,8 @@ EndScriptData */
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "trial_of_the_champion.h"
+#include "Vehicle.h"
+#include "Log.h"
 
 enum Spells
 {
@@ -152,9 +154,25 @@ public:
             summons.Despawn(summon);
         }
 
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            if (instance)
+                instance->SetBossState(BOSS_BLACK_KNIGHT, IN_PROGRESS);
+        }
+
         void UpdateAI(uint32 uiDiff) override
         {
-            //Return since we have no target
+            // The gryphon script owns the entire landing/dismount/intro sequence.
+            // Boss AI only waits while he is actually still mounted.
+            if (me->GetVehicle())
+                return;
+
+            if (!me->GetVictim())
+            {
+                if (Player* player = me->SelectNearestPlayer(100.0f))
+                    AttackStart(player);
+            }
+
             if (!UpdateVictim())
                 return;
 
@@ -290,9 +308,13 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            DoCast(me, SPELL_KILL_CREDIT);
+            // 68663 is the encounter kill-credit spell already intended by this script.
+            // Cast it before marking the encounter DONE so the normal/heroic
+            // Trial of the Champion achievement criteria can update normally.
+            DoCast(me, SPELL_KILL_CREDIT, true);
 
-            instance->SetBossState(BOSS_BLACK_KNIGHT, DONE);
+            if (instance)
+                instance->SetBossState(BOSS_BLACK_KNIGHT, DONE);
         }
     };
 
@@ -351,28 +373,161 @@ public:
     }
 };
 
-static constexpr uint32 PATH_ESCORT_GRYPHON = 283930;
-
 class npc_black_knight_skeletal_gryphon : public CreatureScript
 {
 public:
     npc_black_knight_skeletal_gryphon() : CreatureScript("npc_black_knight_skeletal_gryphon") { }
 
-    struct npc_black_knight_skeletal_gryphonAI : public EscortAI
+    struct npc_black_knight_skeletal_gryphonAI : public ScriptedAI
     {
-        npc_black_knight_skeletal_gryphonAI(Creature* creature) : EscortAI(creature)
+        npc_black_knight_skeletal_gryphonAI(Creature* creature) : ScriptedAI(creature)
         {
-            LoadPath(PATH_ESCORT_GRYPHON);
-            Start(false);
+            me->SetReactState(REACT_PASSIVE);
+            currentPoint = 0;
+            passengerReleased = false;
+            StartNextPoint();
         }
 
-        void UpdateAI(uint32 uiDiff) override
-        {
-            EscortAI::UpdateAI(uiDiff);
+        uint8 currentPoint;
+        bool passengerReleased;
 
-            UpdateVictim();
+        struct PathPoint
+        {
+            float x;
+            float y;
+            float z;
+        };
+
+        static constexpr PathPoint FlightPath[10] =
+        {
+            { 754.709f, 646.999f, 442.961f },
+            { 738.850f, 637.289f, 439.134f },
+            { 727.272f, 619.164f, 438.186f },
+            { 733.524f, 608.939f, 433.711f },
+            { 745.537f, 605.399f, 428.795f },
+            { 754.460f, 607.124f, 426.542f },
+            { 763.480f, 616.796f, 422.603f },
+            { 761.823f, 625.299f, 418.482f },
+            { 755.923f, 631.506f, 413.966f },
+            { 744.841f, 634.505f, 411.575f }
+        };
+
+        void StartNextPoint()
+        {
+            if (currentPoint >= 10)
+            {
+                ReleasePassenger();
+                return;
+            }
+
+            PathPoint const& p = FlightPath[currentPoint];
+            me->GetMotionMaster()->MovePoint(currentPoint + 1, p.x, p.y, p.z);
         }
 
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != POINT_MOTION_TYPE)
+                return;
+
+            if (id != currentPoint + 1)
+                return;
+
+            ++currentPoint;
+            StartNextPoint();
+        }
+
+        void ReleasePassenger()
+        {
+            if (passengerReleased)
+                return;
+
+            passengerReleased = true;
+
+            Creature* knight = nullptr;
+
+            if (Vehicle* vehicle = me->GetVehicleKit())
+            {
+                for (int8 seat = 0; seat < 8; ++seat)
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(seat))
+                    {
+                        passenger->ExitVehicle();
+
+                        if (!knight)
+                            knight = passenger->ToCreature();
+                    }
+                }
+            }
+
+            if (knight)
+            {
+                knight->NearTeleportTo(744.841f, 634.505f, 411.575f, knight->GetOrientation());
+
+                knight->SetFaction(14);
+                knight->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                knight->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                knight->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                knight->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                knight->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                knight->SetImmuneToPC(false);
+                knight->SetImmuneToNPC(false);
+                knight->SetReactState(REACT_AGGRESSIVE);
+
+                if (InstanceScript* instance = me->GetInstanceScript())
+                {
+                    if (Creature* herald = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ANNOUNCER)))
+                    {
+                        if (herald->IsAlive())
+                        {
+                            knight->SetFacingToObject(herald);
+                            knight->CastSpell(herald, SPELL_DEATH_RESPITE_3, true);
+
+                            uint32 risenEntry = 0;
+                            if (herald->GetEntry() == NPC_JAEREN)
+                                risenEntry = NPC_RISEN_JAEREN;
+                            else if (herald->GetEntry() == NPC_ARELAS)
+                                risenEntry = NPC_RISEN_ARELAS;
+
+                            Position heraldPos = herald->GetPosition();
+
+                            herald->KillSelf();
+
+                            // Raise the appropriate herald as the Black Knight's ghoul.
+                            if (risenEntry)
+                            {
+                                if (Creature* risen = knight->SummonCreature(
+                                        risenEntry,
+                                        heraldPos.GetPositionX(),
+                                        heraldPos.GetPositionY(),
+                                        heraldPos.GetPositionZ(),
+                                        heraldPos.GetOrientation(),
+                                        TEMPSUMMON_CORPSE_DESPAWN))
+                                {
+                                    risen->SetFaction(14);
+                                    risen->SetReactState(REACT_AGGRESSIVE);
+
+                                    if (Player* target = risen->SelectNearestPlayer(100.0f))
+                                        risen->AI()->AttackStart(target);
+                                }
+                            }
+
+                            // Remove the original herald corpse after the risen version appears.
+                            herald->DespawnOrUnsummon(1s);
+                        }
+                    }
+                }
+
+                if (Player* player = knight->SelectNearestPlayer(100.0f))
+                    knight->AI()->AttackStart(player);
+            }
+
+            me->DespawnOrUnsummon(2s);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            // All movement is driven explicitly by MovePoint/MovementInform.
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override

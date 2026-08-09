@@ -52,6 +52,9 @@ public:
             SetBossNumber(ToCEncounterCount);
             uiMovementDone = 0;
             uiGrandChampionsDeaths = 0;
+            uiGrandChampionMountsDefeated = 0;
+            uiGrandChampionGroundDelay = 0;
+            bGrandChampionGroundPending = false;
             uiArgentSoldierDeaths = 0;
             teamInInstance = 0;
 
@@ -61,6 +64,9 @@ public:
         uint32 teamInInstance;
         uint16 uiMovementDone;
         uint16 uiGrandChampionsDeaths;
+        uint8 uiGrandChampionMountsDefeated;
+        uint32 uiGrandChampionGroundDelay;
+        bool bGrandChampionGroundPending;
         uint8 uiArgentSoldierDeaths;
 
         ObjectGuid uiAnnouncerGUID;
@@ -165,16 +171,8 @@ public:
                     }
                     else if (state == DONE)
                     {
-                        ++uiGrandChampionsDeaths;
-                        if (uiGrandChampionsDeaths == 3)
-                        {
-                            if (Creature* pAnnouncer = instance->GetCreature(uiAnnouncerGUID))
-                            {
-                                pAnnouncer->GetMotionMaster()->MovePoint(0, 748.309f, 619.487f, 411.171f);
-                                pAnnouncer->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                                pAnnouncer->SummonGameObject(instance->IsHeroic() ? GO_CHAMPIONS_LOOT_H : GO_CHAMPIONS_LOOT, 746.59f, 618.49f, 411.09f, 1.42f, QuaternionData(), 25h);
-                            }
-                        }
+                        // Final completion is handled by DATA_GRAND_CHAMPION_DEFEATED.
+                        // DONE is an encounter state and must not be abused as a per-boss death counter.
                     }
                     break;
                 case BOSS_ARGENT_CHALLENGE_E:
@@ -203,6 +201,24 @@ public:
             return true;
         }
 
+        void Update(uint32 diff) override
+        {
+            if (!bGrandChampionGroundPending)
+                return;
+
+            if (uiGrandChampionGroundDelay > diff)
+            {
+                uiGrandChampionGroundDelay -= diff;
+                return;
+            }
+
+            uiGrandChampionGroundDelay = 0;
+            bGrandChampionGroundPending = false;
+
+            // This activates the already proven FORCE_STAND_GROUND boss AI.
+            SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+        }
+
         void SetData(uint32 uiType, uint32 uiData) override
         {
             switch (uiType)
@@ -215,14 +231,132 @@ public:
                             pAnnouncer->AI()->SetData(DATA_IN_POSITION, 0);
                     }
                     break;
+                case DATA_GRAND_CHAMPION_MOUNT_DEFEATED:
+                {
+                    if (uiGrandChampionMountsDefeated < 3)
+                        ++uiGrandChampionMountsDefeated;
+
+                    if (uiGrandChampionMountsDefeated == 3)
+                    {
+                        // Mounted phase is over. Force every player off tournament vehicles.
+                        Map::PlayerList const& players = instance->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        {
+                            if (Player* player = itr->GetSource())
+                            {
+                                if (player->GetVehicle())
+                                    player->ExitVehicle();
+                            }
+                        }
+
+                        // Clean up the defeated tournament mounts.
+                        ObjectGuid vehicleGuids[3] =
+                        {
+                            uiGrandChampionVehicle1GUID,
+                            uiGrandChampionVehicle2GUID,
+                            uiGrandChampionVehicle3GUID
+                        };
+
+                        for (ObjectGuid const& guid : vehicleGuids)
+                            if (Creature* vehicle = instance->GetCreature(guid))
+                                vehicle->DespawnOrUnsummon();
+
+                        ObjectGuid championGuids[3] =
+                        {
+                            uiGrandChampion1GUID,
+                            uiGrandChampion2GUID,
+                            uiGrandChampion3GUID
+                        };
+
+                        Position const groundPositions[3] =
+                        {
+                            {739.678f, 662.541f, 412.393f, 4.49f},
+                            {746.710f, 661.020f, 411.690f, 4.60f},
+                            {754.340f, 660.700f, 412.390f, 4.79f}
+                        };
+
+                        for (uint8 i = 0; i < 3; ++i)
+                        {
+                            if (Creature* champion = instance->GetCreature(championGuids[i]))
+                            {
+                                if (champion->GetVehicle())
+                                    champion->ExitVehicle();
+
+                                champion->CombatStop(true);
+                                champion->GetMotionMaster()->Clear();
+                                champion->StopMoving();
+
+                                // Remove any fake-death/vehicle residue and force a clean standing update.
+                                champion->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                                champion->setDeathState(ALIVE);
+                                champion->ClearUnitState(UNIT_STATE_DIED);
+                                champion->SetEmoteState(EMOTE_STATE_NONE);
+                                champion->SetStandState(UNIT_STAND_STATE_STAND);
+                                champion->SetFullHealth();
+
+                                // Force a fresh world-position/movement update after the vehicle exit.
+                                champion->NearTeleportTo(
+                                    groundPositions[i].GetPositionX(),
+                                    groundPositions[i].GetPositionY(),
+                                    groundPositions[i].GetPositionZ(),
+                                    groundPositions[i].GetOrientation()
+                                );
+
+                                champion->SetStandState(UNIT_STAND_STATE_STAND);
+
+                                // Wait phase: set protection ONCE and then leave the champion
+                                // completely untouched for 30 seconds.
+                                champion->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                                champion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                                champion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                                champion->SetImmuneToPC(true);
+                                champion->SetImmuneToNPC(true);
+                                champion->SetReactState(REACT_PASSIVE);
+                            }
+                        }
+
+                        bGrandChampionGroundPending = true;
+                        uiGrandChampionGroundDelay = 30000;
+                    }
+                    break;
+                }
+                case DATA_GRAND_CHAMPION_DEFEATED:
+                {
+                    if (uiGrandChampionsDeaths < 3)
+                        ++uiGrandChampionsDeaths;
+
+                    if (uiGrandChampionsDeaths == 3)
+                    {
+                        // Complete the encounter exactly once, after all three ground bosses are dead.
+                        SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+
+                        if (Creature* pAnnouncer = instance->GetCreature(uiAnnouncerGUID))
+                        {
+                            pAnnouncer->GetMotionMaster()->MovePoint(0, 748.309f, 619.487f, 411.171f);
+                            pAnnouncer->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
+                            pAnnouncer->SummonGameObject(
+                                instance->IsHeroic() ? GO_CHAMPIONS_LOOT_H : GO_CHAMPIONS_LOOT,
+                                746.59f, 618.49f, 411.09f, 1.42f,
+                                QuaternionData(), 25h);
+                        }
+                    }
+                    break;
+                }
                 case DATA_ARGENT_SOLDIER_DEFEATED:
                     uiArgentSoldierDeaths = uiData;
                     if (uiArgentSoldierDeaths == 9)
                     {
-                        if (Creature* pBoss =  instance->GetCreature(uiArgentChampionGUID))
+                        if (Creature* pBoss = instance->GetCreature(uiArgentChampionGUID))
                         {
                             pBoss->GetMotionMaster()->MovePoint(0, 746.88f, 618.74f, 411.06f);
+
+                            // Eadric/Paletress are spawned with friendly faction 35.
+                            // Switch them to hostile and fully enable combat after all 9 soldiers are defeated.
+                            pBoss->SetFaction(14);
                             pBoss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                            pBoss->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                            pBoss->SetImmuneToPC(false);
                             pBoss->SetReactState(REACT_AGGRESSIVE);
                         }
                     }
@@ -238,6 +372,7 @@ public:
             switch (uiData)
             {
                 case DATA_MOVEMENT_DONE: return uiMovementDone;
+                case DATA_GRAND_CHAMPION_DEFEATED: return uiGrandChampionsDeaths;
                 case DATA_ARGENT_SOLDIER_DEFEATED: return uiArgentSoldierDeaths;
             }
 
@@ -251,6 +386,9 @@ public:
                 case DATA_ANNOUNCER: return uiAnnouncerGUID;
                 case DATA_MAIN_GATE: return uiMainGateGUID;
 
+                case DATA_GRAND_CHAMPION_VEHICLE_1: return uiGrandChampionVehicle1GUID;
+                case DATA_GRAND_CHAMPION_VEHICLE_2: return uiGrandChampionVehicle2GUID;
+                case DATA_GRAND_CHAMPION_VEHICLE_3: return uiGrandChampionVehicle3GUID;
                 case DATA_GRAND_CHAMPION_1: return uiGrandChampion1GUID;
                 case DATA_GRAND_CHAMPION_2: return uiGrandChampion2GUID;
                 case DATA_GRAND_CHAMPION_3: return uiGrandChampion3GUID;
@@ -263,6 +401,15 @@ public:
         {
             switch (uiType)
             {
+                case DATA_GRAND_CHAMPION_VEHICLE_1:
+                    uiGrandChampionVehicle1GUID = uiData;
+                    break;
+                case DATA_GRAND_CHAMPION_VEHICLE_2:
+                    uiGrandChampionVehicle2GUID = uiData;
+                    break;
+                case DATA_GRAND_CHAMPION_VEHICLE_3:
+                    uiGrandChampionVehicle3GUID = uiData;
+                    break;
                 case DATA_GRAND_CHAMPION_1:
                     uiGrandChampion1GUID = uiData;
                     break;

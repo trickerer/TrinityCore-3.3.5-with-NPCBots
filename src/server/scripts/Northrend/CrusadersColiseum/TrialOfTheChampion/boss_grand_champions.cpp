@@ -33,6 +33,9 @@ EndScriptData */
 
 enum Spells
 {
+    // Server-side Trial of the Champion achievement credit marker.
+    // The spell resolves the actual champion entry to the matching criterion.
+    SPELL_GRAND_CHAMPIONS_CREDIT = 68572,
     //Vehicle
     SPELL_CHARGE                    = 63010,
     SPELL_SHIELD_BREAKER            = 68504,
@@ -110,8 +113,14 @@ void AggroAllPlayers(Creature* temp)
 
             if (player->IsAlive())
             {
+                temp->SetStandState(UNIT_STAND_STATE_STAND);
                 temp->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                temp->SetImmuneToPC(true);
+                temp->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                temp->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                temp->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                temp->SetImmuneToPC(false);
+                temp->SetImmuneToNPC(false);
                 temp->SetReactState(REACT_AGGRESSIVE);
                 temp->EngageWithTarget(player);
             }
@@ -176,10 +185,12 @@ public:
         uint32 uiBuffTimer;
 
         uint32 uiWaypointPath;
+        bool bMountDefeated = false;
 
         void Reset() override
         {
             Initialize();
+            bMountDefeated = false;
         }
 
         void SetData(uint32 uiType, uint32 /*uiData*/) override
@@ -228,6 +239,44 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             DoCastSpellShield();
+        }
+
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            uint32 minHealth = me->CountPctFromMaxHealth(1);
+            if (minHealth < 1)
+                minHealth = 1;
+
+            if (bMountDefeated)
+            {
+                damage = 0;
+                return;
+            }
+
+            if (damage >= me->GetHealth() - minHealth)
+            {
+                bMountDefeated = true;
+                damage = 0;
+                me->SetHealth(minHealth);
+
+                me->AttackStop();
+                me->CombatStop(true);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(true);
+
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(SEAT_ID_0))
+                    {
+                        passenger->ExitVehicle();
+                        passenger->SetStandState(UNIT_STAND_STATE_STAND);
+                    }
+                }
+
+                if (instance)
+                    instance->SetData(DATA_GRAND_CHAMPION_MOUNT_DEFEATED, 1);
+            }
         }
 
         void DoCastSpellShield()
@@ -371,19 +420,34 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            // Mounted -> ground transition is handled centrally by the instance script.
+            // Once the rider is physically detached from its vehicle, keep forcing a clean
+            // ground-combat state. Some vehicle seats leave a persistent prone/transport
+            // visual state on certain champion classes in this branch.
             if (!bDone && GrandChampionsOutVehicle(me))
+                bDone = true;
+
+            if (me->IsAlive() && !me->GetVehicle() && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
             {
                 bDone = true;
 
-                if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_1))
-                    me->SetHomePosition(739.678f, 662.541f, 412.393f, 4.49f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_2))
-                    me->SetHomePosition(746.71f, 661.02f, 411.69f, 4.6f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_3))
-                    me->SetHomePosition(754.34f, 660.70f, 412.39f, 4.79f);
+                me->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                me->setDeathState(ALIVE);
+                me->ClearUnitState(UNIT_STATE_DIED);
+                me->SetEmoteState(EMOTE_STATE_NONE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
 
-                EnterEvadeMode();
-                bHome = true;
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                me->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToPC(false);
+                me->SetImmuneToNPC(false);
+                me->SetReactState(REACT_AGGRESSIVE);
+
+                if (!me->GetVictim())
+                    AggroAllPlayers(me);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -433,9 +497,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            // While the Grand Champion is still riding, the rider itself must not die.
+            // NPCBots can otherwise attack the passenger directly even though players
+            // are blocked by SetImmuneToPC(true).
+            //
+            // As soon as the rider leaves the vehicle, transport.guid becomes empty
+            // and normal damage is allowed for the ground-combat phase.
+            if (!me->m_movementInfo.transport.guid.IsEmpty())
+                damage = 0;
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+            // Explicitly update the achievement criterion for this champion.
+            DoCast(me, SPELL_GRAND_CHAMPIONS_CREDIT, true);
+            instance->SetData(DATA_GRAND_CHAMPION_DEFEATED, 1);
         }
     };
 
@@ -511,21 +589,34 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            // Mounted -> ground transition is handled centrally by the instance script.
+            // Once the rider is physically detached from its vehicle, keep forcing a clean
+            // ground-combat state. Some vehicle seats leave a persistent prone/transport
+            // visual state on certain champion classes in this branch.
             if (!bDone && GrandChampionsOutVehicle(me))
+                bDone = true;
+
+            if (me->IsAlive() && !me->GetVehicle() && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
             {
                 bDone = true;
 
-                if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_1))
-                    me->SetHomePosition(739.678f, 662.541f, 412.393f, 4.49f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_2))
-                    me->SetHomePosition(746.71f, 661.02f, 411.69f, 4.6f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_3))
-                    me->SetHomePosition(754.34f, 660.70f, 412.39f, 4.79f);
+                me->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                me->setDeathState(ALIVE);
+                me->ClearUnitState(UNIT_STATE_DIED);
+                me->SetEmoteState(EMOTE_STATE_NONE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
 
-                instance->SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                me->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToPC(false);
+                me->SetImmuneToNPC(false);
+                me->SetReactState(REACT_AGGRESSIVE);
 
-                EnterEvadeMode();
-                bHome = true;
+                if (!me->GetVictim())
+                    AggroAllPlayers(me);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -577,9 +668,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            // While the Grand Champion is still riding, the rider itself must not die.
+            // NPCBots can otherwise attack the passenger directly even though players
+            // are blocked by SetImmuneToPC(true).
+            //
+            // As soon as the rider leaves the vehicle, transport.guid becomes empty
+            // and normal damage is allowed for the ground-combat phase.
+            if (!me->m_movementInfo.transport.guid.IsEmpty())
+                damage = 0;
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+            // Explicitly update the achievement criterion for this champion.
+            DoCast(me, SPELL_GRAND_CHAMPIONS_CREDIT, true);
+            instance->SetData(DATA_GRAND_CHAMPION_DEFEATED, 1);
         }
     };
 
@@ -661,21 +766,34 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            // Mounted -> ground transition is handled centrally by the instance script.
+            // Once the rider is physically detached from its vehicle, keep forcing a clean
+            // ground-combat state. Some vehicle seats leave a persistent prone/transport
+            // visual state on certain champion classes in this branch.
             if (!bDone && GrandChampionsOutVehicle(me))
+                bDone = true;
+
+            if (me->IsAlive() && !me->GetVehicle() && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
             {
                 bDone = true;
 
-                if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_1))
-                    me->SetHomePosition(739.678f, 662.541f, 412.393f, 4.49f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_2))
-                    me->SetHomePosition(746.71f, 661.02f, 411.69f, 4.6f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_3))
-                    me->SetHomePosition(754.34f, 660.70f, 412.39f, 4.79f);
+                me->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                me->setDeathState(ALIVE);
+                me->ClearUnitState(UNIT_STATE_DIED);
+                me->SetEmoteState(EMOTE_STATE_NONE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
 
-                instance->SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                me->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToPC(false);
+                me->SetImmuneToNPC(false);
+                me->SetReactState(REACT_AGGRESSIVE);
 
-                EnterEvadeMode();
-                bHome = true;
+                if (!me->GetVictim())
+                    AggroAllPlayers(me);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -729,9 +847,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            // While the Grand Champion is still riding, the rider itself must not die.
+            // NPCBots can otherwise attack the passenger directly even though players
+            // are blocked by SetImmuneToPC(true).
+            //
+            // As soon as the rider leaves the vehicle, transport.guid becomes empty
+            // and normal damage is allowed for the ground-combat phase.
+            if (!me->m_movementInfo.transport.guid.IsEmpty())
+                damage = 0;
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+            // Explicitly update the achievement criterion for this champion.
+            DoCast(me, SPELL_GRAND_CHAMPIONS_CREDIT, true);
+            instance->SetData(DATA_GRAND_CHAMPION_DEFEATED, 1);
         }
     };
 
@@ -812,21 +944,34 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            // Mounted -> ground transition is handled centrally by the instance script.
+            // Once the rider is physically detached from its vehicle, keep forcing a clean
+            // ground-combat state. Some vehicle seats leave a persistent prone/transport
+            // visual state on certain champion classes in this branch.
             if (!bDone && GrandChampionsOutVehicle(me))
+                bDone = true;
+
+            if (me->IsAlive() && !me->GetVehicle() && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
             {
                 bDone = true;
 
-                if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_1))
-                    me->SetHomePosition(739.678f, 662.541f, 412.393f, 4.49f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_2))
-                    me->SetHomePosition(746.71f, 661.02f, 411.69f, 4.6f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_3))
-                    me->SetHomePosition(754.34f, 660.70f, 412.39f, 4.79f);
+                me->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                me->setDeathState(ALIVE);
+                me->ClearUnitState(UNIT_STATE_DIED);
+                me->SetEmoteState(EMOTE_STATE_NONE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
 
-                instance->SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                me->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToPC(false);
+                me->SetImmuneToNPC(false);
+                me->SetReactState(REACT_AGGRESSIVE);
 
-                EnterEvadeMode();
-                bHome = true;
+                if (!me->GetVictim())
+                    AggroAllPlayers(me);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -890,9 +1035,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            // While the Grand Champion is still riding, the rider itself must not die.
+            // NPCBots can otherwise attack the passenger directly even though players
+            // are blocked by SetImmuneToPC(true).
+            //
+            // As soon as the rider leaves the vehicle, transport.guid becomes empty
+            // and normal damage is allowed for the ground-combat phase.
+            if (!me->m_movementInfo.transport.guid.IsEmpty())
+                damage = 0;
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+            // Explicitly update the achievement criterion for this champion.
+            DoCast(me, SPELL_GRAND_CHAMPIONS_CREDIT, true);
+            instance->SetData(DATA_GRAND_CHAMPION_DEFEATED, 1);
         }
     };
 
@@ -965,21 +1124,34 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            // Mounted -> ground transition is handled centrally by the instance script.
+            // Once the rider is physically detached from its vehicle, keep forcing a clean
+            // ground-combat state. Some vehicle seats leave a persistent prone/transport
+            // visual state on certain champion classes in this branch.
             if (!bDone && GrandChampionsOutVehicle(me))
+                bDone = true;
+
+            if (me->IsAlive() && !me->GetVehicle() && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
             {
                 bDone = true;
 
-                if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_1))
-                    me->SetHomePosition(739.678f, 662.541f, 412.393f, 4.49f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_2))
-                    me->SetHomePosition(746.71f, 661.02f, 411.69f, 4.6f);
-                else if (me->GetGUID() == instance->GetGuidData(DATA_GRAND_CHAMPION_3))
-                    me->SetHomePosition(754.34f, 660.70f, 412.39f, 4.79f);
+                me->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                me->setDeathState(ALIVE);
+                me->ClearUnitState(UNIT_STATE_DIED);
+                me->SetEmoteState(EMOTE_STATE_NONE);
+                me->SetStandState(UNIT_STAND_STATE_STAND);
 
-                instance->SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_ATTACKABLE_1);
+                me->RemoveUnitFlag(UNIT_FLAG_UNINTERACTIBLE);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetImmuneToPC(false);
+                me->SetImmuneToNPC(false);
+                me->SetReactState(REACT_AGGRESSIVE);
 
-                EnterEvadeMode();
-                bHome = true;
+                if (!me->GetVictim())
+                    AggroAllPlayers(me);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -1016,9 +1188,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+        {
+            // While the Grand Champion is still riding, the rider itself must not die.
+            // NPCBots can otherwise attack the passenger directly even though players
+            // are blocked by SetImmuneToPC(true).
+            //
+            // As soon as the rider leaves the vehicle, transport.guid becomes empty
+            // and normal damage is allowed for the ground-combat phase.
+            if (!me->m_movementInfo.transport.guid.IsEmpty())
+                damage = 0;
+        }
+
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetBossState(BOSS_GRAND_CHAMPIONS, DONE);
+            // Explicitly update the achievement criterion for this champion.
+            DoCast(me, SPELL_GRAND_CHAMPIONS_CREDIT, true);
+            instance->SetData(DATA_GRAND_CHAMPION_DEFEATED, 1);
         }
     };
 

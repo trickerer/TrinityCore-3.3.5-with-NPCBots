@@ -31,6 +31,7 @@ EndScriptData */
 #include "SpellScript.h"
 #include "TemporarySummon.h"
 #include "trial_of_the_champion.h"
+#include "Player.h"
 /*
 enum Yells
 {
@@ -58,6 +59,10 @@ enum Yells
 */
 enum Spells
 {
+    // Server-side Trial of the Champion achievement marker for Eadric/Paletress.
+    SPELL_PALETRESS_CREDIT       = 68574,
+    SPELL_EADRIC_CREDIT          = 68575,
+    // Server-side Trial of the Champion achievement credit markers
     // Eadric the Pure
     SPELL_EADRIC_ACHIEVEMENT    = 68197,
     SPELL_HAMMER_JUSTICE        = 66863,
@@ -193,12 +198,33 @@ public:
 
         void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
         {
-            if (damage >= me->GetHealth())
+            if (damage >= me->GetHealth() && !bDone)
             {
+                // Scripted defeat: do NOT evade/home-run through the gate.
                 damage = 0;
-                EnterEvadeMode();
+                me->SetHealth(1);
+                me->AttackStop();
+                me->CombatStop(true);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(true);
+
+                // 68574 searches for ENEMY units around the caster.
+                // Cast it while the boss is still hostile so players are valid targets.
+                me->CastSpell((Unit*)nullptr, SPELL_EADRIC_CREDIT, true);
+
+                if (instance)
+                    instance->DoUpdateAchievementCriteria(
+                        ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET,
+                        SPELL_EADRIC_CREDIT);
+
                 me->SetFaction(FACTION_FRIENDLY);
+
+                // Eadric does not actually die in this scripted defeat flow,
+                // so explicitly fire his server-side achievement credit marker.
+
                 bDone = true;
+                uiResetTimer = 3000;
             }
         }
 
@@ -206,19 +232,29 @@ public:
         {
             if (MovementType != POINT_MOTION_TYPE)
                 return;
-
-            instance->SetBossState(BOSS_ARGENT_CHALLENGE_E, DONE);
-
-            me->DisappearAndDie();
         }
 
         void UpdateAI(uint32 uiDiff) override
         {
-            if (bDone && uiResetTimer <= uiDiff)
+            if (bDone)
             {
-                me->GetMotionMaster()->MovePoint(0, 746.87f, 665.87f, 411.75f);
-                bDone = false;
-            } else uiResetTimer -= uiDiff;
+                if (uiResetTimer <= uiDiff)
+                {
+                    // Encounter is already won at 1 HP. Finish it here so loot/announcer
+                    // do not depend on pathfinding or MovementInform.
+                    instance->SetBossState(BOSS_ARGENT_CHALLENGE_E, DONE);
+
+                    me->GetMotionMaster()->MovePoint(0, 746.87f, 665.87f, 411.75f);
+                    me->DespawnOrUnsummon(5s);
+
+                    bDone = false;
+                    uiResetTimer = 0;
+                }
+                else
+                    uiResetTimer -= uiDiff;
+
+                return;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -321,12 +357,33 @@ public:
 
         void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
         {
-            if (damage >= me->GetHealth())
+            if (damage >= me->GetHealth() && !bDone)
             {
+                // Scripted defeat: do NOT evade/home-run through the gate.
                 damage = 0;
-                EnterEvadeMode();
+                me->SetHealth(1);
+                me->AttackStop();
+                me->CombatStop(true);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetImmuneToPC(true);
+
+                // 68574 searches for ENEMY units around the caster.
+                // Cast it while the boss is still hostile so players are valid targets.
+                me->CastSpell((Unit*)nullptr, SPELL_PALETRESS_CREDIT, true);
+
+                if (instance)
+                    instance->DoUpdateAchievementCriteria(
+                        ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET,
+                        SPELL_PALETRESS_CREDIT);
+
                 me->SetFaction(FACTION_FRIENDLY);
+
+                // Paletress also survives at 1 HP, so normal creature death credit
+                // never happens. Fire the server-side achievement marker explicitly.
+
                 bDone = true;
+                uiResetTimer = 3000;
             }
         }
 
@@ -334,19 +391,29 @@ public:
         {
             if (MovementType != POINT_MOTION_TYPE || Point != 0)
                 return;
-
-            instance->SetBossState(BOSS_ARGENT_CHALLENGE_P, DONE);
-
-            me->DisappearAndDie();
         }
 
         void UpdateAI(uint32 uiDiff) override
         {
-            if (bDone && uiResetTimer <= uiDiff)
+            if (bDone)
             {
-                me->GetMotionMaster()->MovePoint(0, 746.87f, 665.87f, 411.75f);
-                bDone = false;
-            } else uiResetTimer -= uiDiff;
+                if (uiResetTimer <= uiDiff)
+                {
+                    // Encounter is already won at 1 HP. Finish it here so loot/announcer
+                    // do not depend on pathfinding or MovementInform.
+                    instance->SetBossState(BOSS_ARGENT_CHALLENGE_P, DONE);
+
+                    me->GetMotionMaster()->MovePoint(0, 746.87f, 665.87f, 411.75f);
+                    me->DespawnOrUnsummon(5s);
+
+                    bDone = false;
+                    uiResetTimer = 0;
+                }
+                else
+                    uiResetTimer -= uiDiff;
+
+                return;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -506,7 +573,6 @@ class npc_argent_soldier : public CreatureScript
 public:
     npc_argent_soldier() : CreatureScript("npc_argent_soldier") { }
 
-    // THIS AI NEEDS MORE IMPROVEMENTS
     struct npc_argent_soldierAI : public EscortAI
     {
         npc_argent_soldierAI(Creature* creature) : EscortAI(creature)
@@ -514,29 +580,70 @@ public:
             instance = creature->GetInstanceScript();
             me->SetReactState(REACT_DEFENSIVE);
             SetDespawnAtEnd(false);
-            uiWaypoint = 0;
+            Initialize();
         }
 
         InstanceScript* instance;
-
         uint8 uiWaypoint;
+        uint32 abilityTimer1;
+        uint32 abilityTimer2;
+        uint32 abilityTimer3;
+        uint32 smiteTimer;
+        bool finalMeditationDone;
+
+        enum ArgentSoldierSpells
+        {
+            // Argent Lightwielder - 35309
+            SPELL_CLEAVE               = 15284,
+            SPELL_UNBALANCING_STRIKE   = 26613,
+            SPELL_BLAZING_LIGHT        = 67254,
+
+            // Argent Monk - 35305
+            SPELL_FLURRY_OF_BLOWS      = 67233,
+            SPELL_PUMMEL               = 67235,
+            SPELL_FINAL_MEDITATION     = 67255,
+
+            // Argent Priestess - 35307
+            SPELL_FOUNTAIN_OF_LIGHT    = 67194,
+            SPELL_MIND_CONTROL         = 67229,
+            SPELL_PRIESTESS_SMITE      = 48123,
+            SPELL_PRIESTESS_SWP        = 48125,
+        };
+
+        void Initialize()
+        {
+            uiWaypoint = 0;
+            abilityTimer1 = urand(4000, 7000);
+            abilityTimer2 = urand(7000, 11000);
+            abilityTimer3 = urand(1000, 2000);
+            finalMeditationDone = false;
+            smiteTimer = urand(3000, 5000);
+
+            // Priestess should establish her Fountain shortly after combat begins.
+            if (me->GetEntry() == NPC_PRIESTESS)
+            {
+                abilityTimer1 = urand(5000, 8000);   // Shadow Word: Pain
+                abilityTimer2 = urand(12000, 18000); // Heroic Mind Control
+                abilityTimer3 = urand(2000, 4000);   // Fountain of Light
+            }
+        }
+
+        void Reset() override
+        {
+            Initialize();
+            me->SetReactState(REACT_DEFENSIVE);
+        }
 
         void WaypointReached(uint32 waypointId, uint32 /*pathId*/) override
         {
-            if (waypointId == 0)
+            if (waypointId != 0)
+                return;
+
+            switch (uiWaypoint)
             {
-                switch (uiWaypoint)
-                {
-                    case 0:
-                        me->SetFacingTo(5.81f);
-                        break;
-                    case 1:
-                        me->SetFacingTo(4.60f);
-                        break;
-                    case 2:
-                        me->SetFacingTo(2.79f);
-                        break;
-                }
+                case 0: me->SetFacingTo(5.81f); break;
+                case 1: me->SetFacingTo(4.60f); break;
+                case 2: me->SetFacingTo(2.79f); break;
             }
         }
 
@@ -547,43 +654,25 @@ public:
                 case NPC_ARGENT_LIGHWIELDER:
                     switch (uiType)
                     {
-                        case 0:
-                            AddWaypoint(0, 712.14f, 628.42f, 411.88f, true);
-                            break;
-                        case 1:
-                            AddWaypoint(0, 742.44f, 650.29f, 411.79f, true);
-                            break;
-                        case 2:
-                            AddWaypoint(0, 783.33f, 615.29f, 411.84f, true);
-                            break;
+                        case 0: AddWaypoint(0, 712.14f, 628.42f, 411.88f, true); break;
+                        case 1: AddWaypoint(0, 742.44f, 650.29f, 411.79f, true); break;
+                        case 2: AddWaypoint(0, 783.33f, 615.29f, 411.84f, true); break;
                     }
                     break;
                 case NPC_ARGENT_MONK:
                     switch (uiType)
                     {
-                        case 0:
-                            AddWaypoint(0, 713.12f, 632.97f, 411.90f, true);
-                            break;
-                        case 1:
-                            AddWaypoint(0, 746.73f, 650.24f, 411.56f, true);
-                            break;
-                        case 2:
-                            AddWaypoint(0, 781.32f, 610.54f, 411.82f, true);
-                            break;
+                        case 0: AddWaypoint(0, 713.12f, 632.97f, 411.90f, true); break;
+                        case 1: AddWaypoint(0, 746.73f, 650.24f, 411.56f, true); break;
+                        case 2: AddWaypoint(0, 781.32f, 610.54f, 411.82f, true); break;
                     }
                     break;
                 case NPC_PRIESTESS:
                     switch (uiType)
                     {
-                        case 0:
-                            AddWaypoint(0, 715.06f, 637.07f, 411.91f, true);
-                            break;
-                        case 1:
-                            AddWaypoint(0, 750.72f, 650.20f, 411.77f, true);
-                            break;
-                        case 2:
-                            AddWaypoint(0, 779.77f, 607.03f, 411.81f, true);
-                            break;
+                        case 0: AddWaypoint(0, 715.06f, 637.07f, 411.91f, true); break;
+                        case 1: AddWaypoint(0, 750.72f, 650.20f, 411.77f, true); break;
+                        case 2: AddWaypoint(0, 779.77f, 607.03f, 411.81f, true); break;
                     }
                     break;
             }
@@ -592,19 +681,211 @@ public:
             uiWaypoint = uiType;
         }
 
-        void UpdateAI(uint32 uiDiff) override
+        void AttackStart(Unit* who) override
         {
-            EscortAI::UpdateAI(uiDiff);
+            if (!who)
+                return;
+
+            // Priestess is a ranged caster and must not chase into melee.
+            if (me->GetEntry() == NPC_PRIESTESS)
+                AttackStartCaster(who, 25.0f);
+            else
+                EscortAI::AttackStart(who);
+        }
+
+        void JustEngagedWith(Unit* who) override
+        {
+            if (!who)
+                return;
+
+            me->SetReactState(REACT_AGGRESSIVE);
+
+            // Pull exactly the nearby trio. The three packs are far enough apart
+            // that a 15 yd radius links one pack without waking the other two.
+            std::list<Creature*> members;
+            GetCreatureListWithEntryInGrid(members, me, NPC_ARGENT_LIGHWIELDER, 15.0f);
+            GetCreatureListWithEntryInGrid(members, me, NPC_ARGENT_MONK, 15.0f);
+            GetCreatureListWithEntryInGrid(members, me, NPC_PRIESTESS, 15.0f);
+
+            for (Creature* member : members)
+            {
+                if (!member || member == me || !member->IsAlive() || member->IsInCombat())
+                    continue;
+
+                member->SetReactState(REACT_AGGRESSIVE);
+                member->AI()->AttackStart(who);
+            }
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo*/) override
+        {
+            if (me->GetEntry() == NPC_ARGENT_MONK && me->GetMap()->IsHeroic() && !finalMeditationDone && damage >= me->GetHealth())
+            {
+                finalMeditationDone = true;
+                damage = 0;
+                me->SetHealth(1);
+                me->AttackStop();
+                me->CombatStop(false);
+                DoCast(me, SPELL_FINAL_MEDITATION, true);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            EscortAI::UpdateAI(diff);
 
             if (!UpdateVictim())
                 return;
 
-            DoMeleeAttackIfReady();
+            switch (me->GetEntry())
+            {
+                case NPC_ARGENT_LIGHWIELDER:
+                {
+                    if (abilityTimer1 <= diff)
+                    {
+                        DoCastVictim(SPELL_CLEAVE);
+                        abilityTimer1 = urand(5000, 8000);
+                    }
+                    else
+                        abilityTimer1 -= diff;
+
+                    if (abilityTimer2 <= diff)
+                    {
+                        DoCastVictim(SPELL_UNBALANCING_STRIKE);
+                        abilityTimer2 = urand(9000, 13000);
+                    }
+                    else
+                        abilityTimer2 -= diff;
+
+                    if (abilityTimer3 <= diff)
+                    {
+                        if (Unit* target = DoSelectLowestHpFriendly(30.0f, 1))
+                            DoCast(target, SPELL_BLAZING_LIGHT);
+                        abilityTimer3 = urand(10000, 15000);
+                    }
+                    else
+                        abilityTimer3 -= diff;
+
+                    DoMeleeAttackIfReady();
+                    break;
+                }
+
+                case NPC_ARGENT_MONK:
+                {
+                    if (abilityTimer1 <= diff)
+                    {
+                        DoCast(me, SPELL_FLURRY_OF_BLOWS);
+                        abilityTimer1 = urand(10000, 15000);
+                    }
+                    else
+                        abilityTimer1 -= diff;
+
+                    if (abilityTimer2 <= diff)
+                    {
+                        if (Unit* victim = me->GetVictim())
+                            if (victim->IsNonMeleeSpellCast(false))
+                                DoCast(victim, SPELL_PUMMEL);
+                        abilityTimer2 = urand(7000, 11000);
+                    }
+                    else
+                        abilityTimer2 -= diff;
+
+                    DoMeleeAttackIfReady();
+                    break;
+                }
+
+                case NPC_PRIESTESS:
+                {
+                    // Documented ToC behaviour:
+                    // Fountain of Light, Holy Smite, Shadow Word: Pain;
+                    // Heroic additionally uses Mind Control.
+                    Unit* victim = me->GetVictim();
+                    if (!victim)
+                        return;
+
+                    // Keep mana available so the caster AI cannot stall.
+                    if (me->GetMaxPower(POWER_MANA) > 0 &&
+                        me->GetPower(POWER_MANA) < me->CountPctFromMaxPower(POWER_MANA, 30))
+                    {
+                        me->SetPower(POWER_MANA, me->CountPctFromMaxPower(POWER_MANA, 70));
+                    }
+
+                    // IMPORTANT: all timers tick every update, even while another spell is casting.
+                    if (abilityTimer1 > diff)
+                        abilityTimer1 -= diff;
+                    else
+                        abilityTimer1 = 0;
+
+                    if (abilityTimer3 > diff)
+                        abilityTimer3 -= diff;
+                    else
+                        abilityTimer3 = 0;
+
+                    if (smiteTimer > diff)
+                        smiteTimer -= diff;
+                    else
+                        smiteTimer = 0;
+
+                    if (me->GetMap()->IsHeroic())
+                    {
+                        if (abilityTimer2 > diff)
+                            abilityTimer2 -= diff;
+                        else
+                            abilityTimer2 = 0;
+                    }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                        return;
+
+                    // Highest priority: establish/refresh the healing fountain.
+                    if (abilityTimer3 == 0)
+                    {
+                        DoCast(me, SPELL_FOUNTAIN_OF_LIGHT);
+                        abilityTimer3 = urand(28000, 35000);
+                        return;
+                    }
+
+                    // Heroic: interruptible Mind Control attempt.
+                    if (me->GetMap()->IsHeroic() && abilityTimer2 == 0)
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
+                            DoCast(target, SPELL_MIND_CONTROL);
+
+                        abilityTimer2 = urand(18000, 25000);
+                        return;
+                    }
+
+                    // Maintain Shadow Word: Pain periodically.
+                    if (abilityTimer1 == 0)
+                    {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
+                            DoCast(target, SPELL_PRIESTESS_SWP);
+
+                        abilityTimer1 = urand(12000, 16000);
+                        return;
+                    }
+
+                    // Holy Smite has a short cooldown; it is a filler, not a machine gun.
+                    if (smiteTimer == 0)
+                    {
+                        DoCast(victim, SPELL_PRIESTESS_SMITE);
+                        smiteTimer = urand(4000, 6000);
+                        return;
+                    }
+
+                    // Intentionally do nothing between casts. No melee fallback.
+                    break;
+                }
+                default:
+                    DoMeleeAttackIfReady();
+                    break;
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, instance->GetData(DATA_ARGENT_SOLDIER_DEFEATED) + 1);
+            if (instance)
+                instance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, instance->GetData(DATA_ARGENT_SOLDIER_DEFEATED) + 1);
         }
     };
 

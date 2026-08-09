@@ -65,7 +65,10 @@ enum Gossip
 ## npc_announcer_toc5
 ######*/
 
-const Position SpawnPosition = {746.261f, 657.401f, 411.681f, 4.65f};
+// Spawn deliberately behind the main gate.
+// Arena-side reference from the user: 735.809 / 661.920 / 412.394 facing 4.714.
+// With that facing, the gate lies to the north (+Y), so the parade must originate farther north.
+const Position SpawnPosition = {746.261f, 684.000f, 411.681f, 4.65f};
 
 class npc_announcer_toc5 : public CreatureScript
 {
@@ -131,19 +134,31 @@ public:
                 uiPhase = uiPhaseStep;
         }
 
+        void SetMainGate(bool open)
+        {
+            if (GameObject* gate = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_MAIN_GATE)))
+                instance->HandleGameObject(gate->GetGUID(), open);
+        }
+
         void SetData(uint32 uiType, uint32 /*uiData*/) override
         {
             switch (uiType)
             {
                 case DATA_START:
+                    Talk(SAY_INTRO_1);
+
+                    // Presentation pass:
+                    // open gate -> Grand Champion first -> three mounted-looking lesser champions behind him
+                    SetMainGate(true);
                     DoSummonGrandChampion(uiFirstBoss);
-                    NextStep(10000, false, 1);
+
+                    // Give the whole group time to clear the doorway, then close it.
+                    NextStep(10000, false, 10);
                     break;
-                case DATA_IN_POSITION: //movement done.
-                    me->GetMotionMaster()->MovePoint(1, 735.81f, 661.92f, 412.39f);
-                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_MAIN_GATE)))
-                        instance->HandleGameObject(go->GetGUID(), false);
-                    NextStep(10000, false, 3);
+                case DATA_IN_POSITION: // movement done - compatibility fallback
+                    // Entrance sequencing is timer-driven because the old vehicle waypoint callback
+                    // is unreliable in this branch. Never reopen the gate from this callback.
+                    SetMainGate(false);
                     break;
                 case DATA_LESSER_CHAMPIONS_DEFEATED:
                 {
@@ -198,29 +213,34 @@ public:
         void DoSummonGrandChampion(uint32 uiBoss)
         {
             ++uiSummonTimes;
+
             uint32 VEHICLE_TO_SUMMON1 = 0;
-            uint32 VEHICLE_TO_SUMMON2 = 0;
+            uint32 LESSER_TO_SUMMON = 0;
+
+            // Alliance players fight the Horde champion set in this script.
+            // Grand Champions keep their original mounted encounter.
+            // Lesser champions are now standalone 353xx NPCs and never use 333xx vehicles.
             switch (uiBoss)
             {
                 case 0:
                     VEHICLE_TO_SUMMON1 = VEHICLE_MOKRA_SKILLCRUSHER_MOUNT;
-                    VEHICLE_TO_SUMMON2 = VEHICLE_ORGRIMMAR_WOLF;
+                    LESSER_TO_SUMMON = 35314; // Orgrimmar Champion
                     break;
                 case 1:
                     VEHICLE_TO_SUMMON1 = VEHICLE_ERESSEA_DAWNSINGER_MOUNT;
-                    VEHICLE_TO_SUMMON2 = VEHICLE_SILVERMOON_HAWKSTRIDER;
+                    LESSER_TO_SUMMON = 35326; // Silvermoon Champion
                     break;
                 case 2:
                     VEHICLE_TO_SUMMON1 = VEHICLE_RUNOK_WILDMANE_MOUNT;
-                    VEHICLE_TO_SUMMON2 = VEHICLE_THUNDER_BLUFF_KODO;
+                    LESSER_TO_SUMMON = 35325; // Thunder Bluff Champion
                     break;
                 case 3:
                     VEHICLE_TO_SUMMON1 = VEHICLE_ZUL_TORE_MOUNT;
-                    VEHICLE_TO_SUMMON2 = VEHICLE_DARKSPEAR_RAPTOR;
+                    LESSER_TO_SUMMON = 35323; // Sen'jin Champion
                     break;
                 case 4:
                     VEHICLE_TO_SUMMON1 = VEHICLE_DEATHSTALKER_VESCERI_MOUNT;
-                    VEHICLE_TO_SUMMON2 = VEHICLE_FORSAKE_WARHORSE;
+                    LESSER_TO_SUMMON = 35327; // Undercity Champion
                     break;
                 default:
                     return;
@@ -237,6 +257,7 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss1 = unit->GetGUID();
+
                         instance->SetGuidData(DATA_GRAND_CHAMPION_VEHICLE_1, uiVehicle1GUID);
                         instance->SetGuidData(DATA_GRAND_CHAMPION_1, uiGrandChampionBoss1);
                         pBoss->AI()->SetData(1, 0);
@@ -249,6 +270,7 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss2 = unit->GetGUID();
+
                         instance->SetGuidData(DATA_GRAND_CHAMPION_VEHICLE_2, uiVehicle2GUID);
                         instance->SetGuidData(DATA_GRAND_CHAMPION_2, uiGrandChampionBoss2);
                         pBoss->AI()->SetData(2, 0);
@@ -261,6 +283,7 @@ public:
                         if (Vehicle* pVehicle = pBoss->GetVehicleKit())
                             if (Unit* unit = pVehicle->GetPassenger(0))
                                 uiGrandChampionBoss3 = unit->GetGUID();
+
                         instance->SetGuidData(DATA_GRAND_CHAMPION_VEHICLE_3, uiVehicle3GUID);
                         instance->SetGuidData(DATA_GRAND_CHAMPION_3, uiGrandChampionBoss3);
                         pBoss->AI()->SetData(3, 0);
@@ -270,9 +293,12 @@ public:
                         return;
                 }
 
+                // Three standalone lesser champions escort each Grand Champion into the arena.
+                // They start passive/non-attackable through JustSummoned(), then the announcer
+                // activates the three waves with AggroAllPlayers().
                 for (uint8 i = 0; i < 3; ++i)
                 {
-                    if (Creature* pAdd = me->SummonCreature(VEHICLE_TO_SUMMON2, SpawnPosition, TEMPSUMMON_CORPSE_DESPAWN))
+                    if (Creature* pAdd = me->SummonCreature(LESSER_TO_SUMMON, SpawnPosition, TEMPSUMMON_CORPSE_DESPAWN))
                     {
                         switch (uiSummonTimes)
                         {
@@ -300,7 +326,6 @@ public:
                                 break;
                         }
                     }
-
                 }
             }
         }
@@ -373,26 +398,39 @@ public:
 
         void AggroAllPlayers(Creature* temp)
         {
-            Map::PlayerList const& PlList = me->GetMap()->GetPlayers();
-            if (PlList.isEmpty())
+            if (!temp)
                 return;
 
-            for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
+            temp->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+            temp->SetFaction(14);
+            temp->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+
+            temp->RemoveUnitFlag(
+                UNIT_FLAG_NON_ATTACKABLE |
+                UNIT_FLAG_NOT_ATTACKABLE_1 |
+                UNIT_FLAG_UNINTERACTIBLE |
+                UNIT_FLAG_IMMUNE_TO_PC |
+                UNIT_FLAG_IMMUNE_TO_NPC
+            );
+
+            temp->SetImmuneToPC(false);
+            temp->SetImmuneToNPC(false);
+            temp->SetReactState(REACT_AGGRESSIVE);
+
+            Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             {
-                if (Player* player = i->GetSource())
+                if (Player* player = itr->GetSource())
                 {
-                    if (player->IsGameMaster())
+                    if (player->IsGameMaster() || !player->IsAlive())
                         continue;
 
-                    if (player->IsAlive())
-                    {
-                        temp->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                        temp->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        temp->SetReactState(REACT_AGGRESSIVE);
-                        AddThreat(player, 0.0f, temp);
-                    }
+                    AddThreat(player, 1.0f, temp);
                 }
             }
+
+            if (temp->AI())
+                temp->AI()->DoZoneInCombat();
         }
 
        void UpdateAI(uint32 uiDiff) override
@@ -403,25 +441,60 @@ public:
             {
                 switch (uiPhase)
                 {
+                    // First group has just entered.
+                    case 10:
+                        SetMainGate(false);
+                        NextStep(3000, false, 1);
+                        break;
+
+                    // Second entrance.
                     case 1:
+                        Talk(SAY_INTRO_2);
+                        SetMainGate(true);
                         DoSummonGrandChampion(uiSecondBoss);
-                        NextStep(10000, true);
+                        NextStep(10000, false, 11);
                         break;
+
+                    case 11:
+                        SetMainGate(false);
+                        NextStep(3000, false, 2);
+                        break;
+
+                    // Third entrance.
                     case 2:
+                        Talk(SAY_INTRO_3);
+                        SetMainGate(true);
                         DoSummonGrandChampion(uiThirdBoss);
-                        NextStep(0, false);
+                        NextStep(10000, false, 12);
                         break;
+
+                    case 12:
+                        SetMainGate(false);
+
+                        // The parade is complete. Put the announcer in his arena position,
+                        // pause briefly, then release the first lesser wave.
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, 735.81f, 661.92f, 412.39f);
+                        NextStep(5000, false, 3);
+                        break;
+
+                    // Wave 1 begins only after all three ceremonial entrances are finished.
                     case 3:
                         if (!Champion1List.empty())
                         {
                             for (GuidList::const_iterator itr = Champion1List.begin(); itr != Champion1List.end(); ++itr)
                                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                                     AggroAllPlayers(summon);
-                            NextStep(0, false);
                         }
+
+                        // Stop the presentation timer until deaths trigger waves 2/3.
+                        uiPhase = 0;
+                        uiTimer = 0;
                         break;
                 }
-            } else uiTimer -= uiDiff;
+            }
+            else
+                uiTimer -= uiDiff;
 
             if (!UpdateVictim())
                 return;
@@ -436,31 +509,18 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon) override
+        void SummonedCreatureDespawn(Creature* /*summon*/) override
         {
-            switch (summon->GetEntry())
-            {
-                case VEHICLE_DARNASSIA_NIGHTSABER:
-                case VEHICLE_EXODAR_ELEKK:
-                case VEHICLE_STORMWIND_STEED:
-                case VEHICLE_GNOMEREGAN_MECHANOSTRIDER:
-                case VEHICLE_IRONFORGE_RAM:
-                case VEHICLE_FORSAKE_WARHORSE:
-                case VEHICLE_THUNDER_BLUFF_KODO:
-                case VEHICLE_ORGRIMMAR_WOLF:
-                case VEHICLE_SILVERMOON_HAWKSTRIDER:
-                case VEHICLE_DARKSPEAR_RAPTOR:
-                    SetData(DATA_LESSER_CHAMPIONS_DEFEATED, 0);
-                    break;
-            }
+            // Lesser-wave progression is handled immediately by npc_toc5_lesser_champion::JustDied().
+            // The old implementation counted despawning 333xx vehicles, which are no longer used.
         }
 
         bool OnGossipHello(Player* player) override
         {
-            if (((instance->GetBossState(BOSS_GRAND_CHAMPIONS) == DONE &&
-                    instance->GetBossState(BOSS_BLACK_KNIGHT) == DONE &&
-                    instance->GetBossState(BOSS_ARGENT_CHALLENGE_E) == DONE) ||
-                    instance->GetBossState(BOSS_ARGENT_CHALLENGE_P) == DONE))
+            // Disable gossip only after the final encounter is actually finished.
+            // The old condition disabled gossip immediately when Paletress was DONE,
+            // which prevented starting the Black Knight encounter.
+            if (instance->GetBossState(BOSS_BLACK_KNIGHT) == DONE)
                 return false;
 
             if (instance->GetBossState(BOSS_GRAND_CHAMPIONS) == NOT_STARTED &&
@@ -501,7 +561,66 @@ public:
     }
 };
 
+
+/*######
+## npc_toc5_lesser_champion
+##
+## Replacement for the broken 333xx lesser vehicle phase.
+## 353xx champion NPCs fight as ordinary creatures and report their death
+## directly to the announcer so wave progression no longer depends on vehicles.
+######*/
+
+class npc_toc5_lesser_champion : public CreatureScript
+{
+public:
+    npc_toc5_lesser_champion() : CreatureScript("npc_toc5_lesser_champion") { }
+
+    struct npc_toc5_lesser_championAI : public ScriptedAI
+    {
+        npc_toc5_lesser_championAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
+
+        InstanceScript* instance;
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (!instance)
+                return;
+
+            if (Creature* announcer = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ANNOUNCER)))
+                if (announcer->AI())
+                    announcer->AI()->SetData(DATA_LESSER_CHAMPIONS_DEFEATED, 0);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetTrialOfTheChampionAI<npc_toc5_lesser_championAI>(creature);
+    }
+};
+
 void AddSC_trial_of_the_champion()
 {
     new npc_announcer_toc5();
+    new npc_toc5_lesser_champion();
 }
