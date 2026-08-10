@@ -379,6 +379,8 @@ public:
         void StartEncounter()
         {
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            // Close the player entrance before intro, trash, or boss combat begins.
+            instance->SetData(DATA_ENTRANCE_GATE, 0);
 
             if (instance->GetBossState(BOSS_BLACK_KNIGHT) == NOT_STARTED)
             {
