@@ -77,3 +77,7 @@ It assigns the standalone lesser-champion script, removes the obsolete vehicle a
 LFG players are teleported back to their saved entry point before their LFG group and dungeon data are cleared.
 
 This also handles the NPCBot-specific case where one real player with NPCBots leaves the group and the entire LFG group is disbanded instead of passing the player through the normal member-removal path.
+
+### Encounter entrance gate
+
+The north entrance portcullis (`195650`) closes when an encounter is started and reopens when its boss state is completed, failed, or reset. The separate main gate (`195647`) remains responsible for boss entrances and presentation sequences.

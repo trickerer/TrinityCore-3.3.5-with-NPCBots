@@ -71,6 +71,7 @@ public:
 
         ObjectGuid uiAnnouncerGUID;
         ObjectGuid uiMainGateGUID;
+        ObjectGuid uiEntranceGateGUID;
         ObjectGuid uiGrandChampionVehicle1GUID;
         ObjectGuid uiGrandChampionVehicle2GUID;
         ObjectGuid uiGrandChampionVehicle3GUID;
@@ -145,9 +146,13 @@ public:
         {
             switch (go->GetEntry())
             {
-                case GO_MAIN_GATE:
-                    uiMainGateGUID = go->GetGUID();
-                    break;
+            case GO_MAIN_GATE:
+                uiMainGateGUID = go->GetGUID();
+                break;
+            case GO_NORTH_PORTCULLIS:
+                uiEntranceGateGUID = go->GetGUID();
+                HandleGameObject(uiEntranceGateGUID, true, go);
+                break;
                 case GO_CHAMPIONS_LOOT:
                 case GO_CHAMPIONS_LOOT_H:
                     uiChampionLootGUID = go->GetGUID();
@@ -159,6 +164,12 @@ public:
         {
             if (!InstanceScript::SetBossState(id, state))
                 return false;
+
+            // Keep the player entrance locked while an encounter is active.
+            if (state == IN_PROGRESS)
+                HandleGameObject(uiEntranceGateGUID, false);
+            else if (state == DONE || state == FAIL || state == NOT_STARTED)
+                HandleGameObject(uiEntranceGateGUID, true);
 
             switch (id)
             {
@@ -223,6 +234,9 @@ public:
         {
             switch (uiType)
             {
+                case DATA_ENTRANCE_GATE:
+                    HandleGameObject(uiEntranceGateGUID, uiData != 0);
+                    break;
                 case DATA_MOVEMENT_DONE:
                     uiMovementDone = uiData;
                     if (uiMovementDone == 3)

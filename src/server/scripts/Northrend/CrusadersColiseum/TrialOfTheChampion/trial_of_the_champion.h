@@ -36,7 +36,8 @@ enum TCData
     DATA_GRAND_CHAMPION_DEFEATED,
     DATA_START,
     DATA_IN_POSITION,
-    DATA_ARGENT_SOLDIER_DEFEATED
+    DATA_ARGENT_SOLDIER_DEFEATED,
+    DATA_ENTRANCE_GATE
 };
 
 enum TCData64
@@ -88,6 +89,7 @@ enum TCCreatureIds
 enum TCGameObjects
 {
     GO_MAIN_GATE                = 195647,
+    GO_NORTH_PORTCULLIS        = 195650,
 
     GO_CHAMPIONS_LOOT           = 195709,
     GO_CHAMPIONS_LOOT_H            = 195710,
