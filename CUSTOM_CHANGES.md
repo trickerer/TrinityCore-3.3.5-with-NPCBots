@@ -81,3 +81,7 @@ This also handles the NPCBot-specific case where one real player with NPCBots le
 ### Encounter entrance gate
 
 The north entrance portcullis (`195650`) closes when an encounter is started and reopens when its boss state is completed, failed, or reset. The separate main gate (`195647`) remains responsible for boss entrances and presentation sequences.
+
+### Lesser champion mounts
+
+The three lesser-champion waves use cosmetic faction mounts while remaining independent scripted creatures. The broken vehicle-passenger system is not restored.
