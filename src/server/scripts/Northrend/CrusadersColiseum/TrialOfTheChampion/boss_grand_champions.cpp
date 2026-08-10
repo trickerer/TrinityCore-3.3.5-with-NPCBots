@@ -128,6 +128,26 @@ void AggroAllPlayers(Creature* temp)
     }
 }
 
+void EngageGrandChampionGroup(Creature* source)
+{
+    InstanceScript* instance = source->GetInstanceScript();
+    if (!instance)
+        return;
+
+    ObjectGuid const championGuids[3] =
+    {
+        instance->GetGuidData(DATA_GRAND_CHAMPION_1),
+        instance->GetGuidData(DATA_GRAND_CHAMPION_2),
+        instance->GetGuidData(DATA_GRAND_CHAMPION_3)
+    };
+
+    for (ObjectGuid const& guid : championGuids)
+        if (Creature* champion = ObjectAccessor::GetCreature(*source, guid))
+            if (champion->IsAlive() && !champion->GetVehicle() &&
+                champion->m_movementInfo.transport.guid.IsEmpty())
+                AggroAllPlayers(champion);
+}
+
 bool GrandChampionsOutVehicle(Creature* me)
 {
     InstanceScript* instance = me->GetInstanceScript();
@@ -269,6 +289,20 @@ public:
                 {
                     if (Unit* passenger = vehicle->GetPassenger(SEAT_ID_0))
                     {
+                        // Capture the rider GUID while the passenger is guaranteed to exist.
+                        // The spawn-time GetPassenger(0) lookup can run before the vehicle
+                        // accessory is fully installed and store an empty GUID instead.
+                        if (instance)
+                        {
+                            ObjectGuid const vehicleGuid = me->GetGUID();
+                            if (instance->GetGuidData(DATA_GRAND_CHAMPION_VEHICLE_1) == vehicleGuid)
+                                instance->SetGuidData(DATA_GRAND_CHAMPION_1, passenger->GetGUID());
+                            else if (instance->GetGuidData(DATA_GRAND_CHAMPION_VEHICLE_2) == vehicleGuid)
+                                instance->SetGuidData(DATA_GRAND_CHAMPION_2, passenger->GetGUID());
+                            else if (instance->GetGuidData(DATA_GRAND_CHAMPION_VEHICLE_3) == vehicleGuid)
+                                instance->SetGuidData(DATA_GRAND_CHAMPION_3, passenger->GetGUID());
+                        }
+
                         passenger->ExitVehicle();
                         passenger->SetStandState(UNIT_STAND_STATE_STAND);
                     }
@@ -444,10 +478,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetImmuneToPC(false);
                 me->SetImmuneToNPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (!me->GetVictim())
-                    AggroAllPlayers(me);
+                // Arm the champion without starting combat automatically.
+                // Once the group is pulled, retain normal aggressive combat behavior.
+                me->SetReactState(me->IsInCombat() ? REACT_AGGRESSIVE : REACT_DEFENSIVE);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -506,7 +539,14 @@ public:
             // As soon as the rider leaves the vehicle, transport.guid becomes empty
             // and normal damage is allowed for the ground-combat phase.
             if (!me->m_movementInfo.transport.guid.IsEmpty())
+            {
                 damage = 0;
+                return;
+            }
+
+            // Pull the complete ground group only after a player attacks one champion.
+            if (damage && instance && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
+                EngageGrandChampionGroup(me);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -613,10 +653,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetImmuneToPC(false);
                 me->SetImmuneToNPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (!me->GetVictim())
-                    AggroAllPlayers(me);
+                // Arm the champion without starting combat automatically.
+                // Once the group is pulled, retain normal aggressive combat behavior.
+                me->SetReactState(me->IsInCombat() ? REACT_AGGRESSIVE : REACT_DEFENSIVE);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -677,7 +716,14 @@ public:
             // As soon as the rider leaves the vehicle, transport.guid becomes empty
             // and normal damage is allowed for the ground-combat phase.
             if (!me->m_movementInfo.transport.guid.IsEmpty())
+            {
                 damage = 0;
+                return;
+            }
+
+            // Pull the complete ground group only after a player attacks one champion.
+            if (damage && instance && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
+                EngageGrandChampionGroup(me);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -790,10 +836,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetImmuneToPC(false);
                 me->SetImmuneToNPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (!me->GetVictim())
-                    AggroAllPlayers(me);
+                // Arm the champion without starting combat automatically.
+                // Once the group is pulled, retain normal aggressive combat behavior.
+                me->SetReactState(me->IsInCombat() ? REACT_AGGRESSIVE : REACT_DEFENSIVE);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -856,7 +901,14 @@ public:
             // As soon as the rider leaves the vehicle, transport.guid becomes empty
             // and normal damage is allowed for the ground-combat phase.
             if (!me->m_movementInfo.transport.guid.IsEmpty())
+            {
                 damage = 0;
+                return;
+            }
+
+            // Pull the complete ground group only after a player attacks one champion.
+            if (damage && instance && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
+                EngageGrandChampionGroup(me);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -968,10 +1020,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetImmuneToPC(false);
                 me->SetImmuneToNPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (!me->GetVictim())
-                    AggroAllPlayers(me);
+                // Arm the champion without starting combat automatically.
+                // Once the group is pulled, retain normal aggressive combat behavior.
+                me->SetReactState(me->IsInCombat() ? REACT_AGGRESSIVE : REACT_DEFENSIVE);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -1044,7 +1095,14 @@ public:
             // As soon as the rider leaves the vehicle, transport.guid becomes empty
             // and normal damage is allowed for the ground-combat phase.
             if (!me->m_movementInfo.transport.guid.IsEmpty())
+            {
                 damage = 0;
+                return;
+            }
+
+            // Pull the complete ground group only after a player attacks one champion.
+            if (damage && instance && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
+                EngageGrandChampionGroup(me);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1148,10 +1206,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                 me->SetImmuneToPC(false);
                 me->SetImmuneToNPC(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (!me->GetVictim())
-                    AggroAllPlayers(me);
+                // Arm the champion without starting combat automatically.
+                // Once the group is pulled, retain normal aggressive combat behavior.
+                me->SetReactState(me->IsInCombat() ? REACT_AGGRESSIVE : REACT_DEFENSIVE);
             }
 
             if (uiPhaseTimer <= uiDiff)
@@ -1197,7 +1254,14 @@ public:
             // As soon as the rider leaves the vehicle, transport.guid becomes empty
             // and normal damage is allowed for the ground-combat phase.
             if (!me->m_movementInfo.transport.guid.IsEmpty())
+            {
                 damage = 0;
+                return;
+            }
+
+            // Pull the complete ground group only after a player attacks one champion.
+            if (damage && instance && instance->GetBossState(BOSS_GRAND_CHAMPIONS) == IN_PROGRESS)
+                EngageGrandChampionGroup(me);
         }
 
         void JustDied(Unit* /*killer*/) override

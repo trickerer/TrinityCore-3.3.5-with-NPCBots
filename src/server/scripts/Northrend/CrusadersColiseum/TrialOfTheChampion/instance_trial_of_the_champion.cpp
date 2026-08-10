@@ -54,6 +54,7 @@ public:
             uiGrandChampionsDeaths = 0;
             uiGrandChampionMountsDefeated = 0;
             uiGrandChampionGroundDelay = 0;
+            uiGrandChampionGroundPhase = 0;
             bGrandChampionGroundPending = false;
             uiArgentSoldierDeaths = 0;
             teamInInstance = 0;
@@ -66,6 +67,7 @@ public:
         uint16 uiGrandChampionsDeaths;
         uint8 uiGrandChampionMountsDefeated;
         uint32 uiGrandChampionGroundDelay;
+        uint8 uiGrandChampionGroundPhase;
         bool bGrandChampionGroundPending;
         uint8 uiArgentSoldierDeaths;
 
@@ -217,17 +219,231 @@ public:
             if (!bGrandChampionGroundPending)
                 return;
 
-            if (uiGrandChampionGroundDelay > diff)
+            ObjectGuid const championGuids[3] =
             {
+                uiGrandChampion1GUID,
+                uiGrandChampion2GUID,
+                uiGrandChampion3GUID
+            };
+
+            // Safe staging area behind the main gate. SpawnPosition in the
+            // announcer script uses the same part of the map.
+            Position const behindGatePositions[3] =
+            {
+                {742.261f, 684.000f, 411.681f, 4.60f},
+                {746.261f, 684.000f, 411.681f, 4.60f},
+                {750.261f, 684.000f, 411.681f, 4.60f}
+            };
+
+            // Proven positions used by the middle Argent-soldier group.
+            Position const arenaPositions[3] =
+            {
+                {742.440f, 650.290f, 411.790f, 4.60f},
+                {746.730f, 650.240f, 411.560f, 4.60f},
+                {750.720f, 650.200f, 411.770f, 4.60f}
+            };
+
+            // Vehicle exit can reapply its prone visual state after the initial cleanup.
+            // Mirror the proven ground-combat cleanup throughout the transition,
+            // while keeping every champion passive and protected.
+            for (ObjectGuid const& guid : championGuids)
+            {
+                if (Creature* champion = instance->GetCreature(guid))
+                {
+                    champion->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+                    champion->setDeathState(ALIVE);
+                    champion->ClearUnitState(UNIT_STATE_DIED);
+                    champion->SetEmoteState(EMOTE_STATE_NONE);
+                    champion->SetStandState(UNIT_STAND_STATE_STAND);
+                    champion->RemoveUnitFlag(
+                        UNIT_FLAG_NOT_ATTACKABLE_1 |
+                        UNIT_FLAG_UNINTERACTIBLE |
+                        UNIT_FLAG_IMMUNE_TO_PC |
+                        UNIT_FLAG_IMMUNE_TO_NPC);
+                    champion->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    champion->SetImmuneToPC(true);
+                    champion->SetImmuneToNPC(true);
+                    champion->SetReactState(REACT_PASSIVE);
+                }
+            }
+
+            auto CountChampionsAt = [&](Position const positions[3])
+            {
+                uint8 arrived = 0;
+                for (uint8 i = 0; i < 3; ++i)
+                    if (Creature* champion = instance->GetCreature(championGuids[i]))
+                        if (champion->GetDistance2d(positions[i].GetPositionX(), positions[i].GetPositionY()) <= 2.0f)
+                            ++arrived;
+                return arrived;
+            };
+
+            bool const delayExpired = uiGrandChampionGroundDelay <= diff;
+            if (delayExpired)
+                uiGrandChampionGroundDelay = 0;
+            else
                 uiGrandChampionGroundDelay -= diff;
+
+            // Movement phases finish as soon as all three champions arrive.
+            // The timer is only a pathfinding fallback.
+            if (uiGrandChampionGroundPhase == 2)
+            {
+                uint8 const arrived = CountChampionsAt(behindGatePositions);
+                if (arrived < 3 && !delayExpired)
+                    return;
+
+                for (uint8 i = 0; i < 3; ++i)
+                {
+                    if (Creature* champion = instance->GetCreature(championGuids[i]))
+                    {
+                        if (champion->GetDistance2d(behindGatePositions[i].GetPositionX(), behindGatePositions[i].GetPositionY()) > 2.0f)
+                        {
+                            champion->NearTeleportTo(
+                                behindGatePositions[i].GetPositionX(),
+                                behindGatePositions[i].GetPositionY(),
+                                behindGatePositions[i].GetPositionZ(),
+                                behindGatePositions[i].GetOrientation());
+                        }
+                    }
+                }
+
+                HandleGameObject(uiMainGateGUID, false);
+                uiGrandChampionGroundPhase = 3;
+                // Keep the champions hidden behind the gate for ten seconds.
+                uiGrandChampionGroundDelay = 10000;
                 return;
             }
 
-            uiGrandChampionGroundDelay = 0;
-            bGrandChampionGroundPending = false;
+            if (uiGrandChampionGroundPhase == 4)
+            {
+                uint8 const arrived = CountChampionsAt(arenaPositions);
+                if (arrived < 3 && !delayExpired)
+                    return;
 
-            // This activates the already proven FORCE_STAND_GROUND boss AI.
-            SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                for (uint8 i = 0; i < 3; ++i)
+                {
+                    if (Creature* champion = instance->GetCreature(championGuids[i]))
+                    {
+                        if (champion->GetDistance2d(arenaPositions[i].GetPositionX(), arenaPositions[i].GetPositionY()) > 2.0f)
+                        {
+                            champion->NearTeleportTo(
+                                arenaPositions[i].GetPositionX(),
+                                arenaPositions[i].GetPositionY(),
+                                arenaPositions[i].GetPositionZ(),
+                                arenaPositions[i].GetOrientation());
+                        }
+
+                        champion->SetStandState(UNIT_STAND_STATE_STAND);
+                        champion->SetFacingTo(arenaPositions[i].GetOrientation());
+                        champion->SetHomePosition(
+                            arenaPositions[i].GetPositionX(),
+                            arenaPositions[i].GetPositionY(),
+                            arenaPositions[i].GetPositionZ(),
+                            arenaPositions[i].GetOrientation());
+                    }
+                }
+
+                HandleGameObject(uiMainGateGUID, false);
+                uiGrandChampionGroundPhase = 5;
+                uiGrandChampionGroundDelay = 750;
+                return;
+            }
+
+            if (!delayExpired)
+                return;
+
+            switch (uiGrandChampionGroundPhase)
+            {
+                case 1:
+                {
+                    // All three mounted champions are defeated. Wake them together,
+                    // then let them retreat through the newly opened main gate.
+                    HandleGameObject(uiMainGateGUID, true);
+                    // Force-clear any stale vehicle transport state before movement.
+                    // The last rider can still look mounted even after ExitVehicle().
+                    for (ObjectGuid const& guid : championGuids)
+                    {
+                        if (Creature* champion = instance->GetCreature(guid))
+                        {
+                            if (champion->GetVehicle())
+                                champion->ExitVehicle();
+
+                            champion->RemoveUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+                            champion->m_movementInfo.transport.Reset();
+                            champion->SetStandState(UNIT_STAND_STATE_STAND);
+                            champion->NearTeleportTo(
+                                champion->GetPositionX(),
+                                champion->GetPositionY(),
+                                champion->GetPositionZ(),
+                                champion->GetOrientation());
+                        }
+                    }
+
+                    // Hide defeated mounts only after every rider has fully detached.
+                    ObjectGuid const defeatedVehicleGuids[3] =
+                    {
+                        uiGrandChampionVehicle1GUID,
+                        uiGrandChampionVehicle2GUID,
+                        uiGrandChampionVehicle3GUID
+                    };
+
+                    for (ObjectGuid const& guid : defeatedVehicleGuids)
+                        if (Creature* vehicle = instance->GetCreature(guid))
+                            vehicle->SetVisible(false);
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        if (Creature* champion = instance->GetCreature(championGuids[i]))
+                        {
+                            champion->SetStandState(UNIT_STAND_STATE_STAND);
+                            champion->SetWalk(false);
+                            champion->GetMotionMaster()->Clear();
+                            champion->GetMotionMaster()->MovePoint(
+                                100 + i,
+                                behindGatePositions[i].GetPositionX(),
+                                behindGatePositions[i].GetPositionY(),
+                                behindGatePositions[i].GetPositionZ());
+                        }
+                    }
+
+                    uiGrandChampionGroundPhase = 2;
+                    uiGrandChampionGroundDelay = 12000;
+                    break;
+                }
+                case 3:
+                    // Briefly hide the formation, then reopen the gate for the
+                    // three-abreast return into the arena.
+                    HandleGameObject(uiMainGateGUID, true);
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        if (Creature* champion = instance->GetCreature(championGuids[i]))
+                        {
+                            champion->SetWalk(false);
+                            champion->GetMotionMaster()->Clear();
+                            champion->GetMotionMaster()->MovePoint(
+                                110 + i,
+                                arenaPositions[i].GetPositionX(),
+                                arenaPositions[i].GetPositionY(),
+                                arenaPositions[i].GetPositionZ());
+                        }
+                    }
+
+                    uiGrandChampionGroundPhase = 4;
+                    uiGrandChampionGroundDelay = 12000;
+                    break;
+                case 5:
+                    uiGrandChampionGroundPhase = 0;
+                    uiGrandChampionGroundDelay = 0;
+                    bGrandChampionGroundPending = false;
+
+                    // The existing boss AIs remove protection and engage only now.
+                    SetBossState(BOSS_GRAND_CHAMPIONS, IN_PROGRESS);
+                    break;
+                default:
+                    uiGrandChampionGroundPhase = 0;
+                    uiGrandChampionGroundDelay = 0;
+                    bGrandChampionGroundPending = false;
+                    HandleGameObject(uiMainGateGUID, false);
+                    break;
+            }
         }
 
         void SetData(uint32 uiType, uint32 uiData) override
@@ -273,7 +489,9 @@ public:
 
                         for (ObjectGuid const& guid : vehicleGuids)
                             if (Creature* vehicle = instance->GetCreature(guid))
-                                vehicle->DespawnOrUnsummon();
+                                // Keep defeated mounts alive and visible until the delayed
+                                // transition phase confirms that every rider has detached.
+                                vehicle->StopMoving();
 
                         ObjectGuid championGuids[3] =
                         {
@@ -282,12 +500,6 @@ public:
                             uiGrandChampion3GUID
                         };
 
-                        Position const groundPositions[3] =
-                        {
-                            {739.678f, 662.541f, 412.393f, 4.49f},
-                            {746.710f, 661.020f, 411.690f, 4.60f},
-                            {754.340f, 660.700f, 412.390f, 4.79f}
-                        };
 
                         for (uint8 i = 0; i < 3; ++i)
                         {
@@ -308,29 +520,31 @@ public:
                                 champion->SetStandState(UNIT_STAND_STATE_STAND);
                                 champion->SetFullHealth();
 
-                                // Force a fresh world-position/movement update after the vehicle exit.
-                                champion->NearTeleportTo(
-                                    groundPositions[i].GetPositionX(),
-                                    groundPositions[i].GetPositionY(),
-                                    groundPositions[i].GetPositionZ(),
-                                    groundPositions[i].GetOrientation()
-                                );
-
+                                // Keep the champion at the defeat location until all
+                                // three are ready to stand and retreat together.
                                 champion->SetStandState(UNIT_STAND_STATE_STAND);
 
-                                // Wait phase: set protection ONCE and then leave the champion
-                                // completely untouched for 30 seconds.
+                                // Remove protection inherited from the vehicle seat, then apply
+                                // only the transition protection required by this encounter.
+                                champion->RemoveUnitFlag(
+                                    UNIT_FLAG_NON_ATTACKABLE |
+                                    UNIT_FLAG_NOT_ATTACKABLE_1 |
+                                    UNIT_FLAG_UNINTERACTIBLE |
+                                    UNIT_FLAG_IMMUNE_TO_PC |
+                                    UNIT_FLAG_IMMUNE_TO_NPC);
                                 champion->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                                champion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
-                                champion->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                                 champion->SetImmuneToPC(true);
                                 champion->SetImmuneToNPC(true);
                                 champion->SetReactState(REACT_PASSIVE);
                             }
                         }
 
+                        // Open the gate only after all three mounted champions are defeated.
+                        // Give the client one clean standing update before movement starts.
+                        HandleGameObject(uiMainGateGUID, true);
                         bGrandChampionGroundPending = true;
-                        uiGrandChampionGroundDelay = 30000;
+                        uiGrandChampionGroundPhase = 1;
+                        uiGrandChampionGroundDelay = 3000;
                     }
                     break;
                 }
