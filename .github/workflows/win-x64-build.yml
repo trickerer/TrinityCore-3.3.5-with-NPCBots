@@ -21,7 +21,7 @@ jobs:
       MYSQL_ROOT_DIR: C:/Program Files/MySQL/MySQL Server 8.0
       OPENSSL_ROOT_DIR: C:/libs/openssl
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
 
     - name: Set reusable strings
       id: strings
@@ -50,7 +50,7 @@ jobs:
 
     - name: Cache OpenSSL
       id: cache-openssl
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ env.OPENSSL_ROOT_DIR }}
         key: ${{ steps.openssl-info.outputs.cache-key }}
