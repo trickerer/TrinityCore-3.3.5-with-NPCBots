@@ -1580,6 +1580,14 @@ void Creature::UpdateLevelDependantStats()
     m_baseAttackPower       = stats->AttackPower;
     m_baseRangedAttackPower = stats->RangedAttackPower;
 
+    //npcbot
+    if (IsNPCBotOrPet())
+    {
+        m_baseAttackPower = 1;
+        m_baseRangedAttackPower = m_baseAttackPower;
+    }
+    //end npcbot
+
     float armor = (float)stats->GenerateArmor(cInfo); /// @todo Why is this treated as uint32 when it's a float?
     SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, armor);
 }
