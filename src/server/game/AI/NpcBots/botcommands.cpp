@@ -4364,7 +4364,7 @@ public:
         Spell* spell = new Spell(player, spellInfo, TRIGGERED_NONE);
         spell->m_CastItem = item;
         spell->m_cast_count = 1;
-        spell->m_glyphIndex = 0;
+        spell->m_misc.GlyphSlot = 0;
         spell->prepare(targets);
 
         return true;

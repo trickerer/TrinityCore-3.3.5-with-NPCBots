@@ -360,8 +360,8 @@ void bot_ai::CheckOwnerExpiry()
 
         //send all items back
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_EQUIP_BY_ITEM_INSTANCE);
-        //        0            1                2      3         4        5      6             7                 8           9           10    11    12         13
-        //"SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, guid, itemEntry, owner_guid "
+        //        0     1          2            3                4      5         6        7      8             9                 10          11          12    13
+        //"SELECT guid, itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, owner_guid "
         //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
         for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
@@ -375,8 +375,8 @@ void bot_ai::CheckOwnerExpiry()
             do
             {
                 Field* fields2 = iiresult->Fetch();
-                uint32 itemGuidLow = fields2[11].GetUInt32();
-                uint32 itemId = fields2[12].GetUInt32();
+                uint32 itemGuidLow = fields2[0].GetUInt32();
+                uint32 itemId = fields2[1].GetUInt32();
                 uint8 item_idx = std::numeric_limits<uint8>::max();
 
                 for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
@@ -10473,7 +10473,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         ostr << LocalizedNpcText(player, BOT_TEXT_HIREFAIL_COST) << " ("
                             << BotCfg::GetNpcBotCostStr(player->GetLevel(), _botclass) << ")!";
                         ch.SendSysMessage(ostr.view());
-                        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+                        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, nullptr, 0);
                         BotSay("...", player);
                         break;
                     }
@@ -15143,8 +15143,8 @@ void bot_ai::InitEquips()
     else
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_EQUIP_BY_ITEM_INSTANCE);
-        //        0            1                2      3         4        5      6             7                 8           9           10    11    12         13
-        //"SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, guid, itemEntry, owner_guid "
+        //        0     1          2            3                4      5         6        7      8             9                 10          11          12    13
+        //"SELECT guid, itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, owner_guid "
         //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
         std::array<uint32, BOT_INVENTORY_SIZE> assigned_item_guids{};
@@ -15175,8 +15175,8 @@ void bot_ai::InitEquips()
             do
             {
                 fields2 = iiresult->Fetch();
-                uint32 itemGuidLow = fields2[11].GetUInt32();
-                uint32 itemId = fields2[12].GetUInt32();
+                uint32 itemGuidLow = fields2[0].GetUInt32();
+                uint32 itemId = fields2[1].GetUInt32();
                 Item* item = new Item;
                 ASSERT(item->LoadFromDB(itemGuidLow, ObjectGuid::Empty, fields2, itemId));
                 //gonna find where to store our new item

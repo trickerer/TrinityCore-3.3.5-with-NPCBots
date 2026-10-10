@@ -1240,8 +1240,8 @@ void BotDataMgr::LoadNpcBotGearStorage()
     uint32 oldMSTime = getMSTime();
 
     QueryResult result = CharacterDatabase.Query(
-    //          0               1                   2         3            4           5         6                7                    8              9              10       11       12            13             14       15
-        "SELECT ii.creatorGuid, ii.giftCreatorGuid, ii.count, ii.duration, ii.charges, ii.flags, ii.enchantments, ii.randomPropertyId, ii.durability, ii.playedTime, ii.text, ii.guid, ii.itemEntry, ii.owner_guid, gs.guid, gs.item_guid"
+    //          0        1             2               3                   4         5            6           7         8                9                    10             11             12       13             14       15
+        "SELECT ii.guid, ii.itemEntry, ii.creatorGuid, ii.giftCreatorGuid, ii.count, ii.duration, ii.charges, ii.flags, ii.enchantments, ii.randomPropertyId, ii.durability, ii.playedTime, ii.text, ii.owner_guid, gs.guid, gs.item_guid"
         " FROM  characters_npcbot_gear_storage gs JOIN item_instance ii ON gs.item_guid = ii.guid ORDER BY gs.guid, gs.item_guid");
     if (!result)
     {
@@ -1255,9 +1255,9 @@ void BotDataMgr::LoadNpcBotGearStorage()
     {
         Field* fields = result->Fetch();
 
-        uint32 item_id = fields[12].GetUInt32();
+        uint32 item_guidlow = fields[0].GetUInt32();
+        uint32 item_id = fields[1].GetUInt32();
         uint32 player_guidlow = fields[14].GetUInt32();
-        uint32 item_guidlow = fields[15].GetUInt32();
 
         Item* item = new Item();
         ObjectGuid player_guid = ObjectGuid::Create<HighGuid::Player>(player_guidlow);

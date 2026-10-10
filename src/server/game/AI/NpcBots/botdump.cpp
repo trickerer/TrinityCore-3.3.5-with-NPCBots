@@ -897,8 +897,8 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
     ASSERT(deinfo);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_EQUIP_BY_ITEM_INSTANCE);
-    //        0            1                2      3         4        5      6             7                 8           9           10    11    12         13
-    //"SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, guid, itemEntry, owner_guid "
+    //        0     1          2            3                4      5         6        7      8             9                 10          11          12    13
+    //"SELECT guid, itemEntry, creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text, owner_guid "
     //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
     for (auto i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
@@ -926,9 +926,9 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
             bool end = i == item_instance_fields_count-1;
             switch (i)
             {
-                case 4:  //charges
-                case 6:  //enchantments
-                case 10: //text
+                case 6:  //charges
+                case 8:  //enchantments
+                case 12: //text
                 {
                     char const* cstr = fields[i].GetCString();
                     if (!cstr)
@@ -937,10 +937,10 @@ void NPCBotsDump::AppendBotEquipsData(BotStringTransaction* trans, uint32 entry)
                         AppendEscapedValue(ss, EscapedString(cstr), end);
                     break;
                 }
-                case 7:  //randomPropertyId
+                case 9:  //randomPropertyId
                     AppendEscapedValue(ss,      int32(fields[i].GetInt16()),   end);
                     break;
-                case 8:  //durability
+                case 10:  //durability
                     AppendEscapedValue(ss,     uint32(fields[i].GetUInt16()),  end);
                     break;
                 default:
