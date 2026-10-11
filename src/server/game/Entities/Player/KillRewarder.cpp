@@ -158,6 +158,45 @@ inline void KillRewarder::_InitGroupData()
         //      so 100% XP will be rewarded (50% otherwise).
         _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMember->GetLevel());
     }
+    //npcbot
+    else if (_killer->HaveBot())
+    {
+        _count = 1;
+        _maxLevel = _killer->GetLevel();
+        _sumLevel = _maxLevel;
+        if (_victim->GetLevel() > Bcore::XP::GetGrayLevel(_maxLevel))
+            _maxNotGrayMember = _killer;
+        _bots_count_xp = 0;
+        _bots_count_honor = 0;
+        if (BotCfg::IsNpcBotXpReductionEnabled() || BotCfg::IsNpcBotHonorReductionEnabled())
+        {
+            const float reward_dist_sq = std::pow(sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE), 2.f);
+            Player const* member = _killer;
+            BotMap const* botMap = member->GetBotMgr()->GetBotMap();
+            for (auto const& kv : *botMap)
+            {
+                Creature const* bot = kv.second;
+                if (bot && bot->IsAlive() && bot->IsInMap(_victim) && (member->GetMap()->IsDungeon() || _victim->GetExactDistSq(bot) <= reward_dist_sq))
+                {
+                    const bool add_for_xp = BotCfg::IsNpcBotXpReductionEnabled() && !BotCfg::IsNpcBotXpReductionGroupOnly();
+                    const bool add_for_honor = BotCfg::IsNpcBotHonorReductionEnabled() && !BotCfg::IsNpcBotHonorReductionGroupOnly();
+                    if (add_for_xp || add_for_honor)
+                    {
+                        if (add_for_xp)
+                            ++_bots_count_xp;
+                        if (add_for_honor)
+                            ++_bots_count_honor;
+                        const uint8 lvl = bot->GetLevel();
+                        _sumLevel += lvl;
+                        if (_maxLevel < lvl)
+                            _maxLevel = lvl;
+                    }
+                }
+            }
+        }
+        _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMember->GetLevel());
+    }
+    //end npcbot
     else
         _count = 1;
 }
@@ -204,6 +243,16 @@ inline void KillRewarder::_RewardXP(Player* player, float rate)
         else
             xp = 0;
     }
+    //npcbot
+    else if (_bots_count_xp)
+    {
+        if (_maxNotGrayMember && player->IsAlive() && _maxNotGrayMember->GetLevel() >= player->GetLevel())
+            xp = _isFullXP ? uint32(xp * rate) : uint32(xp * rate / 2) + 1;
+        else
+            xp = 0;
+    }
+    //end npcbot
+
     if (xp)
     {
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
@@ -260,9 +309,20 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
+        //npcbot
+        /*
+        //end npcbot
         float const rate = _group ?
             _groupRate * float(player->GetLevel()) / _sumLevel : // Group rate depends on summary level.
             1.0f;                                                // Personal rate is 100%.
+        //npcbot
+        */
+        float rate = _group ?
+            _groupRate * float(player->GetLevel()) / _sumLevel : // Group rate depends on summary level.
+            1.0f;                                                // Personal rate is 100%.
+        if (_bots_count_xp)
+            rate = _groupRate * float(player->GetLevel()) / _sumLevel;
+        //end npcbot
         if (_xp)
             // 4.2. Give XP.
             _RewardXP(player, rate);
