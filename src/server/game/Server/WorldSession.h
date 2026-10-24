@@ -152,8 +152,9 @@ namespace WorldPackets
         class ShowingCloak;
         class ShowingHelm;
         class PlayerLogout;
-        class PlayedTimeClient;
         class SetActionBarToggles;
+        class PlayedTimeClient;
+        class SetTitle;
     }
 
     namespace ClientConfig
@@ -316,6 +317,8 @@ namespace WorldPackets
         class ClientPlayerMovement;
         class WorldPortResponse;
         class MoveTeleportAck;
+        class MovementSpeedAck;
+        class SetActiveMover;
     }
 
     namespace NPC
@@ -339,6 +342,19 @@ namespace WorldPackets
         class RequestPetInfo;
     }
 
+    namespace Petition
+    {
+        class DeclinePetition;
+        class OfferPetition;
+        class PetitionBuy;
+        class PetitionRenameGuild;
+        class PetitionShowList;
+        class PetitionShowSignatures;
+        class QueryPetition;
+        class SignPetition;
+        class TurnInPetition;
+    }
+
     namespace Query
     {
         class QueryCreature;
@@ -360,6 +376,8 @@ namespace WorldPackets
         class QueryQuestInfo;
         class QuestGiverRequestReward;
         class QuestGiverQueryQuest;
+        class QuestGiverAcceptQuest;
+        class QuestLogRemoveQuest;
         class QueryQuestsCompleted;
     }
 
@@ -385,6 +403,7 @@ namespace WorldPackets
         class CastSpell;
         class PetCastSpell;
         class UseItem;
+        class OpenItem;
         class SetActionButton;
     }
 
@@ -402,8 +421,14 @@ namespace WorldPackets
 
     namespace Ticket
     {
+        class GMTicketCreate;
+        class GMTicketUpdateText;
+        class GMTicketDelete;
         class GMTicketGetSystemStatus;
         class GMTicketGetTicket;
+        class GMSurveySubmit;
+        class GMLagReport;
+        class GMTicketResponseResolve;
     }
 
     namespace Trade
@@ -800,7 +825,7 @@ class TC_GAME_API WorldSession
         void HandleRequestHonorStats(WorldPackets::Inspect::RequestHonorStats& request);
         void HandleQueryInspectAchievements(WorldPackets::Inspect::QueryInspectAchievements& inspect);
 
-        void HandleForceSpeedChangeAck(WorldPacket& recvData);
+        void HandleForceSpeedChangeAck(WorldPackets::Movement::MovementSpeedAck& packet);
         void HandleMoveKnockBackAck(WorldPacket& recvPacket);
         void HandleMoveTeleportAck(WorldPackets::Movement::MoveTeleportAck& packet);
         void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
@@ -835,14 +860,14 @@ class TC_GAME_API WorldSession
         void HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& logoutCancel);
 
         // GM Ticket opcodes
-        void HandleGMTicketCreateOpcode(WorldPacket& recvPacket);
-        void HandleGMTicketUpdateOpcode(WorldPacket& recvPacket);
-        void HandleGMTicketDeleteOpcode(WorldPacket& recvPacket);
+        void HandleGMTicketCreateOpcode(WorldPackets::Ticket::GMTicketCreate& gmTicketCreate);
+        void HandleGMTicketUpdateTextOpcode(WorldPackets::Ticket::GMTicketUpdateText& gmTicketUpdateText);
+        void HandleGMTicketDeleteOpcode(WorldPackets::Ticket::GMTicketDelete& gmTicketDelete);
         void HandleGMTicketGetTicketOpcode(WorldPackets::Ticket::GMTicketGetTicket& packet);
         void HandleGMTicketSystemStatusOpcode(WorldPackets::Ticket::GMTicketGetSystemStatus& packet);
-        void HandleGMSurveySubmit(WorldPacket& recvPacket);
-        void HandleReportLag(WorldPacket& recvPacket);
-        void HandleGMResponseResolve(WorldPacket& recvPacket);
+        void HandleGMSurveySubmit(WorldPackets::Ticket::GMSurveySubmit& gmSurveySubmit);
+        void HandleGMLagReport(WorldPackets::Ticket::GMLagReport& gmLagReport);
+        void HandleGMResponseResolve(WorldPackets::Ticket::GMTicketResponseResolve& gmTicketResponseResolve);
 
         void HandleTogglePvP(WorldPackets::Misc::TogglePvP& togglePvP);
 
@@ -890,7 +915,7 @@ class TC_GAME_API WorldSession
 
         void HandleMovementOpcodes(WorldPackets::Movement::ClientPlayerMovement& packet);
         void HandleMovementOpcode(OpcodeClient opcode, MovementInfo& movementInfo);
-        void HandleSetActiveMoverOpcode(WorldPacket& recvData);
+        void HandleSetActiveMoverOpcode(WorldPackets::Movement::SetActiveMover& packet);
         void HandleMoveNotActiveMover(WorldPacket& recvData);
         void HandleDismissControlledVehicle(WorldPacket& recvData);
         void HandleRequestVehicleExit(WorldPacket& recvData);
@@ -918,38 +943,38 @@ class TC_GAME_API WorldSession
         void HandleGroupAssistantLeaderOpcode(WorldPacket& recvData);
         void HandlePartyAssignmentOpcode(WorldPacket& recvData);
 
-        void HandlePetitionBuyOpcode(WorldPacket& recvData);
-        void HandlePetitionShowSignatures(WorldPacket& recvData);
+        void HandlePetitionBuy(WorldPackets::Petition::PetitionBuy& packet);
+        void HandlePetitionShowSignatures(WorldPackets::Petition::PetitionShowSignatures& packet);
         void SendPetitionSigns(Petition const* petition, Player* sendTo);
-        void HandleQueryPetition(WorldPacket& recvData);
-        void HandlePetitionRenameGuild(WorldPacket& recvData);
-        void HandleSignPetition(WorldPacket& recvData);
-        void HandleDeclinePetition(WorldPacket& recvData);
-        void HandleOfferPetitionOpcode(WorldPacket& recvData);
-        void HandleTurnInPetitionOpcode(WorldPacket& recvData);
+        void HandleQueryPetition(WorldPackets::Petition::QueryPetition& packet);
+        void HandlePetitionRenameGuild(WorldPackets::Petition::PetitionRenameGuild& packet);
+        void HandleSignPetition(WorldPackets::Petition::SignPetition& packet);
+        void HandleDeclinePetition(WorldPackets::Petition::DeclinePetition& packet);
+        void HandleOfferPetition(WorldPackets::Petition::OfferPetition& packet);
+        void HandleTurnInPetition(WorldPackets::Petition::TurnInPetition& packet);
 
         void HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query);
-        void HandleGuildCreateOpcode(WorldPackets::Guild::GuildCreate& packet);
-        void HandleGuildInviteOpcode(WorldPackets::Guild::GuildInviteByName& packet);
+        void HandleGuildCreate(WorldPackets::Guild::GuildCreate& packet);
+        void HandleGuildInviteByName(WorldPackets::Guild::GuildInviteByName& packet);
         void HandleGuildOfficerRemoveMember(WorldPackets::Guild::GuildOfficerRemoveMember& packet);
-        void HandleGuildAcceptOpcode(WorldPackets::Guild::AcceptGuildInvite& invite);
-        void HandleGuildDeclineOpcode(WorldPackets::Guild::GuildDeclineInvitation& decline);
-        void HandleGuildInfoOpcode(WorldPackets::Guild::GuildGetInfo& packet);
-        void HandleGuildEventLogQueryOpcode(WorldPackets::Guild::GuildEventLogQuery& packet);
-        void HandleGuildRosterOpcode(WorldPackets::Guild::GuildGetRoster& packet);
-        void HandleGuildPromoteOpcode(WorldPackets::Guild::GuildPromoteMember& promote);
-        void HandleGuildDemoteOpcode(WorldPackets::Guild::GuildDemoteMember& demote);
-        void HandleGuildLeaveOpcode(WorldPackets::Guild::GuildLeave& leave);
+        void HandleGuildAcceptInvite(WorldPackets::Guild::AcceptGuildInvite& invite);
+        void HandleGuildDeclineInvitation(WorldPackets::Guild::GuildDeclineInvitation& decline);
+        void HandleGuildGetInfo(WorldPackets::Guild::GuildGetInfo& packet);
+        void HandleGuildEventLogQuery(WorldPackets::Guild::GuildEventLogQuery& packet);
+        void HandleGuildGetRoster(WorldPackets::Guild::GuildGetRoster& packet);
+        void HandleGuildPromoteMember(WorldPackets::Guild::GuildPromoteMember& promote);
+        void HandleGuildDemoteMember(WorldPackets::Guild::GuildDemoteMember& demote);
+        void HandleGuildLeave(WorldPackets::Guild::GuildLeave& leave);
         void HandleGuildDelete(WorldPackets::Guild::GuildDelete& packet);
         void HandleGuildSetGuildMaster(WorldPackets::Guild::GuildSetGuildMaster& packet);
         void HandleGuildUpdateMotdText(WorldPackets::Guild::GuildUpdateMotdText& packet);
-        void HandleGuildSetPublicNoteOpcode(WorldPackets::Guild::GuildSetMemberNote& packet);
-        void HandleGuildSetOfficerNoteOpcode(WorldPackets::Guild::GuildSetMemberNote& packet);
+        void HandleGuildSetPublicNote(WorldPackets::Guild::GuildSetMemberNote& packet);
+        void HandleGuildSetOfficerNote(WorldPackets::Guild::GuildSetMemberNote& packet);
         void HandleGuildSetRankPermissions(WorldPackets::Guild::GuildSetRankPermissions& packet);
-        void HandleGuildAddRankOpcode(WorldPackets::Guild::GuildAddRank& packet);
+        void HandleGuildAddRank(WorldPackets::Guild::GuildAddRank& packet);
         void HandleGuildDeleteRank(WorldPackets::Guild::GuildDeleteRank& packet);
         void HandleGuildUpdateInfoText(WorldPackets::Guild::GuildUpdateInfoText& packet);
-        void HandleSaveGuildEmblemOpcode(WorldPackets::Guild::SaveGuildEmblem& packet);
+        void HandleSaveGuildEmblem(WorldPackets::Guild::SaveGuildEmblem& packet);
 
         void HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvPacket);
         void HandleTaxiQueryAvailableNodes(WorldPacket& recvPacket);
@@ -961,7 +986,7 @@ class TC_GAME_API WorldSession
         void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
         void HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet);
         void HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpell& packet);
-        void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
+        void HandlePetitionShowList(WorldPackets::Petition::PetitionShowList& packet);
         void HandleGossipHelloOpcode(WorldPackets::NPC::Hello& packet);
         void HandleGossipSelectOptionOpcode(WorldPackets::NPC::GossipSelectOption& packet);
         void HandleSpiritHealerActivateOpcode(WorldPacket& recvPacket);
@@ -1035,7 +1060,7 @@ class TC_GAME_API WorldSession
         void HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet);
 
         void HandleUseItemOpcode(WorldPackets::Spells::UseItem& packet);
-        void HandleOpenItemOpcode(WorldPacket& recvPacket);
+        void HandleOpenItemOpcode(WorldPackets::Spells::OpenItem& packet);
         void HandleOpenWrappedItemCallback(uint16 pos, ObjectGuid itemGuid, PreparedQueryResult result);
         void HandleCastSpellOpcode(WorldPackets::Spells::CastSpell& castRequest);
         void HandleCancelCastOpcode(WorldPackets::Spells::CancelCast& cancelCast);
@@ -1053,14 +1078,14 @@ class TC_GAME_API WorldSession
         void HandleQuestgiverStatusQueryOpcode(WorldPackets::Quest::QuestGiverStatusQuery& packet);
         void HandleQuestgiverStatusMultipleQuery(WorldPackets::Quest::QuestGiverStatusMultipleQuery& packet);
         void HandleQuestgiverHelloOpcode(WorldPacket& recvPacket);
-        void HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvPacket);
+        void HandleQuestgiverAcceptQuestOpcode(WorldPackets::Quest::QuestGiverAcceptQuest& packet);
         void HandleQuestgiverQueryQuestOpcode(WorldPackets::Quest::QuestGiverQueryQuest& packet);
         void HandleQuestgiverChooseRewardOpcode(WorldPacket& recvPacket);
         void HandleQuestgiverRequestRewardOpcode(WorldPackets::Quest::QuestGiverRequestReward& packet);
         void HandleQuestQueryOpcode(WorldPackets::Quest::QueryQuestInfo& query);
         void HandleQuestgiverCancel(WorldPacket& recvData);
         void HandleQuestLogSwapQuest(WorldPacket& recvData);
-        void HandleQuestLogRemoveQuest(WorldPacket& recvData);
+        void HandleQuestLogRemoveQuest(WorldPackets::Quest::QuestLogRemoveQuest& packet);
         void HandleQuestConfirmAccept(WorldPacket& recvData);
         void HandleQuestgiverCompleteQuest(WorldPacket& recvData);
         void HandleQuestgiverQuestAutoLaunch(WorldPacket& recvPacket);
@@ -1149,7 +1174,7 @@ class TC_GAME_API WorldSession
         void HandleFarSightOpcode(WorldPacket& recvData);
         void HandleSetDungeonDifficultyOpcode(WorldPackets::Misc::SetDungeonDifficulty& setDungeonDifficulty);
         void HandleSetRaidDifficultyOpcode(WorldPackets::Misc::SetRaidDifficulty& setRaidDifficulty);
-        void HandleSetTitleOpcode(WorldPacket& recvData);
+        void HandleSetTitleOpcode(WorldPackets::Character::SetTitle& packet);
         void HandleRealmSplitOpcode(WorldPacket& recvData);
         void HandleTimeSyncResponse(WorldPackets::Misc::TimeSyncResponse& packet);
         void HandleWhoIsOpcode(WorldPackets::Who::WhoIsRequest& packet);

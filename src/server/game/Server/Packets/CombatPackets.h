@@ -166,7 +166,35 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            PackedGuid Guid;
+            ObjectGuid Guid;
+        };
+
+        class HealthUpdate final : public ServerPacket
+        {
+        public:
+            explicit HealthUpdate() : ServerPacket(SMSG_HEALTH_UPDATE, 8 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Guid;
+            int32 Health = 0;
+        };
+
+        struct PowerUpdatePower
+        {
+            int32 Power = 0;
+            uint8 PowerType = 0;
+        };
+
+        class PowerUpdate final : public ServerPacket
+        {
+        public:
+            explicit PowerUpdate() : ServerPacket(SMSG_POWER_UPDATE, 8 + 1 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Guid;
+            PowerUpdatePower Power;
         };
 
         class SetSheathed final : public ClientPacket

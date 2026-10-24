@@ -438,6 +438,60 @@ namespace WorldPackets
             ObjectGuid CasterGUID;
         };
 
+        class ClearCooldown final : public ServerPacket
+        {
+        public:
+            explicit ClearCooldown() : ServerPacket(SMSG_CLEAR_COOLDOWN, 4 + 8) { }
+
+            WorldPacket const* Write() override;
+
+            int32 SpellID = 0;
+            ObjectGuid CasterGUID;
+        };
+
+        class ModifyCooldown final : public ServerPacket
+        {
+        public:
+            explicit ModifyCooldown() : ServerPacket(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            int32 DeltaTime = 0;
+            ObjectGuid CasterGUID;
+            int32 SpellID = 0;
+        };
+
+        struct SpellCooldownStruct
+        {
+            SpellCooldownStruct() { }
+            SpellCooldownStruct(uint32 spellId, uint32 forcedCooldown) : SrecID(spellId), ForcedCooldown(forcedCooldown) { }
+
+            uint32 SrecID = 0;
+            uint32 ForcedCooldown = 0;
+        };
+
+        class TC_GAME_API SpellCooldown : public ServerPacket
+        {
+        public:
+            explicit SpellCooldown() : ServerPacket(SMSG_SPELL_COOLDOWN, 8 + 1 + 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<SpellCooldownStruct> SpellCooldowns;
+            ObjectGuid Caster;
+            uint8 Flags = 0;
+        };
+
+        class ClearTarget final : public ServerPacket
+        {
+        public:
+            explicit ClearTarget() : ServerPacket(SMSG_CLEAR_TARGET, 8) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Guid;
+        };
+
         class PlaySpellVisualKit final : public ServerPacket
         {
         public:
@@ -458,6 +512,17 @@ namespace WorldPackets
 
             uint8 CastID = 0;
             uint32 SpellID = 0;
+        };
+
+        class OpenItem final : public ClientPacket
+        {
+        public:
+            explicit OpenItem(WorldPacket&& packet) : ClientPacket(CMSG_OPEN_ITEM, std::move(packet)) { }
+
+            void Read() override;
+
+            uint8 Slot = 0;
+            uint8 PackSlot = 0;
         };
 
         struct ResyncRune

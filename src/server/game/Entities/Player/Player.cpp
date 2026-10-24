@@ -10170,13 +10170,13 @@ bool Player::HasItemTotemCategory(uint32 TotemCategory) const
     for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
         pItem = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && IsTotemCategoryCompatiableWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
+        if (pItem && IsTotemCategoryCompatibleWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
             return true;
     }
     for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
     {
         pItem = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && IsTotemCategoryCompatiableWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
+        if (pItem && IsTotemCategoryCompatibleWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
             return true;
     }
     for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -10186,7 +10186,7 @@ bool Player::HasItemTotemCategory(uint32 TotemCategory) const
             for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
                 pItem = GetUseableItemByPos(i, j);
-                if (pItem && IsTotemCategoryCompatiableWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
+                if (pItem && IsTotemCategoryCompatibleWith(pItem->GetTemplate()->GetTotemCategory(), TotemCategory))
                     return true;
             }
         }
@@ -12003,9 +12003,12 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
                     m_weaponChangeTimer = spellProto->StartRecoveryTime;
 
                     GetSpellHistory()->AddGlobalCooldown(spellProto, m_weaponChangeTimer);
-                    WorldPacket data;
-                    GetSpellHistory()->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, cooldownSpell, 0);
-                    SendDirectMessage(&data);
+
+                    WorldPackets::Spells::SpellCooldown spellCooldown;
+                    spellCooldown.Caster = GetGUID();
+                    spellCooldown.Flags = SPELL_COOLDOWN_FLAG_INCLUDE_GCD;
+                    spellCooldown.SpellCooldowns.emplace_back(cooldownSpell, 0);
+                    SendDirectMessage(spellCooldown.Write());
                 }
             }
         }
@@ -13292,15 +13295,13 @@ void Player::SendBuyError(BuyResult msg, Creature const* creature, uint32 vendor
     SendDirectMessage(packet.Write());
 }
 
-void Player::SendSellError(SellResult msg, Creature const* creature, ObjectGuid guid, uint32 param) const
+void Player::SendSellError(SellResult msg, Creature const* creature, ObjectGuid guid) const
 {
-    WorldPacket data(SMSG_SELL_ITEM, (8+8+(4)+1));  // last check 2.0.10
-    data << (creature ? creature->GetGUID() : ObjectGuid::Empty);
-    data << guid;
-    if (param > 0)
-        data << uint32(param);
-    data << uint8(msg);
-    SendDirectMessage(&data);
+    WorldPackets::Item::SellResponse sellResponse;
+    sellResponse.VendorGUID = creature ? creature->GetGUID() : ObjectGuid::Empty;
+    sellResponse.ItemGUID = guid;
+    sellResponse.Reason = msg;
+    SendDirectMessage(sellResponse.Write());
 }
 
 bool Player::IsUseEquipedWeapon(bool mainhand) const
@@ -20270,16 +20271,13 @@ void Player::SendAttackSwingBadFacingAttack() const
 void Player::SendAutoRepeatCancel(Unit* target)
 {
     WorldPackets::Combat::CancelAutoRepeat cancelAutoRepeat;
-    cancelAutoRepeat.Guid = target->GetPackGUID();      // may be it's target guid
+    cancelAutoRepeat.Guid = target->GetGUID();          // may be it's target guid
     SendMessageToSet(cancelAutoRepeat.Write(), true);
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
 {
-    WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
-    data << uint32(Area);
-    data << uint32(Experience);
-    SendDirectMessage(&data);
+    SendDirectMessage(WorldPackets::Misc::ExplorationExperience(Experience, Area).Write());
 }
 
 void Player::SendDungeonDifficulty(bool changeCurrentDifficuly, bool changeGroupDifficuly) const
@@ -26483,7 +26481,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     Map* map = GetMap();
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
-    if (!pet->Create(map->GenerateLowGuid<HighGuid::Pet>(), map, GetPhaseMask(), entry, pet_number))
+    if (!pet->Create(map->GenerateLowGuid<HighGuid::Pet>(), map, entry, pet_number))
     {
         TC_LOG_ERROR("misc", "Player::SummonPet: No such creature entry {}", entry);
         delete pet;
@@ -26492,6 +26490,8 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     if (petType == SUMMON_PET && petStable.CurrentPet)
         RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
+
+    pet->CopyPhaseFrom(this);
 
     pet->SetCreatorGUID(GetGUID());
     pet->SetFaction(GetFaction());
@@ -26662,11 +26662,11 @@ void Player::RemoveRestFlag(RestFlag restFlag)
     }
 }
 
-uint32 Player::DoRandomRoll(uint32 minimum, uint32 maximum)
+int32 Player::DoRandomRoll(int32 minimum, int32 maximum)
 {
-    ASSERT(maximum <= 10000);
+    ASSERT(maximum <= 1000000);
 
-    uint32 roll = urand(minimum, maximum);
+    int32 roll = irand(minimum, maximum);
 
     WorldPackets::Misc::RandomRoll randomRoll;
     randomRoll.Min = minimum;

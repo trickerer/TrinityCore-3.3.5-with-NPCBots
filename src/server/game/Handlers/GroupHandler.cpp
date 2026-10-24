@@ -512,16 +512,12 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
 {
-    uint32 minimum, maximum;
-    minimum = packet.Min;
-    maximum = packet.Max;
-
     /** error handling **/
-    if (minimum > maximum || maximum > 10000)                // < 32768 for urand call
+    if (packet.Min > packet.Max || packet.Max > 1000000)
         return;
     /********************/
 
-    GetPlayer()->DoRandomRoll(minimum, maximum);
+    GetPlayer()->DoRandomRoll(packet.Min, packet.Max);
 }
 
 void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
@@ -563,7 +559,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket & /*recvData*/)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_RAID_CONVERT");
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_CONVERT_RAID");
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -583,7 +579,7 @@ void WorldSession::HandleGroupRaidConvertOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_CHANGE_SUB_GROUP");
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_CHANGE_SUB_GROUP");
 
     // we will get correct pointer for group here, so we don't have to check if group is BG raid
     Group* group = GetPlayer()->GetGroup();
@@ -630,7 +626,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
 {
-    TC_LOG_DEBUG("network", "WORLD: Received CMSG_GROUP_ASSISTANT_LEADER");
+    TC_LOG_DEBUG("network", "WORLD: Received CMSG_SET_ASSISTANT_LEADER");
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)

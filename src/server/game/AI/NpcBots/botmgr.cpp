@@ -1898,7 +1898,7 @@ void BotMgr::OnBotSpellInterrupt(Unit const* caster, CurrentSpellTypes spellType
     if (spellType == CURRENT_AUTOREPEAT_SPELL)
     {
         WorldPackets::Combat::CancelAutoRepeat cancelAutoRepeat;
-        cancelAutoRepeat.Guid = caster->GetPackGUID();
+        cancelAutoRepeat.Guid = caster->GetGUID();
         caster->SendMessageToSet(cancelAutoRepeat.Write(), true);
     }
 }

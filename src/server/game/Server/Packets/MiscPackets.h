@@ -378,6 +378,18 @@ namespace WorldPackets
             uint32 Timer = 0;
         };
 
+        class ExplorationExperience final : public ServerPacket
+        {
+        public:
+            explicit ExplorationExperience() : ServerPacket(SMSG_EXPLORATION_EXPERIENCE, 8) { }
+            explicit ExplorationExperience(int32 experience, int32 areaID) : ServerPacket(SMSG_EXPLORATION_EXPERIENCE, 8), Experience(experience), AreaID(areaID) { }
+
+            WorldPacket const* Write() override;
+
+            int32 Experience = 0;
+            int32 AreaID = 0;
+        };
+
         class LevelUpInfo final : public ServerPacket
         {
         public:
@@ -409,8 +421,8 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint32 Min = 0;
-            uint32 Max = 0;
+            int32 Min = 0;
+            int32 Max = 0;
         };
 
         class RandomRoll final : public ServerPacket
@@ -420,9 +432,9 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            uint32 Min = 0;
-            uint32 Max = 0;
-            uint32 Result = 0;
+            int32 Min = 0;
+            int32 Max = 0;
+            int32 Result = 0;
             ObjectGuid Roller;
         };
 

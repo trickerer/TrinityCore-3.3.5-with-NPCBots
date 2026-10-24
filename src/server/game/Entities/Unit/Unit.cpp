@@ -9945,11 +9945,11 @@ void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, b
 
     if (withPowerUpdate)
     {
-        WorldPacket data(SMSG_POWER_UPDATE, 8 + 1 + 4);
-        data << GetPackGUID();
-        data << uint8(power);
-        data << uint32(val);
-        SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER);
+        WorldPackets::Combat::PowerUpdate packet;
+        packet.Guid = GetGUID();
+        packet.Power.PowerType = power;
+        packet.Power.Power = val;
+        SendMessageToSet(packet.Write(), GetTypeId() == TYPEID_PLAYER);
     }
 
     // group update
@@ -11538,6 +11538,8 @@ bool Unit::InitTamedPet(Pet* pet, uint8 level, uint32 spell_id)
         TC_LOG_ERROR("entities.unit", "Pet::InitStatsForLevel() failed for creature (Entry: {})!", pet->GetEntry());
         return false;
     }
+
+    pet->CopyPhaseFrom(this);
 
     pet->GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
     // this enables pet details window (Shift+P)

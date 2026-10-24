@@ -294,7 +294,7 @@ enum MoneyConstants
     GOLD   = SILVER*100
 };
 
-enum Stats
+enum Stats : uint16
 {
     STAT_STRENGTH                      = 0,
     STAT_AGILITY                       = 1,
@@ -321,7 +321,7 @@ enum Powers : int8
 #define MAX_RUNES 6
 
 // EnumUtils: DESCRIBE THIS
-enum SpellSchools
+enum SpellSchools : uint16
 {
     SPELL_SCHOOL_NORMAL                 = 0, // TITLE Physical
     SPELL_SCHOOL_HOLY                   = 1, // TITLE Holy
@@ -1649,7 +1649,7 @@ enum SpellPreventionType
     SPELL_PREVENTION_TYPE_PACIFY    = 2  // TITLE Pacify
 };
 
-enum GameobjectTypes
+enum GameobjectTypes : uint8
 {
     GAMEOBJECT_TYPE_DOOR                        = 0,
     GAMEOBJECT_TYPE_BUTTON                      = 1,
@@ -3586,7 +3586,7 @@ enum BanReturn
     BAN_EXISTS
 };
 
-enum PvPTeamId
+enum PvPTeamId : uint8
 {
     PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
     PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
