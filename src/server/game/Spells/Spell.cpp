@@ -2424,9 +2424,26 @@ void Spell::AddDestTarget(SpellDestination const& dest, uint32 effIndex)
     m_destTargets[effIndex] = dest;
 }
 
+int32 Spell::GetUnitTargetIndexForEffect(ObjectGuid const& target, SpellEffIndex effect) const
+{
+    int32 index = 0;
+    for (TargetInfo const& uniqueTargetInfo : m_UniqueTargetInfo)
+    {
+        if (uniqueTargetInfo.MissCondition == SPELL_MISS_NONE && uniqueTargetInfo.EffectMask & (1 << effect))
+        {
+            if (uniqueTargetInfo.TargetGUID == target)
+                return index;
+
+            ++index;
+        }
+    }
+
+    return -1;
+}
+
 int64 Spell::GetUnitTargetCountForEffect(SpellEffIndex effect) const
 {
-    return std::count_if(m_UniqueTargetInfo.begin(), m_UniqueTargetInfo.end(), [effect](TargetInfo const& targetInfo)
+    return std::ranges::count_if(m_UniqueTargetInfo, [effect](TargetInfo const& targetInfo)
     {
         return targetInfo.EffectMask & (1 << effect);
     });
@@ -2434,7 +2451,7 @@ int64 Spell::GetUnitTargetCountForEffect(SpellEffIndex effect) const
 
 int64 Spell::GetGameObjectTargetCountForEffect(SpellEffIndex effect) const
 {
-    return std::count_if(m_UniqueGOTargetInfo.begin(), m_UniqueGOTargetInfo.end(), [effect](GOTargetInfo const& targetInfo)
+    return std::ranges::count_if(m_UniqueGOTargetInfo, [effect](GOTargetInfo const& targetInfo)
     {
         return targetInfo.EffectMask & (1 << effect);
     });
@@ -2442,7 +2459,7 @@ int64 Spell::GetGameObjectTargetCountForEffect(SpellEffIndex effect) const
 
 int64 Spell::GetItemTargetCountForEffect(SpellEffIndex effect) const
 {
-    return std::count_if(m_UniqueItemInfo.begin(), m_UniqueItemInfo.end(), [effect](ItemTargetInfo const& targetInfo)
+    return std::ranges::count_if(m_UniqueItemInfo, [effect](ItemTargetInfo const& targetInfo)
     {
         return targetInfo.EffectMask & (1 << effect);
     });
@@ -8066,16 +8083,18 @@ void Spell::DoEffectOnLaunchTarget(TargetInfo& targetInfo, float multiplier, Spe
 
     if (m_originalCaster && m_damage > 0)
     {
-        if (spellEffectInfo.IsTargetingArea() || spellEffectInfo.IsAreaAuraEffect() || spellEffectInfo.IsEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
+        bool isAoeTarget = spellEffectInfo.IsTargetingArea() || spellEffectInfo.IsAreaAuraEffect() || spellEffectInfo.IsEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA);
+        if (isAoeTarget)
         {
             m_damage = unit->CalculateAOEAvoidance(m_damage, m_spellInfo->SchoolMask, m_originalCaster->GetGUID());
 
             if (m_originalCaster->GetTypeId() == TYPEID_PLAYER)
             {
+                int64 targetCount = GetUnitTargetCountForEffect(spellEffectInfo.EffectIndex);
+
                 // cap damage of player AOE
-                int64 targetAmount = GetUnitTargetCountForEffect(spellEffectInfo.EffectIndex);
-                if (targetAmount > 10)
-                    m_damage = m_damage * 10 / targetAmount;
+                if (targetCount > AOE_DAMAGE_TARGET_CAP)
+                    m_damage = m_damage * AOE_DAMAGE_TARGET_CAP / targetCount;
             }
         }
     }
